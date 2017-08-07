@@ -85,8 +85,8 @@
     Me.trkGreen.Anchor = System.Windows.Forms.AnchorStyles.Bottom
     Me.trkGreen.AutoSize = False
     Me.trkGreen.Location = New System.Drawing.Point(493, 513)
-    Me.trkGreen.Maximum = 100
-    Me.trkGreen.Minimum = -100
+    Me.trkGreen.Maximum = 99
+    Me.trkGreen.Minimum = -99
     Me.trkGreen.Name = "trkGreen"
     Me.trkGreen.Size = New System.Drawing.Size(210, 22)
     Me.trkGreen.TabIndex = 14
@@ -99,8 +99,8 @@
     Me.trkRed.Anchor = System.Windows.Forms.AnchorStyles.Bottom
     Me.trkRed.AutoSize = False
     Me.trkRed.Location = New System.Drawing.Point(493, 482)
-    Me.trkRed.Maximum = 100
-    Me.trkRed.Minimum = -100
+    Me.trkRed.Maximum = 99
+    Me.trkRed.Minimum = -99
     Me.trkRed.Name = "trkRed"
     Me.trkRed.Size = New System.Drawing.Size(210, 22)
     Me.trkRed.TabIndex = 11
@@ -137,42 +137,45 @@
     '
     Me.nmRed.Anchor = System.Windows.Forms.AnchorStyles.Bottom
     Me.nmRed.Location = New System.Drawing.Point(709, 480)
-    Me.nmRed.Minimum = New Decimal(New Integer() {100, 0, 0, -2147483648})
+    Me.nmRed.Maximum = New Decimal(New Integer() {99, 0, 0, 0})
+    Me.nmRed.Minimum = New Decimal(New Integer() {99, 0, 0, -2147483648})
     Me.nmRed.Name = "nmRed"
     Me.nmRed.Size = New System.Drawing.Size(58, 25)
     Me.nmRed.TabIndex = 12
     Me.ToolTip1.SetToolTip(Me.nmRed, "Red change, -100 to 100")
-    Me.nmRed.Value = New Decimal(New Integer() {100, 0, 0, -2147483648})
+    Me.nmRed.Value = New Decimal(New Integer() {99, 0, 0, -2147483648})
     '
     'nmGreen
     '
     Me.nmGreen.Anchor = System.Windows.Forms.AnchorStyles.Bottom
     Me.nmGreen.Location = New System.Drawing.Point(709, 511)
-    Me.nmGreen.Minimum = New Decimal(New Integer() {100, 0, 0, -2147483648})
+    Me.nmGreen.Maximum = New Decimal(New Integer() {99, 0, 0, 0})
+    Me.nmGreen.Minimum = New Decimal(New Integer() {99, 0, 0, -2147483648})
     Me.nmGreen.Name = "nmGreen"
     Me.nmGreen.Size = New System.Drawing.Size(58, 25)
     Me.nmGreen.TabIndex = 15
     Me.ToolTip1.SetToolTip(Me.nmGreen, "Green change, -100 to 100")
-    Me.nmGreen.Value = New Decimal(New Integer() {100, 0, 0, -2147483648})
+    Me.nmGreen.Value = New Decimal(New Integer() {99, 0, 0, -2147483648})
     '
     'nmBlue
     '
     Me.nmBlue.Anchor = System.Windows.Forms.AnchorStyles.Bottom
     Me.nmBlue.Location = New System.Drawing.Point(709, 542)
-    Me.nmBlue.Minimum = New Decimal(New Integer() {100, 0, 0, -2147483648})
+    Me.nmBlue.Maximum = New Decimal(New Integer() {99, 0, 0, 0})
+    Me.nmBlue.Minimum = New Decimal(New Integer() {99, 0, 0, -2147483648})
     Me.nmBlue.Name = "nmBlue"
     Me.nmBlue.Size = New System.Drawing.Size(58, 25)
     Me.nmBlue.TabIndex = 18
     Me.ToolTip1.SetToolTip(Me.nmBlue, "Blue change, -100 to 100")
-    Me.nmBlue.Value = New Decimal(New Integer() {100, 0, 0, -2147483648})
+    Me.nmBlue.Value = New Decimal(New Integer() {99, 0, 0, -2147483648})
     '
     'trkBlue
     '
     Me.trkBlue.Anchor = System.Windows.Forms.AnchorStyles.Bottom
     Me.trkBlue.AutoSize = False
     Me.trkBlue.Location = New System.Drawing.Point(493, 544)
-    Me.trkBlue.Maximum = 100
-    Me.trkBlue.Minimum = -100
+    Me.trkBlue.Maximum = 99
+    Me.trkBlue.Minimum = -99
     Me.trkBlue.Name = "trkBlue"
     Me.trkBlue.Size = New System.Drawing.Size(210, 22)
     Me.trkBlue.TabIndex = 17

@@ -3737,31 +3737,27 @@ Public Module main
   Public Sub batchAdjust(ByRef gBitmap As Bitmap, pView As pViewer)
     ' runs the batch color conversions on gBitmap
     ' this is called by frmColorBatchAdjust and frmConvert
-    Dim iRed, iGreen, iBlue As Integer
-    Dim x As Double
+    Dim gammaRed, gammaGreen, gammaBlue As Integer
 
     Using img As New MagickImage(gBitmap)
 
       If clrValue(6) <> 0 Then ' autoadjust only
         img.Normalize()
       Else ' change specific stuff
-        iRed = clrValue(3) + 100
-        iGreen = clrValue(4) + 100
-        iBlue = clrValue(5) + 100
-        If clrValue(7) <> 0 Then ' normalize intensity
-          If iRed + iGreen + iBlue > 0 Then
-            x = 300 / (iRed + iGreen + iBlue)
-            iRed *= x
-            iGreen *= x
-            iBlue *= x
-          End If
-        End If
+        gammaRed = (clrValue(3) / 100 + 1) ^ 3 ' gamma value for img.level function
+        gammaGreen = (clrValue(4) / 100 + 1) ^ 3
+        gammaBlue = (clrValue(5) / 100 + 1) ^ 3
+
         Try
           img.BackgroundColor = Color.White
-          img.Tint(iRed & "," & iGreen & "," & iBlue)
+          img.Level(New Percentage(0), New Percentage(100), gammaRed, Channels.Red)
+          img.Level(New Percentage(0), New Percentage(100), gammaGreen, Channels.Green)
+          img.Level(New Percentage(0), New Percentage(100), gammaBlue, Channels.Blue)
+
         Catch ex As Exception
           MsgBox(ex.Message)
         End Try
+
       End If
 
       Using b1 As New Bitmap(img.ToBitmap)
