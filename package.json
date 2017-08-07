@@ -1,0 +1,18 @@
+{
+  "name": "photomud",
+  "version": "1.0.0",
+  "description": "",
+  "main": "bin/Photo Mud.exe",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/xpda/PhotoMud"
+  },
+  "keywords": [],
+  "author": "Bob Webster",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/xpda/PhotoMud/issues"
+  },
+  "homepage": "https://xpda.com/photomud/",
+  "private": true
+}
