@@ -1,0 +1,99 @@
+April 1, 1922
+Birthday of Alan Jay Perlis, 1966 Turing Award winner, for advanced programming techniques and compiler construction.
+June 26, 1913
+Birthday of Maurice V. Wilkes, 1967 Turing Award winner, as builder and designer of the EDSAC, the first computer with an internally stored program.
+February 11, 1915
+Birthday of Richard Hamming, 1968 Turing Award winner, for numerical methods, automatic coding systems, and error detecting and correcting codes.
+August 9, 1927
+Birthday of Marvin Minsky, 1969 Turing Award winner, for artificial intelligence.
+27 September 1919
+Birthday of James H. Wilkinson, 1970 Turing Award winner, for numerical analysis, linear algebra and "backward" error analysis.
+September 4, 1927
+Birthday of John McCarthy, 1971 Turing Award winner, for artificial intelligence.
+May 11, 1930 
+Edsger W. Dijkstra, 1972 Turing Award winner, for ALGOL and programming languages, and structured programming.
+Dec 11, 1924
+Birthday of Charles W. Bachman, 1973 Turing Award winner, for database technology.
+January 10, 1938
+Birthday of Donald E. Knuth, 1974 Turing Award winner, for analysis of algorithms, programming language design, and "The Art of Computer Programming."
+March 19, 1927
+Birthday of Allen Newell, 1975 Turing Award winner, for artificial intelligence, the psychology of human cognition, and list processing.
+June 15, 1916
+Birthday of Herbert A. Simon, 1975 Turing Award winner, for artificial intelligence, the psychology of human cognition, and list processing.
+September 1, 1931 
+Michael O. Rabin, 1976 Turing Award winner, for "Finite Automata and Their Decision Problem" and nondeterministic machines.
+December 3, 1924
+Birthday of John Backus, 1977 Turing Award winner, for design of practical high-level programming systems.
+June 8, 1936
+Birthday of Robert W. Floyd, 1978 Turing Award winner, for the theory of parsing and semantics, program synthesis and verification, and analysis of algorithms.
+17 December 1920
+Birthday of Kenneth E. Iverson, 1979 Turing Award winner, for programming languages and and APL.
+11 January 1934
+Birthday of C. Antony R. Hoare, 1980 Turing Award winner, for definition and design of programming languages.
+August 23, 1923
+Birthday of Edgar F. Codd, 1981 Turing Award winner, for theory and practice of relational databases.
+December 14, 1939
+Birthday of Stephen A. Cook, 1982 Turing Award winner, for work in complexity of computation.
+February 4, 1943
+Birthday of Ken Thompson, 1983 Turing Award winner, for generic operating systems theory and the implementation of Unix.
+September 9, 1941
+Birthday of Dennis M. Ritchie, 1983 Turing Award winner, for generic operating systems theory and the implementation of Unix.
+February 15, 1934
+Birthday of Niklaus Wirth, 1984 Turing Award winner, for developing programming languages, including Euler, Algol-W, Modula, and Pascal.
+October 7, 1939
+Birthday of John Hopcroft, 1986 Turing Award winner, for design and analysis of algorithms and data structures.
+April 30, 1948
+Birthday of Robert Tarjan, 1986 Turing Award winner, for design and analysis of algorithms and data structures.
+May 30, 1925
+Birthday of John Cocke, 1987 Turing Award winner, for compiler design and theory, and RISC architecture.
+May 22, 1938 
+Ivan Sutherland, 1988 Turing Award winner, for computer graphics.
+June 5, 1933
+Birthday of William (Velvel) Kahan, 1989 Turing Award winner, for numerical analysis and floating-point computations.
+July 1, 1926 
+Fernando J. Corbató, 1990 Turing Award winner, for design and development of the large-scale, time-sharing systems CTSS and Multics.
+13 January 1934
+Birthday of Robin Milner, 1991 Turing Award winner, for LCF, machine assisted proof construction; ML language; and CCS, a general theory of concurrency.
+23 December 1943
+Birthday of Butler W. Lampson, 1992 Turing Award winner, for distributed, personal computing environments and the technology for their implementation.
+July 5, 1928 
+Juris Hartmanis 1993 Turing Award winner, for computational complexity theory.
+July 5, 1936
+Birthday of Richard E. Stearns, 1993 Turing Award winner, for computational complexity theory.
+January 20, 1936
+Birthday of Edward Feigenbaum, 1994 Turing Award winner, for design and construction of large scale artificial intelligence systems.
+June 13, 1937
+Birthday of Raj Reddy, 1994 Turing Award winner, for design and construction of large scale artificial intelligence systems.
+26 April 1938 
+Manuel Blum, 1995 Turing Award winner, for computational complexity theory, cryptography, and program checking.
+April 22, 1941
+Birthday of Amir Pnueli, 1996 Turing Award winner, for temporal logic in computing science and systems verification.
+January 30, 1925
+Birthday of Douglas Engelbart, 1997 Turing Award winner, for work in interactive computing.
+Jan 12 1944
+Birthday of Jim Gray, 1998 Turing Award winner, for database and transaction processing research.
+April 19, 1931
+Frederick P. Brooks, Jr., 1999 Turing Award winner, for computer architecture, operating systems, and software engineering.
+October 12, 1931
+Birthday of Ole-Johan Dahl 2001 Turing Award winner, for object-oriented programming, through Simula I and Simula 67.
+August 27, 1926
+Birthday of Kristen Nygaard, 2001 Turing Award winner, for object-oriented programming, through Simula I and Simula 67.
+May 6, 1947
+Birthday of Ronald L. Rivest, 2002 Turing Award winner, for public-key cryptography.
+December 31, 1945
+Birthday of Leonard M. Adleman, 2002 Turing Award winner, for public-key cryptography.
+May 17, 1940
+Birthday of Alan Kay, 2003 Turing Award winner, for object-oriented programming languages, Smalltalk, and fundamental contributions.
+June 23, 1943
+Birthday of Vinton G. Cerf, 2004 Turing Award winner, for networking and the design and implementation of TCP/IP.
+December 23, 1938
+Birthday of Robert E. Kahn, 2004 Turing Award winner, for networking and the design and implementation of TCP/IP.
+October 25, 1928
+Birthday of Peter Naur, 2005 Turing Award winner, for programming language and compiler design, ALGOL 60, and the art and practice of computer programming.
+1932
+Birthday of Frances E. Allen, 2006 Turing Award winner, for optimizing compiler techniques and automatic parallel execution.
+July 27, 1945
+Birthday of Edmund M. Clarke, 2007 Turing Award winner, for model-checking.
+December 26, 1946
+Birthday of Joseph Sifakis, 2007 Turing Award winner, for model-checking.
+

@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "ph", "ph.vbproj", "{C7DA7FD8-9450-4863-B26B-330D8693E5B0}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "Photo Mud Loader", "Photo Mud Loader\Photo Mud Loader.vbproj", "{6912561C-74C3-4C49-91FC-B820D398F1CA}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Photo Mud Install", "install\photomud install.vdproj", "{1A4FB375-720D-45CE-9083-2703831B9ADB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C7DA7FD8-9450-4863-B26B-330D8693E5B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C7DA7FD8-9450-4863-B26B-330D8693E5B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C7DA7FD8-9450-4863-B26B-330D8693E5B0}.Debug|x64.ActiveCfg = Debug|x64
+		{C7DA7FD8-9450-4863-B26B-330D8693E5B0}.Debug|x64.Build.0 = Debug|x64
+		{C7DA7FD8-9450-4863-B26B-330D8693E5B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C7DA7FD8-9450-4863-B26B-330D8693E5B0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C7DA7FD8-9450-4863-B26B-330D8693E5B0}.Release|x64.ActiveCfg = Release|x64
+		{C7DA7FD8-9450-4863-B26B-330D8693E5B0}.Release|x64.Build.0 = Release|x64
+		{6912561C-74C3-4C49-91FC-B820D398F1CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6912561C-74C3-4C49-91FC-B820D398F1CA}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{6912561C-74C3-4C49-91FC-B820D398F1CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6912561C-74C3-4C49-91FC-B820D398F1CA}.Release|x64.ActiveCfg = Release|Any CPU
+		{1A4FB375-720D-45CE-9083-2703831B9ADB}.Debug|Any CPU.ActiveCfg = Debug
+		{1A4FB375-720D-45CE-9083-2703831B9ADB}.Debug|x64.ActiveCfg = Debug
+		{1A4FB375-720D-45CE-9083-2703831B9ADB}.Debug|x64.Build.0 = Debug
+		{1A4FB375-720D-45CE-9083-2703831B9ADB}.Release|Any CPU.ActiveCfg = Release
+		{1A4FB375-720D-45CE-9083-2703831B9ADB}.Release|Any CPU.Build.0 = Release
+		{1A4FB375-720D-45CE-9083-2703831B9ADB}.Release|x64.ActiveCfg = Release
+		{1A4FB375-720D-45CE-9083-2703831B9ADB}.Release|x64.Build.0 = Release
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

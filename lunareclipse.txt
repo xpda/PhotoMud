@@ -1,0 +1,54 @@
+2001 Jan 09 ' Total, E Americas, Europe, Africa, Asia
+2001 Dec 30 ' Penumbral, E Asia, Aus., Pacific, Americas
+2002 May 26 ' Penumbral, E Asia, Aus., Pacific, W Americas
+2002 Jun 24 ' Penumbral, S. America, Europe, Africa, C  Asia, Aus.
+2002 Nov 20 ' Penumbral, Americas, Europe, Africa, E Asia
+2003 May 16 ' Total, C Pacific, Americas, Europe, Africa
+2003 Nov 09 ' Total, Americas, Europe, Africa, C  Asia
+2004 May 04 ' Total, S. America, Europe, Africa, Asia, Aus.
+2004 Oct 28 ' Total, Americas, Europe, Africa, C  Asia
+2005 Apr 24 ' Penumbral, E Asia, Aus., Pacific, Americas
+2006 Mar 14 ' Penumbral, Americas, Europe, Africa, Asia
+2007 Mar 03 ' Total, Americas, Europe, Africa, Asia
+2007 Aug 28 ' Total, E Asia, Aus., Pacific, Americas
+2008 Feb 21 ' Total, C Pacific, Americas, Europe, Africa
+2009 Feb 09 ' Penumbral, E Europe, Asia, Aus., Pacific, W N.A.
+2009 Jul 07 ' Penumbral, Aus., Pacific, Americas
+2009 Aug 06 ' Penumbral, Americas, Europe, Africa, W Asia
+2010 Dec 21 ' Total, E Asia, Aus., Pacific, Americas, Europe
+2011 Jun 15 ' Total, S.America, Europe, Africa, Asia, Aus.
+2011 Dec 10 ' Total, Europe, E Africa, Asia, Aus., Pacific, N.A.
+2012 Nov 28 ' Penumbral, Europe, E Africa, Asia, Aus., Pacific, N.A.
+2013 May 25 ' Penumbral, Americas, Africa
+2013 Oct 18 ' Penumbral, Americas, Europe, Africa, Asia
+2014 Apr 15 ' Total, Aus., Pacific, Americas
+2014 Oct 08 ' Total, Asia, Aus., Pacific, Americas
+2015 Apr 04 ' Total, Asia, Aus., Pacific, Americas
+2015 Sep 28 ' Total, E Pacific, Americas, Europe, Africa, W Asia
+2016 Mar 23 ' Penumbral, Asia, Aus., Pacific, W Americas
+2016 Aug 18 ' Penumbral, Aus., Pacific, Americas
+2016 Sep 16 ' Penumbral, Europe, Africa, Asia, Aus., W Pacific
+2017 Feb 11 ' Penumbral, Americas, Europe, Africa, Asia
+2018 Jan 31 ' Total, Asia, Aus., Pacific, W N.America
+2018 Jul 27 ' Total, S.America, Europe, Africa, Asia, Aus.
+2019 Jan 21 ' Total, C Pacific, Americas, Europe, Africa
+2020 Jan 10 ' Penumbral, Europe, Africa, Asia, Aus.
+2020 Jun 05 ' Penumbral, Europe, Africa, Asia, Aus.
+2020 Jul 05 ' Penumbral, Americas, sw Europe, Africa
+2020 Nov 30 ' Penumbral, Asia, Aus., Pacific, Americas
+2021 May 26 ' Total, E Asia, Australia, Pacific, Americas
+2022 May 16 ' Total, Americas, Europe, Africa
+2022 Nov 08 ' Total, Asia, Australia, Pacific, Americas
+2023 May 05 ' Penumbral, Africa, Asia, Australia
+2024 Mar 25 ' Penumbral, Americas
+2025 Mar 14 ' Total, Pacific, Americas, W Europe, W Africa
+2025 Sep 07 ' Total, Europe, Africa, Asia, Australia
+2026 Mar 03 ' Total, E Asia, Australia, Pacific, Americas
+2027 Feb 20 ' Penumbral, Americas, Europe, Africa, Asia
+2027 Jul 18 ' Penumbral, E Africa, Asia, Australia, Pacific
+2027 Aug 17 ' Penumbral, Pacific, Americas
+2028 Dec 31 ' Total, Europe, Africa, Asia, Australia, Pacific
+2029 Jun 26 ' Total, Americas, Europe, Africa, Mid East
+2029 Dec 20 ' Total, Americas, Europe, Africa, Asia
+2030 Dec 09 ' Penumbral, Americas, Europe, Africa, Asia' 
+

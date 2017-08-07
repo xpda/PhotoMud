@@ -1,0 +1,62 @@
+The Photo Mud Explorer browses through images in the folder, and the Photo Mud Editor is used for editing an image. To edit the current image in Photo Mud Explorer, press Enter or click on the Open button on the toolbar.
+
+You can view and image on the full screen using Ctrl-M or the full-screen button on the toolbar. In full screen view, you can press Page-Up or Page-Down to browse through images in the current folder.
+
+The check boxes in Photo Mud Explorer can be used to tag images for printing, emailing, conversions, and other multi-image operations. 
+
+It's easy to make a photo web page. Just select "Make Thumbnail Web Page" under the Tools menu of Photo Mud Explorer.
+
+In Photo Mud Explorer you can choose to view file Details, List, or Thumbnails, under the View menu.
+
+You can tag all the images in a folder using Ctrl-A (select all), then Ctrl-T (tag selected).
+
+A quick way to get help on a command is to highlight the command in the menu, and press F1.
+
+In Photo Mud Explorer you can move images from one folder to another by dragging the images at the bottoms of the screen to the folder on the left. To copy instead of move the images, hold down the Ctrl key.
+
+You can display detailed information about an image using the "Image Information" under the Tools menu, or by pressing Ctrl-I.
+
+To print more than one image at once, tag the images you want to print and use "Print Tagged Images" under the File menu.
+
+In Photo Mud Explorer it is convenient to rotate an image left or right 90 degrees with Ctrl-L and Ctrl-R. The image is automatically saved in the new orientation.
+
+You can enter comments into an image file using "Enter File Comments" under the Tools menu. You can use the arrow buttons to browse files in a folder and enter comments as you go.
+
+You can search photos based on their internal comments and create a web page out of the matching photos. Use Image Search and then Make Thumbnail Web Page under the Tools menu of Photo Mud Explorer.
+
+Online registration and purchasing is available through the Help menu.
+
+Photo Mud can search a folder or hard drive for duplicate images. Use "Search for Duplicates" under the Tools menu.
+
+You can usually improve the color of a hazy photograph by expanding midtones in the "Histogram Color Adjustment" under the Color menu of Photo Mud Editor.
+
+When cropping an image, you can hold down the shift key as you drag the box to view the cropped area.
+
+You can view a group of tagged images using the "Slidehow" command under the Tools menu of Photo Mud Explorer. Additional slidehow options can be set in "Options" under the Tools menu.
+
+You can use Stretch Paste to paste a person or object into another image. First select the object to be pasted, copy it to the clipboard, and then use "Stretch Paste" under the Edit menu to paste it into the new image.
+
+To email more than one image at once, tag the images you want to send and use "Email Tagged Images" under the File menu.
+
+F3 repeats the last Photo Mud editing command.
+
+In Photo Mud Explorer you can use Alt-Left Arrow and Alt-Right Arrow to move to the previous and next folders.
+
+You can right-click on the toolbar to change the button icon size or customize the toolbar.
+
+"File Convert" under the File menu of Photo Mud Explorer can convert a group of images from one format to another, resize a group of images, and perform a color adjustment on a group of images.
+
+You can use "Screen Capture" under the File menu to capture all or part of the screen in another application and bring it into Photo Mud as an image file.
+
+The status line at the lower right corner of the screen shows the number of files in the current folder, the number of files tagged, and information about the current image.
+
+You can normally tag files in more than one folder. Use the Options command if you want to restrict file tags to the current folder.
+
+Files tags are turned off after many commands in Photo Mud Explorer. To tag the same set of files again, use "Set Previous Tags" under the Edit menu.
+
+When you make a thumbnail web page, you can automatically add the file names and internal file comments to the image captions with the buttons "Image Name Captions" and "Internal Image Captions."
+
+To print more than one image on a page, check Multiple Images per Page in the Print command, and specify the number of rows and columns per page.
+
+.jpg and .jpeg files use "lossy" compression. This means you lose a little bit of color and clarity every time you resave the file. The less compression, the less image loss. You can set the .jpg compression in "Options" under the Tools menu.
+

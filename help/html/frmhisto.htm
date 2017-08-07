@@ -1,0 +1,58 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" Content="text/html; charset=Windows-1252">
+<TITLE>Histogram Color Adjustment</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TEXT="#000000">
+
+<OBJECT TYPE="application/x-oleobject" CLASSID="clsid:1e2a7bd0-dab9-11d0-b93a-00c04fc99f9e">
+	<PARAM NAME="Keyword" VALUE="histogram color adjustment">
+	<PARAM NAME="Keyword" VALUE="color adjustment">
+</OBJECT>
+
+<H1><A NAME="frmhisto"></A>Histogram Color Adjustment</H1>
+
+<P>The Histogram Color Adjustment allows you to view the color histogram of an image and make detailed adjustments to the color of the image.</P>
+
+<P>A color histogram is a graph that shows the number of pixels of each intensity (0 to 255) in the image. The histogram typically shows a concentration near the center, the midrange of the color values.</P>
+
+<P>There are two images and two histograms shown on the screen. The ones on the left are the original image, and the ones on the right are the modified image. As you modify the color of the image, the image and histogram on the right are changed so you can see the results.</P>
+
+<P>You can modify the image's red, green, and blue color components together, which affects the intensity or brightness of the image. To do this, select the "Intensity" option at the right of the window. If you want to alter the red, green, or blue color of the image independently, you can select "Red," "Green," or "Blue." When you change from one color to another, the changes you have made are retained in the "Original" image on the left. You can click the Reset button to bring back to the original image before any changes.</P>
+
+<P>There are four methods of color adjustment. The histogram on the left that represents the original image has a diagonal line across it, representing the original pixel intensities. As you adjust the colors, this line is overlaid with a blue line that may lie above and below it. The blue line shows where the new pixel intensities will like.</P>
+
+<P>For example, if the blue line is below the original diagonal line on the left half of the histogram and above it on the right half, then the dark pixels of the image will become darker and the light pixels of the image will become lighter.</P>
+
+<H2><I>Clipping</I></H2>
+
+<P>Clipping is the simplest method. It merely limits the maximum or minimum intensity of the color. Color values can normally range from 0 to 255, but you can limit the darkest or brightest by sliding the pointers at left of the histogram for the original image. You can also enter the minimum and maximum color values. The percent displayed to the left of these values is the percentage of pixels in the images that are affected by the clipping.</P>
+
+<H2><I>Linear Spread</I></H2>
+
+<P>The Linear Spread is used to add contrast to the image by spreading apart the midrange pixel values. You can adjust the linear spread by sliding the pointers below the original histogram, and by entering the lower and upper values for the linear spread. The image and histogram on the right will reflect the changes you make.</P>
+
+<P>For example, of you use a lower value of 10, then all the pixels in the original image with intensities below 10 will be set to zero, and the remaining pixels will be redistributed proportionally over intensities 0 to 255. Since the pixel intensities are shifted down in this case, in addition to more contrast, the image will be darkened slightly. If you also change the upper value to 245, the overall image will remain about the same intensity.</P>
+
+<P>The percentages displayed near the upper and lower values show how many pixels are "lost," or set to 0 (lower end) or 255 (upper end).</P>
+
+<H2><I>Expand Midtones</I></H2>
+
+<P>This function adds or removes contrast by spreading or compressing the midtones. This is similar to the Linear Spread, but it uses a curve to remap the intensities so that none are completely lost on the upper and lower ends. This function is probably the easiest way to make quality adjustments to the color of the image. It can be used in together with the Linear Spread and Clipping.</P>
+
+<P>You can use the Expand Midtones function with the slider above the two histograms, and you can enter values from -100 to 100.</P>
+
+<H2><I>Freeform Curve Adjustment</I></H2>
+
+<P>The Freeform Curve adjustment lets you drag the histogram curve anywhere you want it. The pixel intensities will be increased or decreased according to the position of the curve. For example, if the blue line is below the original diagonal line on the left half of the histogram and above it on the right half, then the dark pixels of the image will become darker and the light pixels of the image will become lighter.</P>
+
+<P>To use the Freeform Curve adjustment, check the "Use Freeform Curve" option near the lower right of the window. The other histogram functions are hidden when you are using the Freeform Curve adjustment.</P>
+
+<P>The Original and Modified images can be zoomed in or out using the command buttons between the images. You can drag the mouse across an image to move or pan the images. It may be useful to zoom in on the image to get a better idea of the changes being made.</P>
+
+<P><B>Histogram Adjustment</B> is under the <B>Color</B> menu of Photo Mud Editor.</P>
+
+</BODY>
+</HTML>

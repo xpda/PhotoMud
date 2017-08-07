@@ -1,0 +1,45 @@
+8 2001 Jun 21 12:04:46 ' S Atlantic, S Africa, Madagascar
+8 2001 Dec 14 20:53:01 ' C Pacific, Costa Rica
+8 2002 Jun 10 23:45:22 ' N Pacific, W Mexico
+8 2002 Dec 04 7:32:15 ' S Africa, S Indian, S Australia
+8 2003 May 31 4:09:23 ' Iceland, Greenland
+8 2003 Nov 23 22:50:22 ' Antarctica
+8 2005 Apr 08 20:36:50 ' S Pacific, Panama, Colombia, Venezuela
+8 2005 Oct 03 10:32:47 ' Portugal, Spain, Libia, Sudan, Kenya
+8 2006 Mar 29 10:12:22 ' C Africa, Turkey, Russia
+8 2006 Sep 22 11:41:16 ' Guyana, Suriname, F. Guiana, S Atlantic
+8 2008 Feb 07 3:56:10 ' Antarctica
+8 2008 Aug 01 10:22:12 ' N Canada, Greenland, Siberia, Mongolia, China
+8 2009 Jan 26 7:59:44 ' S Indian, Sumatra, Borneo
+8 2009 Jul 22 2:36:24 ' Total: India, Nepal, China, C Pacific
+8 2010 Jan 15 7:07:39 ' C Africa, India, Malymar, China
+8 2010 Jul 11 19:34:37 ' S Pacific, Easter Is., Chile, Argentina
+8 2012 May 20 23:53:53 ' China, Japan, Pacific, W U.S.
+8 2012 Nov 13 22:12:55 ' N Australia, S Pacific
+8 2013 May 10 0:26:20 ' N Australia, Solomon Is., C Pacific
+8 2013 Nov 03 12:47:36 ' Atlantic, C Africa
+8 2014 Apr 29 6:04:32 ' Antarctica
+8 2015 Mar 20 9:46:47 ' N Atlantic, Faeroe Is, Svalbard
+8 2016 Mar 09 1:58:19 ' Sumatra, Borneo, Sulawesi, Pacific
+8 2016 Sep 01 9:08:02 ' Atlantic, C Africa, Madagascar, Indian
+8 2017 Feb 26 14:54:32 ' Pacific, Chile, Argentina, Atlantic, Africa
+8 2017 Aug 21 18:26:40 ' N Pacific, U.S., S Atlantic
+8 2019 Jul 02 19:24:07 ' S Pacific, Chile, Argentina
+8 2019 Dec 26 5:18:53 ' Saudi Arabia, India, Sumatra, Borneo
+8 2020 Jun 21 6:41:15 ' C Africa, S Asia, China, Pacific
+8 2020 Dec 14 16:14:39 ' S Pacific, Chile, Argentina, S Atlantic
+8 2021 Jun 10 10:43:06 ' N Canada, Greenland, Russia
+8 2021 Dec 04 7:34:38 ' Antarctca
+8 2023 Apr 20 4:17:55 ' Indonesia, Australia, Papua New Guinea
+8 2023 Oct 14 18:00:40 ' W US, C. America, Columbia, Brazil
+8 2024 Apr 08 18:18:29 ' Mexico, C U.S., E Canada
+8 2024 Oct 02 18:46:13 ' S Chile, S Argentina
+8 2026 Feb 17 12:13:05 ' Antarctica
+8 2026 Aug 12 17:47:05 ' Arctic, Greenland, Iceland, Spain
+8 2027 Feb 06 16:00:47 ' Chile, Argentina, Atlantic
+8 2027 Aug 02 10:07:49 ' Morocco, Spain, Algeria, Libya, Egypt, Saudi Arabia, Yemen, Somalia
+8 2028 Jan 26 15:08:58 ' Ecuador, Peru, Brazil, Suriname, Spain, Portugal
+8 2028 Jul 22 2:56:39 ' Australia, N. Z.
+8 2030 Jun 01 6:29:13 ' Algeria, Tunesia, Greece, Turkey, Russia, n. China, Japan
+8 2030 Nov 25 6:51:37 ' Botswana, S. Africa, Australia
+

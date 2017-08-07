@@ -1,0 +1,61 @@
+'1 annual
+'2 xth x-day of x-month
+'5 easter
+'6 last x-day in x-month
+'7 non-annual (4 0) date
+'8 first x-day after x-day in x-month
+1 1 1
+New Year's Day
+2 3 1 1 ' 3rd monday in January
+Martin Luther King, Jr. Day
+2 3 1 2 ' 3rd mon in feb
+President's Day
+6 1 5 ' last monday in may
+Memorial Day
+1 7 4
+Independence Day
+2 1 1 9 ' first monday in September
+Labor Day
+2 2 1 10 ' 2nd monday oct
+Columbus Day
+1 11 11
+Veteran's Day
+2 4 4 11
+Thanksgiving
+1 12 25
+Christmas
+2 3 7 6
+Father's Day
+2 2 7 5
+Mother's Day
+1 10 31
+Halloween
+1 2 2
+Groundhog Day
+1 2 14
+Valentine's Day
+1 3 17
+St. Patrick's Day
+5 -3
+Good Friday
+5 0
+Easter
+1 4 22
+Earth Day
+1 5 5
+Cinco de Mayo
+5 -47
+Mardi Gras
+8 2 1 11
+Election Day
+7 4 1 1 20 
+Inauguration Day
+1 4 15
+Tax Day
+1 12 16
+Beethoven's Birthday
+1 1 10 
+Donald Knuth's Birthday
+2 1 1 10
+U.S. Supreme Court Term Begins
+

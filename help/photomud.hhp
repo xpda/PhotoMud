@@ -1,0 +1,404 @@
+[OPTIONS]
+Contents file=photomud.hhc
+Index file=photomud.hhk
+
+[FILES]
+html\photomud.htm
+html\whatsnew.htm
+html\jpgcompression.htm
+html\frmsend.htm
+html\clipboard.htm
+html\frmfullscreen.htm
+html\filetypes.htm
+html\toolbar.htm
+html\frmamp.htm
+html\frmblur.htm
+html\frmborder.htm
+html\frmbright.htm
+html\frmcapture.htm
+html\frmcolortolerance.htm
+html\frmcombine.htm
+html\frmcomment.htm
+html\frmedgedetect.htm
+html\frmexpand.htm
+html\frmfileassoc.htm
+html\frmfilter.htm
+html\frmhalftone.htm
+html\frmhisto.htm
+html\frminfo.htm
+html\frmlineoptions.htm
+html\frmmedian.htm
+html\frmnew.htm
+html\frmoptions.htm
+html\frmpagesetup.htm
+html\frmpicturize1.htm
+html\frmpicturize2.htm
+html\frmredeye.htm
+html\frmresize.htm
+html\frmrotate.htm
+html\frmsaturation.htm
+html\frmspecialeffects.htm
+html\frmunsharp.htm
+html\frmskew.htm
+html\fileacquire.htm
+html\editundo.htm
+html\selection.htm
+html\editdelete.htm
+html\imageflip.htm
+html\imagecrop.htm
+html\colorautoenhance.htm
+html\colorgrayscale.htm
+html\colornegative.htm
+html\frmtext.htm
+html\drawline.htm
+html\frmshapes.htm
+html\drawfill.htm
+html\drawcolors.htm
+html\viewpan.htm
+html\viewzoom.htm
+html\toolswallpaper.htm
+html\fmwebpage.htm
+html\saving.htm
+html\fmconvert.htm
+html\taggingimages.htm
+html\uponelevel.htm
+html\filelistviews.htm
+html\frmtoolbar.htm
+html\editorexplorer.htm
+html\fmcoloradjust.htm
+html\repeatcommand.htm
+html\howdoi.htm
+html\frmslideshow.htm
+html\stretchpaste.htm
+html\imagestretch.htm
+html\frmpicsearch.htm
+html\quickstart.htm
+html\revert.htm
+html\fileopen.htm
+html\filecopy.htm
+html\editrename.htm
+html\fmeditkeywords.htm
+html\fmsavehtml.htm
+html\online.htm
+html\frmcolormerge.htm
+html\frmsearch.htm
+
+[ALIAS]
+clipboard = html\clipboard.htm
+colorautoenhance = html\colorautoenhance.htm
+colorgrayscale = html\colorgrayscale.htm
+colornegative = html\colornegative.htm
+drawcolors = html\drawcolors.htm
+drawfill = html\drawfill.htm
+drawline = html\drawline.htm
+editdelete = html\editdelete.htm
+editorexplorer = html\editorexplorer.htm
+editrename = html\editrename.htm
+editundo = html\editundo.htm
+fileacquire = html\fileacquire.htm
+filecopy = html\filecopy.htm
+filelistviews = html\filelistviews.htm
+fileopen = html\fileopen.htm
+filetypes = html\filetypes.htm
+fmcoloradjust = html\fmcoloradjust.htm
+fmconvert = html\fmconvert.htm
+fmeditkeywords = html\fmeditkeywords.htm
+fmsavehtml = html\fmsavehtml.htm
+fmwebpage = html\fmwebpage.htm
+frmamp = html\frmamp.htm
+frmblur = html\frmblur.htm
+frmborder = html\frmborder.htm
+frmbright = html\frmbright.htm
+frmcapture = html\frmcapture.htm
+frmcolormerge = html\frmcolormerge.htm
+frmcolortolerance = html\frmcolortolerance.htm
+frmcombine = html\frmcombine.htm
+frmcomment = html\frmcomment.htm
+frmedgedetect = html\frmedgedetect.htm
+frmexpand = html\frmexpand.htm
+frmfileassoc = html\frmfileassoc.htm
+frmfilter = html\frmfilter.htm
+frmfullscreen = html\frmfullscreen.htm
+frmhalftone = html\frmhalftone.htm
+frmhisto = html\frmhisto.htm
+frminfo = html\frminfo.htm
+frmlineoptions = html\frmlineoptions.htm
+frmmedian = html\frmmedian.htm
+frmnew = html\frmnew.htm
+frmoptions = html\frmoptions.htm
+frmpagesetup = html\frmpagesetup.htm
+frmpicsearch = html\frmpicsearch.htm
+frmpicturize1 = html\frmpicturize1.htm
+frmpicturize2 = html\frmpicturize2.htm
+frmredeye = html\frmredeye.htm
+frmresize = html\frmresize.htm
+frmrotate = html\frmrotate.htm
+frmsaturation = html\frmsaturation.htm
+frmsearch = html\frmsearch.htm
+frmsend = html\frmsend.htm
+frmshapes = html\frmshapes.htm
+frmskew = html\frmskew.htm
+frmslideshow = html\frmslideshow.htm
+frmspecialeffects = html\frmspecialeffects.htm
+frmtext = html\frmtext.htm
+frmtoolbar = html\frmtoolbar.htm
+frmunsharp = html\frmunsharp.htm
+howdoi = html\howdoi.htm
+imagecrop = html\imagecrop.htm
+imageflip = html\imageflip.htm
+imagestretch = html\imagestretch.htm
+jpgcompression = html\jpgcompression.htm
+online = html\online.htm
+frmsend = html\frmsend.htm
+fmwebpage = html\fmwebpage.htm
+frmcapture = html\frmcapture.htm
+drawcolors = html\drawcolors.htm
+frmskew = html\frmskew.htm
+viewpan = html\viewpan.htm
+frmhalftone = html\frmhalftone.htm
+frmresize = html\frmresize.htm
+jpgcompression = html\jpgcompression.htm
+frmlineoptions = html\frmlineoptions.htm
+selection = html\selection.htm
+fmcoloradjust = html\fmcoloradjust.htm
+frmcolortolerance = html\frmcolortolerance.htm
+fmeditkeywords = html\fmeditkeywords.htm
+frmrotate = html\frmrotate.htm
+frmspecialeffects = html\frmspecialeffects.htm
+fmconvert = html\fmconvert.htm
+colornegative = html\colornegative.htm
+editrename = html\editrename.htm
+frmfilter = html\frmfilter.htm
+frmfullscreen = html\frmfullscreen.htm
+frmshapes = html\frmshapes.htm
+frmexpand = html\frmexpand.htm
+colorautoenhance = html\colorautoenhance.htm
+repeatcommand = html\repeatcommand.htm
+toolbar = html\toolbar.htm
+frmamp = html\frmamp.htm
+frmpagesetup = html\frmpagesetup.htm
+frmsearch = html\frmsearch.htm
+saving = html\saving.htm
+frminfo = html\frminfo.htm
+imagestretch = html\imagestretch.htm
+frmbright = html\frmbright.htm
+frmblur = html\frmblur.htm
+frmslideshow = html\frmslideshow.htm
+frmnew = html\frmnew.htm
+editdelete = html\editdelete.htm
+fileacquire = html\fileacquire.htm
+frmcombine = html\frmcombine.htm
+frmtext = html\frmtext.htm
+whatsnew = html\whatsnew.htm
+frmunsharp = html\frmunsharp.htm
+drawfill = html\drawfill.htm
+stretchpaste = html\stretchpaste.htm
+frmredeye = html\frmredeye.htm
+imageflip = html\imageflip.htm
+clipboard = html\clipboard.htm
+editorexplorer = html\editorexplorer.htm
+frmmedian = html\frmmedian.htm
+frmborder = html\frmborder.htm
+viewzoom = html\viewzoom.htm
+frmfileassoc = html\frmfileassoc.htm
+frmedgedetect = html\frmedgedetect.htm
+filelistviews = html\filelistviews.htm
+online = html\online.htm
+frmcomment = html\frmcomment.htm
+frmtoolbar = html\frmtoolbar.htm
+taggingimages = html\taggingimages.htm
+fileopen = html\fileopen.htm
+frmpicturize1 = html\frmpicturize1.htm
+frmpicturize2 = html\frmpicturize2.htm
+frmpicsearch = html\frmpicsearch.htm
+photomud = html\photomud.htm
+uponelevel = html\uponelevel.htm
+editundo = html\editundo.htm
+quickstart = html\quickstart.htm
+filetypes = html\filetypes.htm
+colorgrayscale = html\colorgrayscale.htm
+revert = html\revert.htm
+frmhisto = html\frmhisto.htm
+frmoptions = html\frmoptions.htm
+fmsavehtml = html\fmsavehtml.htm
+frmcolormerge = html\frmcolormerge.htm
+frmsaturation = html\frmsaturation.htm
+filecopy = html\filecopy.htm
+toolswallpaper = html\toolswallpaper.htm
+howdoi = html\howdoi.htm
+drawline = html\drawline.htm
+imagecrop = html\imagecrop.htm
+photomud = html\photomud.htm
+quickstart = html\quickstart.htm
+repeatcommand = html\repeatcommand.htm
+revert = html\revert.htm
+saving = html\saving.htm
+selection = html\selection.htm
+stretchpaste = html\stretchpaste.htm
+taggingimages = html\taggingimages.htm
+toolbar = html\toolbar.htm
+toolswallpaper = html\toolswallpaper.htm
+uponelevel = html\uponelevel.htm
+viewpan = html\viewpan.htm
+viewzoom = html\viewzoom.htm
+whatsnew = html\whatsnew.htm
+
+[MAP]
+#define clipboard 50
+#define colorautoenhance 51
+#define colorgrayscale 52
+#define colornegative 53
+#define drawcolors 54
+#define drawfill 55
+#define drawline 56
+#define editdelete 59
+#define editorexplorer 71
+#define editrename 85
+#define editundo 60
+#define fileacquire 61
+#define filecopy 84
+#define filelistviews 87
+#define fileopen 81
+#define filetypes 62
+#define fmcoloradjust 200
+#define fmconvert 201
+#define fmeditkeywords 202
+#define fmsavehtml 207
+#define fmwebpage 209
+#define frmamp 11
+#define frmblur 12
+#define frmborder 13
+#define frmbright 14
+#define frmcapture 15
+#define frmcolormerge 79
+#define frmcolortolerance 16
+#define frmcombine 17
+#define frmcomment 19
+#define frmedgedetect 20
+#define frmexpand 21
+#define frmfileassoc 22
+#define frmfilter 23
+#define frmfullscreen 24
+#define frmhalftone 25
+#define frmhisto 26
+#define frminfo 27
+#define frmlineoptions 28
+#define frmmedian 31
+#define frmnew 32
+#define frmoptions 33
+#define frmpagesetup 35
+#define frmpicsearch 76
+#define frmpicturize1 36
+#define frmpicturize2 37
+#define frmredeye 39
+#define frmresize 40
+#define frmrotate 41
+#define frmsaturation 42
+#define frmsearch 89
+#define frmsend 43
+#define frmshapes 57
+#define frmskew 46
+#define frmslideshow 72
+#define frmspecialeffects 44
+#define frmtext 58
+#define frmtoolbar 73
+#define frmunsharp 45
+#define howdoi 0
+#define imagecrop 63
+#define imageflip 64
+#define imagestretch 78
+#define jpgcompression 65
+#define online 88
+#define frmsend 0
+#define fmwebpage 0
+#define frmcapture 0
+#define drawcolors 0
+#define frmskew 0
+#define viewpan 69
+#define frmhalftone 0
+#define frmresize 0
+#define jpgcompression 0
+#define frmlineoptions 0
+#define selection 66
+#define fmcoloradjust 0
+#define frmcolortolerance 0
+#define fmeditkeywords 0
+#define frmrotate 0
+#define frmspecialeffects 0
+#define fmconvert 0
+#define colornegative 0
+#define editrename 0
+#define frmfilter 0
+#define frmfullscreen 0
+#define frmshapes 0
+#define frmexpand 0
+#define colorautoenhance 0
+#define repeatcommand 83
+#define toolbar 67
+#define frmamp 0
+#define frmpagesetup 0
+#define frmsearch 0
+#define saving 82
+#define frminfo 0
+#define imagestretch 0
+#define frmbright 0
+#define frmblur 0
+#define frmslideshow 0
+#define frmnew 0
+#define editdelete 0
+#define fileacquire 0
+#define frmcombine 0
+#define frmtext 0
+#define whatsnew 0
+#define frmunsharp 0
+#define drawfill 0
+#define stretchpaste 77
+#define frmredeye 0
+#define imageflip 0
+#define clipboard 0
+#define editorexplorer 0
+#define frmmedian 0
+#define frmborder 0
+#define viewzoom 70
+#define frmfileassoc 0
+#define frmedgedetect 0
+#define filelistviews 0
+#define online 0
+#define frmcomment 0
+#define frmtoolbar 0
+#define taggingimages 86
+#define fileopen 0
+#define frmpicturize1 0
+#define frmpicturize2 0
+#define frmpicsearch 0
+#define photomud 0
+#define uponelevel 0
+#define editundo 0
+#define quickstart 0
+#define filetypes 0
+#define colorgrayscale 0
+#define revert 80
+#define frmhisto 0
+#define frmoptions 0
+#define fmsavehtml 0
+#define frmcolormerge 0
+#define frmsaturation 0
+#define filecopy 0
+#define toolswallpaper 68
+#define howdoi 0
+#define drawline 0
+#define imagecrop 0
+#define photomud 0
+#define quickstart 0
+#define repeatcommand 0
+#define revert 0
+#define saving 0
+#define selection 0
+#define stretchpaste 0
+#define taggingimages 0
+#define toolbar 0
+#define toolswallpaper 0
+#define uponelevel 0
+#define viewpan 0
+#define viewzoom 0
+#define whatsnew 0

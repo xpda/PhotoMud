@@ -1,0 +1,72 @@
+The Photo Mud Explorer browses through photos in the folder, and the Photo Mud Editor is used for editing a photo. To edit the current photo in Photo Mud Explorer, press Enter, double click on a photo, or click on the Open button on the toolbar.
+
+You can view and photo on the full screen using Ctrl-M or the full-screen button on the toolbar. In full screen view, you can press Page-Up or Page-Down to browse through photos in the current folder.
+
+When you email a photo with Photo Mud, you can resize it to make it smaller by selecting "Convert or Resize the Photo".
+
+It's easy to make a photo web page. Just select "Make Thumbnail Web Page" under the Tools menu of Photo Mud Explorer.
+
+You can print a monthly calendar using your own photos and important dates using "Print Calendar" under the Tools menu.
+
+In Photo Mud Explorer you can choose to view file Details or Thumbnails under the View menu.
+
+You can perform a screen capture by pressing Shift-PrtScr to copy a screen image to the clipboard, and then pasting it into a new Photo Mud window using Paste into New Window (Ctrl-Q).
+
+The Slide Show can display any photos in random or named order.
+
+You can tag all the photos in a folder using Ctrl-A (select all), then Ctrl-T (tag selected).
+
+A quick way to get help on a command is to highlight the command in the menu, and press F1.
+
+In Photo Mud Explorer you can move photos from one folder to another by dragging the photos at the bottoms of the screen to the folder on the left. To copy instead of move the photos, hold down the Ctrl key.
+
+You can display detailed information about a photo using the "Photo Information" under the Tools menu, or by pressing Ctrl-I.
+
+When rotating a photo, you can display a grid to align horizontal or vertical lines in the drawing, such as the horizon or a building.
+
+To print more than one photo at once, tag the photos you want to print and use "Print Tagged Photos" under the File menu.
+
+In Photo Mud Explorer it is convenient to rotate a photo left or right 90 degrees with Ctrl-L and Ctrl-R. The photo is automatically saved in the new orientation.
+
+You can enter comments into a photo file using "Enter File Comments" under the Tools menu. You can use the arrow buttons to browse files in a folder and enter comments as you go.
+
+There are dozens of special and artistic effects you can apply to photos using "Special Effects" and "Artistic Effects" under the Image menu of Photo Mud Editor.
+
+You can search photos based on their internal comments and create a web page out of the matching photos. Use Photo Search and then Make Thumbnail Web Page under the Tools menu of Photo Mud Explorer.
+
+Online registration and purchasing is available through the Help menu.
+
+Photo Mud can search a folder or hard drive for duplicate photos. Use "Search for Duplicates" under the Tools menu.
+
+Auto Enhance, under the Color menu, is a fast way to make automatic color correction to a photo.
+
+You can usually improve the color of a hazy photograph by expanding midtones in the "Histogram Color Adjustment" under the Color menu of Photo Mud Editor.
+
+When cropping a photo, you can hold down the shift key as you drag the box to view the cropped area.
+
+You can view a group of tagged photos using the "Slidehow" command under the Tools menu of Photo Mud Explorer. Additional slidehow options can be set in "Options" under the Tools menu.
+
+You can use Stretch Paste to paste a person or object into another photo. First select the object to be pasted, copy it to the clipboard, and then use "Stretch Paste" under the Edit menu to paste it into the new photo.
+
+To email more than one photo at once, tag the photos you want to send and use "Email Tagged Photos" under the File menu.
+
+F3 repeats the last Photo Mud editing command.
+
+In Photo Mud Explorer you can use Alt-Left Arrow and Alt-Right Arrow to move to the previous and next folders.
+
+You can right-click on the toolbar to change the button size or customize the toolbar.
+
+"File Convert" under the File menu of Photo Mud Explorer can convert a group of photos from one format to another, resize a group of photos, and perform a color adjustment on a group of photos.
+
+The status line at the bottom of the Photo Mud Explorer screen displays the number of files in the current folder, the number of files or selected, and information about the current photo.
+
+In the details view of Photo Mud Explorer, you can normally tag files in more than one folder. Use the Options command if you want to restrict file tags to the current folder.
+
+Files tags are turned off after many commands in Photo Mud Explorer. To tag the same set of files again, use "Set Previous Tags" under the Edit menu.
+
+When you make a thumbnail web page, you can automatically add the internal file comments, dates, and GPS data to the photo captions.
+
+To print more than one photo on a page, check Multiple Photos per Page in the Print command, and specify the number of rows and columns per page.
+
+.jpg and .jpeg files use "lossy" compression. This means you lose a little bit of color and clarity every time you resave the file. The less compression, the less photo loss. You can specify the .jpg compression when you save the file, and in "Options" under the Tools menu.
+

@@ -1,0 +1,995 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectType>Local</ProjectType>
+    <MyType>WindowsFormsWithCustomSubMain</MyType>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{C7DA7FD8-9450-4863-B26B-330D8693E5B0}</ProjectGuid>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <AssemblyName>Photo Mud</AssemblyName>
+    <OutputType>WinExe</OutputType>
+    <StartupObject>Sub Main</StartupObject>
+    <AssemblyMajorVersion>3</AssemblyMajorVersion>
+    <AssemblyMinorVersion>0</AssemblyMinorVersion>
+    <AssemblyRevisionNumber>482</AssemblyRevisionNumber>
+    <GenerateRevisionNumber>True</GenerateRevisionNumber>
+    <AssemblyCompanyName>Upperspace</AssemblyCompanyName>
+    <ApplicationIcon>Resources\balloon.ico</ApplicationIcon>
+    <RootNamespace>PhotoMud</RootNamespace>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <ApplicationManifest>My Project\app.manifest</ApplicationManifest>
+    <SignManifests>false</SignManifests>
+    <ManifestCertificateThumbprint>934DD112F4A046ABF3CD17F3881DDFF62A004C69</ManifestCertificateThumbprint>
+    <ManifestKeyFile>
+    </ManifestKeyFile>
+    <GenerateManifests>false</GenerateManifests>
+    <TargetZone>LocalIntranet</TargetZone>
+    <OptionStrict>Off</OptionStrict>
+    <SignAssembly>false</SignAssembly>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <TargetFrameworkProfile />
+    <PublishUrl>c:\tmp\q\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Background</UpdateMode>
+    <UpdateInterval>30</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>true</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <TargetCulture>en-US</TargetCulture>
+    <ProductName>Photo Mud</ProductName>
+    <PublisherName>Bob</PublisherName>
+    <WebPage>publish.htm</WebPage>
+    <AutorunEnabled>true</AutorunEnabled>
+    <ApplicationRevision>2</ApplicationRevision>
+    <ApplicationVersion>6.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <PublishWizardCompleted>true</PublishWizardCompleted>
+    <BootstrapperEnabled>false</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>.\bin\</OutputPath>
+    <DocumentationFile>
+    </DocumentationFile>
+    <DebugSymbols>true</DebugSymbols>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>false</DefineTrace>
+    <DefineConstants>
+    </DefineConstants>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <NoWarn>41999,42016,42017,42018,42019,42032,42036,42353,42354,42355</NoWarn>
+    <DebugType>Full</DebugType>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <WarningsAsErrors>42020,42021,42022</WarningsAsErrors>
+    <Optimize>false</Optimize>
+    <Prefer32Bit>false</Prefer32Bit>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>bin\</OutputPath>
+    <DocumentationFile>
+    </DocumentationFile>
+    <DebugSymbols>false</DebugSymbols>
+    <DefineDebug>False</DefineDebug>
+    <DefineTrace>false</DefineTrace>
+    <DefineConstants>
+    </DefineConstants>
+    <PlatformTarget>x86</PlatformTarget>
+    <NoWarn>41999,42016,42017,42018,42019,42032,42036,42353,42354,42355</NoWarn>
+    <DebugType>None</DebugType>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <Optimize>true</Optimize>
+    <WarningsAsErrors>42020,42021,42022</WarningsAsErrors>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\</OutputPath>
+    <NoWarn>41999,42016,42017,42018,42019,42032,42036,42353,42354,42355</NoWarn>
+    <DebugType>Full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <WarningsAsErrors>42020,42021,42022</WarningsAsErrors>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <Prefer32Bit>false</Prefer32Bit>
+    <DocumentationFile>
+    </DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
+    <OutputPath>bin\x64\</OutputPath>
+    <Optimize>true</Optimize>
+    <NoWarn>41999,42016,42017,42018,42019,42032,42036,42353,42354,42355</NoWarn>
+    <PlatformTarget>x64</PlatformTarget>
+    <WarningsAsErrors>42020,42021,42022</WarningsAsErrors>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <Prefer32Bit>false</Prefer32Bit>
+    <DocumentationFile>
+    </DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionInfer>Off</OptionInfer>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Magick.NET-Q16-AnyCPU, Version=7.0.0.0, Culture=neutral, PublicKeyToken=2004825badfa91ec, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\Magick.NET-Q16-AnyCPU.dll</HintPath>
+    </Reference>
+    <Reference Include="MySql.Data, Version=6.9.6.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\MySql.Data.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System">
+      <Name>System</Name>
+    </Reference>
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing">
+      <Name>System.Drawing</Name>
+    </Reference>
+    <Reference Include="System.ServiceModel">
+      <RequiredTargetFramework>3.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Windows.Forms">
+      <Name>System.Windows.Forms</Name>
+    </Reference>
+    <Reference Include="System.XML" />
+  </ItemGroup>
+  <ItemGroup>
+    <Import Include="Microsoft.VisualBasic" />
+    <Import Include="System" />
+    <Import Include="System.Collections" />
+    <Import Include="System.Diagnostics" />
+    <Import Include="System.Drawing" />
+    <Import Include="System.Linq" />
+    <Import Include="System.Windows.Forms" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="apiHeader.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ApplicationEvents.vb" />
+    <Compile Include="AssemblyInfo.vb" />
+    <Compile Include="bugMain.vb" />
+    <Compile Include="clsCalendar.vb" />
+    <Compile Include="ctlBrightness.Designer.vb">
+      <DependentUpon>ctlBrightness.vb</DependentUpon>
+    </Compile>
+    <Compile Include="ctlBrightness.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ctlTabs.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ctlColorTolerance.Designer.vb">
+      <DependentUpon>ctlColorTolerance.vb</DependentUpon>
+    </Compile>
+    <Compile Include="ctlColorTolerance.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ctlFeatherControl.Designer.vb">
+      <DependentUpon>ctlFeatherControl.vb</DependentUpon>
+    </Compile>
+    <Compile Include="ctlFeatherControl.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ctlTextControl.Designer.vb">
+      <DependentUpon>ctlTextControl.vb</DependentUpon>
+    </Compile>
+    <Compile Include="ctlTextControl.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ctlViewCompare.Designer.vb">
+      <DependentUpon>ctlViewCompare.vb</DependentUpon>
+    </Compile>
+    <Compile Include="ctlViewCompare.vb">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="frmBatchInfoCopy.Designer.vb">
+      <DependentUpon>frmBatchInfoCopy.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmBatchInfoCopy.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmArtEffects.Designer.vb">
+      <DependentUpon>frmArtEffects.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmArtEffects.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmBugPhotos.Designer.vb">
+      <DependentUpon>frmBugPhotos.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmBugPhotos.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmBugQuery.Designer.vb">
+      <DependentUpon>frmBugQuery.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmBugQuery.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmCalendarEvents.Designer.vb">
+      <DependentUpon>frmCalendarEvents.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmCalendarEvents.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmCalendar.Designer.vb">
+      <DependentUpon>frmCalendar.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmCalendar.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmColorAdjust.Designer.vb">
+      <DependentUpon>frmColorAdjust.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmColorAdjust.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmColorBatchAdjust.Designer.vb">
+      <SubType>Code</SubType>
+      <DependentUpon>frmColorBatchAdjust.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmColorBatchAdjust.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmConcatenate.Designer.vb">
+      <DependentUpon>frmConcatenate.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmConcatenate.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmContrastStretch.Designer.vb">
+      <DependentUpon>frmContrastStretch.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmContrastStretch.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmConvert.Designer.vb">
+      <DependentUpon>frmConvert.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmConvert.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmFileTypes.Designer.vb">
+      <SubType>Code</SubType>
+      <DependentUpon>frmFileTypes.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmFileTypes.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmOverwrite.Designer.vb">
+      <SubType>Code</SubType>
+      <DependentUpon>frmOverwrite.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmOverwrite.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmRacePhoto.Designer.vb">
+      <DependentUpon>frmRacePhoto.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmRacePhoto.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmSaveAs.Designer.vb">
+      <SubType>Code</SubType>
+      <DependentUpon>frmSaveAs.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmSaveAs.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmSaveVerify.Designer.vb">
+      <SubType>Code</SubType>
+      <DependentUpon>frmSaveVerify.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmSaveVerify.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmTagMatches.designer.vb">
+      <DependentUpon>frmTagMatches.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmTagMatches.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmWebPage.Designer.vb">
+      <SubType>Code</SubType>
+      <DependentUpon>frmWebPage.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmWebPage.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmAbout.Designer.vb">
+      <SubType>Code</SubType>
+      <DependentUpon>frmAbout.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmAbout.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmAmp.Designer.vb">
+      <SubType>Code</SubType>
+      <DependentUpon>frmAmp.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmAmp.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmAskAssociate.Designer.vb">
+      <SubType>Code</SubType>
+      <DependentUpon>frmAskAssociate.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmAskAssociate.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmBlur.Designer.vb">
+      <SubType>Code</SubType>
+      <DependentUpon>frmBlur.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmBlur.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmBorder.Designer.vb">
+      <SubType>Code</SubType>
+      <DependentUpon>frmBorder.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmBorder.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmColorMerge.Designer.vb">
+      <SubType>Code</SubType>
+      <DependentUpon>frmColorMerge.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmColorMerge.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmCombine.Designer.vb">
+      <SubType>Code</SubType>
+      <DependentUpon>frmCombine.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmCombine.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmCombineSelection.Designer.vb">
+      <SubType>Code</SubType>
+      <DependentUpon>frmCombineSelection.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmCombineSelection.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmComment.Designer.vb">
+      <SubType>Code</SubType>
+      <DependentUpon>frmComment.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmComment.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmEdgeDetect.Designer.vb">
+      <SubType>Code</SubType>
+      <DependentUpon>frmEdgeDetect.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmEdgeDetect.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmExpand.Designer.vb">
+      <SubType>Code</SubType>
+      <DependentUpon>frmExpand.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmExpand.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmExploref.Designer.vb">
+      <SubType>Code</SubType>
+      <DependentUpon>frmExploref.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmExploref.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmFileAssoc.Designer.vb">
+      <SubType>Code</SubType>
+      <DependentUpon>frmFileAssoc.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmFileAssoc.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmFilter.Designer.vb">
+      <SubType>Code</SubType>
+      <DependentUpon>frmFilter.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmFilter.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmFullscreen.Designer.vb">
+      <SubType>Code</SubType>
+      <DependentUpon>frmFullscreen.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmFullscreen.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmHalftone.Designer.vb">
+      <SubType>Code</SubType>
+      <DependentUpon>frmHalftone.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmHalftone.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmHisto.Designer.vb">
+      <SubType>Code</SubType>
+      <DependentUpon>frmHisto.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmHisto.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmInfo.Designer.vb">
+      <SubType>Code</SubType>
+      <DependentUpon>frmInfo.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmInfo.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmLineOptions.Designer.vb">
+      <SubType>Code</SubType>
+      <DependentUpon>frmLineOptions.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmLineOptions.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmMainf.Designer.vb">
+      <SubType>Code</SubType>
+      <DependentUpon>frmMainf.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmMainf.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmMedian.Designer.vb">
+      <SubType>Code</SubType>
+      <DependentUpon>frmMedian.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmMedian.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmNew.Designer.vb">
+      <SubType>Code</SubType>
+      <DependentUpon>frmNew.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmNew.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmOptions.Designer.vb">
+      <SubType>Code</SubType>
+      <DependentUpon>frmOptions.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmOptions.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmPrint.Designer.vb">
+      <SubType>Code</SubType>
+      <DependentUpon>frmPrint.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmPrint.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmDupSearch.Designer.vb">
+      <SubType>Code</SubType>
+      <DependentUpon>frmDupSearch.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmDupSearch.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmPicturize1.Designer.vb">
+      <SubType>Code</SubType>
+      <DependentUpon>frmPicturize1.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmPicturize1.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmPicturize2.Designer.vb">
+      <SubType>Code</SubType>
+      <DependentUpon>frmPicturize2.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmPicturize2.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmPicturize3.Designer.vb">
+      <SubType>Code</SubType>
+      <DependentUpon>frmPicturize3.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmPicturize3.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmRedeye.Designer.vb">
+      <SubType>Code</SubType>
+      <DependentUpon>frmRedeye.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmRedeye.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmResize.Designer.vb">
+      <SubType>Code</SubType>
+      <DependentUpon>frmResize.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmResize.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmRotate.Designer.vb">
+      <SubType>Code</SubType>
+      <DependentUpon>frmRotate.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmRotate.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmSearch.Designer.vb">
+      <SubType>Code</SubType>
+      <DependentUpon>frmSearch.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmSearch.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmSend.Designer.vb">
+      <SubType>Code</SubType>
+      <DependentUpon>frmSend.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmSend.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmSlideShow.Designer.vb">
+      <SubType>Code</SubType>
+      <DependentUpon>frmSlideShow.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmSlideShow.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmSpecialEffects.Designer.vb">
+      <SubType>Code</SubType>
+      <DependentUpon>frmSpecialEffects.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmSpecialEffects.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmTips.Designer.vb">
+      <SubType>Code</SubType>
+      <DependentUpon>frmTips.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmTips.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmToolbar.Designer.vb">
+      <SubType>Code</SubType>
+      <DependentUpon>frmToolbar.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmToolbar.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmSharpen.Designer.vb">
+      <SubType>Code</SubType>
+      <DependentUpon>frmSharpen.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmSharpen.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GlobalSuppressions.vb" />
+    <Compile Include="ImageInfo.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="main.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="mudViewer.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="My Project\Application.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Application.myapp</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Resources.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Settings.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+    <Compile Include="picLoadService.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="pViewer.vb">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="raceMain.vb" />
+    <Compile Include="Settings.vb" />
+    <Compile Include="treeviewSubs.vb" />
+    <Compile Include="uExif.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="uTags.vb">
+      <SubType>Code</SubType>
+    </Compile>
+    <EmbeddedResource Include="ctlBrightness.resx">
+      <DependentUpon>ctlBrightness.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ctlColorTolerance.resx">
+      <DependentUpon>ctlColorTolerance.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ctlFeatherControl.resx">
+      <DependentUpon>ctlFeatherControl.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ctlTextControl.resx">
+      <DependentUpon>ctlTextControl.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ctlViewCompare.resx">
+      <DependentUpon>ctlViewCompare.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmArtEffects.resx">
+      <DependentUpon>frmArtEffects.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmBatchInfoCopy.resx">
+      <DependentUpon>frmBatchInfoCopy.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmBugPhotos.resx">
+      <DependentUpon>frmBugPhotos.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmBugQuery.resx">
+      <DependentUpon>frmBugQuery.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmCalendar.resx">
+      <DependentUpon>frmCalendar.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmCalendarEvents.resx">
+      <DependentUpon>frmCalendarEvents.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmColorAdjust.resx">
+      <DependentUpon>frmColorAdjust.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmColorBatchAdjust.resX">
+      <DependentUpon>frmColorBatchAdjust.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmConcatenate.resx">
+      <DependentUpon>frmConcatenate.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmContrastStretch.resx">
+      <DependentUpon>frmContrastStretch.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmConvert.resX">
+      <DependentUpon>frmConvert.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmFileTypes.resX">
+      <DependentUpon>frmFileTypes.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmOverwrite.resX">
+      <DependentUpon>frmOverwrite.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmRacePhoto.resx">
+      <DependentUpon>frmRacePhoto.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmSaveAs.resX">
+      <DependentUpon>frmSaveAs.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmSaveVerify.resX">
+      <DependentUpon>frmSaveVerify.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmTagMatches.resx">
+      <DependentUpon>frmTagMatches.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmWebPage.resX">
+      <DependentUpon>frmWebPage.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmAbout.resX">
+      <DependentUpon>frmAbout.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmAmp.resX">
+      <DependentUpon>frmAmp.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmAskAssociate.resX">
+      <DependentUpon>frmAskAssociate.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmBlur.resX">
+      <DependentUpon>frmBlur.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmBorder.resX">
+      <DependentUpon>frmBorder.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmColorMerge.resX">
+      <DependentUpon>frmColorMerge.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmCombine.resX">
+      <DependentUpon>frmCombine.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmCombineSelection.resX">
+      <DependentUpon>frmCombineSelection.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmComment.resX">
+      <DependentUpon>frmComment.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmEdgeDetect.resX">
+      <DependentUpon>frmEdgeDetect.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmExpand.resX">
+      <DependentUpon>frmExpand.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmExploref.resX">
+      <DependentUpon>frmExploref.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmFileAssoc.resX">
+      <DependentUpon>frmFileAssoc.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmFilter.resX">
+      <DependentUpon>frmFilter.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmFullscreen.resX">
+      <DependentUpon>frmFullscreen.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmHalftone.resX">
+      <DependentUpon>frmHalftone.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmHisto.resX">
+      <DependentUpon>frmHisto.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmInfo.resX">
+      <DependentUpon>frmInfo.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmLineOptions.resX">
+      <DependentUpon>frmLineOptions.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmMainf.resX">
+      <DependentUpon>frmMainf.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmMedian.resX">
+      <DependentUpon>frmMedian.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmNew.resX">
+      <DependentUpon>frmNew.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmOptions.resX">
+      <DependentUpon>frmOptions.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmPrint.resX">
+      <DependentUpon>frmPrint.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmDupSearch.resX">
+      <DependentUpon>frmDupSearch.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmPicturize1.resX">
+      <DependentUpon>frmPicturize1.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmPicturize2.resX">
+      <DependentUpon>frmPicturize2.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmPicturize3.resX">
+      <DependentUpon>frmPicturize3.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmRedeye.resX">
+      <DependentUpon>frmRedeye.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmResize.resX">
+      <DependentUpon>frmResize.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmRotate.resX">
+      <DependentUpon>frmRotate.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmSearch.resX">
+      <DependentUpon>frmSearch.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmSend.resX">
+      <DependentUpon>frmSend.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmSlideShow.resX">
+      <DependentUpon>frmSlideShow.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmSpecialEffects.resX">
+      <DependentUpon>frmSpecialEffects.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmTips.resX">
+      <DependentUpon>frmTips.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmToolbar.resX">
+      <DependentUpon>frmToolbar.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmSharpen.resX">
+      <DependentUpon>frmSharpen.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="My Project\licenses.licx" />
+    <EmbeddedResource Include="My Project\Resources.resx">
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.vb</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <None Include="ClassDiagram1.cd" />
+    <None Include="My Project\Application.myapp">
+      <Generator>MyApplicationCodeGenerator</Generator>
+      <LastGenOutput>Application.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="Resources\zoom.cur">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\stretchPaste.cur">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\sketch.cur">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\selRoundedBox.cur">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\selRectangle.cur">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\selEllipse.cur">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\selectSimilar.cur">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\selBox.cur">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\floodcur.cur">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\fill.cur">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\eyedrop.cur">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\eyedrop1.cur">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\dropper.cur">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\drawShape.cur">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\drawLine.cur">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\Draw.cur">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\crop.cur">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\blank.cur">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\zoomWindow.cur">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\balloon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="My Project\app.manifest" />
+    <None Include="My Project\Settings.settings">
+      <CustomToolNamespace>My</CustomToolNamespace>
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.vb</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 2.0 %28x86%29</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.0 %28x86%29</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="icons\" />
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="WIA">
+      <Guid>{94A0E92D-43C0-494E-AC29-FD45948A5221}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+</Project>

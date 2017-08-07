@@ -1,0 +1,939 @@
+<HTML>
+<!-- Sitemap 1.0 -->
+<OBJECT type="text/site properties">
+</OBJECT>
+<UL>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="acquiring an image from a scanner or camera">
+		<param name="Name" value="Downloading from a Scanner or Camera">
+		<param name="Local" value="html/fileacquire.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="activation key">
+		<param name="Name" value="Online Registration, Update, and Purchasing">
+		<param name="Local" value="html/online.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="auto enhance">
+		<param name="Name" value="Auto Enhance">
+		<param name="Local" value="html/colorautoenhance.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="batch processing">
+		<param name="Name" value="Tagging Images">
+		<param name="Local" value="html/taggingimages.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="blurring">
+		<param name="Name" value="Image Blur">
+		<param name="Local" value="html/frmblur.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="border">
+		<param name="See Also" value="border">
+		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Keyword" value="adding to an image">
+			<param name="Local" value="html/frmborder.htm">
+			</OBJECT>
+	</UL>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="brightness">
+		<param name="Name" value="Brightness and Contrast">
+		<param name="Local" value="html/frmbright.htm">
+		<param name="Name" value="Color Adjustment">
+		<param name="Local" value="html/fmcoloradjust.htm">
+		<param name="Name" value="How To?">
+		<param name="Local" value="html/howdoi.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="camera">
+		<param name="Name" value="How To?">
+		<param name="Local" value="html/howdoi.htm">
+		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Keyword" value="downloading images">
+			<param name="Local" value="html/fileacquire.htm">
+			</OBJECT>
+	</UL>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="capturing the screen image">
+		<param name="Name" value="Screen Capture">
+		<param name="Local" value="html/frmcapture.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="cell images">
+		<param name="Name" value="Photo Mosaic Options">
+		<param name="Local" value="html/frmpicturize2.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="clipboard">
+		<param name="Name" value="How To?">
+		<param name="Local" value="html/howdoi.htm">
+		<param name="Name" value="Stretch Paste">
+		<param name="Local" value="html/stretchpaste.htm">
+		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Keyword" value="copying to">
+			<param name="Local" value="html/clipboard.htm">
+			</OBJECT>
+	</UL>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="color adjustment">
+		<param name="Name" value="Histogram Color Adjustment">
+		<param name="Local" value="html/frmhisto.htm">
+		<param name="Name" value="Color Adjustment">
+		<param name="Local" value="html/fmcoloradjust.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="color enhancement">
+		<param name="Name" value="Auto Enhance">
+		<param name="Local" value="html/colorautoenhance.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="color planes">
+		<param name="Name" value="Merging Color Separations">
+		<param name="Local" value="html/frmcolormerge.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="color separation">
+		<param name="Name" value="Merging Color Separations">
+		<param name="Local" value="html/frmcolormerge.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="color tolerance">
+		<param name="Name" value="Color Tolerance">
+		<param name="Local" value="html/frmcolortolerance.htm">
+		<param name="Name" value="Photo Mud Options">
+		<param name="Local" value="html/frmoptions.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="color">
+		<param name="See Also" value="color">
+		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Keyword" value="changing">
+			<param name="Local" value="html/howdoi.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Keyword" value="saturation">
+			<param name="Local" value="html/frmsaturation.htm">
+			</OBJECT>
+	</UL>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="colors">
+		<param name="See Also" value="colors">
+		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Keyword" value="drawing">
+			<param name="Local" value="html/drawcolors.htm">
+			</OBJECT>
+	</UL>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="combining images">
+		<param name="Name" value="Combining Two Images">
+		<param name="Local" value="html/frmcombine.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="comments">
+		<param name="Name" value="Image File Comments">
+		<param name="Local" value="html/frmcomment.htm">
+		<param name="Name" value="How To?">
+		<param name="Local" value="html/howdoi.htm">
+		<param name="Name" value="Image Search">
+		<param name="Local" value="html/frmsearch.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="common tasks">
+		<param name="Name" value="How To?">
+		<param name="Local" value="html/howdoi.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="compression">
+		<param name="Name" value="JPG Compression">
+		<param name="Local" value="html/jpgcompression.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="contrast">
+		<param name="Name" value="Brightness and Contrast">
+		<param name="Local" value="html/frmbright.htm">
+		<param name="Name" value="Auto Enhance">
+		<param name="Local" value="html/colorautoenhance.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="converting images">
+		<param name="Name" value="Converting Images">
+		<param name="Local" value="html/fmconvert.htm">
+		<param name="Name" value="How To?">
+		<param name="Local" value="html/howdoi.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="copy and paste">
+		<param name="Name" value="How To?">
+		<param name="Local" value="html/howdoi.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="copying a file">
+		<param name="Name" value="Copy Image File">
+		<param name="Local" value="html/filecopy.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="copying and pasting with the Windows clipboard">
+		<param name="Name" value="Copying and Pasting with the Windows Clipboard">
+		<param name="Local" value="html/clipboard.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="cropping">
+		<param name="Name" value="Cropping the Image">
+		<param name="Local" value="html/imagecrop.htm">
+		<param name="Name" value="How To?">
+		<param name="Local" value="html/howdoi.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="date">
+		<param name="Name" value="How To?">
+		<param name="Local" value="html/howdoi.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="delete file">
+		<param name="Name" value="Delete File">
+		<param name="Local" value="html/editdelete.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="demo version">
+		<param name="Name" value="Online Registration, Update, and Purchasing">
+		<param name="Local" value="html/online.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="downloading images">
+		<param name="Name" value="How To?">
+		<param name="Local" value="html/howdoi.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="drawing">
+		<param name="See Also" value="drawing">
+		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Keyword" value="colors">
+			<param name="Local" value="html/drawcolors.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Keyword" value="filled regions">
+			<param name="Local" value="html/drawfill.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Keyword" value="lines">
+			<param name="Local" value="html/drawline.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Keyword" value="shapes">
+			<param name="Local" value="html/frmshapes.htm">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Keyword" value="text">
+			<param name="Local" value="html/frmtext.htm">
+			</OBJECT>
+	</UL>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="duplicate images">
+		<param name="Name" value="Search for Duplicate Images">
+		<param name="Local" value="html/frmpicsearch.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="edge detection">
+		<param name="Name" value="Edge Detection">
+		<param name="Local" value="html/frmedgedetect.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="editor window">
+		<param name="Name" value="Photo Mud Explorer and Photo Mud Editor">
+		<param name="Local" value="html/editorexplorer.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="emailing images">
+		<param name="Name" value="Emailing Images">
+		<param name="Local" value="html/frmsend.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="emailing multiple images">
+		<param name="Name" value="How To?">
+		<param name="Local" value="html/howdoi.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="emboss">
+		<param name="Name" value="Special Effects">
+		<param name="Local" value="html/frmspecialeffects.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="EXIF information">
+		<param name="Name" value="Image Information">
+		<param name="Local" value="html/frminfo.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="expanding the image size">
+		<param name="Name" value="Image Expand">
+		<param name="Local" value="html/frmexpand.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="explorer window">
+		<param name="Name" value="Photo Mud Explorer and Photo Mud Editor">
+		<param name="Local" value="html/editorexplorer.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="file association">
+		<param name="Name" value="Image File Associations">
+		<param name="Local" value="html/frmfileassoc.htm">
+		<param name="Name" value="How To?">
+		<param name="Local" value="html/howdoi.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="file delete">
+		<param name="Name" value="Delete File">
+		<param name="Local" value="html/editdelete.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="file details">
+		<param name="Name" value="File List Views">
+		<param name="Local" value="html/filelistviews.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="file formats">
+		<param name="Name" value="Image File Types">
+		<param name="Local" value="html/filetypes.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="file list views">
+		<param name="Name" value="File List Views">
+		<param name="Local" value="html/filelistviews.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="fill">
+		<param name="Name" value="Color Tolerance">
+		<param name="Local" value="html/frmcolortolerance.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="filling a region with a color">
+		<param name="Name" value="Filling Regions in an Image">
+		<param name="Local" value="html/drawfill.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="filter">
+		<param name="See Also" value="filter">
+		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Keyword" value="custom">
+			<param name="Local" value="html/frmfilter.htm">
+			</OBJECT>
+	</UL>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="filters">
+		<param name="Name" value="Edge Detection">
+		<param name="Local" value="html/frmedgedetect.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="flip horizontally or vertically">
+		<param name="Name" value="The Flip Commands">
+		<param name="Local" value="html/imageflip.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="font">
+		<param name="Name" value="Adding Text to Your Image">
+		<param name="Local" value="html/frmtext.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="formats">
+		<param name="See Also" value="formats">
+		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Keyword" value="image">
+			<param name="Local" value="html/filetypes.htm">
+			</OBJECT>
+	</UL>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="frame">
+		<param name="See Also" value="frame">
+		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Keyword" value="adding to an image">
+			<param name="Local" value="html/frmborder.htm">
+			</OBJECT>
+	</UL>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="full screen viewing">
+		<param name="Name" value="Full Screen Viewing">
+		<param name="Local" value="html/frmfullscreen.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="full-screen display">
+		<param name="Name" value="Zooming In and Out">
+		<param name="Local" value="html/viewzoom.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="gamma correction">
+		<param name="Name" value="Brightness and Contrast">
+		<param name="Local" value="html/frmbright.htm">
+		<param name="Name" value="Color Adjustment">
+		<param name="Local" value="html/fmcoloradjust.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="getting started">
+		<param name="Name" value="Photo Mud Quick Start">
+		<param name="Local" value="html/quickstart.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="gradient directional filter">
+		<param name="Name" value="Edge Detection">
+		<param name="Local" value="html/frmedgedetect.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="grayscale">
+		<param name="Name" value="Grayscale">
+		<param name="Local" value="html/colorgrayscale.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="halftone">
+		<param name="Name" value="Converting to Halftone">
+		<param name="Local" value="html/frmhalftone.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="hazy or faded images">
+		<param name="Name" value="How To?">
+		<param name="Local" value="html/howdoi.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="histogram color adjustment">
+		<param name="Name" value="Histogram Color Adjustment">
+		<param name="Local" value="html/frmhisto.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="icon size">
+		<param name="Name" value="Customizing the Toolbar">
+		<param name="Local" value="html/frmtoolbar.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="image formats">
+		<param name="Name" value="Image File Types">
+		<param name="Local" value="html/filetypes.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="image information">
+		<param name="Name" value="Image Information">
+		<param name="Local" value="html/frminfo.htm">
+		<param name="Name" value="How To?">
+		<param name="Local" value="html/howdoi.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="image size">
+		<param name="Name" value="Resizing the Image">
+		<param name="Local" value="html/frmresize.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="intensity detect">
+		<param name="Name" value="Special Effects">
+		<param name="Local" value="html/frmspecialeffects.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="introduction">
+		<param name="Name" value="Introduction">
+		<param name="Local" value="html/photomud.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="JPG compression">
+		<param name="Name" value="JPG Compression">
+		<param name="Local" value="html/jpgcompression.htm">
+		<param name="Name" value="Photo Mud Options">
+		<param name="Local" value="html/frmoptions.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="keywords">
+		<param name="Name" value="Image File Comments">
+		<param name="Local" value="html/frmcomment.htm">
+		<param name="Name" value="Image Search">
+		<param name="Local" value="html/frmsearch.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="light amplifier">
+		<param name="Name" value="Light Amplifier">
+		<param name="Local" value="html/frmamp.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="line">
+		<param name="Name" value="Drawing Lines">
+		<param name="Local" value="html/drawline.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="line options">
+		<param name="Name" value="Line Options">
+		<param name="Local" value="html/frmlineoptions.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="line style and thickness">
+		<param name="Name" value="Line Options">
+		<param name="Local" value="html/frmlineoptions.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="makernote for EXIF files">
+		<param name="Name" value="Image Information">
+		<param name="Local" value="html/frminfo.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="making a web page">
+		<param name="Name" value="Making a Web Page">
+		<param name="Local" value="html/fmwebpage.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="median filter noise removal">
+		<param name="Name" value="Median Filter Noise Removal">
+		<param name="Local" value="html/frmmedian.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="merging color separations">
+		<param name="Name" value="Merging Color Separations">
+		<param name="Local" value="html/frmcolormerge.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="merging images">
+		<param name="Name" value="How To?">
+		<param name="Local" value="html/howdoi.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="mirror image">
+		<param name="Name" value="The Flip Commands">
+		<param name="Local" value="html/imageflip.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="mosaic">
+		<param name="Name" value="Photo Mosaic">
+		<param name="Local" value="html/frmpicturize1.htm">
+		<param name="Name" value="Special Effects">
+		<param name="Local" value="html/frmspecialeffects.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="moving the image">
+		<param name="Name" value="Panning the Image">
+		<param name="Local" value="html/viewpan.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="negative">
+		<param name="Name" value="Making a Negative">
+		<param name="Local" value="html/colornegative.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="new features">
+		<param name="Name" value="What's New in Version 3.0?">
+		<param name="Local" value="html/whatsnew.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="new image">
+		<param name="Name" value="Creating a New Image">
+		<param name="Local" value="html/frmnew.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="noise removal">
+		<param name="Name" value="Image Blur">
+		<param name="Local" value="html/frmblur.htm">
+		<param name="Name" value="Median Filter Noise Removal">
+		<param name="Local" value="html/frmmedian.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="noise">
+		<param name="See Also" value="noise">
+		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Keyword" value="adding">
+			<param name="Local" value="html/frmspecialeffects.htm">
+			</OBJECT>
+	</UL>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="online purchasing">
+		<param name="Name" value="Online Registration, Update, and Purchasing">
+		<param name="Local" value="html/online.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="online registration">
+		<param name="Name" value="Online Registration, Update, and Purchasing">
+		<param name="Local" value="html/online.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="open">
+		<param name="Name" value="Opening an Image File">
+		<param name="Local" value="html/fileopen.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="options">
+		<param name="Name" value="Photo Mud Options">
+		<param name="Local" value="html/frmoptions.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="panning the image">
+		<param name="Name" value="Panning the Image">
+		<param name="Local" value="html/viewpan.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="paste">
+		<param name="Name" value="Stretch Paste">
+		<param name="Local" value="html/stretchpaste.htm">
+		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Keyword" value="clipboard">
+			<param name="Local" value="html/clipboard.htm">
+			</OBJECT>
+	</UL>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="photo date">
+		<param name="Name" value="How To?">
+		<param name="Local" value="html/howdoi.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="photo mosaic">
+		<param name="Name" value="Photo Mosaic">
+		<param name="Local" value="html/frmpicturize1.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="photo mosaic options">
+		<param name="Name" value="Photo Mosaic Options">
+		<param name="Local" value="html/frmpicturize2.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="Photo Mud Editor">
+		<param name="Name" value="Photo Mud Explorer and Photo Mud Editor">
+		<param name="Local" value="html/editorexplorer.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="Photo Mud Explorer">
+		<param name="Name" value="Photo Mud Explorer and Photo Mud Editor">
+		<param name="Local" value="html/editorexplorer.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="posterize">
+		<param name="Name" value="Special Effects">
+		<param name="Local" value="html/frmspecialeffects.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="Prewitt filter">
+		<param name="Name" value="Edge Detection">
+		<param name="Local" value="html/frmedgedetect.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="printing">
+		<param name="Name" value="Printing with Photo Mud">
+		<param name="Local" value="html/frmpagesetup.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="printing multiple images">
+		<param name="Name" value="How To?">
+		<param name="Local" value="html/howdoi.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="quick start">
+		<param name="Name" value="Photo Mud Quick Start">
+		<param name="Local" value="html/quickstart.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="red eye removal">
+		<param name="Name" value="Red Eye Removal">
+		<param name="Local" value="html/frmredeye.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="redo">
+		<param name="Name" value="Undo and Redo">
+		<param name="Local" value="html/editundo.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="renaming a file">
+		<param name="Name" value="Renaming an Image File">
+		<param name="Local" value="html/editrename.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="repeat last command">
+		<param name="Name" value="Repeat Last Command">
+		<param name="Local" value="html/repeatcommand.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="resize">
+		<param name="Name" value="Image Expand">
+		<param name="Local" value="html/frmexpand.htm">
+		<param name="Name" value="Resizing the Image">
+		<param name="Local" value="html/frmresize.htm">
+		<param name="Name" value="How To?">
+		<param name="Local" value="html/howdoi.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="resizing images">
+		<param name="Name" value="Converting Images">
+		<param name="Local" value="html/fmconvert.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="revert to last saved">
+		<param name="Name" value="Revert to Last Saved">
+		<param name="Local" value="html/revert.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="rotate">
+		<param name="Name" value="Rotating the Image">
+		<param name="Local" value="html/frmrotate.htm">
+		<param name="Name" value="How To?">
+		<param name="Local" value="html/howdoi.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="salt and pepper noise removal">
+		<param name="Name" value="Median Filter Noise Removal">
+		<param name="Local" value="html/frmmedian.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="saturation">
+		<param name="Name" value="Adjusting the Color Saturation">
+		<param name="Local" value="html/frmsaturation.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="saving images">
+		<param name="Name" value="Saving Images">
+		<param name="Local" value="html/saving.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="scanner">
+		<param name="Name" value="How To?">
+		<param name="Local" value="html/howdoi.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="scanning an image">
+		<param name="Name" value="Downloading from a Scanner or Camera">
+		<param name="Local" value="html/fileacquire.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="screen capture">
+		<param name="Name" value="Screen Capture">
+		<param name="Local" value="html/frmcapture.htm">
+		<param name="Name" value="How To?">
+		<param name="Local" value="html/howdoi.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="search for duplicate images">
+		<param name="Name" value="Search for Duplicate Images">
+		<param name="Local" value="html/frmpicsearch.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="searching images">
+		<param name="Name" value="Image Search">
+		<param name="Local" value="html/frmsearch.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="select similar color">
+		<param name="Name" value="Color Tolerance">
+		<param name="Local" value="html/frmcolortolerance.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="selection">
+		<param name="Name" value="Selections">
+		<param name="Local" value="html/selection.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="send email">
+		<param name="Name" value="Emailing Images">
+		<param name="Local" value="html/frmsend.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="shapes">
+		<param name="Name" value="Drawing Shapes">
+		<param name="Local" value="html/frmshapes.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="sharpen">
+		<param name="Name" value="Edge Detection">
+		<param name="Local" value="html/frmedgedetect.htm">
+		<param name="Name" value="Sharpening an Image">
+		<param name="Local" value="html/frmunsharp.htm">
+		<param name="Name" value="How To?">
+		<param name="Local" value="html/howdoi.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="shear">
+		<param name="Name" value="Image Skew">
+		<param name="Local" value="html/frmskew.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="shift-difference filter">
+		<param name="Name" value="Edge Detection">
+		<param name="Local" value="html/frmedgedetect.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="sketching">
+		<param name="Name" value="Drawing Lines">
+		<param name="Local" value="html/drawline.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="skew">
+		<param name="Name" value="Image Skew">
+		<param name="Local" value="html/frmskew.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="slide show options">
+		<param name="Name" value="Photo Mud Options">
+		<param name="Local" value="html/frmoptions.htm#slideshowoptions">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="slideshow">
+		<param name="Name" value="How To?">
+		<param name="Local" value="html/howdoi.htm">
+		<param name="Name" value="Slideshow">
+		<param name="Local" value="html/frmslideshow.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="Sobel filter">
+		<param name="Name" value="Edge Detection">
+		<param name="Local" value="html/frmedgedetect.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="solarize">
+		<param name="Name" value="Special Effects">
+		<param name="Local" value="html/frmspecialeffects.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="special effects">
+		<param name="Name" value="Special Effects">
+		<param name="Local" value="html/frmspecialeffects.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="stretching an image">
+		<param name="Name" value="Stretch Paste">
+		<param name="Local" value="html/stretchpaste.htm">
+		<param name="Name" value="Image Stretch">
+		<param name="Local" value="html/imagestretch.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="tagging images">
+		<param name="Name" value="Tagging Images">
+		<param name="Local" value="html/taggingimages.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="text">
+		<param name="Name" value="Adding Text to Your Image">
+		<param name="Local" value="html/frmtext.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="thumbnail images">
+		<param name="Name" value="Making a Web Page">
+		<param name="Local" value="html/fmwebpage.htm">
+		<param name="Name" value="File List Views">
+		<param name="Local" value="html/filelistviews.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="toolbar">
+		<param name="Name" value="Using the Toolbar">
+		<param name="Local" value="html/toolbar.htm">
+		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Keyword" value="customizing">
+			<param name="Local" value="html/frmtoolbar.htm">
+			</OBJECT>
+	</UL>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="trial period">
+		<param name="Name" value="Online Registration, Update, and Purchasing">
+		<param name="Local" value="html/online.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="trimming">
+		<param name="Name" value="How To?">
+		<param name="Local" value="html/howdoi.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="undo">
+		<param name="Name" value="Undo and Redo">
+		<param name="Local" value="html/editundo.htm">
+		<param name="Name" value="Revert to Last Saved">
+		<param name="Local" value="html/revert.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="undo and redo">
+		<param name="See Also" value="undo and redo">
+		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Keyword" value="enabling">
+			<param name="Local" value="html/frmoptions.htm">
+			</OBJECT>
+	</UL>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="unsharp mask">
+		<param name="Name" value="Sharpening an Image">
+		<param name="Local" value="html/frmunsharp.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="up one level">
+		<param name="Name" value="Up One Level">
+		<param name="Local" value="html/uponelevel.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="updates">
+		<param name="Name" value="Online Registration, Update, and Purchasing">
+		<param name="Local" value="html/online.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="version 3.0">
+		<param name="Name" value="What's New in Version 3.0?">
+		<param name="Local" value="html/whatsnew.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="Wallpaper">
+		<param name="Name" value="Setting your Windows Wallpaper">
+		<param name="Local" value="html/toolswallpaper.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="web page">
+		<param name="Name" value="How To?">
+		<param name="Local" value="html/howdoi.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="web page images">
+		<param name="See Also" value="web page images">
+		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Keyword" value="saving">
+			<param name="Local" value="html/fmwebpage.htm">
+			</OBJECT>
+	</UL>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="web page options">
+		<param name="Name" value="Making a Web Page">
+		<param name="Local" value="html/fmwebpage.htm">
+		</OBJECT>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="web page">
+		<param name="See Also" value="web page">
+		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Keyword" value="images and captions">
+			<param name="Local" value="html/fmwebpage.htm">
+			</OBJECT>
+	</UL>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="web pages">
+		<param name="See Also" value="web pages">
+		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Keyword" value="making">
+			<param name="Local" value="html/fmwebpage.htm">
+			</OBJECT>
+	</UL>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Keyword" value="zoom">
+		<param name="Name" value="Zooming In and Out">
+		<param name="Local" value="html/viewzoom.htm">
+		</OBJECT>
+</UL></HTML>

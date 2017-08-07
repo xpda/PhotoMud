@@ -1,0 +1,79 @@
+
+Print a Calendar.
+In Photo Mud Explorer select or tag the photos you want to include in the calendar. Then click on Calendar under the Tools menu.
+
+Find duplicates photos.
+You can find duplicate or near-duplicate photos on your hard drive with Search for Duplicates under the Tools menu.
+
+Make a photo mosaic -- a large photo made up of smaller photos.
+First, copy the cell photos, the photos from which the large photo is to be composed, into a separate folder. Open the photo you want to convert into a photo mosaic. Then select Photo Mosaic from the Tools menu of Photo Mud Editor.
+
+Rotate a photo to make the horizon level.
+Select Rotate from the Image menu of Photo Mud Editor. Drag the slider until the horizon is aligned with a horizontal grid line, then click OK.
+
+Apply special effects on a photo.
+Select Special Effects or Artistic Effects from the Image menu.
+
+Fix a photo that's too dark or too light.
+In Photo Mud Editor, select Brightness, Contrast, Saturation from the Color menu.
+
+Make a picture less blurry.
+Use the Sharpen under the Image menu of Photo Mud Editor.
+
+Print several pictures on one page.
+First, select or tag the photos you want to print in Photo Mud Explorer. Then, click on Print under the File menu. Check "Multiple Photos per Page" and specify the number of rows and columns you want to print.
+
+Make a web page of photos.
+In Photo Mud Explorer, select or tag the photos you want to include in the web page. Then select Make Thumbnail Web Page from the Tools menu.
+
+Resize or convert a group of pictures.
+In Photo Mud Explorer, select or tag the photos you want to resize or convert. Then select Convert Photos from the File menu.
+
+Fix a photo that is too red or too blue.
+In Photo Mud Editor, select Color Adjustment from the Color menu. Then change the intensities for the specific colors, emphasizing the midtones.
+
+Fix a photo that looks hazy or faded.
+The best way is with usually to "Expand Midtones" with Histogram Adjustment under the Color menu. You can also do more complex adjustments under the Histogram Adjustment. For a one-step enhancement, try Auto Enhance, also under the Color menu.
+
+Trim or crop a photo.
+Use Set Cropping Area%_45q9_ under the Image menu, or click on the crop tool. .
+
+Use Photo Mud to open a photo you double-click on in Windows Explorer or an email attachment.
+Select Associate File Types under the Tools menu, and check the file types you want to "associate" with Photo Mud.
+
+Copy an object or person from one photo into another.
+Select the section of the photo to be copied using one of the selection methods under the Edit menu of Photo Mud Editor. If you want soft edges on the selection, increase the feathering amount. Then press Ctrl-C to copy the selected area to the clipboard. Open the photo where the selection will be copied, and use Paste under the Edit menu to copy the selection into the new photo.
+
+Find out when a photo was taken.
+Most modern digital photos contain information such as camera settings, date and time, and technical details of the photo file. To display this information, select Photo Information from the Tools menu.
+
+Add a caption or comments to a photo.
+Select Enter Photo Comments from the Tools menu. The comments can be displayed with Photo Information, and can be automatically added to web pages generated with Photo Mud.
+
+Download photos from a scanner.
+Select Scan from the File menu. If there is more than one scanner or camera attached to your computer, you can select the input device.
+
+Rotate a photo 90 degrees.
+You can rotate photos under Photo Mud Explorer using a single keystroke or mouse click for Rotate Left (Ctrl-L) and Rotate Right%Ind_rni6w (Ctrl-R). These automatically save the rotated photo.
+        
+
+Make a slide show from a set of photos.
+Select or tag the photos you want to include in the slide show, then select Slide Show in the Tools menu of Photo Mud Explorer.
+
+Merge two photos.
+Use Combine Photos%4ol4ml under the Tools menu of Photo Mud Editor, or copy and paste from one photo to another.
+
+Email several photos at once.
+Select or tag the photos you want to email, then select Email Photos%Ind6bk7nh from the File menu.
+
+Capture a screen photo.
+Display the screen you want to capture, and press Shift-PrtScr. Then, in Photo Mud, press Ctrl-Q or click on Paste Image to New Window under the Edit menu.
+
+Repeat the last command.
+In Photo Mud Editor, you can press the F3 key to repeat the last command. For example, if you want to draw more than one line, you can draw one line using the Line command and then press F3 to draw subsequent lines.
+
+Rename, create, or delete a folder.
+Right-click on the folder, then select Rename, Create, or Delete from the context menu.
+
+Use GPS coordinates in photos.
+A few cameras have built-in GPS receivers and use them to automatically add GPS data to photo files. You can also use software such as GPS Stamp to incorporate a GPS track into a set of photos, adding the GPS coordinates to the photo files.
