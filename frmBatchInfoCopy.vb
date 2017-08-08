@@ -229,6 +229,8 @@ Public Class frmBatchInfoCopy
     Dim mResult As MsgBoxResult
     Dim copied As Boolean
     Dim bmp As Bitmap = Nothing
+    Dim v As Object
+    Dim s As String
 
     pComments = readPropertyItems(sourceFile)
     If pComments.Count <= 2 Then Return 0
@@ -240,8 +242,14 @@ Public Class frmBatchInfoCopy
     End Using
     If chkCommentOnly.Checked Then
       For Each p As PropertyItem In pComments
+
         If p.Id = propID.ImageDescription Then
-          attachPropertyItems(bmp, pComments)
+          s = "" ' only copy non-blank comments in comment-only copy
+          If p.Type = 2 Then ' string - should always be this
+            v = getTagValue(p)
+            If v IsNot Nothing AndAlso UBound(v) >= 0 Then s = v(0)
+          End If
+          If s <> "" Then attachPropertyItems(bmp, pComments)
           bmp.SetPropertyItem(p)
           copied = True
           Exit For

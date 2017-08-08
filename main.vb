@@ -3737,7 +3737,7 @@ Public Module main
   Public Sub batchAdjust(ByRef gBitmap As Bitmap, pView As pViewer)
     ' runs the batch color conversions on gBitmap
     ' this is called by frmColorBatchAdjust and frmConvert
-    Dim gammaRed, gammaGreen, gammaBlue As Integer
+    Dim gammaRed, gammaGreen, gammaBlue As Double
 
     Using img As New MagickImage(gBitmap)
 
