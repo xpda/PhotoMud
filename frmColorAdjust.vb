@@ -155,7 +155,7 @@ Public Class frmColorAdjust
 
     saveStuff(img, aView.pView1, gpath, fullbitmap)
 
-    bmp = aView.pView0.FloaterBitmap.Clone
+    bmp = aView.pView1.FloaterBitmap.Clone
     histo = getHisto(bmp)
     showHisto(pviewHisto, histo, histXscale, histYscale)
 
