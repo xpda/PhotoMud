@@ -15,6 +15,8 @@ Public Class frmColorBatchAdjust
   Dim downy As Single
   Dim iPicnum As Integer
 
+  Dim WithEvents Timer1 As New Timer
+
   Private Sub cmdCancel_Click(ByVal Sender As Object, ByVal e As EventArgs) Handles cmdCancel.Click
 
     colorAdjust = False
@@ -63,6 +65,8 @@ Public Class frmColorBatchAdjust
 
     helpProvider1.SetHelpNavigator(Me, HelpNavigator.Topic)
     helpProvider1.SetHelpKeyword(Me, Me.Name & ".html")
+
+    Timer1.Enabled = False
 
     Loading = True
 
@@ -115,7 +119,7 @@ Public Class frmColorBatchAdjust
       nmSaturation.Value = trk.Value
     End If
 
-    drawPic()
+    Timer1.Interval = 150 : Timer1.Stop() : Timer1.Start() ' draw after 150 milliseconds
 
     Sliding = False
 
@@ -145,7 +149,8 @@ Public Class frmColorBatchAdjust
       trkSaturation.Value = nm.Value
     End If
 
-    drawPic()
+    Timer1.Interval = 150 : Timer1.Stop() : Timer1.Start() ' draw after 150 milliseconds
+    Sliding = False
 
   End Sub
 
@@ -241,10 +246,20 @@ Public Class frmColorBatchAdjust
 
     chkAutoAdjust.Checked = False
 
+    Timer1.Interval = 150 : Timer1.Stop() : Timer1.Start() ' draw after 150 milliseconds
+
     aview.ZoomViews(0)
     drawPic()
 
   End Sub
 
+  Private Sub Timer1_Tick(ByVal sender As Object, ByVal e As System.EventArgs) Handles Timer1.Tick
+    Timer1.Stop()
+    drawPic()
+  End Sub
+
+  Sub aview_zoomed() Handles aview.Zoomed, Me.Resize
+    Timer1.Stop() : Timer1.Interval = 150 : Timer1.Start() ' calls drawsharp
+  End Sub
 
 End Class

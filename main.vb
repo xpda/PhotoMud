@@ -5270,6 +5270,80 @@ Public Module main
 
   End Sub
 
+  Sub showHisto(pView As pViewer, ByRef hist(,) As Integer, ByRef histXscale As Double, ByRef histYscale As Double)
+    ' draws the histograms in the pictureboxes.
+
+    Static busy As Boolean = False
+
+    Dim k As Integer
+    Dim maxH As Integer
+    Dim RP(257) As PointF
+    Dim bmp1 As Bitmap
+
+
+    If busy Then Exit Sub
+    busy = True
+
+    ' If getScale Then getHistoScale(bmp, picBox)
+    maxH = 1
+    For j As Integer = 0 To 255
+      k = Max(Max(hist(0, j), hist(1, j)), hist(2, j))
+      If k > maxH Then maxH = k
+    Next j
+
+    histYscale = pView.ClientSize.Height / maxH
+    histXscale = pView.ClientSize.Width / 255
+
+    'For j As Integer = 0 To 255
+    ' k = (hist(0, j) + hist(1, j) + hist(2, j)) \ 3
+    ' RP(j).X = j * histXscale
+    ' RP(j).Y = PicBox.ClientSize.Height - (k * histYscale)
+    ' Next j
+
+    bmp1 = New Bitmap(pView.Width, pView.Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb)
+    Using g As Graphics = Graphics.FromImage(bmp1)
+      g.Clear(Color.Black)
+    End Using
+
+    For i As Integer = 0 To 2
+      For j As Integer = 0 To 255
+        k = hist(i, j)
+        RP(j).X = j * histXscale
+        RP(j).Y = pView.ClientSize.Height - (k * histYscale)
+      Next j
+      Using bmp2 As Bitmap = New Bitmap(pView.Width, pView.Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb)
+        If i = 0 Then redrawHisto(bmp2, RP, Color.FromArgb(255, 0, 0))
+        If i = 1 Then redrawHisto(bmp2, RP, Color.FromArgb(0, 255, 0))
+        If i = 2 Then redrawHisto(bmp2, RP, Color.FromArgb(0, 0, 255))
+        bmpMerge(bmp2, bmp1, mergeOp.opAdd, New Rectangle(0, 0, bmp2.Width, bmp2.Height))
+      End Using
+    Next i
+
+    pView.Image = bmp1
+    pView.Invalidate()
+
+    busy = False
+
+  End Sub
+
+  Sub redrawHisto(bmp As Bitmap, rp() As PointF, col As Color)
+
+    rp(256).X = rp(255).X
+    rp(256).Y = bmp.Height
+    rp(257).X = rp(0).X
+    rp(257).Y = rp(256).Y
+
+    Using g As Graphics = Graphics.FromImage(bmp),
+      gBrush As New solidbrush(col)
+      g.SmoothingMode = SmoothingMode.HighQuality
+      g.PixelOffsetMode = PixelOffsetMode.HighQuality
+      g.Clear(Color.Black)
+      g.FillPolygon(gBrush, rp)
+    End Using
+
+  End Sub
+
+
 
   Function getRational(value As Object) As Integer()
     ' returns an array of numerators and denominators that match the double(s) "value".

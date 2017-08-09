@@ -121,7 +121,7 @@
       trkBrightness.Minimum = -100
       trkBrightness.Maximum = 100
       trkBrightness.SmallChange = 1
-      trkBrightness.LargeChange = 10
+      trkBrightness.LargeChange = 5
       nmBrightness.Minimum = trkBrightness.Minimum
       nmBrightness.Maximum = trkBrightness.Maximum
       nmBrightness.Value = trkBrightness.Value
@@ -131,7 +131,7 @@
       trkContrast.Minimum = -100
       trkContrast.Maximum = 100
       trkContrast.SmallChange = 1
-      trkContrast.LargeChange = 10
+      trkContrast.LargeChange = 5
       nmContrast.Minimum = trkContrast.Minimum
       nmContrast.Maximum = trkContrast.Maximum
       nmContrast.Value = trkContrast.Value

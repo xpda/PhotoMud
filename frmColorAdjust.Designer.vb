@@ -41,6 +41,7 @@ Partial Class frmColorAdjust
     Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
     Me.chkPreserveIntensity = New System.Windows.Forms.CheckBox()
     Me.aView = New PhotoMud.ctlViewCompare()
+    Me.pviewHisto = New PhotoMud.pViewer()
     CType(Me.nmMidRed, System.ComponentModel.ISupportInitialize).BeginInit()
     CType(Me.trkMidRed, System.ComponentModel.ISupportInitialize).BeginInit()
     CType(Me.nmMidGreen, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -48,6 +49,7 @@ Partial Class frmColorAdjust
     CType(Me.nmMidBlue, System.ComponentModel.ISupportInitialize).BeginInit()
     CType(Me.trkMidBlue, System.ComponentModel.ISupportInitialize).BeginInit()
     Me.GroupBox2.SuspendLayout()
+    CType(Me.pviewHisto, System.ComponentModel.ISupportInitialize).BeginInit()
     Me.SuspendLayout()
     '
     'cmdHelp
@@ -243,6 +245,55 @@ Partial Class frmColorAdjust
     Me.aView.TabIndex = 79
     Me.aView.zoomFactor = 0.0R
     '
+    'pviewHisto
+    '
+    Me.pviewHisto.BackColor = System.Drawing.SystemColors.ActiveCaptionText
+    Me.pviewHisto.BitmapPath = Nothing
+    Me.pviewHisto.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+    Me.pviewHisto.CurrentPage = 0
+    Me.pviewHisto.DrawAngle = 0.0R
+    Me.pviewHisto.DrawBackColor = System.Drawing.Color.White
+    Me.pviewHisto.DrawBox = New System.Drawing.Rectangle(0, 0, 0, 0)
+    Me.pviewHisto.DrawDashed = False
+    Me.pviewHisto.DrawFilled = False
+    Me.pviewHisto.DrawFont = Nothing
+    Me.pviewHisto.DrawForeColor = System.Drawing.Color.Navy
+    Me.pviewHisto.DrawLineWidth = 1.0!
+    Me.pviewHisto.DrawPath = Nothing
+    Me.pviewHisto.DrawPoints = CType(resources.GetObject("pviewHisto.DrawPoints"), System.Collections.Generic.List(Of System.Drawing.Point))
+    Me.pviewHisto.DrawShape = PhotoMud.shape.Line
+    Me.pviewHisto.DrawString = ""
+    Me.pviewHisto.DrawTextFmt = Nothing
+    Me.pviewHisto.FloaterOutline = False
+    Me.pviewHisto.FloaterPath = Nothing
+    Me.pviewHisto.FloaterPosition = New System.Drawing.Point(0, 0)
+    Me.pviewHisto.FloaterVisible = True
+    Me.pviewHisto.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.High
+    Me.pviewHisto.Location = New System.Drawing.Point(569, 416)
+    Me.pviewHisto.Name = "pviewHisto"
+    Me.pviewHisto.pageBmp = CType(resources.GetObject("pviewHisto.pageBmp"), System.Collections.Generic.List(Of System.Drawing.Bitmap))
+    Me.pviewHisto.PageCount = 0
+    Me.pviewHisto.RubberAngle = 0.0R
+    Me.pviewHisto.rubberBackColor = System.Drawing.Color.White
+    Me.pviewHisto.RubberBox = New System.Drawing.Rectangle(0, 0, 0, 0)
+    Me.pviewHisto.RubberBoxCrop = False
+    Me.pviewHisto.RubberColor = System.Drawing.Color.Navy
+    Me.pviewHisto.RubberDashed = False
+    Me.pviewHisto.RubberEnabled = False
+    Me.pviewHisto.RubberFilled = False
+    Me.pviewHisto.RubberFont = Nothing
+    Me.pviewHisto.RubberLineWidth = 1.0R
+    Me.pviewHisto.RubberPath = Nothing
+    Me.pviewHisto.RubberPoints = CType(resources.GetObject("pviewHisto.RubberPoints"), System.Collections.Generic.List(Of System.Drawing.Point))
+    Me.pviewHisto.RubberShape = PhotoMud.shape.Curve
+    Me.pviewHisto.RubberString = ""
+    Me.pviewHisto.RubberTextFmt = Nothing
+    Me.pviewHisto.SelectionVisible = True
+    Me.pviewHisto.Size = New System.Drawing.Size(322, 166)
+    Me.pviewHisto.TabIndex = 80
+    Me.pviewHisto.TabStop = False
+    Me.pviewHisto.ZoomFactor = 1.0R
+    '
     'frmColorAdjust
     '
     Me.AcceptButton = Me.cmdOK
@@ -250,6 +301,7 @@ Partial Class frmColorAdjust
     Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
     Me.CancelButton = Me.cmdCancel
     Me.ClientSize = New System.Drawing.Size(976, 685)
+    Me.Controls.Add(Me.pviewHisto)
     Me.Controls.Add(Me.aView)
     Me.Controls.Add(Me.chkPreserveIntensity)
     Me.Controls.Add(Me.cmdReset)
@@ -270,25 +322,27 @@ Partial Class frmColorAdjust
     CType(Me.trkMidBlue, System.ComponentModel.ISupportInitialize).EndInit()
     Me.GroupBox2.ResumeLayout(False)
     Me.GroupBox2.PerformLayout()
+    CType(Me.pviewHisto, System.ComponentModel.ISupportInitialize).EndInit()
     Me.ResumeLayout(False)
     Me.PerformLayout()
 
-End Sub
-    Public WithEvents cmdHelp As System.Windows.Forms.Button
-    Public WithEvents cmdOK As System.Windows.Forms.Button
-    Public WithEvents cmdCancel As System.Windows.Forms.Button
-    Friend WithEvents nmMidRed As System.Windows.Forms.NumericUpDown
-    Friend WithEvents trkMidRed As System.Windows.Forms.TrackBar
-    Friend WithEvents nmMidGreen As System.Windows.Forms.NumericUpDown
-    Friend WithEvents trkMidGreen As System.Windows.Forms.TrackBar
-    Friend WithEvents nmMidBlue As System.Windows.Forms.NumericUpDown
-    Friend WithEvents trkMidBlue As System.Windows.Forms.TrackBar
-    Friend WithEvents GroupBox2 As System.Windows.Forms.GroupBox
-    Friend WithEvents Label6 As System.Windows.Forms.Label
-    Friend WithEvents Label7 As System.Windows.Forms.Label
-    Friend WithEvents Label8 As System.Windows.Forms.Label
-    Public WithEvents cmdReset As System.Windows.Forms.Button
-    Friend WithEvents ToolTip1 As System.Windows.Forms.ToolTip
-    Friend WithEvents chkPreserveIntensity As System.Windows.Forms.CheckBox
-    Friend WithEvents aView As PhotoMud.ctlViewCompare
+  End Sub
+  Public WithEvents cmdHelp As System.Windows.Forms.Button
+  Public WithEvents cmdOK As System.Windows.Forms.Button
+  Public WithEvents cmdCancel As System.Windows.Forms.Button
+  Friend WithEvents nmMidRed As System.Windows.Forms.NumericUpDown
+  Friend WithEvents trkMidRed As System.Windows.Forms.TrackBar
+  Friend WithEvents nmMidGreen As System.Windows.Forms.NumericUpDown
+  Friend WithEvents trkMidGreen As System.Windows.Forms.TrackBar
+  Friend WithEvents nmMidBlue As System.Windows.Forms.NumericUpDown
+  Friend WithEvents trkMidBlue As System.Windows.Forms.TrackBar
+  Friend WithEvents GroupBox2 As System.Windows.Forms.GroupBox
+  Friend WithEvents Label6 As System.Windows.Forms.Label
+  Friend WithEvents Label7 As System.Windows.Forms.Label
+  Friend WithEvents Label8 As System.Windows.Forms.Label
+  Public WithEvents cmdReset As System.Windows.Forms.Button
+  Friend WithEvents ToolTip1 As System.Windows.Forms.ToolTip
+  Friend WithEvents chkPreserveIntensity As System.Windows.Forms.CheckBox
+  Friend WithEvents aView As PhotoMud.ctlViewCompare
+  Friend WithEvents pviewHisto As PhotoMud.pViewer
 End Class

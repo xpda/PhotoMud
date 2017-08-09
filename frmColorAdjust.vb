@@ -98,9 +98,10 @@ Public Class frmColorAdjust
   Sub drawColors(fullbitmap As Boolean)
 
     Dim gammaRed, gammaGreen, gammaBlue As Double
-
+    Dim histo(2, 255) As Integer ' histogram data
+    Dim histXscale, histYscale As Double
+    Dim bmp As Bitmap
     Static busy As Boolean = False
-
     Dim img As MagickImage
 
     If aView.pView0.Bitmap Is Nothing Then Exit Sub
@@ -153,6 +154,12 @@ Public Class frmColorAdjust
     End Try
 
     saveStuff(img, aView.pView1, gpath, fullbitmap)
+
+    bmp = aView.pView0.FloaterBitmap.Clone
+    histo = getHisto(bmp)
+    showHisto(pviewHisto, histo, histXscale, histYscale)
+
+
     aView.Repaint()
     aView.zoomLabel()
 
