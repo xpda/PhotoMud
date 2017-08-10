@@ -153,12 +153,14 @@ Public Class frmColorAdjust
       MsgBox(ex.Message)
     End Try
 
-    saveStuff(img, aView.pView1, gpath, fullbitmap)
-
-    bmp = aView.pView1.FloaterBitmap.Clone
+    'bmp = aView.pView1.FloaterBitmap.Clone
+    bmp = img.ToBitmap
+    Set32bppPArgb(bmp)
     histo = getHisto(bmp)
+    clearBitmap(bmp)
     showHisto(pviewHisto, histo, histXscale, histYscale)
 
+    saveStuff(img, aView.pView1, gpath, fullbitmap)
 
     aView.Repaint()
     aView.zoomLabel()

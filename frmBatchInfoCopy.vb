@@ -44,6 +44,10 @@ Public Class frmBatchInfoCopy
     If vb.Right(txDestPath.Text, 1) = ":" Then txDestPath.Text = txDestPath.Text & "\"
     TreeViewInit(TreeViewDest, txDestPath.Text) ' initialize treeview with drives, etc.
 
+    chkCommentOnly.Checked = False
+    chkOverwrite.Checked = True
+    chkOverwrite.Enabled = False
+
     Loading = False
 
   End Sub
@@ -224,12 +228,12 @@ Public Class frmBatchInfoCopy
     ' copies the comments from sourceFile to destFile
 
     Dim pComments As New List(Of PropertyItem)
+    Dim destComments As New List(Of PropertyItem)
     Dim saver As New ImageSave
     Dim msg As String = ""
     Dim mResult As MsgBoxResult
     Dim copied As Boolean
     Dim bmp As Bitmap = Nothing
-    Dim v As Object
     Dim s As String
 
     pComments = readPropertyItems(sourceFile)
@@ -240,21 +244,22 @@ Public Class frmBatchInfoCopy
       bmp = Image.FromStream(iStream, True, False)
       Set32bppPArgb(bmp) ' prevents write error?
     End Using
-    If chkCommentOnly.Checked Then
-      For Each p As PropertyItem In pComments
 
-        If p.Id = propID.ImageDescription Then
-          s = "" ' only copy non-blank comments in comment-only copy
-          If p.Type = 2 Then ' string - should always be this
-            v = getTagValue(p)
-            If v IsNot Nothing AndAlso UBound(v) >= 0 Then s = v(0)
-          End If
-          If s <> "" Then attachPropertyItems(bmp, pComments)
-          bmp.SetPropertyItem(p)
+    If chkCommentOnly.Checked Then
+      s = ""
+      If Not chkOverwrite.Checked Then
+        destComments = readPropertyItems(destFile)
+        s = getBmpComment(propID.ImageDescription, destComments)
+      End If
+      If s = "" Then ' only copy if destination is blank or overwrite is checked
+        s = getBmpComment(propID.ImageDescription, pComments)
+        If s <> "" Then
+          setBmpComment(propID.ImageDescription, destComments, s, exifType.typeAscii)
+          attachPropertyItems(bmp, destComments)
           copied = True
-          Exit For
         End If
-      Next p
+      End If
+
     Else ' copy all comments
       attachPropertyItems(bmp, pComments)
       copied = True
@@ -311,4 +316,7 @@ Public Class frmBatchInfoCopy
     txSourcePath.Select()
   End Sub
 
+  Private Sub chkCommentOnly_CheckedChanged(sender As Object, e As EventArgs) Handles chkCommentOnly.CheckedChanged
+    If chkCommentOnly.Checked Then chkOverwrite.Enabled = True Else chkOverwrite.Enabled = False
+  End Sub
 End Class

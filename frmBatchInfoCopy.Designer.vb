@@ -39,6 +39,7 @@ Partial Class frmBatchInfoCopy
     Me.Label2 = New System.Windows.Forms.Label()
     Me.chkCommentOnly = New System.Windows.Forms.CheckBox()
     Me.bkgSave = New System.ComponentModel.BackgroundWorker()
+    Me.chkOverwrite = New System.Windows.Forms.CheckBox()
     Me.StatusStrip1.SuspendLayout()
     Me.SuspendLayout()
     '
@@ -53,7 +54,7 @@ Partial Class frmBatchInfoCopy
     Me.TreeViewDest.Location = New System.Drawing.Point(448, 63)
     Me.TreeViewDest.Name = "TreeViewDest"
     Me.TreeViewDest.SelectedImageIndex = 0
-    Me.TreeViewDest.Size = New System.Drawing.Size(417, 477)
+    Me.TreeViewDest.Size = New System.Drawing.Size(417, 453)
     Me.TreeViewDest.TabIndex = 30
     Me.TreeViewDest.TabStop = False
     '
@@ -101,7 +102,7 @@ Partial Class frmBatchInfoCopy
     Me.TreeViewSource.Location = New System.Drawing.Point(11, 63)
     Me.TreeViewSource.Name = "TreeViewSource"
     Me.TreeViewSource.SelectedImageIndex = 0
-    Me.TreeViewSource.Size = New System.Drawing.Size(417, 477)
+    Me.TreeViewSource.Size = New System.Drawing.Size(417, 453)
     Me.TreeViewSource.TabIndex = 33
     Me.TreeViewSource.TabStop = False
     '
@@ -135,7 +136,7 @@ Partial Class frmBatchInfoCopy
     '
     Me.StatusStrip1.ImageScalingSize = New System.Drawing.Size(20, 20)
     Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ProgressBar1})
-    Me.StatusStrip1.Location = New System.Drawing.Point(0, 655)
+    Me.StatusStrip1.Location = New System.Drawing.Point(0, 689)
     Me.StatusStrip1.Name = "StatusStrip1"
     Me.StatusStrip1.Size = New System.Drawing.Size(879, 23)
     Me.StatusStrip1.TabIndex = 34
@@ -150,7 +151,7 @@ Partial Class frmBatchInfoCopy
     '
     Me.cmdStart.Anchor = System.Windows.Forms.AnchorStyles.Bottom
     Me.cmdStart.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.cmdStart.Location = New System.Drawing.Point(545, 587)
+    Me.cmdStart.Location = New System.Drawing.Point(543, 605)
     Me.cmdStart.Name = "cmdStart"
     Me.cmdStart.Size = New System.Drawing.Size(105, 51)
     Me.cmdStart.TabIndex = 5
@@ -164,7 +165,7 @@ Partial Class frmBatchInfoCopy
     Me.cmdCancel.Anchor = System.Windows.Forms.AnchorStyles.Bottom
     Me.cmdCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
     Me.cmdCancel.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.cmdCancel.Location = New System.Drawing.Point(674, 587)
+    Me.cmdCancel.Location = New System.Drawing.Point(674, 605)
     Me.cmdCancel.Name = "cmdCancel"
     Me.cmdCancel.Size = New System.Drawing.Size(105, 51)
     Me.cmdCancel.TabIndex = 6
@@ -173,28 +174,47 @@ Partial Class frmBatchInfoCopy
     '
     'Label2
     '
-    Me.Label2.Location = New System.Drawing.Point(8, 549)
+    Me.Label2.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+    Me.Label2.Location = New System.Drawing.Point(8, 537)
     Me.Label2.Name = "Label2"
-    Me.Label2.Size = New System.Drawing.Size(453, 65)
+    Me.Label2.Size = New System.Drawing.Size(496, 65)
     Me.Label2.TabIndex = 37
     Me.Label2.Text = "This function copies the photo information, "
     '
     'chkCommentOnly
     '
+    Me.chkCommentOnly.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
     Me.chkCommentOnly.AutoSize = True
-    Me.chkCommentOnly.Location = New System.Drawing.Point(61, 625)
+    Me.chkCommentOnly.Location = New System.Drawing.Point(39, 621)
     Me.chkCommentOnly.Name = "chkCommentOnly"
     Me.chkCommentOnly.Size = New System.Drawing.Size(214, 21)
     Me.chkCommentOnly.TabIndex = 4
     Me.chkCommentOnly.Text = "&Copy only the comment field"
     Me.chkCommentOnly.UseVisualStyleBackColor = True
     '
+    'bkgSave
+    '
+    '
+    'chkOverwrite
+    '
+    Me.chkOverwrite.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+    Me.chkOverwrite.AutoSize = True
+    Me.chkOverwrite.Checked = True
+    Me.chkOverwrite.CheckState = System.Windows.Forms.CheckState.Checked
+    Me.chkOverwrite.Location = New System.Drawing.Point(39, 651)
+    Me.chkOverwrite.Name = "chkOverwrite"
+    Me.chkOverwrite.Size = New System.Drawing.Size(220, 21)
+    Me.chkOverwrite.TabIndex = 38
+    Me.chkOverwrite.Text = "&Overwrite existing comments"
+    Me.chkOverwrite.UseVisualStyleBackColor = True
+    '
     'frmBatchInfoCopy
     '
     Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 17.0!)
     Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
     Me.CancelButton = Me.cmdCancel
-    Me.ClientSize = New System.Drawing.Size(879, 678)
+    Me.ClientSize = New System.Drawing.Size(879, 712)
+    Me.Controls.Add(Me.chkOverwrite)
     Me.Controls.Add(Me.chkCommentOnly)
     Me.Controls.Add(Me.Label2)
     Me.Controls.Add(Me.cmdStart)
@@ -231,4 +251,5 @@ Partial Class frmBatchInfoCopy
   Friend WithEvents Label2 As System.Windows.Forms.Label
   Friend WithEvents chkCommentOnly As System.Windows.Forms.CheckBox
   Friend WithEvents bkgSave As System.ComponentModel.BackgroundWorker
+  Friend WithEvents chkOverwrite As System.Windows.Forms.CheckBox
 End Class
