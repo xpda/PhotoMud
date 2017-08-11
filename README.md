@@ -2,7 +2,7 @@
 
 Photo Mud is a very nice program. You can have a free copy and use it all you want. There is no DRM, Copy Protection, Authentication, Product Key, or other nonsense. [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-There are no guarantees, but I would like to hear from you if you have any problems, questions, comments, suggestions, or general harassment: https://github.com/gsdnano/photomud/issues
+There are no guarantees, but I would like to hear from you if you have any problems, questions, comments, suggestions, or general harassment: https://github.com/xpda/PhotoMud/issues
 
 # Usage
 
