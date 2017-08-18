@@ -37,9 +37,9 @@ Public Class frmComment
   Private Sub cmdOK_Click(ByVal Sender As Object, ByVal e As EventArgs) Handles cmdOK.Click
 
     msg = ""
-    rtext1_Leave(rText2, New EventArgs()) ' validate date
-    If msg = "" Then rtext1_Leave(rText1, New EventArgs()) ' validate date
-    If msg = "" Then rtext3_Leave(rText3, New EventArgs()) ' validate GPS
+    If rText2.Visible Then rtext1_Leave(rText2, New EventArgs()) ' validate date
+    If rText1.Visible AndAlso msg = "" Then rtext1_Leave(rText1, New EventArgs()) ' validate date
+    If rText3.Visible AndAlso msg = "" Then rtext3_Leave(rText3, New EventArgs()) ' validate GPS
 
 
     If msg = "" Then
@@ -302,7 +302,7 @@ Public Class frmComment
     Dim lastCallingForm As Form
 
     If pView.Bitmap Is Nothing Then Exit Sub
-    If pView.Bitmap.Width < 600 Then
+    If pView.Bitmap.Width < 600 And pView.Bitmap.Height < 600 Then
       showPicture(filenames(iPic), pView, False, Nothing)
       Exit Sub
     End If
@@ -441,4 +441,5 @@ Public Class frmComment
   Private Sub frmComment_Shown(sender As Object, e As EventArgs) Handles Me.Shown
     rText0.Focus()
   End Sub
+
 End Class

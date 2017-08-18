@@ -5196,6 +5196,10 @@ Public Module main
     Try
       For Each prop As PropertyItem In propertyItems
         If prop.Id = propID.ThumbnailData Then updateThumbnail(prop, bmp) ' slow - 90+ ms
+        If prop.Id = propID.MakerNote Then
+
+        End If
+
         bmp.SetPropertyItem(prop)
       Next prop
     Catch ex As Exception
