@@ -59,6 +59,8 @@ bld/
 [Bb]in/
 [Oo]bj/
 [Ll]og/
+obj/debug
+obj/release
 
 # Visual Studio 2015 cache/options directory
 .vs/
