@@ -3141,7 +3141,6 @@ Public Module main
 
   End Sub
 
-
   Function getFilePaths(ByVal fPath As String, ByRef fileNames As List(Of String), ByVal subFolders As Boolean) As Integer
     ' gets file names from folder fPath into fileNames()
     ' returns -1 for error

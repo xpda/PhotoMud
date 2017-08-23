@@ -1556,9 +1556,14 @@ Public Class frmExploref
     End Using
     If dResult <> DialogResult.Cancel Then cleartags()
 
-    If dirWatch IsNot Nothing AndAlso Not dirWatch.Path.StartsWith("\\") Then dirWatch.EnableRaisingEvents = True
-    Me.Refresh()
-
+    If dirWatch IsNot Nothing AndAlso Not dirWatch.Path.StartsWith("\\") Then
+      Try
+        dirWatch.EnableRaisingEvents = True
+        Me.Refresh()
+      Catch ex As Exception
+        MsgBox(ex.Message)
+      End Try
+    End If
   End Sub
 
   Private Sub mnuUpOneLevel_Click(ByVal Sender As Object, ByVal e As EventArgs) Handles mnuUpOneLevel.Click
@@ -2245,7 +2250,11 @@ Public Class frmExploref
       TreeView.Enabled = False
       txFolder.Enabled = False
     Else
-      If dirWatch IsNot Nothing AndAlso Not dirWatch.Path.StartsWith("\\") Then dirWatch.EnableRaisingEvents = True
+      Try
+        If dirWatch IsNot Nothing AndAlso Not dirWatch.Path.StartsWith("\\") Then dirWatch.EnableRaisingEvents = True
+      Catch ex As Exception
+        MsgBox(ex.Message)
+      End Try
       TreeView.Enabled = True
       txFolder.Enabled = True
     End If
