@@ -136,7 +136,7 @@
     Me.txSearch.Name = "txSearch"
     Me.txSearch.Size = New System.Drawing.Size(269, 25)
     Me.txSearch.TabIndex = 2
-    Me.txSearch.Text = "c:\down\tmp"
+    Me.txSearch.Text = ""
     Me.ToolTip1.SetToolTip(Me.txSearch, "This folder will be searched for duplicates")
     '
     'trkTolerance

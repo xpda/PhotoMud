@@ -3,7 +3,7 @@
 
 ' backup database
 '   cd \Program Files\MySQL\MySQL Server 5.5\bin
-'   mysqldump -u root -pp taxa > d:\bugs\121028dump.sql
+'   mysqldump -u root -pp taxa > c:\bugs\121028dump.sql
 
 ' set image counts!
 '   select id from taxatable where taxon = "arthropoda" into @id;
@@ -25,7 +25,7 @@
 ' updates:
 ' update imagecounters
 ' update bugguide site stuff?
-' move data to server -- mysqldump (d:\bugs\dump.bat)
+' move data to server -- mysqldump (c:\bugs\dump.bat)
 ' file convert to 480 small
 ' file convert to 240 smaller
 ' upload new images

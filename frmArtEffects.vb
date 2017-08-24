@@ -904,10 +904,11 @@ Public Class frmArtEffects
           Dim circLineWidth As New ImageMagick.DrawableStrokeWidth(1)
           Dim circFillColor As New ImageMagick.DrawableFillColor(Color.White)
 
-          Using img2 As New MagickImage("c:\tmp\tmp.jpg")
-            img.Composite(img2, CompositeOperator.Screen)
-          End Using
-          saveStuff(img, aView.pView1, gPath, fullBitmap)
+          ' test
+          'Using img2 As New MagickImage("c:\tmp\tmp.jpg")
+          'img.Composite(img2, CompositeOperator.Screen)
+          'End Using
+          'saveStuff(img, aView.pView1, gPath, fullBitmap)
 
         Case "impressionist"
           Dim bmpq As Bitmap
@@ -930,11 +931,11 @@ Public Class frmArtEffects
               iy1 = iy + Ceiling(Rnd() * diameter) - diameter \ 2
               If iy1 < 0 Then iy1 = 0 Else If iy1 >= bmpq.Height Then iy1 = bmpq.Height - 1
 
-              SourceOffset = iy1 * bmpq.Width * 4 + ix1 * 4
+              sourceOffset = iy1 * bmpq.Width * 4 + ix1 * 4
 
-              bbTarget(iOff) = bbSource(sourceoffset)
-              bbTarget(iOff + 1) = bbSource(sourceoffset + 1)
-              bbTarget(iOff + 2) = bbSource(sourceoffset + 2)
+              bbTarget(iOff) = bbSource(sourceOffset)
+              bbTarget(iOff + 1) = bbSource(sourceOffset + 1)
+              bbTarget(iOff + 2) = bbSource(sourceOffset + 2)
               iOff = iOff + 4
             Next ix
           Next iy

@@ -536,7 +536,6 @@ Public Class frmFilter
     Catch ex As Exception
       MsgBox(ex.Message)
     End Try
-    img.Write("c:\tmp.jpg")
     saveStuff(img, aView.pView1, gpath, fullBitmap)
     aView.Repaint()
     aView.zoomLabel()
