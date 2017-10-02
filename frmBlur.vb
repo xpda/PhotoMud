@@ -248,7 +248,7 @@ Public Class frmBlur
 
     If aView.lbPoint.Visible Then
       r = aView.pView0.ControlToBitmap(aView.pView0.ClientRectangle)
-      If gPath IsNot Nothing Then
+      If gPath IsNot Nothing AndAlso gPath.PointCount > 0 Then
         pcenter.X = Max(r.X, pcenter.X)
         pcenter.X = Min(r.X + r.Width - 1, pcenter.X)
         pcenter.Y = Max(r.Y, pcenter.Y)

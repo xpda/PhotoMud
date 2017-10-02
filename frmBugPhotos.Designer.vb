@@ -588,6 +588,7 @@ Partial Class frmBugPhotos
     Me.tvTaxon.ShowNodeToolTips = True
     Me.tvTaxon.Size = New System.Drawing.Size(525, 529)
     Me.tvTaxon.TabIndex = 90
+    Me.tvTaxon.Visible = False
     '
     'cmdCrop
     '
@@ -703,7 +704,6 @@ Partial Class frmBugPhotos
     Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
     Me.CancelButton = Me.cmdClose
     Me.ClientSize = New System.Drawing.Size(1326, 828)
-    Me.Controls.Add(Me.pView)
     Me.Controls.Add(Me.cmdImageUpdate)
     Me.Controls.Add(Me.cmdMeasure)
     Me.Controls.Add(Me.cmdDelete)
@@ -721,6 +721,7 @@ Partial Class frmBugPhotos
     Me.Controls.Add(Me.cmdSaveAll)
     Me.Controls.Add(Me.Label2w)
     Me.Controls.Add(Me.cmdClose)
+    Me.Controls.Add(Me.pView)
     Me.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
     Me.Name = "frmBugPhotos"

@@ -542,7 +542,7 @@ Public Class pViewer
     attr.SetColorMatrix(ColorMatrix)
 
     Using g As Graphics = Graphics.FromImage(TargetBitmap)
-      If gPath IsNot Nothing Then g.SetClip(gPath)
+      If gPath IsNot Nothing AndAlso gPath.PointCount > 0 Then g.SetClip(gPath)
       g.DrawImage(SourceBitmap, New Rectangle(0, 0, SourceBitmap.Width, SourceBitmap.Height),
        0, 0, SourceBitmap.Width, SourceBitmap.Height, GraphicsUnit.Pixel, attr)
     End Using
@@ -776,7 +776,7 @@ Public Class pViewer
 
 
     Using g As Graphics = Graphics.FromImage(TargetBitmap)
-      If gPath IsNot Nothing Then g.SetClip(gPath)
+      If gPath IsNot Nothing AndAlso gPath.PointCount > 0 Then g.SetClip(gPath)
       g.InterpolationMode = InterpolationMode
       g.Clear(FillColor)
     End Using

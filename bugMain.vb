@@ -291,7 +291,6 @@ Public Module bugMain
         End If
 
         If ancestor.Count < targetLevel Then ' save the top match
-          topMatch = match
           ndTarget = ndc
           targetLevel = ancestor.Count
           topMatch = match

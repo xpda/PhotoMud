@@ -1038,14 +1038,14 @@ Public Class frmMainf
       If gPoints IsNot Nothing And gTypes IsNot Nothing And clipData.GetDataPresent(GetType(Bitmap)) Then
         Using gPath As New GraphicsPath(gPoints, gTypes),
               bmp As Bitmap = clipData.GetImage()
-          If gPath IsNot Nothing And bmp IsNot Nothing Then ' save floater
+          If gPath IsNot Nothing AndAlso gPath.PointCount > 0 AndAlso bmp IsNot Nothing Then ' save floater
 
             'mView.BitmapToControl(gPath)
             mView.setFloaterBitmap(bmp)
             'mView.SetSelection(gPath)
             If mView.FloaterPath IsNot Nothing Then mView.FloaterPath.Dispose() : mView.FloaterPath = Nothing
             mView.FloaterPath = gPath.Clone
-            mView.FloaterPosition = New Point(1500, 1500)
+            mView.FloaterPosition = New Point(mView.Bitmap.Width \ 2, mView.Bitmap.Height \ 2)
             startFloater()
             mView.Zoom()
           End If
@@ -2264,12 +2264,14 @@ Public Class frmMainf
         startFloater() ' change from selectRectangle mode to Floater mode.
 
       Case cmd.SelectSketch
-        Using gpath As GraphicsPath = New GraphicsPath
-          gpath.AddPolygon(zP.ToArray)
-          mView.SetSelection(gpath)
-        End Using
-        mView.InitFloater()
-        startFloater() ' change from selectRectangle mode to Floater mode.
+        If zP.Count > 0 Then
+          Using gpath As GraphicsPath = New GraphicsPath
+            gpath.AddPolygon(zP.ToArray)
+            mView.SetSelection(gpath)
+          End Using
+          mView.InitFloater()
+          startFloater() ' change from selectRectangle mode to Floater mode.
+        End If
 
       Case cmd.DrawSketch
         CompleteCommand()
@@ -4022,15 +4024,16 @@ Public Class frmMainf
 
       Using img As New MagickImage(qImage)
         img.ColorFuzz = colorTolerance
-        img.FloodFill(New MagickColor(0, 0, 0, 0), p.X, p.Y)
+        img.FloodFill(New MagickColor(mainColor), p.X, p.Y)
         Dim bmp As Bitmap = img.ToBitmap
+        Set32bppPArgb(bmp)
         If mView.FloaterBitmap Is Nothing Then
           mView.setBitmap(bmp)
         Else
           mView.setFloaterBitmap(bmp)
         End If
         Using gPath As GraphicsPath = alphaToPath(bmp)
-          If gPath IsNot Nothing Then mView.FloaterPath = gPath.Clone
+          If gPath IsNot Nothing AndAlso gPath.PointCount > 0 Then mView.FloaterPath = gPath.Clone Else mView.FloaterPath = Nothing
         End Using
         clearBitmap(bmp)
       End Using

@@ -1357,7 +1357,6 @@ Public Class frmExploref
   Sub setViewStyle()
 
     Dim item As ListViewItem = Nothing
-    Dim v As lvSort
     Dim s As String
     Dim selectedPath As String
     Dim Ascend As String = "  " & ChrW(&H25B2)
@@ -1424,10 +1423,6 @@ Public Class frmExploref
 
     ' ascending sort, filename
     ListView1.ListViewItemSorter = New lvSort(0)
-    v = ListView1.ListViewItemSorter
-    v.sortkey = 0
-    v.sortOrder = 1
-    v.dataType = ""
     If Not Loading Then ListViewLoad(iniExplorePath, selectedPath)
 
     'If item IsNot Nothing Then  ' put the cursor back where it was
@@ -2238,12 +2233,10 @@ Public Class frmExploref
     ' loads the listview with photos from folder fPath.
     Dim fileNames As New List(Of String)
     Dim ix As New List(Of Integer)
-    Dim i, k As Integer
-    Dim item As ListViewItem
-    Dim fInfo As FileInfo
-    Dim fIcon As Icon
+    Dim i As Integer
     ' Dim v As lvSort  11/6/2012
     Static busy As Boolean
+    Dim v As lvSort
 
     If useQuery Then
       dirWatch.EnableRaisingEvents = False
@@ -2293,10 +2286,9 @@ Public Class frmExploref
     processing = True
     ListView1.SmallImageList = imgSmallIcons
     ListView1.BeginUpdate()
-    ' v = ListView1.ListViewItemSorter  ' 11/6/2012
+    v = ListView1.ListViewItemSorter  ' commented out 11/6/2012, uncommented 10/1/17. Too slow?
     ListView1.ListViewItemSorter = Nothing
     ListView1.Items.Clear()
-
 
     If useQuery Then
       getQueryPaths(fileNames, True)
@@ -2319,24 +2311,9 @@ Public Class frmExploref
     imgSmallIcons.ImageSize = New Size(ListView1.Font.Height + 2, ListView1.Font.Height + 2)
 
     For i = 0 To fileNames.Count - 1
-      If Not (imgSmallIcons.Images.ContainsKey(Path.GetExtension(fileNames(ix(i))))) Then
-        fIcon = System.Drawing.Icon.ExtractAssociatedIcon(fileNames(ix(i)))
-        If fIcon Is Nothing Then fIcon = SystemIcons.WinLogo
-        imgSmallIcons.Images.Add(Path.GetExtension(fileNames(ix(i))), fIcon)
-      End If
 
-      item = New ListViewItem
-      item.ImageKey = Path.GetExtension(fileNames(ix(i)))
-      item.Text = Path.GetFileName(fileNames(ix(i)))
-      item.Name = item.Text ' for .find
-      item.Tag = fileNames(ix(i))
-      fInfo = My.Computer.FileSystem.GetFileInfo(fileNames(ix(i)))
-      k = Round(fInfo.Length / 1000)
-      If k = 0 Then k = 1
-      item.SubItems.Add(Format(k, "#,##0 KB"))
-      item.SubItems.Add(Format(fInfo.LastWriteTime, "short date") & " " & Format(fInfo.LastWriteTime, "short time"))
-      item.SubItems.Add("")
-      ListView1.Items.Add(item)
+      addListviewItem(fileNames(ix(i)))
+
       If i = 200 Then  ' update the list for a large folder
         ListView1.EndUpdate()
         Application.DoEvents()
@@ -2344,8 +2321,8 @@ Public Class frmExploref
       End If
     Next i
 
-    ' ListView1.ListViewItemSorter = v
-    ListView1.ListViewItemSorter = New lvSort(0)   ' 11/6/2012
+    ListView1.ListViewItemSorter = v  ' commented out 11/6/2012, uncommented 10/1/17
+    'ListView1.ListViewItemSorter = New lvSort(0)   ' added 11/6/2012, commented out 10/1/17
     ListView1.EndUpdate()
     processing = False
 
@@ -2356,6 +2333,35 @@ Public Class frmExploref
     busy = False
 
   End Sub
+
+  Sub addListviewItem(fname As String)
+
+    Dim item As ListViewItem
+    Dim fInfo As FileInfo
+    Dim fIcon As Icon
+    Dim k As Integer
+
+    If Not (imgSmallIcons.Images.ContainsKey(Path.GetExtension(fname))) Then
+      fIcon = System.Drawing.Icon.ExtractAssociatedIcon(fname)
+      If fIcon Is Nothing Then fIcon = SystemIcons.WinLogo
+      imgSmallIcons.Images.Add(Path.GetExtension(fname), fIcon)
+    End If
+
+    item = New ListViewItem
+    item.ImageKey = Path.GetExtension(fname)
+    item.Text = Path.GetFileName(fname)
+    item.Name = item.Text ' for .find
+    item.Tag = fname
+    fInfo = My.Computer.FileSystem.GetFileInfo(fname)
+    k = Round(fInfo.Length / 1000)
+    If k = 0 Then k = 1
+    item.SubItems.Add(Format(k, "#,##0 KB"))
+    item.SubItems.Add(Format(fInfo.LastWriteTime, "short date") & " " & Format(fInfo.LastWriteTime, "short time"))
+    item.SubItems.Add("")
+    ListView1.Items.Add(item)
+
+  End Sub
+
 
   Sub afterListviewFill(ByVal selectedPath As String)
 
@@ -2875,21 +2881,29 @@ Public Class frmExploref
     End If
   End Sub
 
-  Private Sub dirWatch_event(ByVal sender As Object, ByVal e As System.IO.FileSystemEventArgs) _
-    Handles dirWatch.Created, dirWatch.Deleted, dirWatch.Renamed
+  Private Sub dirWatch_created(ByVal sender As Object, ByVal e As FileSystemEventArgs) _
+    Handles dirWatch.Created, dirWatch.Deleted
+    dirwatchEvent(sender, "", e.FullPath, e.ChangeType)
+  End Sub
+
+  Private Sub dirWatch_renamed(ByVal sender As Object, ByVal e As RenamedEventArgs) _
+    Handles dirWatch.Renamed
+    dirwatchEvent(sender, e.OldFullPath, e.FullPath, e.ChangeType)
+  End Sub
+
+  Sub dirwatchEvent(sender As Object, oldFullPath As String, fullPath As String, changetype As WatcherChangeTypes)
     ' reloads treeview or listview if a folder or file is changed. 
     ' if a folder or file is deleted out of iniExplorePath, then they both are updated.
 
     Dim fPath As String
-    Dim oldPath As String
     Dim item As ListViewItem
     Dim i, k As Integer
     Dim nd As TreeNode
     Dim s, ext As String
 
-    fPath = Path.GetDirectoryName(e.FullPath)
-    ext = Path.GetExtension(e.FullPath)
-    k = 0
+    fPath = Path.GetDirectoryName(FullPath)
+    ext = Path.GetExtension(FullPath)
+    k = -1
     For i = 0 To iniFileType.Count - 1
       s = iniFileType(i)
       If eqstr(s, ext) Then
@@ -2898,44 +2912,55 @@ Public Class frmExploref
       End If
     Next i
 
-    If k = 0 Then ' is it a directory?
+    If k < 0 Then ' is it a directory?
       Try
-        If Directory.Exists(e.FullPath) Then k = 1
+        If Directory.Exists(fullPath) Then k = 1
       Catch
       End Try
     End If
 
-    If k > 0 Then ' image extension
-      If eqstr(fPath, iniExplorePath) And (Not Directory.Exists(e.FullPath)) Then
-        ' reload photos if that directory's contents changed
-        If ListView1.SelectedItems.Count = 1 Then
-          oldPath = ListView1.SelectedItems(0).Tag
-        Else
-          oldPath = ""
-        End If
-        ListViewLoad(iniExplorePath)
-        ' restore the previously selected item
-        If oldPath <> "" Then
-          item = ListView1.FindItemWithText(Path.GetFileName(oldPath))
-          If item IsNot Nothing Then
-            ListView1.SelectedItems.Clear()
-            item.Selected = True
-            item.EnsureVisible()
-            item.Focused = True
-          End If
-        End If
+    If k >= 0 Then ' image extension
+      If eqstr(fPath, iniExplorePath) And (Not Directory.Exists(fullPath)) Then
+
+        Select Case changetype
+
+          Case WatcherChangeTypes.Created
+            addListviewItem(fullPath)
+
+          Case WatcherChangeTypes.Renamed
+            item = ListView1.FindItemWithText(Path.GetFileName(oldFullPath))
+
+            If item IsNot Nothing Then
+              If item.Checked Then unTag(item.Tag)
+              item.Remove()
+              addListviewItem(fullPath)
+            End If
+
+          Case WatcherChangeTypes.Deleted
+
+            item = ListView1.FindItemWithText(Path.GetFileName(fullPath))
+
+            If item IsNot Nothing Then
+              If item.Checked Then unTag(item.Tag)
+              item.Remove()
+            End If
+
+        End Select
+
+        ' If ListView1.FocusedItem IsNot Nothing Then ListView1.FocusedItem.Selected = True ``
+
       End If
+    End If
 
-      If Not File.Exists(e.FullPath) Then ' do the folder stuff
-        nd = TreeViewfind(TreeView, fPath) ' search for the path in treeview. Ignore if it's not in there.
+    If Not File.Exists(fullPath) Then ' do the folder stuff
+      nd = TreeViewfind(TreeView, fPath) ' search for the path in treeview. Ignore if it's not in ther
 
-        If nd IsNot Nothing Then
-          loadNode(nd) ' load the changed folder in treeview
-          nd.Expand()
-          If Not Directory.Exists(iniExplorePath) Then
-            iniExplorePath = nd.Tag
-            loadPath = iniExplorePath
-          End If
+      If nd IsNot Nothing Then
+        loadNode(nd) ' load the changed folder in treeview
+        nd.Expand()
+        If Not Directory.Exists(iniExplorePath) Then
+          iniExplorePath = nd.Tag
+          loadPath = iniExplorePath
         End If
       End If
     End If
@@ -3162,7 +3187,7 @@ Public Class frmExploref
     Dim Ascend As String = "  " & ChrW(&H25B2)
     Dim Descend As String = "  " & ChrW(&H25BC)
 
-    v = ListView1.ListViewItemSorter ' this is in frmPicSearch.vb
+    v = ListView1.ListViewItemSorter ' this is in main.vb
 
     s = ListView1.Columns(v.sortkey).Text
     s = Replace(s, Ascend, "")

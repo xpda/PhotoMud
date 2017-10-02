@@ -171,9 +171,9 @@ Public Class frmConvert
         k = Len(commonPath)
         If Len(s) < k Then k = Len(s)
         n = 0
-        For j = 0 To k
-          If s.Chars(j - 1) <> commonPath.Chars(j - 1) Then Exit For
-          If s.Chars(j - 1) = "\" Then n = j
+        For j = 0 To k - 1
+          If s.Chars(j) <> commonPath.Chars(j) Then Exit For
+          If s.Chars(j) = "\" Then n = j
         Next j
         commonPath = commonPath.Substring(0, n)
       Next i
