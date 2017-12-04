@@ -297,7 +297,7 @@ Public Class frmPrint
         rBox.X = i * cellWidth + PrinterLeft
         rBox.Y = j * cellHeight + PrinterTop
 
-        n = (pageNumber * nRows * nCols + j * nCols + i) \ nCopies + 1 ' n is the image number in tagpath (if used)
+        n = (pageNumber * nRows * nCols + j * nCols + i) \ nCopies ' n is the image number in tagpath (if used)
         ' get image size
         If qImage IsNot Nothing Then
           pWidth = qImage.Width  ' qimage is a copy of the current image from the calling form. img is already assigned if qimage is being printed.
@@ -988,7 +988,7 @@ Public Class frmPrint
         rBox.Height = cellHeight
         rBox.X = i * cellWidth + paperXoff
         rBox.Y = j * cellHeight + paperYoff
-        n = (j * nCols + i) \ nCopies + 1
+        n = (j * nCols + i) \ nCopies
         If qImage Is Nothing Then ' qimage is a copy of the current image from the calling form
           picInfo = getPicinfo(tagPath(n), True)
           If picInfo.isNull OrElse (pWidth <= 0 Or pHeight <= 0) Then
@@ -1016,7 +1016,7 @@ Public Class frmPrint
         If qImage Is Nothing Then ' qimage is a copy of the current image from the calling form
           ' use tagpath
           gImage = Nothing
-          n = (j * nCols + i) \ nCopies + 1
+          n = (j * nCols + i) \ nCopies
           ' load the picture and resize
           gImage = readBitmap(tagPath(n), msg)
           pView.ResizeBitmap(New Size(rPic.Width, rPic.Height), gImage, gImage)

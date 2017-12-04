@@ -1485,40 +1485,41 @@ Public Class frmExploref
   Private Sub mnuFilePrint_Click(ByVal Sender As Object, ByVal e As EventArgs) _
     Handles mnuFilePrintTagged.Click, mnuFilePrint.Click
 
-    Dim msg As String = "Oops!  Couldn't read the file " & ListView1.SelectedItems(0).Tag
+    Dim msg As String = ""
 
-    If Sender Is mnuFilePrint And ListView1.View <> View.LargeIcon And rview.Bitmap IsNot Nothing Then ' Print rview.bitmap
-      currentpicPath = ListView1.SelectedItems(0).Tag
-      qImage = New Bitmap(rview.Bitmap)
+    If Sender Is mnuFilePrint Then
+      If ListView1.View <> View.LargeIcon AndAlso rview.Bitmap IsNot Nothing Then ' Print rview.bitmap
+        currentpicPath = ListView1.SelectedItems(0).Tag
+        qImage = New Bitmap(rview.Bitmap)
 
-    ElseIf (ListView1.View = View.LargeIcon And ListView1.SelectedItems.Count = 1) Then ' print selected item
-      currentpicPath = ListView1.SelectedItems(0).Tag
-      qImage = readBitmap(ListView1.SelectedItems(0).Tag, msg)
+      ElseIf ListView1.View = View.LargeIcon AndAlso ListView1.SelectedItems.Count = 1 Then ' print selected item
+        currentpicPath = ListView1.SelectedItems(0).Tag
+        qImage = readBitmap(ListView1.SelectedItems(0).Tag, msg)
 
-      If qImage Is Nothing Then
-        MsgBox(msg & crlf & "Oops!  Couldn't read the file " & ListView1.SelectedItems(0).Tag)
-        tagPath = New List(Of String)
+        If qImage Is Nothing Then
+          MsgBox(msg & crlf & "Oops!  Couldn't read the file " & ListView1.SelectedItems(0).Tag)
+          tagPath = New List(Of String)
+        End If
       End If
 
-    Else ' tagged file send, or thumbnail view. Load files
+    Else ' tagged file send.
       If tagPath.Count <= 0 Then
         MsgBox("No photos are tagged to be printed.", MsgBoxStyle.OkOnly)
         Exit Sub
       End If
-
       clearBitmap(qImage) ' if qImage is nothing, then it uses the files in tagpath.count
     End If
 
-    If qImage IsNot Nothing Or tagPath.Count > 0 Then
-      callingForm = Me
-      Using frm As New frmPrint
-        dResult = frm.ShowDialog() ' print qImage or tagfiles
-      End Using
-      clearBitmap(qImage)
-    End If
+      If qImage IsNot Nothing Or tagPath.Count > 0 Then
+        callingForm = Me
+        Using frm As New frmPrint
+          dResult = frm.ShowDialog() ' print qImage or tagfiles
+        End Using
+        clearBitmap(qImage)
+      End If
 
-    If dResult <> DialogResult.Cancel Then cleartags()
-    Me.Refresh()
+      If dResult <> DialogResult.Cancel Then cleartags()
+      Me.Refresh()
 
   End Sub
 
@@ -3188,6 +3189,7 @@ Public Class frmExploref
     Dim Descend As String = "  " & ChrW(&H25BC)
 
     v = ListView1.ListViewItemSorter ' this is in main.vb
+    If v Is Nothing Then Exit Sub
 
     s = ListView1.Columns(v.sortkey).Text
     s = Replace(s, Ascend, "")

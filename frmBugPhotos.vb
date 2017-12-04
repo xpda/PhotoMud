@@ -1914,10 +1914,10 @@ Public Class frmBugPhotos
             location = Mid(s1, 1, i - 1)
             s1 = Mid(s1, i + 6)
             i = InStr(s1, "<br />")
-            If s1 = "" Then
-              photoDate = "1/1/1900"
-            Else
+            If IsDate(Mid(s1, 1, i - 1)) Then
               photoDate = CDate(Mid(s1, 1, i - 1))
+            Else
+              photoDate = "1/1/1900"
             End If
             i2 = InStr(i1, s, "<br />Size:")
             If i2 > 0 Then
@@ -2189,7 +2189,7 @@ Public Class cWebClient
       Dim cook As New Cookie
       cook.Domain = "bugguide.net"
       cook.Name = "PHPSESSID"
-      cook.Value = "fn6rtdrj39spf6biopnqqqeev7"
+      cook.Value = "93m4lpqnl6rq4okni6bn2f4gf5"
       cc.Add(cook)
     End If
 
