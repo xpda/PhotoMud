@@ -211,6 +211,7 @@
     Me.mnxFSaveAs = New System.Windows.Forms.ToolStripMenuItem()
     Me.mnxFPrint = New System.Windows.Forms.ToolStripMenuItem()
     Me.mnxFemail = New System.Windows.Forms.ToolStripMenuItem()
+    Me.mnxFMap = New System.Windows.Forms.ToolStripMenuItem()
     Me.ToolStripSeparator2 = New System.Windows.Forms.ToolStripSeparator()
     Me.mnxFProperties = New System.Windows.Forms.ToolStripMenuItem()
     Me.mnxFComment = New System.Windows.Forms.ToolStripMenuItem()
@@ -247,7 +248,6 @@
     Me.mnxViewStyle = New System.Windows.Forms.ContextMenuStrip(Me.components)
     Me.mnxVThumbnails = New System.Windows.Forms.ToolStripMenuItem()
     Me.mnxVDetails = New System.Windows.Forms.ToolStripMenuItem()
-    Me.mnxFMap = New System.Windows.Forms.ToolStripMenuItem()
     Me.mnu.SuspendLayout()
     Me.mnxToolStrip.SuspendLayout()
     Me.mnxListView.SuspendLayout()
@@ -757,6 +757,7 @@
     'mnuToolsBugPhotos
     '
     Me.mnuToolsBugPhotos.Name = "mnuToolsBugPhotos"
+    Me.mnuToolsBugPhotos.ShortcutKeys = CType((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.G), System.Windows.Forms.Keys)
     Me.mnuToolsBugPhotos.Size = New System.Drawing.Size(295, 26)
     Me.mnuToolsBugPhotos.Text = "&Bug Data Entry"
     '
@@ -770,6 +771,7 @@
     'mnuToolsBugQuery
     '
     Me.mnuToolsBugQuery.Name = "mnuToolsBugQuery"
+    Me.mnuToolsBugQuery.ShortcutKeys = CType((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.F), System.Windows.Forms.Keys)
     Me.mnuToolsBugQuery.Size = New System.Drawing.Size(295, 26)
     Me.mnuToolsBugQuery.Text = "Bug &Query"
     '
@@ -885,12 +887,13 @@
     'ToolStripSeparator7
     '
     Me.ToolStripSeparator7.Name = "ToolStripSeparator7"
-    Me.ToolStripSeparator7.Size = New System.Drawing.Size(63, 6)
+    Me.ToolStripSeparator7.Size = New System.Drawing.Size(178, 6)
     '
     'mnuHelp
     '
     Me.mnuHelp.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuHelpHelpTopics, Me.mnuHelpHelpIndex, Me.mnuHelpTips, Me.helpLine1, Me.mnuHelpRegister, Me.mnuHelpUpdate, Me.helpline2, Me.mnuHelpAbout})
     Me.mnuHelp.Name = "mnuHelp"
+    Me.mnuHelp.ShortcutKeys = CType((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.F), System.Windows.Forms.Keys)
     Me.mnuHelp.Size = New System.Drawing.Size(48, 22)
     Me.mnuHelp.Text = "&Help"
     '
@@ -952,47 +955,47 @@
     Me.mnxToolStrip.ImageScalingSize = New System.Drawing.Size(20, 20)
     Me.mnxToolStrip.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnxTSmallIcons, Me.mnxTLargeIcons, Me.ToolStripSeparator5, Me.mnxTCustomize, Me.mnxTHideToolbar, Me.ToolStripSeparator6, Me.mnxTHelp})
     Me.mnxToolStrip.Name = "mnuToolStrip"
-    Me.mnxToolStrip.Size = New System.Drawing.Size(204, 146)
+    Me.mnxToolStrip.Size = New System.Drawing.Size(198, 126)
     '
     'mnxTSmallIcons
     '
     Me.mnxTSmallIcons.Name = "mnxTSmallIcons"
-    Me.mnxTSmallIcons.Size = New System.Drawing.Size(203, 26)
+    Me.mnxTSmallIcons.Size = New System.Drawing.Size(197, 22)
     Me.mnxTSmallIcons.Text = "&Small Icons"
     '
     'mnxTLargeIcons
     '
     Me.mnxTLargeIcons.Name = "mnxTLargeIcons"
-    Me.mnxTLargeIcons.Size = New System.Drawing.Size(203, 26)
+    Me.mnxTLargeIcons.Size = New System.Drawing.Size(197, 22)
     Me.mnxTLargeIcons.Text = "&Large Icons"
     '
     'ToolStripSeparator5
     '
     Me.ToolStripSeparator5.Name = "ToolStripSeparator5"
-    Me.ToolStripSeparator5.Size = New System.Drawing.Size(200, 6)
+    Me.ToolStripSeparator5.Size = New System.Drawing.Size(194, 6)
     '
     'mnxTCustomize
     '
     Me.mnxTCustomize.Name = "mnxTCustomize"
-    Me.mnxTCustomize.Size = New System.Drawing.Size(203, 26)
+    Me.mnxTCustomize.Size = New System.Drawing.Size(197, 22)
     Me.mnxTCustomize.Text = "&Customize Toolbar"
     '
     'mnxTHideToolbar
     '
     Me.mnxTHideToolbar.CheckOnClick = True
     Me.mnxTHideToolbar.Name = "mnxTHideToolbar"
-    Me.mnxTHideToolbar.Size = New System.Drawing.Size(203, 26)
+    Me.mnxTHideToolbar.Size = New System.Drawing.Size(197, 22)
     Me.mnxTHideToolbar.Text = "Hide &Toolbar"
     '
     'ToolStripSeparator6
     '
     Me.ToolStripSeparator6.Name = "ToolStripSeparator6"
-    Me.ToolStripSeparator6.Size = New System.Drawing.Size(200, 6)
+    Me.ToolStripSeparator6.Size = New System.Drawing.Size(194, 6)
     '
     'mnxTHelp
     '
     Me.mnxTHelp.Name = "mnxTHelp"
-    Me.mnxTHelp.Size = New System.Drawing.Size(203, 26)
+    Me.mnxTHelp.Size = New System.Drawing.Size(197, 22)
     Me.mnxTHelp.Text = "&Help"
     '
     'imgTreeView
@@ -1008,95 +1011,101 @@
     Me.mnxListView.ImageScalingSize = New System.Drawing.Size(20, 20)
     Me.mnxListView.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnxFSaveAs, Me.mnxFPrint, Me.mnxFemail, Me.mnxFMap, Me.ToolStripSeparator2, Me.mnxFProperties, Me.mnxFComment, Me.ToolStripSeparator3, Me.mnxFOpen, Me.mnxFCopyFile, Me.mnxFCopyImage, Me.mnxFCopyFilename, Me.mnxFPasteFile, Me.ToolStripSeparator4, Me.mnxFDelete, Me.mnxFRename})
     Me.mnxListView.Name = "ContextMenuStrip1"
-    Me.mnxListView.Size = New System.Drawing.Size(193, 388)
+    Me.mnxListView.Size = New System.Drawing.Size(187, 308)
     '
     'mnxFSaveAs
     '
     Me.mnxFSaveAs.Name = "mnxFSaveAs"
-    Me.mnxFSaveAs.Size = New System.Drawing.Size(192, 26)
+    Me.mnxFSaveAs.Size = New System.Drawing.Size(186, 22)
     Me.mnxFSaveAs.Text = "Save &As"
     '
     'mnxFPrint
     '
     Me.mnxFPrint.Name = "mnxFPrint"
-    Me.mnxFPrint.Size = New System.Drawing.Size(192, 26)
+    Me.mnxFPrint.Size = New System.Drawing.Size(186, 22)
     Me.mnxFPrint.Text = "&Print"
     '
     'mnxFemail
     '
     Me.mnxFemail.Name = "mnxFemail"
-    Me.mnxFemail.Size = New System.Drawing.Size(192, 26)
+    Me.mnxFemail.Size = New System.Drawing.Size(186, 22)
     Me.mnxFemail.Text = "e&Mail"
+    '
+    'mnxFMap
+    '
+    Me.mnxFMap.Name = "mnxFMap"
+    Me.mnxFMap.Size = New System.Drawing.Size(186, 22)
+    Me.mnxFMap.Text = "Sho&w on Map"
     '
     'ToolStripSeparator2
     '
     Me.ToolStripSeparator2.Name = "ToolStripSeparator2"
-    Me.ToolStripSeparator2.Size = New System.Drawing.Size(189, 6)
+    Me.ToolStripSeparator2.Size = New System.Drawing.Size(183, 6)
     '
     'mnxFProperties
     '
     Me.mnxFProperties.Name = "mnxFProperties"
-    Me.mnxFProperties.Size = New System.Drawing.Size(192, 26)
+    Me.mnxFProperties.Size = New System.Drawing.Size(186, 22)
     Me.mnxFProperties.Text = "Photo P&roperties"
     '
     'mnxFComment
     '
     Me.mnxFComment.Name = "mnxFComment"
-    Me.mnxFComment.Size = New System.Drawing.Size(192, 26)
+    Me.mnxFComment.Size = New System.Drawing.Size(186, 22)
     Me.mnxFComment.Text = "&Enter Description"
     '
     'ToolStripSeparator3
     '
     Me.ToolStripSeparator3.Name = "ToolStripSeparator3"
-    Me.ToolStripSeparator3.Size = New System.Drawing.Size(189, 6)
+    Me.ToolStripSeparator3.Size = New System.Drawing.Size(183, 6)
     '
     'mnxFOpen
     '
     Me.mnxFOpen.Name = "mnxFOpen"
-    Me.mnxFOpen.Size = New System.Drawing.Size(192, 26)
+    Me.mnxFOpen.Size = New System.Drawing.Size(186, 22)
     Me.mnxFOpen.Text = "&Open"
     '
     'mnxFCopyFile
     '
     Me.mnxFCopyFile.Name = "mnxFCopyFile"
     Me.mnxFCopyFile.ShortcutKeys = CType((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.C), System.Windows.Forms.Keys)
-    Me.mnxFCopyFile.Size = New System.Drawing.Size(192, 26)
+    Me.mnxFCopyFile.Size = New System.Drawing.Size(186, 22)
     Me.mnxFCopyFile.Text = "&Copy File"
     '
     'mnxFCopyImage
     '
     Me.mnxFCopyImage.Name = "mnxFCopyImage"
-    Me.mnxFCopyImage.Size = New System.Drawing.Size(192, 26)
+    Me.mnxFCopyImage.Size = New System.Drawing.Size(186, 22)
     Me.mnxFCopyImage.Text = "Copy &Image"
     '
     'mnxFCopyFilename
     '
     Me.mnxFCopyFilename.Name = "mnxFCopyFilename"
-    Me.mnxFCopyFilename.Size = New System.Drawing.Size(192, 26)
+    Me.mnxFCopyFilename.Size = New System.Drawing.Size(186, 22)
     Me.mnxFCopyFilename.Text = "Copy &Filename"
     '
     'mnxFPasteFile
     '
     Me.mnxFPasteFile.Name = "mnxFPasteFile"
     Me.mnxFPasteFile.ShortcutKeys = CType((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.V), System.Windows.Forms.Keys)
-    Me.mnxFPasteFile.Size = New System.Drawing.Size(192, 26)
+    Me.mnxFPasteFile.Size = New System.Drawing.Size(186, 22)
     Me.mnxFPasteFile.Text = "Pa&ste File"
     '
     'ToolStripSeparator4
     '
     Me.ToolStripSeparator4.Name = "ToolStripSeparator4"
-    Me.ToolStripSeparator4.Size = New System.Drawing.Size(189, 6)
+    Me.ToolStripSeparator4.Size = New System.Drawing.Size(183, 6)
     '
     'mnxFDelete
     '
     Me.mnxFDelete.Name = "mnxFDelete"
-    Me.mnxFDelete.Size = New System.Drawing.Size(192, 26)
+    Me.mnxFDelete.Size = New System.Drawing.Size(186, 22)
     Me.mnxFDelete.Text = "&Delete"
     '
     'mnxFRename
     '
     Me.mnxFRename.Name = "mnxFRename"
-    Me.mnxFRename.Size = New System.Drawing.Size(192, 26)
+    Me.mnxFRename.Size = New System.Drawing.Size(186, 22)
     Me.mnxFRename.Text = "Rena&me"
     '
     'imgThumbnails
@@ -1147,7 +1156,7 @@
     Me.SplitContainer2.Panel2.Controls.Add(Me.ListView1)
     Me.SplitContainer2.Panel2.Controls.Add(Me.StatusStrip1)
     Me.SplitContainer2.Size = New System.Drawing.Size(695, 599)
-    Me.SplitContainer2.SplitterDistance = 433
+    Me.SplitContainer2.SplitterDistance = 431
     Me.SplitContainer2.TabIndex = 12
     Me.SplitContainer2.TabStop = False
     '
@@ -1163,7 +1172,7 @@
     Me.ListView1.LargeImageList = Me.imgThumbnails
     Me.ListView1.Location = New System.Drawing.Point(0, 0)
     Me.ListView1.Name = "ListView1"
-    Me.ListView1.Size = New System.Drawing.Size(695, 137)
+    Me.ListView1.Size = New System.Drawing.Size(695, 139)
     Me.ListView1.SmallImageList = Me.imgSmallIcons
     Me.ListView1.TabIndex = 0
     Me.ListView1.UseCompatibleStateImageBehavior = False
@@ -1172,7 +1181,7 @@
     '
     Me.StatusStrip1.ImageScalingSize = New System.Drawing.Size(20, 20)
     Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.lbStatus})
-    Me.StatusStrip1.Location = New System.Drawing.Point(0, 137)
+    Me.StatusStrip1.Location = New System.Drawing.Point(0, 139)
     Me.StatusStrip1.Name = "StatusStrip1"
     Me.StatusStrip1.Size = New System.Drawing.Size(695, 25)
     Me.StatusStrip1.SizingGrip = False
@@ -1223,47 +1232,47 @@
     Me.mnxTreeview.ImageScalingSize = New System.Drawing.Size(20, 20)
     Me.mnxTreeview.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnxTreeviewNewFolder, Me.mnxTreeviewRenameFolder, Me.mnxTreeviewDeleteFolder, Me.mnxTreeviewRefresh, Me.ToolStripSeparator10, Me.mnxTreeviewTagFolder, Me.mnxTreeviewTagFolderSub})
     Me.mnxTreeview.Name = "mnxTreeview"
-    Me.mnxTreeview.Size = New System.Drawing.Size(325, 166)
+    Me.mnxTreeview.Size = New System.Drawing.Size(319, 154)
     '
     'mnxTreeviewNewFolder
     '
     Me.mnxTreeviewNewFolder.Name = "mnxTreeviewNewFolder"
-    Me.mnxTreeviewNewFolder.Size = New System.Drawing.Size(324, 26)
+    Me.mnxTreeviewNewFolder.Size = New System.Drawing.Size(318, 24)
     Me.mnxTreeviewNewFolder.Text = "Ne&w Folder"
     '
     'mnxTreeviewRenameFolder
     '
     Me.mnxTreeviewRenameFolder.Name = "mnxTreeviewRenameFolder"
-    Me.mnxTreeviewRenameFolder.Size = New System.Drawing.Size(324, 26)
+    Me.mnxTreeviewRenameFolder.Size = New System.Drawing.Size(318, 24)
     Me.mnxTreeviewRenameFolder.Text = "Rena&me Folder"
     '
     'mnxTreeviewDeleteFolder
     '
     Me.mnxTreeviewDeleteFolder.Name = "mnxTreeviewDeleteFolder"
-    Me.mnxTreeviewDeleteFolder.Size = New System.Drawing.Size(324, 26)
+    Me.mnxTreeviewDeleteFolder.Size = New System.Drawing.Size(318, 24)
     Me.mnxTreeviewDeleteFolder.Text = "&Delete Folder"
     '
     'mnxTreeviewRefresh
     '
     Me.mnxTreeviewRefresh.Name = "mnxTreeviewRefresh"
-    Me.mnxTreeviewRefresh.Size = New System.Drawing.Size(324, 26)
+    Me.mnxTreeviewRefresh.Size = New System.Drawing.Size(318, 24)
     Me.mnxTreeviewRefresh.Text = "&Refresh"
     '
     'ToolStripSeparator10
     '
     Me.ToolStripSeparator10.Name = "ToolStripSeparator10"
-    Me.ToolStripSeparator10.Size = New System.Drawing.Size(321, 6)
+    Me.ToolStripSeparator10.Size = New System.Drawing.Size(315, 6)
     '
     'mnxTreeviewTagFolder
     '
     Me.mnxTreeviewTagFolder.Name = "mnxTreeviewTagFolder"
-    Me.mnxTreeviewTagFolder.Size = New System.Drawing.Size(324, 26)
+    Me.mnxTreeviewTagFolder.Size = New System.Drawing.Size(318, 24)
     Me.mnxTreeviewTagFolder.Text = "Tag Photos in Folder"
     '
     'mnxTreeviewTagFolderSub
     '
     Me.mnxTreeviewTagFolderSub.Name = "mnxTreeviewTagFolderSub"
-    Me.mnxTreeviewTagFolderSub.Size = New System.Drawing.Size(324, 26)
+    Me.mnxTreeviewTagFolderSub.Size = New System.Drawing.Size(318, 24)
     Me.mnxTreeviewTagFolderSub.Text = "Tag Photos in Folder and Subfolders"
     '
     'SplitContainer1
@@ -1291,26 +1300,20 @@
     Me.mnxViewStyle.ImageScalingSize = New System.Drawing.Size(20, 20)
     Me.mnxViewStyle.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnxVThumbnails, Me.mnxVDetails})
     Me.mnxViewStyle.Name = "mnxViewStyle"
-    Me.mnxViewStyle.Size = New System.Drawing.Size(157, 56)
+    Me.mnxViewStyle.Size = New System.Drawing.Size(151, 48)
     Me.mnxViewStyle.Text = "View Style"
     '
     'mnxVThumbnails
     '
     Me.mnxVThumbnails.Name = "mnxVThumbnails"
-    Me.mnxVThumbnails.Size = New System.Drawing.Size(156, 26)
+    Me.mnxVThumbnails.Size = New System.Drawing.Size(150, 22)
     Me.mnxVThumbnails.Text = "&Thumbnails"
     '
     'mnxVDetails
     '
     Me.mnxVDetails.Name = "mnxVDetails"
-    Me.mnxVDetails.Size = New System.Drawing.Size(156, 26)
+    Me.mnxVDetails.Size = New System.Drawing.Size(150, 22)
     Me.mnxVDetails.Text = "&Details"
-    '
-    'mnxFMap
-    '
-    Me.mnxFMap.Name = "mnxFMap"
-    Me.mnxFMap.Size = New System.Drawing.Size(192, 26)
-    Me.mnxFMap.Text = "Sho&w on Map"
     '
     'frmExploref
     '

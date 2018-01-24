@@ -341,8 +341,8 @@ Public Class frmBugPhotos
 
     loadInitialPic()
 
-    uDescription = getBmpComment(propID.ImageDescription, pcomments)
-    uDate = getBmpComment(propID.DateTimeOriginal, pcomments)
+    uDescription = getBmpComment(propID.ImageDescription, pComments)
+    uDate = getBmpComment(propID.DateTimeOriginal, pComments)
 
     If Len(uDate) = 19 Then
       uDate = Mid(uDate, 6, 2) & "/" & Mid(uDate, 9, 2) & "/" & uDate.Substring(0, 4) & uDate.Substring(uDate.Length - 9)
@@ -631,7 +631,7 @@ Public Class frmBugPhotos
 
     iPic = n
 
-    pcomments = New List(Of PropertyItem)
+    pComments = New List(Of PropertyItem)
     currentpicPath = filenames(ix(iPic))
     lbPicPath.Text = Path.GetFileName(filenames(ix(iPic)))
     picpath = filenames(ix(iPic))
@@ -1285,7 +1285,7 @@ Public Class frmBugPhotos
   End Sub
 
   Private Sub frmBugPhotos_SizeChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.SizeChanged
-    If loading Then Exit Sub
+    If Loading Then Exit Sub
     pView.Zoom(0)
   End Sub
 
@@ -2170,6 +2170,232 @@ Public Class frmBugPhotos
 
   End Sub
 
+
+
+
+  Private Sub Button_Click(sender As Object, e As EventArgs)
+
+    ' makes a tab-separated file comparing species in the database with articles in wikipedia
+    '     topics to be created
+    '     topics the can be edited (redirected to common or other names)
+    '     topics that already have a photo
+    '     topics with article that need a photo
+    '     topics redirected to a genus
+
+
+    Dim client As New cWebClient
+    Dim s, s1 As String
+    Dim link As String
+    Dim taxonkey As String
+    Dim i, j, k As Integer
+    Dim ds As DataSet
+    Dim match As New taxrec
+    Dim sb As New StringBuilder
+
+    Dim cook As Cookie
+
+    Me.Cursor = Cursors.WaitCursor
+
+    cook = New Cookie
+    cook.Domain = "en.wikipedia.org"
+    cook.Name = "loginnotify_prevlogins"
+    cook.Value = "2017-krpybj-mtrdo42urmr27yb8oas59kwgndhycra"
+    client.cc.Add(cook)
+
+    cook = New Cookie
+    cook.Domain = "en.wikipedia.org"
+    cook.Name = "CP"
+    cook.Value = "H2"
+    client.cc.Add(cook)
+
+    cook = New Cookie
+    cook.Domain = "en.wikipedia.org"
+    cook.Name = "enwikiSession"
+    cook.Value = "rru3jchvup317plb29uf3mrk3a5r7pon"
+    client.cc.Add(cook)
+
+    cook = New Cookie
+    cook.Domain = "en.wikipedia.org"
+    cook.Name = "enwikiUserName"
+    cook.Value = "Xpda"
+    client.cc.Add(cook)
+
+    cook.Domain = "en.wikipedia.org"
+    cook.Name = "WMF-Last-Access"
+    cook.Value = "06-Dec-2017"
+    client.cc.Add(cook)
+
+    ds = getDS("select * from taxatable where imagecounter > 0 and rank = @parm1 order by id;", "Species")
+    If ds IsNot Nothing Then
+      For Each dr As DataRow In ds.Tables(0).Rows ' children
+        getTaxon(dr, match)
+
+        taxonkey = getTaxonKey(match.parentid, match.rank, match.taxon)
+
+        link = "https://en.wikipedia.org/w/index.php?title=" & taxonkey.Replace(" ", "_") & "&action=edit"
+
+        j = 0
+        s = client.DownloadString(link)
+        'File.WriteAllText("c:\tmp.htm", s)
+        s = LCase(s)
+        i = InStr(s, "{{speciesbox")
+        If i <= 0 Then i = InStr(s, "{{taxobox")
+        If i > 0 Then
+          k = InStr(i, s, "}}")
+          If k > 0 Then
+            s = LCase(Mid(s, i, k - i + 1))
+            s1 = s.Replace(" ", "")
+            j = InStr(s1, "|image=")
+            If j = 0 Then
+              sb.AppendLine("need picture" & vbTab & taxonkey & vbTab & match.taxon & vbTab & link)
+            Else
+              sb.AppendLine("has picture" & vbTab & taxonkey & vbTab & match.taxon & vbTab & link)
+            End If
+          End If
+
+        Else ' no {{species and no {{taxobox -- not a normal entry
+          If InStr(s, "<title>editing " & LCase(taxonkey)) > 0 Then
+            If InStr(s, LCase("#REDIRECT [[")) > 0 Then ' redirect
+              i = InStr(taxonkey, " ")
+              If i > 0 Then s1 = Mid(taxonkey, 1, i - 1) Else s1 = "" ' s1 is genus?
+              If s1 <> "" AndAlso InStr(s, LCase("#REDIRECT [[" & s1 & "]]")) > 0 Then ' redirect to genus
+                sb.AppendLine("redirect genus" & vbTab & taxonkey & vbTab & match.taxon & vbTab & link)
+              Else ' redirect probably to common name
+                sb.AppendLine("editing - redirect" & vbTab & taxonkey & vbTab & match.taxon & vbTab & link)
+              End If
+            Else
+              sb.AppendLine("editing - redirectless" & vbTab & taxonkey & vbTab & match.taxon & vbTab & link)
+            End If
+          ElseIf InStr(s, "<title>creating") > 0 Then
+            sb.AppendLine("creating" & vbTab & taxonkey & vbTab & match.taxon & vbTab & link)
+          ElseIf InStr(s, "permission error") > 0 Then
+            sb.AppendLine("create (permission)" & vbTab & taxonkey & vbTab & match.taxon & vbTab & link)
+          Else
+            sb.AppendLine("other" & vbTab & taxonkey & vbTab & match.taxon & vbTab & link)
+          End If
+        End If
+      Next dr
+    End If
+
+    s = sb.ToString
+    File.WriteAllText("c:\tmp1.txt", s)
+
+    Me.Cursor = Cursors.Default
+
+  End Sub
+
+  Private Sub cmdWikimedia_Click(sender As Object, e As EventArgs) Handles cmdWikimedia.Click
+
+    ' click to append to the file "c:\tmp\uploadwiki.txt" a line for the pattypan spreadsheet
+    ' for a bulk upload of photos to wikimedia commons
+    ' path, name, description, depicted_place, date, categories
+
+    ' template file: 
+    '=={{int:filedesc}}==
+    '{{Photograph
+    ' |author = [[User:xpda|xpda]] 
+    ' |description = ${description}
+    ' |depicted people = 
+    ' |depicted place = ${depicted_place}
+    ' |date = ${date}
+    ' |references = ${references}
+    ' |credit line = 
+    ' |notes =
+    ' |source = {{own}}
+    ' |other_versions = 
+    '}}
+    '
+    '=={{int:license-header}}==
+    '{{self|cc-by-sa-4.0}}
+    '
+    '<#if categories ? has_content>
+    '<#list categories ? split(";") as category>
+    '[[Category:${category?trim}]]
+    '</#list>
+    '<#else>{{subst:unc}}
+    '</#if>
+
+    Dim s, s1 As String
+    Dim match As New bugMain.taxrec
+    Dim ancestor As New List(Of taxrec)
+    Dim dset As New DataSet
+
+    Me.Cursor = Cursors.WaitCursor
+
+    s = picpath ' path
+    s &= vbTab & txTaxon.Text & " " & Path.GetFileNameWithoutExtension(picpath) ' name
+
+    ' description
+    s1 = "''" & txTaxon.Text & "'', " & txCommon.Text
+    If txRemarks.Text <> "" Then s1 &= ", " & txRemarks.Text
+    If txSize.Text <> "" Then s1 &= ", Size: " & txSize.Text
+    If txConfidence.Text <> "40" And txConfidence.Text <> "0" Then s1 &= ", ID Confidence: " & txConfidence.Text
+    's &= vbTab & """" & s1 & """"
+    s &= vbTab & s1
+
+    s1 = txLocation.Text
+    If txCounty.Text <> "" Then
+      If s1 <> "" Then s1 &= ", "
+      s1 &= txCounty.Text & " County"
+    End If
+    If txState.Text <> "" Then
+      If s1 <> "" Then s1 &= ", "
+      s1 &= txState.Text
+    End If
+    If txCountry.Text <> "" Then
+      If s1 <> "" Then s1 &= ", "
+      s1 &= txCountry.Text
+    End If
+    If txGPS.Text <> "" Then
+      If s1 <> "" Then s1 &= ", "
+      s1 &= txGPS.Text
+    End If
+    If txElevation.Text <> "" Then
+      If s1 <> "" Then s1 &= ", "
+      s1 &= "Elevation: " & txElevation.Text
+    End If
+
+    s &= vbTab & s1 ' depicted_place
+
+    s &= vbTab & Format(CDate(txDate.Text), "yyyy-MM-dd") ' date
+    If IsNumeric(txBugguide.Text) AndAlso txBugguide.Text <> "0" Then
+      s &= vbTab & "[https://bugguide.net/node/view/" & txBugguide.Text & " bugguide.net]"
+    Else
+      s &= vbTab & ""
+    End If
+
+    dset = TaxonkeySearch(txTaxon.Text, False)
+
+    If dset IsNot Nothing Then
+      For Each drow As DataRow In dset.Tables(0).Rows
+        getTaxon(drow, match)
+      Next drow ' should only be one
+    End If
+
+    ancestor.Clear()
+    ancestor.Add(match)
+    'getancestors(ancestor, True, "arthropoda")  ' retrieve ancestors of ancestor(0). true = exclude "no taxons"
+    s1 = txTaxon.Text
+    ' wikimedia calls this overcategorization
+    'For Each taxi As taxrec In ancestor
+    '  If LCase(taxi.rank) = "family" Then s1 &= "; " & taxi.taxon
+    '  If LCase(taxi.rank) = "class" Then s1 &= "; " & taxi.taxon
+    '  If LCase(taxi.rank) = "order" Then s1 &= "; " & taxi.taxon
+    'Next taxi
+    's1 &= "; Arthropoda; Entomology"
+
+    If LCase(txCounty.Text) = "mayes" And LCase(txState.Text) = "ok" Then s1 &= "; Bugs of Mayes County, Oklahoma"
+
+    s &= vbTab & s1 ' category
+    s &= vbCrLf
+
+    File.AppendAllText("c:\tmp\uploadwiki.txt", s)
+
+    Me.Cursor = Cursors.Default
+
+  End Sub
+
+
 End Class
 
 
@@ -2177,7 +2403,7 @@ End Class
 Public Class cWebClient
 
   Inherits WebClient
-  Private cc As New CookieContainer()
+  Public cc As New CookieContainer()
   Private lastPage As String
 
 

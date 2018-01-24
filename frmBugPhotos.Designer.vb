@@ -80,6 +80,7 @@ Partial Class frmBugPhotos
     Me.cmdDelete = New System.Windows.Forms.Button()
     Me.cmdMeasure = New System.Windows.Forms.Button()
     Me.pView = New PhotoMud.pViewer()
+    Me.cmdWikimedia = New System.Windows.Forms.Button()
     Me.GroupBox1.SuspendLayout()
     CType(Me.pView, System.ComponentModel.ISupportInitialize).BeginInit()
     Me.SuspendLayout()
@@ -487,6 +488,7 @@ Partial Class frmBugPhotos
     Me.cmdReadweb.TabStop = False
     Me.cmdReadweb.Text = "read web"
     Me.cmdReadweb.UseVisualStyleBackColor = True
+    Me.cmdReadweb.Visible = False
     '
     'cmdImageUpdate
     '
@@ -698,12 +700,23 @@ Partial Class frmBugPhotos
     Me.pView.TabStop = False
     Me.pView.ZoomFactor = 1.0R
     '
+    'cmdWikimedia
+    '
+    Me.cmdWikimedia.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.cmdWikimedia.Location = New System.Drawing.Point(924, 772)
+    Me.cmdWikimedia.Name = "cmdWikimedia"
+    Me.cmdWikimedia.Size = New System.Drawing.Size(90, 39)
+    Me.cmdWikimedia.TabIndex = 92
+    Me.cmdWikimedia.Text = "&Wikimedia"
+    Me.cmdWikimedia.UseVisualStyleBackColor = True
+    '
     'frmBugPhotos
     '
     Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 17.0!)
     Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
     Me.CancelButton = Me.cmdClose
     Me.ClientSize = New System.Drawing.Size(1326, 828)
+    Me.Controls.Add(Me.cmdWikimedia)
     Me.Controls.Add(Me.cmdImageUpdate)
     Me.Controls.Add(Me.cmdMeasure)
     Me.Controls.Add(Me.cmdDelete)
@@ -792,4 +805,5 @@ Partial Class frmBugPhotos
   Friend WithEvents txElevation As System.Windows.Forms.TextBox
   Public WithEvents Label11 As System.Windows.Forms.Label
   Friend WithEvents pView As PhotoMud.pViewer
+  Friend WithEvents cmdWikimedia As System.Windows.Forms.Button
 End Class

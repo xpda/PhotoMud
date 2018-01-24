@@ -16,6 +16,10 @@ Public Class frmBugQuery
   Dim nn As Integer = 0
   Dim folderPath As String
 
+  Private Sub frmBugQuery_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
+    'QueryTaxon = ""
+  End Sub
+
   Private Sub frmBugQuery_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
 
     Dim s As String = ""
@@ -419,6 +423,12 @@ Public Class frmBugQuery
     End If
 
     cmdTaxon_Click(sender, e)
+
+    'If QueryTaxon <> "" Then
+    ' txTaxon.Text = QueryTaxon
+    'cmdOK_Click(sender, e)
+    'End If
+
   End Sub
 
   Private Sub tvTaxon_PreviewKeyDown(ByVal sender As Object, ByVal e As PreviewKeyDownEventArgs) Handles tvTaxon.PreviewKeyDown
@@ -461,4 +471,5 @@ Public Class frmBugQuery
     Me.DialogResult = DialogResult.Cancel
     Me.Close()
   End Sub
+
 End Class

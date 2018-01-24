@@ -21,15 +21,18 @@ Public Module bugMain
   End Structure
 
   Structure taxrec
-    Dim taxonkey As String
+    Dim rank As String
     Dim taxon As String
     Dim descr As String
-    Dim rank As String
     Dim id As Integer
     Dim parentid As Integer
     Dim imageCounter As Integer
     Dim childimageCounter As Integer
+    Dim link As String
+    Dim authority As String
+    Dim taxonkey As String
   End Structure
+
 
   Public nodeMatchColor As Color = Color.Cornsilk
   Public queryNames As New List(Of String) ' used by frmexpore and frmbugphotos
@@ -54,6 +57,9 @@ Public Module bugMain
   Public iniBugPixelsPerMM As Double = 274.5 ' gx1: 268.4 macro, 56.5 for zoom, gh4: 274.5 macro, 57.8 zoom
 
   Public bugPrevFilename As String = ""
+
+  'Public QueryTaxon As String = ""  ' for shortcut -- temporary!
+
 
   Sub linkBugPhotos()
     ' link the tagged images in the bug database -- changes the database only.
@@ -99,13 +105,15 @@ Public Module bugMain
   Sub getTaxon(ByRef drow As DataRow, ByRef match As taxrec)
 
     ' load drow into match
-    If IsDBNull(drow.Item("id")) Then match.id = 0 Else match.id = drow.Item("id")
+    If IsDBNull(drow.Item("rank")) Then match.rank = "" Else match.rank = drow.Item("rank")
     If IsDBNull(drow.Item("taxon")) Then match.taxon = "" Else match.taxon = drow.Item("taxon")
     If IsDBNull(drow.Item("descr")) Then match.descr = "" Else match.descr = drow.Item("descr")
+    If IsDBNull(drow.Item("id")) Then match.id = 0 Else match.id = drow.Item("id")
     If IsDBNull(drow.Item("parentid")) Then match.parentid = 0 Else match.parentid = drow.Item("parentid")
-    If IsDBNull(drow.Item("rank")) Then match.rank = "" Else match.rank = drow.Item("rank")
     If IsDBNull(drow.Item("imagecounter")) Then match.imageCounter = 0 Else match.imageCounter = drow.Item("imagecounter")
     If IsDBNull(drow.Item("childimagecounter")) Then match.childimageCounter = 0 Else match.childimageCounter = drow.Item("childimagecounter")
+    If IsDBNull(drow.Item("link")) Then match.link = "" Else match.link = drow.Item("link")
+    If IsDBNull(drow.Item("authority")) Then match.authority = "" Else match.authority = drow.Item("authority")
 
     match.taxonkey = getTaxonKey(match.parentid, match.rank, match.taxon)
 
@@ -328,6 +336,8 @@ Public Module bugMain
 
   Sub getQueryPaths(ByRef fileNames As List(Of String), ByVal initialize As Boolean)
     ' gets file names from bugquery into fileNames()
+
+    'If Clipboard.ContainsText Then QueryTaxon = Clipboard.GetText '` temporary!!!
 
     If initialize Or queryNames Is Nothing Then
       If useQuery Then ' bugs
