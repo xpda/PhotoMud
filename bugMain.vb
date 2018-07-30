@@ -761,7 +761,7 @@ Public Module bugMain
       If parentID <= 0 Then Exit For
 
       dset = getDS("select * from taxatable where id = @parm1", parentID)
-      If dset Is Nothing OrElse dset.Tables.Count <> 1 Then Exit For ' error
+      If dset Is Nothing OrElse dset.Tables.Count <> 1 Or dset.Tables(0).Rows.Count = 0 Then Exit For ' error
 
       childImageCounter = dset.Tables(0).Rows(0)("childimagecounter")
       childImageCounter += inc

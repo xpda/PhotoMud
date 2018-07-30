@@ -26,6 +26,7 @@ Partial Class frmCalendar
     Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmCalendar))
     Me.tabControl1 = New System.Windows.Forms.TabControl()
     Me.TabPage1 = New System.Windows.Forms.TabPage()
+    Me.pView = New PhotoMud.pViewer()
     Me.cmdShuffle = New System.Windows.Forms.Button()
     Me.chkDaily = New System.Windows.Forms.CheckBox()
     Me.Label6 = New System.Windows.Forms.Label()
@@ -87,9 +88,9 @@ Partial Class frmCalendar
     Me.cmdCancel = New System.Windows.Forms.Button()
     Me.cmdPreviousMonth = New System.Windows.Forms.Button()
     Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
-    Me.pView = New PhotoMud.pViewer()
     Me.tabControl1.SuspendLayout()
     Me.TabPage1.SuspendLayout()
+    CType(Me.pView, System.ComponentModel.ISupportInitialize).BeginInit()
     CType(Me.nmMonths, System.ComponentModel.ISupportInitialize).BeginInit()
     CType(Me.nmBeginYear, System.ComponentModel.ISupportInitialize).BeginInit()
     Me.TabPage2.SuspendLayout()
@@ -100,7 +101,6 @@ Partial Class frmCalendar
     Me.pnPaperFrame.SuspendLayout()
     Me.pnPaper.SuspendLayout()
     CType(Me.Picture1, System.ComponentModel.ISupportInitialize).BeginInit()
-    CType(Me.pView, System.ComponentModel.ISupportInitialize).BeginInit()
     Me.SuspendLayout()
     '
     'tabControl1
@@ -142,6 +142,57 @@ Partial Class frmCalendar
     Me.TabPage1.TabIndex = 0
     Me.TabPage1.Text = "Photos"
     Me.TabPage1.UseVisualStyleBackColor = True
+    '
+    'pView
+    '
+    Me.pView.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.pView.BackColor = System.Drawing.SystemColors.ControlDarkDark
+    Me.pView.BitmapPath = Nothing
+    Me.pView.CurrentPage = -1
+    Me.pView.DrawAngle = 0.0R
+    Me.pView.DrawBackColor = System.Drawing.Color.White
+    Me.pView.DrawBox = New System.Drawing.Rectangle(0, 0, 0, 0)
+    Me.pView.DrawDashed = False
+    Me.pView.DrawFilled = False
+    Me.pView.DrawFont = Nothing
+    Me.pView.DrawForeColor = System.Drawing.Color.Navy
+    Me.pView.DrawLineWidth = 1.0!
+    Me.pView.DrawPath = Nothing
+    Me.pView.DrawPoints = CType(resources.GetObject("pView.DrawPoints"), System.Collections.Generic.List(Of System.Drawing.Point))
+    Me.pView.DrawShape = PhotoMud.shape.Line
+    Me.pView.DrawString = ""
+    Me.pView.DrawTextFmt = Nothing
+    Me.pView.FloaterOutline = False
+    Me.pView.FloaterPath = Nothing
+    Me.pView.FloaterPosition = New System.Drawing.Point(0, 0)
+    Me.pView.FloaterVisible = True
+    Me.pView.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.Low
+    Me.pView.Location = New System.Drawing.Point(389, 37)
+    Me.pView.Name = "pView"
+    Me.pView.pageBmp = CType(resources.GetObject("pView.pageBmp"), System.Collections.Generic.List(Of System.Drawing.Bitmap))
+    Me.pView.PageCount = 0
+    Me.pView.RubberAngle = 0.0R
+    Me.pView.rubberBackColor = System.Drawing.Color.White
+    Me.pView.RubberBox = New System.Drawing.Rectangle(0, 0, 0, 0)
+    Me.pView.RubberBoxCrop = False
+    Me.pView.RubberColor = System.Drawing.Color.Navy
+    Me.pView.RubberDashed = False
+    Me.pView.RubberEnabled = False
+    Me.pView.RubberFilled = False
+    Me.pView.RubberFont = Nothing
+    Me.pView.RubberLineWidth = 1.0R
+    Me.pView.RubberPath = Nothing
+    Me.pView.RubberPoints = CType(resources.GetObject("pView.RubberPoints"), System.Collections.Generic.List(Of System.Drawing.Point))
+    Me.pView.RubberShape = PhotoMud.shape.Curve
+    Me.pView.RubberString = ""
+    Me.pView.RubberTextFmt = Nothing
+    Me.pView.SelectionVisible = True
+    Me.pView.Size = New System.Drawing.Size(560, 451)
+    Me.pView.TabIndex = 83
+    Me.pView.TabStop = False
+    Me.pView.ZoomFactor = 1.0R
     '
     'cmdShuffle
     '
@@ -509,9 +560,9 @@ Partial Class frmCalendar
     Me.Label2.AutoSize = True
     Me.Label2.Location = New System.Drawing.Point(12, 210)
     Me.Label2.Name = "Label2"
-    Me.Label2.Size = New System.Drawing.Size(101, 17)
+    Me.Label2.Size = New System.Drawing.Size(202, 17)
     Me.Label2.TabIndex = 85
-    Me.Label2.Text = "Calendar Title:"
+    Me.Label2.Text = "Calendar Title (blank for year):"
     '
     'txTitle
     '
@@ -833,20 +884,6 @@ Partial Class frmCalendar
     Me.ToolTip1.SetToolTip(Me.cmdPreviousMonth, "Previous month")
     Me.cmdPreviousMonth.UseVisualStyleBackColor = True
     '
-    'pView
-    '
-    Me.pView.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-            Or System.Windows.Forms.AnchorStyles.Left) _
-            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-    Me.pView.BackColor = System.Drawing.SystemColors.ControlDarkDark
-    Me.pView.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.Low
-    Me.pView.Location = New System.Drawing.Point(389, 37)
-    Me.pView.Name = "pView"
-    Me.pView.Size = New System.Drawing.Size(560, 451)
-    Me.pView.TabIndex = 83
-    Me.pView.TabStop = False
-    Me.pView.ZoomFactor = 1.0R
-    '
     'frmCalendar
     '
     Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 17.0!)
@@ -862,6 +899,7 @@ Partial Class frmCalendar
     Me.tabControl1.ResumeLayout(False)
     Me.TabPage1.ResumeLayout(False)
     Me.TabPage1.PerformLayout()
+    CType(Me.pView, System.ComponentModel.ISupportInitialize).EndInit()
     CType(Me.nmMonths, System.ComponentModel.ISupportInitialize).EndInit()
     CType(Me.nmBeginYear, System.ComponentModel.ISupportInitialize).EndInit()
     Me.TabPage2.ResumeLayout(False)
@@ -874,7 +912,6 @@ Partial Class frmCalendar
     Me.pnPaperFrame.ResumeLayout(False)
     Me.pnPaper.ResumeLayout(False)
     CType(Me.Picture1, System.ComponentModel.ISupportInitialize).EndInit()
-    CType(Me.pView, System.ComponentModel.ISupportInitialize).EndInit()
     Me.ResumeLayout(False)
 
 End Sub

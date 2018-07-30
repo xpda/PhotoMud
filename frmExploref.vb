@@ -2411,6 +2411,11 @@ Public Class frmExploref
 
     If useQuery Then
       getQueryPaths(fileNames, initialize)
+      'fileNames = New List(Of String)
+      'For Each s1 As String In queryNames
+      ' fileNames.Add(s1)
+      'Next s1
+
       'If nFiles <= 0 Then
       '  useQuery = False
       '  dirWatch.EnableRaisingEvents = True
@@ -2590,7 +2595,7 @@ Public Class frmExploref
             ' this is for access to the imagelist and listview from the background thread.
             Me.Invoke(imagelistDelegate, img, imageKey) ' imagelistAdd
             iconStatus(ix(i)) = 2
-          Catch
+          Catch ex As Exception
             e.Cancel = True
             Exit Do
           End Try

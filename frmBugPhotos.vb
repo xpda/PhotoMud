@@ -1914,7 +1914,7 @@ Public Class frmBugPhotos
             location = Mid(s1, 1, i - 1)
             s1 = Mid(s1, i + 6)
             i = InStr(s1, "<br />")
-            If IsDate(Mid(s1, 1, i - 1)) Then
+            If i > 0 AndAlso IsDate(Mid(s1, 1, i - 1)) Then
               photoDate = CDate(Mid(s1, 1, i - 1))
             Else
               photoDate = "1/1/1900"
@@ -2372,8 +2372,8 @@ Public Class frmBugPhotos
       Next drow ' should only be one
     End If
 
-    ancestor.Clear()
-    ancestor.Add(match)
+    'ancestor.Clear()
+    'ancestor.Add(match)
     'getancestors(ancestor, True, "arthropoda")  ' retrieve ancestors of ancestor(0). true = exclude "no taxons"
     s1 = txTaxon.Text
     ' wikimedia calls this overcategorization

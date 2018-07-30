@@ -97,6 +97,7 @@ Public Class frmCalendar
       If Not chkDaily.Checked Then ' show month calendar page
         qCal.Categories = getcats()
         calTitle = txTitle.Text
+        If calTitle = "" Then calTitle = calDate.Year
         qCal.showMonth(g, calDate, rBox, calTitle, fontName)
       Else '   show second image 
         iPicm += 1
@@ -225,7 +226,7 @@ Public Class frmCalendar
     calBegin = Today.AddMonths(1)
     calBegin = calBegin.Month & "/1/" & calBegin.Year
     calDate = calBegin
-    txTitle.Text = calDate.Year
+    txTitle.Text = ""
     nmBeginYear.Value = calBegin.Year
     cmBeginMonth.SelectedItem = Format(calBegin, "MMMM")
     lbMonth.Text = "Photo for " & Format(calBegin.AddMonths(lstFiles.SelectedIndex), "MMMM yyyy")
@@ -689,6 +690,7 @@ Public Class frmCalendar
       End If
 
       calTitle = txTitle.Text
+      If calTitle = "" Then calTitle = dt.Year
       qCal.showMonth(e.Graphics, dt, rBox, calTitle, fontName)
     End If
 
@@ -791,6 +793,7 @@ Public Class frmCalendar
       End If
 
       calTitle = txTitle.Text
+      If calTitle = "" Then calTitle = dt.Year
       qCal.showMonth(e.Graphics, dt, rBox, calTitle, fontName)
     End If
 

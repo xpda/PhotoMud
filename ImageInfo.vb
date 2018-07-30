@@ -9934,11 +9934,11 @@ Public Module ImageInfo
         Case 5
           parm = "Extra Fine"
         Case 6
-          parm = "Raw+Jpeg"
+          parm = "raw+jpg"
         Case 7
           parm = "Compressed Raw"
         Case 8
-          parm = "Compressed Raw+Jpeg"
+          parm = "Compressed raw+jpg"
         Case Else
           parm = ""
       End Select
@@ -10304,24 +10304,25 @@ Public Module ImageInfo
     End If
 
     If makerTags.Contains(sTag(&H201B)) Then
-      iu = makerTags.Item(sTag(&H201B)).singleValue
-      Select Case iu
-        Case 0
-          parm = "Manual"
-        Case 2
-          parm = "AF-S"
-        Case 3
-          parm = "AF-C"
-        Case 4
-          parm = "AF-A"
-        Case 6
-          parm = "DMF"
-        Case 7
-          parm = "AF-D"
-        Case Else
-          parm = iu
-      End Select
-      If Len(parm) > 0 Then note = note & "Focus Mode:" & tb & parm & "\par "
+      ' this is always zero on the RX10 m3
+      'iu = makerTags.Item(sTag(&H201B)).singleValue
+      'Select Case iu
+      '  Case 0
+      'parm = "Manual"
+      '  Case 2
+      'parm = "AF-S"
+      '  Case 3
+      'parm = "AF-C"
+      '  Case 4
+      'parm = "AF-A"
+      '  Case 6
+      'parm = "DMF"
+      '  Case 7
+      'parm = "AF-D"
+      '  Case Else
+      'parm = iu
+      'End Select
+      'If Len(parm) > 0 Then note = note & "Focus Mode:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H201C)) Then
