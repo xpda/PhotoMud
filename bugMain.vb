@@ -24,8 +24,8 @@ Public Module bugMain
     Dim rank As String
     Dim taxon As String
     Dim descr As String
-    Dim id As Integer
-    Dim parentid As Integer
+    Dim id As String
+    Dim parentid As String
     Dim imageCounter As Integer
     Dim childimageCounter As Integer
     Dim link As String
@@ -40,7 +40,7 @@ Public Module bugMain
 
   Public iniBugPath As String
   Public lastbugTaxon As String = ""
-  Public lastbugTaxonID As Integer = 0
+  Public lastbugTaxonID As String = "0"
   Public lastbugCommon As String = ""
   Public lastbugLocation As String = ""
   Public lastbugCounty As String = ""
@@ -59,7 +59,6 @@ Public Module bugMain
   Public bugPrevFilename As String = ""
 
   'Public QueryTaxon As String = ""  ' for shortcut -- temporary!
-
 
   Sub linkBugPhotos()
     ' link the tagged images in the bug database -- changes the database only.
@@ -87,39 +86,147 @@ Public Module bugMain
 
   End Sub
 
-  Sub getTaxonByID(ByVal id As Integer, ByRef match As taxrec)
+  Function mergeMatches(matches As List(Of taxrec), gmatches As List(Of taxrec)) As List(Of taxrec)
 
-    Dim dset As New DataSet
+    ' merges taxrec lists, removes dups from second, must be sorted on input
 
-    dset = getDS("select * from taxatable where id = @parm1 limit 1", id)
+    Dim ms As New List(Of taxrec)
+    Dim taxa As New List(Of String)
+    Dim i1, i2 As Integer
 
-    If dset IsNot Nothing AndAlso dset.Tables(0).Rows.Count >= 1 Then
-      getTaxon(dset.Tables(0).Rows(0), match)
-    Else
-      match.taxon = ""
-      match.taxonkey = ""
+    i1 = 0 : i2 = 0
+    Do While i1 < matches.Count
+      Do While gmatches(i2).taxonkey < matches(i1).taxonkey And i2 < gmatches.Count
+        ms.Add(gmatches(i2))
+        i2 += 1
+      Loop
+      If i2 < gmatches.Count AndAlso gmatches(i2).taxonkey = matches(i1).taxonkey Then i2 += 1
+
+      ms.Add(matches(i1))
+      i1 += 1
+    Loop
+
+    If i2 < gmatches.Count AndAlso gmatches(i2).taxonkey = matches(i1).taxonkey Then i2 += 1
+    Do While i2 < gmatches.Count
+      ms.Add(gmatches(i2))
+      i2 += 1
+    Loop
+
+    Return ms
+
+
+  End Function
+
+
+  Function getTaxrecByID(ByVal id As String) As List(Of taxrec)
+
+    ' gbif ids start with g: g1234, for example.
+
+    Dim ds As New DataSet
+    Dim m As New taxrec
+    Dim matches As New List(Of taxrec)
+
+    If id = "" Then Return Nothing
+
+    If eqstr(id.Substring(0, 1), "g") Then ' gbif database
+      ds = getDS("select * from gbif.tax where taxid = @parm1 and usable = 'yes';",
+                 id.Substring(1).Trim)
+      If ds IsNot Nothing Then
+        For Each dr As DataRow In ds.Tables(0).Rows
+          m = getTaxrecg(dr)
+          matches.Add(m)
+        Next dr
+      End If
+
+    Else ' taxatable database
+      ds = getDS("select * from taxatable where id = @parm1", id)
+      If ds IsNot Nothing Then
+        For Each dr As DataRow In ds.Tables(0).Rows
+          m = getTaxrec(dr)
+          matches.Add(m)
+        Next dr
+      End If
     End If
 
-  End Sub
+    Return matches
 
-  Sub getTaxon(ByRef drow As DataRow, ByRef match As taxrec)
+  End Function
+
+  Function getTaxrec(ByRef dr As DataRow) As taxrec
+
+    Dim match As New taxrec
 
     ' load drow into match
-    If IsDBNull(drow.Item("rank")) Then match.rank = "" Else match.rank = drow.Item("rank")
-    If IsDBNull(drow.Item("taxon")) Then match.taxon = "" Else match.taxon = drow.Item("taxon")
-    If IsDBNull(drow.Item("descr")) Then match.descr = "" Else match.descr = drow.Item("descr")
-    If IsDBNull(drow.Item("id")) Then match.id = 0 Else match.id = drow.Item("id")
-    If IsDBNull(drow.Item("parentid")) Then match.parentid = 0 Else match.parentid = drow.Item("parentid")
-    If IsDBNull(drow.Item("imagecounter")) Then match.imageCounter = 0 Else match.imageCounter = drow.Item("imagecounter")
-    If IsDBNull(drow.Item("childimagecounter")) Then match.childimageCounter = 0 Else match.childimageCounter = drow.Item("childimagecounter")
-    If IsDBNull(drow.Item("link")) Then match.link = "" Else match.link = drow.Item("link")
-    If IsDBNull(drow.Item("authority")) Then match.authority = "" Else match.authority = drow.Item("authority")
+    If IsDBNull(dr("rank")) Then match.rank = "" Else match.rank = dr("rank")
+    If IsDBNull(dr("taxon")) Then match.taxon = "" Else match.taxon = dr("taxon")
+    If IsDBNull(dr("descr")) Then match.descr = "" Else match.descr = dr("descr")
+    If IsDBNull(dr("id")) Then match.id = "" Else match.id = dr("id")
+    If IsDBNull(dr("parentid")) Then match.parentid = "" Else match.parentid = dr("parentid")
+    If IsDBNull(dr("imagecounter")) Then match.imageCounter = 0 Else match.imageCounter = dr("imagecounter")
+    If IsDBNull(dr("childimagecounter")) Then match.childimageCounter = 0 Else match.childimageCounter = dr("childimagecounter")
+    If IsDBNull(dr("link")) Then match.link = "" Else match.link = dr("link")
+    If IsDBNull(dr("authority")) Then match.authority = "" Else match.authority = dr("authority")
 
     match.taxonkey = getTaxonKey(match.parentid, match.rank, match.taxon)
 
-  End Sub
+    Return match
 
-  Function getTaxonKey(ByVal parentid As Integer, ByVal rank As String, ByVal taxon As String) As String
+  End Function
+  Function getTaxrecg(ByRef dr As DataRow) As taxrec
+    ' get a taxref from gbif database
+    Dim match As New taxrec
+    Dim matches As New List(Of taxrec)
+    Dim vnames As New List(Of String)
+    Dim s As String
+    Dim sq() As String
+    Dim taxid As String
+    Dim ds As DataSet
+
+
+    If IsDBNull(dr("taxid")) Then taxid = "" Else taxid = dr("taxid")
+    match.id = "g" & taxid ' gbif id prefix
+
+    ' load dr into match
+    If IsDBNull(dr("rank")) Then match.rank = "" Else match.rank = dr("rank")
+    If IsDBNull(dr("name")) Then match.taxon = "" Else match.taxonkey = dr("name")
+    If IsDBNull(dr("parent")) Then match.parentid = "" Else match.parentid = "g" & dr("parent")
+    If IsDBNull(dr("imagecounter")) Then match.imageCounter = 0 Else match.imageCounter = dr("imagecounter")
+    If IsDBNull(dr("childimagecounter")) Then match.childimageCounter = 0 Else match.childimageCounter = dr("childimagecounter")
+    If IsDBNull(dr("authority")) Then match.authority = "" Else match.authority = dr("authority")
+
+    match.link = "https://www.gbif.org/species/" & match.id.Substring(1) ' no "g"
+
+    sq = match.taxonkey.Split(" ")
+    If sq.Count >= 0 Then
+      match.taxon = sq(sq.Count - 1)
+    Else
+      match.taxon = ""
+    End If
+
+    match.id.Substring(1) ' no "g"
+
+    ds = getDS("select * from gbif.vernacularname where taxonid = @parm1 and language = 'en'", taxid)
+    match.descr = ""
+
+    If ds IsNot Nothing Then
+      For Each drv As DataRow In ds.Tables(0).Rows
+        s = drv("vernacularname")
+        If vnames.IndexOf(s) < 0 Then vnames.Add(s)
+      Next drv
+
+      If vnames.Count > 0 Then
+        match.descr = vnames(0)
+        'For i As Integer = 1 To vnames.Count - 1
+        'match.descr &= "|" & vnames(i)
+        'Next i
+      End If
+    End If
+
+    Return match
+
+  End Function
+
+  Function getTaxonKey(ByVal parentid As String, ByVal rank As String, ByVal taxon As String) As String
 
     ' adds the genus to species, and both of those to subspecies
     If String.Compare(rank, "species", True) <> 0 And String.Compare(rank, "subspecies", True) <> 0 Then Return taxon
@@ -150,40 +257,67 @@ Public Module bugMain
 
   End Function
 
+  Function queryTax(cmd As String, val As String, Optional val2 As String = "") As List(Of taxrec)
+
+    Dim ds As New DataSet
+    Dim match As New taxrec
+    Dim matches As New List(Of taxrec)
+
+    ds = getDS(cmd, val, val2)
+    If ds IsNot Nothing Then
+      For Each dr As DataRow In ds.Tables(0).Rows
+        If cmd.Contains("gbif.") Then
+          match = getTaxrecg(dr)
+        Else
+          match = getTaxrec(dr)
+        End If
+        If match.id <> "" Then matches.Add(match)
+      Next dr
+    End If
+
+    Return matches
+
+  End Function
+
+
   Public Sub populate(ByRef node As TreeNode, ByVal isQuery As Boolean)
     ' populate a single tree node from the database
 
-    Dim dset As New DataSet
-    Dim drow As DataRow
-    Dim match As New taxrec
+    Dim matches As List(Of taxrec)
+    'Dim gmatches As List(Of taxrec)
 
     Dim nd As TreeNode
     Dim found As Boolean
 
     If isQuery Then
-      dset = getDS("select * from taxatable where parentid = @parm1 and childimagecounter > 0 order by taxon", node.Tag)
+      If node.Tag.startswith("g") Then
+        matches = queryTax("select * from gbif.tax where parent = @parm1 and childimagecounter > 0 order by name", node.Tag.substring(1))
+      Else
+        matches = queryTax("select * from taxatable where parentid = @parm1 and childimagecounter > 0 order by taxon", node.Tag)
+      End If
     Else
-      dset = getDS("select * from taxatable where parentid = @parm1 order by taxon", node.Tag)
+      If node.Tag.startswith("g") Then
+        matches = queryTax("select * from gbif.tax where parent = @parm1 and usable = 'yes' order by name", node.Tag.substring(1))
+      Else
+        matches = queryTax("select * from taxatable where parentid = @parm1 order by taxon", node.Tag)
+      End If
     End If
 
-    If dset IsNot Nothing Then
-      For Each drow In dset.Tables(0).Rows
-        getTaxon(drow, match)
-        found = False
-        For Each nd In node.Nodes
-          If Int(nd.Tag) = match.id Then ' don't add duplicate
-            found = True
-            Exit For
-          End If
-        Next nd
-
-        If Not found Then
-          nd = node.Nodes.Add(taxaLabel(match, False, isQuery))
-          nd.ToolTipText = match.rank
-          nd.Tag = match.id
+    For Each m As taxrec In matches
+      found = False
+      For Each nd In node.Nodes
+        If nd.Tag = m.id Then ' don't add duplicate
+          found = True
+          Exit For
         End If
-      Next drow
-    End If
+      Next nd
+
+      If Not found Then
+        nd = node.Nodes.Add(taxaLabel(m, False, isQuery))
+        nd.ToolTipText = m.rank
+        nd.Tag = m.id
+      End If
+    Next m
 
   End Sub
 
@@ -193,25 +327,29 @@ Public Module bugMain
     ' shortform is true to omit "Family: Brushfoot etc."
 
     Dim match As New taxrec
-    Dim parent As Integer
+    Dim matches As List(Of taxrec)
+    Dim parent As String
     Dim iter As Integer = 0
     Dim i As Integer
 
-    If inMatch.parentid <= 0 Then ' inmatch might only have the taxonid
+    If inMatch.parentid = "" Then ' inmatch might only have the taxonid
       ' load everything else into inmatch
       i = inMatch.id
-      getTaxonByID(i, inMatch)
+      matches = getTaxrecByID(i)
+      If matches.Count > 0 Then inMatch = matches(0)
     End If
 
     If inMatch.descr <> "" Or shortForm Then Return inMatch.descr
     parent = inMatch.parentid
 
-    Do While parent >= 0 And iter < 25
+    Do While parent > "" And iter < 25
       iter = iter + 1
-      getTaxonByID(parent, match)
-      If match.taxon = "" Then Return ""
+      matches = getTaxrecByID(parent)
+      If matches.Count <= 0 OrElse matches(0).taxon = "" Then Return ""
+      match = matches(0)
 
-      If match.descr <> "" AndAlso match.rank <> "No Taxon" And (match.rank <> "Species" Or inMatch.rank = "Subspecies") And match.rank <> "Subspecies" Then
+      If match.descr <> "" AndAlso match.rank <> "No Taxon" And (match.rank <> "Species" Or inMatch.rank = "Subspecies") And
+           match.rank <> "Subspecies" Then
         Return match.rank & ": " & match.descr
       End If
       parent = match.parentid
@@ -221,118 +359,114 @@ Public Module bugMain
 
   End Function
 
-  Function popuTaxon(ByVal xtaxi As String, ByRef tvtaxon As TreeView, ByVal isQuery As Boolean) As taxrec
-    ' populate the tvTaxon and open it to taxi
+  Function popuTaxon(ByVal xtaxi As String, ByRef tvTax As TreeView, ByVal isQuery As Boolean) As taxrec
+    ' populate the tvTax and open it to taxi
 
     Dim nd As TreeNode = Nothing
     Dim ndc As TreeNode = Nothing
     Dim ndParent As TreeNode = Nothing
     Dim ids As New List(Of Integer)
-    Dim match, topMatch As New taxrec
+    Dim topMatch As New taxrec
+    Dim matches As New List(Of taxrec)
     Dim ancestor As New List(Of taxrec)
     Dim i As Integer
 
-    Dim dset As New DataSet
-    Dim drow As DataRow
-
     Dim ndTarget As TreeNode = Nothing
-    Dim targetLevel As Integer ' level in tvTaxon of the match
+    Dim targetLevel As Integer ' level in tvTax of the match
 
-    tvtaxon.Visible = True
+    tvTax.Visible = True
 
     ' search for the taxon
-    dset = TaxonkeySearch(xtaxi, isQuery)
+    matches = TaxonkeySearch(xtaxi, isQuery)
 
     ndTarget = Nothing
     targetLevel = 999
 
-    If dset IsNot Nothing Then
-      For Each drow In dset.Tables(0).Rows
-        getTaxon(drow, match)
+    For Each match As taxrec In matches
+      ancestor = getancestors(match, False, "phylum")  ' retrieve ancestors of ancestor(0). false = don't exclude "no taxons"
 
-        ancestor.Clear()
-        ancestor.Add(match)
-        getancestors(ancestor, False, "arthropoda")  ' retrieve ancestors of ancestor(0). false = don't exclude "no taxons"
+      'ndParent = Nothing
+      'For Each nd In tvTax.Nodes(0).Nodes
+      '  If InStr(nd.Text, "Hexapoda") > 0 Then
+      '    ndParent = nd
+      '    Exit For
+      '    End If
+      '  Next nd
 
-        'ndParent = Nothing
-        'For Each nd In tvtaxon.Nodes(0).Nodes
-        '  If InStr(nd.Text, "Hexapoda") > 0 Then
-        '    ndParent = nd
-        '    Exit For
-        '    End If
-        '  Next nd
+      'If ndParent Is Nothing Then Exit For ' should never happen
 
-        'If ndParent Is Nothing Then Exit For ' should never happen
+      ndParent = tvTax.Nodes(0) ' 9/25/14
 
-        ndParent = tvtaxon.Nodes(0) ' 9/25/14
-
-        For i = ancestor.Count - 2 To 0 Step -1  ' go through ancestors top down, starting at arthropoda children
-          ndc = Nothing
-          For Each nd In ndParent.Nodes          ' search for next match
-            If Int(nd.Tag) = ancestor(i).id Then
-              ndc = nd
-              Exit For
-            End If
-          Next nd
-
-          ' add node to treeview if it's not already there
-          If ndc Is Nothing Then
-            ndc = ndParent.Nodes.Add(taxaLabel(ancestor(i), False, isQuery))
-            'If ancestor(i).descr = "" Then
-            '  ndc = ndParent.Nodes.Add(ancestor(i).taxon)
-            'Else
-            '  ndc = ndParent.Nodes.Add(ancestor(i).taxon & " -- " & ancestor(i).descr)
-            '  End If
-            ndc.ToolTipText = ancestor(i).rank
-            ndc.Tag = ancestor(i).id
+      For i = ancestor.Count - 2 To 0 Step -1  ' go through ancestors top down, starting at arthropoda children
+        ndc = Nothing
+        For Each nd In ndParent.Nodes          ' search for next match
+          If nd.Tag = ancestor(i).id Then
+            ndc = nd
+            Exit For
           End If
+        Next nd
 
-          If ndc.Nodes.Count = 0 Then populate(ndc, isQuery)
-          ndc.Expand()
-          ndParent = ndc  ' descend one level
-        Next i
-
-        If ndc IsNot Nothing Then
-          ndc.BackColor = nodeMatchColor
-        Else
-          ndParent.BackColor = nodeMatchColor
+        ' add node to treeview if it's not already there
+        If ndc Is Nothing Then
+          ndc = ndParent.Nodes.Add(taxaLabel(ancestor(i), False, isQuery))
+          'If ancestor(i).descr = "" Then
+          '  ndc = ndParent.Nodes.Add(ancestor(i).taxon)
+          'Else
+          '  ndc = ndParent.Nodes.Add(ancestor(i).taxon & " -- " & ancestor(i).descr)
+          '  End If
+          ndc.ToolTipText = ancestor(i).rank
+          ndc.Tag = ancestor(i).id
         End If
 
-        If ancestor.Count < targetLevel Then ' save the top match
-          ndTarget = ndc
-          targetLevel = ancestor.Count
-          topMatch = match
-        End If
+        If ndc.Nodes.Count = 0 Then populate(ndc, isQuery)
+        ndc.Expand()
+        ndParent = ndc  ' descend one level
+      Next i
 
-      Next drow
-    End If
+      If ndc IsNot Nothing Then
+        ndc.BackColor = nodeMatchColor
+      Else
+        ndParent.BackColor = nodeMatchColor
+      End If
+
+      If ancestor.Count < targetLevel Then ' save the top match
+        ndTarget = ndc
+        targetLevel = ancestor.Count
+        topMatch = match
+      End If
+
+    Next match
 
     ' highlight the top match
-    tvtaxon.SelectedNode = ndTarget
-    tvtaxon.Select()
+    tvTax.SelectedNode = ndTarget
+    tvTax.Select()
 
     Return topMatch
 
   End Function
 
-  Sub getancestors(ByVal ancestor As List(Of taxrec), ByVal excludeNoTaxon As Boolean, ByVal StopAt As String)
+  Function getancestors(m As taxrec, ByVal excludeNoTaxon As Boolean, ByVal StopAt As String) As List(Of taxrec)
 
-    Dim match As New taxrec
+    Dim matches As List(Of taxrec)
+    Dim ancestor As New List(Of taxrec)
     Dim iter As Integer = 0
-    Dim id As Integer
+    Dim id As String
 
-    If ancestor.Count <> 1 Then Exit Sub
-    id = ancestor(0).parentid
+    ancestor.Add(m)
+    id = m.parentid
 
-    Do While id > 0 And iter < 50
-      getTaxonByID(id, match)
-      ancestor.Add(match)
-      If eqstr(match.taxon, StopAt) Then Exit Do
-      id = match.parentid
+    Do While id <> "" And iter < 50
+      matches = getTaxrecByID(id)
+      If matches.Count <= 0 Then Return Nothing
+      ancestor.Add(matches(0))
+      If eqstr(matches(0).rank, StopAt) Then Exit Do
+      id = matches(0).parentid
       iter = iter + 1
     Loop
 
-  End Sub
+    Return ancestor
+
+  End Function
 
   Sub getQueryPaths(ByRef fileNames As List(Of String), ByVal initialize As Boolean)
     ' gets file names from bugquery into fileNames()
@@ -349,43 +483,48 @@ Public Module bugMain
     fileNames.AddRange(queryNames)
 
   End Sub
-  Sub gotoNextNode(ByVal tvtaxon As TreeView)
+  Sub gotoNextNode(tvTax As TreeView)
 
     ' select the next node with treeMatchColor
 
     Dim ndStart As TreeNode
     Dim done As Boolean
+    Dim mode As Integer
 
-    ndStart = tvtaxon.SelectedNode
+    ndStart = tvTax.SelectedNode
 
-    done = traverse(tvtaxon.Nodes(0), ndStart, 0, tvtaxon) ' 0 means to skip the current node nd
+    mode = 0
+    done = traverse(tvTax.Nodes(0), ndStart, mode, tvTax) ' 0 means to skip the current node nd
 
-    If Not done Then done = traverse(tvtaxon.Nodes(0), ndStart, 1, tvtaxon) ' ignore nd -- wrap
+    mode = 1
+    If Not done Then done = traverse(tvTax.Nodes(0), ndStart, mode, tvTax) ' wrap
 
   End Sub
 
-  Function traverse(ByRef nd As TreeNode, ByRef startNode As TreeNode, ByRef mode As Integer, ByRef tvtaxon As TreeView) As Boolean
+  Function traverse(nd As TreeNode, startNode As TreeNode, ByRef mode As Integer, tvTax As TreeView) As Boolean
 
-    Dim ndc As TreeNode
+    ' mode = 0 means to skip nd
+
     Dim done As Boolean
-
-    If nd.BackColor = nodeMatchColor Then
-      done = done
-    End If
 
     If mode = 0 AndAlso nd Is startNode Then
       mode = 1
     Else
+
+      If nd.BackColor = nodeMatchColor Then
+        done = done
+      End If
+
       If mode = 1 AndAlso nd.BackColor = nodeMatchColor Then
-        tvtaxon.SelectedNode = nd
+        tvTax.SelectedNode = nd
         nd.EnsureVisible()
-        ' tvtaxon.Select()
+        ' tvTax.Select()
         Return True
       End If
     End If
 
-    For Each ndc In nd.Nodes
-      done = traverse(ndc, startNode, mode, tvtaxon)
+    For Each ndc As TreeNode In nd.Nodes
+      done = traverse(ndc, startNode, mode, tvTax)
       If done Then Return True
     Next ndc
 
@@ -481,7 +620,8 @@ Public Module bugMain
 
   Sub bugDelete(ByVal fName As String)
 
-    Dim i, imageID, setID, taxID As Integer
+    Dim i, imageID, setID As Integer
+    Dim taxID As String
 
     imageID = getScalar("select id from images where filename = @parm1 limit 1", fName)
     taxID = getScalar("select taxonid from images where id = @parm1 limit 1", imageID)
@@ -674,13 +814,16 @@ Public Module bugMain
 
   End Function
 
-  Function TaxonkeySearch(ByVal findme As String, ByVal isQuery As Boolean) As DataSet
+  Function TaxonkeySearch(ByVal findme As String, ByVal isQuery As Boolean) As List(Of taxrec)
 
     ' get dataset taxatable record for taxonkey or common name findme
 
     Dim qspecies As String
+    Dim cmd As String
+    Dim m As New taxrec
+    Dim matches As New List(Of taxrec)
     Dim s As String
-    Dim suffix, suffixp As String
+    Dim suffix, suffixg, suffixp As String
     Dim ds As New DataSet
     Dim ss() As String
 
@@ -688,33 +831,55 @@ Public Module bugMain
 
     If isQuery Then
       suffix = " and (childimagecounter > 0) order by taxon"
+      suffixg = " and (childimagecounter > 0) and usable = 'yes' order by name"
       suffixp = " and (childimagecounter > 0) order by @p"
     Else
       suffix = " order by taxon"
+      suffixg = "  and usable = 'yes' order by name"
       suffixp = " order by @p"
     End If
 
     ss = Split(findme, " ")
-    If UBound(ss) = 0 Then ' no space -- on-word search
-      ds = getDS("select * from taxatable where taxon = @parm1" & suffix, findme)
-      If ds Is Nothing OrElse ds.Tables(0).Rows.Count = 0 Then
-        ds = getDS("select * from taxatable where (taxon like @parm1)" & suffix, findme & "%")
+    If UBound(ss) = 0 Then ' no space -- one-word search
+      matches = queryTax("select * from taxatable where taxon = @parm1" & suffix, findme)
+      If matches.Count = 0 Then matches = queryTax("select * from gbif.tax where name = @parm1" & suffixg, findme)
+      If matches.Count = 0 Then
+        matches = queryTax("select * from taxatable where (taxon like @parm1)" & suffix, findme & "%")
+        ' If matches.Count = 0 Then matches = queryTax("select * from gbif.tax where (name like @parm1)" & suffixg, findme & "%") ' exact search only for gbif
       End If
 
     Else ' multi-word search, search genus and species, for example
       qspecies = ss(UBound(ss)) ' last word, could be subspecies
-      ds = getDS("select * from taxatable where taxon = @parm2 and @p := gettaxonkey(parentid, rank, taxon) = @parm1" & suffixp, findme, qspecies)
+      matches = queryTax(
+        "select * from taxatable where taxon = @parm2 and @p := gettaxonkey(parentid, rank, taxon) = @parm1" &
+        suffixp, findme, qspecies)
+      If matches.Count = 0 Then matches = queryTax("select * from gbif.tax where name = @parm1" & suffixg, findme) ' name includes genus
     End If
 
-    If ds Is Nothing OrElse ds.Tables(0).Rows.Count <= 0 Then ' search descr
-      ds.Clear()
+    If matches.Count = 0 Then  ' search descr
       s = findme.Replace("-", "`") ' accept either space or dash, so "eastern tailed blue" finds "eastern tailed-blue". Only works with rlike (mysql bug).
       s = s.Replace(" ", "[- ]")
       s = s.Replace("`", "[- ]")
-      ds = getDS("select * from taxatable where (descr rlike @parm1)" & suffix, s)
+      matches = queryTax("select * from taxatable where (descr rlike @parm1)" & suffix, s)
+
+      If matches.Count = 0 Then
+        ds = getDS("select * from gbif.vernacularname where vernacularname rlike @parm1 and language = 'en'", s)
+        If ds IsNot Nothing AndAlso ds.Tables(0).Rows.Count > 0 Then
+          cmd = "select * from gbif.tax where ("
+          For Each dr As DataRow In ds.Tables(0).Rows
+            If cmd.IndexOf(dr("taxonid")) < 0 Then cmd &= "taxid = '" & (dr("taxonid")) & "' or "
+          Next dr
+          If cmd.EndsWith(" or ") Then
+            cmd = cmd.Substring(0, cmd.Length - 4)
+            cmd &= ") and usable = 'yes' order by name"
+            matches = queryTax(cmd, "")
+          End If
+        End If
+      End If
+
     End If
 
-    Return ds
+    Return matches
 
   End Function
 
@@ -736,40 +901,42 @@ Public Module bugMain
     Return "server=" & host & "; database=" & database & "; uid=" & user & "; pwd=" & password & "; allowuservariables=true;"
   End Function
 
-  Sub incImageCounter(ByVal taxid As Integer, ByVal inc As Integer)
+  Sub incImageCounter(ByVal taxid As String, ByVal inc As Integer)
 
     ' add inc to imagecounter and childimagecounter for taxid and its ancestors
 
     Dim i As Integer
-    Dim imageCounter, childImageCounter, parentID As Integer
-    Dim dset As New DataSet
+    Dim imageCounter, childImageCounter As Integer
+    Dim parentID As String
+    Dim m As taxrec
+    Dim matches As List(Of taxrec)
 
-    dset = getDS("select * from taxatable where id = @parm1", taxid)
+    matches = getTaxrecByID(taxid)
+    If matches.Count <> 1 Then Exit Sub ' error
+    m = matches(0)
 
-    If dset Is Nothing OrElse dset.Tables.Count <> 1 Then Exit Sub ' error
-    imageCounter = dset.Tables(0).Rows(0)("imagecounter")
-    childImageCounter = dset.Tables(0).Rows(0)("childimagecounter")
+    imageCounter = m.imageCounter
+    childImageCounter = m.childimageCounter
     imageCounter += inc
     childImageCounter += inc
 
     i = nonQuery("update taxatable set imagecounter = @parm1, childimagecounter = @parm2 where id = @parm3", _
       imageCounter, childImageCounter, taxid)
 
-    parentID = dset.Tables(0).Rows(0)("parentid")
+    parentID = m.parentid
     ' follow parentID up the taxon tree, incrementing childImageCounter
     For k As Integer = 1 To 200
-      If parentID <= 0 Then Exit For
+      If parentID = "" Then Exit For
 
-      dset = getDS("select * from taxatable where id = @parm1", parentID)
-      If dset Is Nothing OrElse dset.Tables.Count <> 1 Or dset.Tables(0).Rows.Count = 0 Then Exit For ' error
+      matches = getTaxrecByID(parentID)
+      If matches.Count <> 1 Then Exit For ' error
+      m = matches(0)
 
-      childImageCounter = dset.Tables(0).Rows(0)("childimagecounter")
+      childImageCounter = m.childimageCounter
       childImageCounter += inc
 
       i = nonQuery("update taxatable set childimagecounter = @parm1 where id = @parm2", childImageCounter, parentID)
-      If i = 1 Then
-        parentID = dset.Tables(0).Rows(0)("parentid")
-      End If
+      If i = 1 Then parentID = m.parentid
     Next k
 
   End Sub

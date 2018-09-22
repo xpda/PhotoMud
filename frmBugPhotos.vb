@@ -70,7 +70,7 @@ Public Class frmBugPhotos
   Dim picInfo As pictureInfo
   Dim pComments As List(Of PropertyItem)
 
-  Dim taxonid As Integer
+  Dim taxonid As String
   Dim iElevation As Integer
   Dim abort As Boolean = False
 
@@ -109,13 +109,12 @@ Public Class frmBugPhotos
 
     Dim cmd As MySqlCommand
     Dim sql As String
-    Dim s As String
     Dim fName As String
-    Dim id As Integer = 0
+    Dim id As String = "0"
     Dim k As Integer
-    Dim match As New bugMain.taxrec
+    Dim match As New taxrec
+    Dim matches As New List(Of taxrec)
     Dim setID As Integer
-    Dim ds As DataSet
     Dim oldTaxid As Integer
 
     Me.Cursor = Cursors.WaitCursor
@@ -143,40 +142,32 @@ Public Class frmBugPhotos
       End If
 
       ' make sure there is one taxon
-      ds = TaxonkeySearch(txTaxon.Text, False)
-      If ds Is Nothing Then
-        k = 0 ' i is number of matches
-      Else
-        k = ds.Tables(0).Rows.Count
-      End If
+      matches = TaxonkeySearch(txTaxon.Text, False)
+      taxonid = ""
 
-      If k = 1 Then
-        getTaxon(ds.Tables(0).Rows(0), match)
-        taxonid = match.id
-        txCommon.Text = match.descr
+      If matches.Count = 1 Then
+        taxonid = matches(0).id
+        txCommon.Text = matches(0).descr
 
-      ElseIf k > 1 Then
+      ElseIf matches.Count > 1 Then
         k = -1
         ' omit all the species and subspecies and see if there is one match
-        For i As Integer = 0 To ds.Tables(0).Rows.Count - 1
-          s = LCase(ds.Tables(0).Rows(i)("rank"))
-          If s <> "species" And s <> "subspecies" Then
+        For i As Integer = 0 To matches.Count - 1
+          If (Not eqstr(matches(i).rank, "species")) And (Not eqstr(matches(i).rank, "subspecies")) Then
+            ' found a genus or higher. Theoretically there is only one.
+            taxonid = matches(k).id
+            txCommon.Text = matches(k).descr
             k = i
-            Exit For
           End If
         Next i
-        If k >= 0 Then ' found a genus or higher. Theoretically there is only one.
-          getTaxon(ds.Tables(0).Rows(k), match)
-          taxonid = match.id
-          txCommon.Text = match.descr
-        Else ' abort
+        If taxonid = "" Then ' abort
           MsgBox("There is more than one " & txTaxon.Text & " in the Database.", MsgBoxStyle.OkOnly)
           Me.Cursor = Cursors.Default
           cmdTaxon_Click(Nothing, Nothing)
           Return 0
         End If
 
-      Else ' k <= 0 
+      Else ' matches.count <= 0 
         MsgBox(txTaxon.Text & " is Not in the Database.", MsgBoxStyle.OkOnly)
         Me.Cursor = Cursors.Default
         cmdTaxon_Click(Nothing, Nothing)
@@ -299,7 +290,8 @@ Public Class frmBugPhotos
     Dim uComments As uExif
     Dim xLat, xLon As Double
 
-    Dim match As New bugMain.taxrec
+    Dim match As New taxrec
+    Dim matches As New List(Of taxrec)
 
     Dim dset As New DataSet
     Dim drow As DataRow
@@ -385,17 +377,18 @@ Public Class frmBugPhotos
     txCountry.Text = lastbugCountry
     txOriginalPath.Text = picpath ' this will be changed from the database if possible
 
-    taxonid = 0 ' global
+    taxonid = "" ' global
 
     txDateAdded.Text = Format(Now, "MM/dd/yyyy HH:mm")
 
-    dset = getDS("SELECT * FROM images WHERE filename = @parm1 limit 1", txFileName.Text)
+    dset = getDS("select * from images where filename = @parm1 limit 1", txFileName.Text)
 
     If dset IsNot Nothing AndAlso dset.Tables(0).Rows.Count > 0 Then
       drow = dset.Tables(0).Rows(0)
       If Not IsDBNull(drow("taxonid")) Then
         taxonid = drow("taxonid")
-        getTaxonByID(taxonid, match)
+        matches = getTaxrecByID(taxonid)
+        If matches.count < 0 Then match = New taxrec Else match = matches(0)
       End If
 
       If Not IsDBNull(drow("photodate")) Then txDate.Text = Format(drow("photodate"), "MM/dd/yyyy HH:mm:ss")
@@ -514,8 +507,11 @@ Public Class frmBugPhotos
 
   Sub grabTaxon(ByVal udescription As String, ByRef match As taxrec)
 
+    ' try to get the taxon from the jpg comment
+
     Dim s As String
     Dim i1, i2, eol As Integer
+    Dim matches As New List(Of taxrec)
 
     Dim adapt As New MySqlDataAdapter
     Dim dset As New DataSet
@@ -554,12 +550,11 @@ Public Class frmBugPhotos
     s = s.Trim  ' s is the taxon from the jpg comment (possibly)
 
     If s <> "" Then
-      dset = TaxonkeySearch(s, False)
+      matches = TaxonkeySearch(s, False)
 
-      If dset IsNot Nothing AndAlso dset.Tables(0).Rows.Count > 0 Then
-        getTaxon(dset.Tables(0).Rows(0), match)
-        txTaxon.Text = match.taxonkey
-        taxonid = match.id
+      If matches.Count > 0 Then
+        txTaxon.Text = matches(0).taxonkey
+        taxonid = matches(0).id
       End If
 
       If udescription <> "" Then
@@ -1038,6 +1033,7 @@ Public Class frmBugPhotos
     Dim dset As New DataSet
 
     Dim match As New bugMain.taxrec
+    Dim matches As List(Of taxrec)
     Dim nd As TreeNode = Nothing
     Dim ndc As TreeNode = Nothing
 
@@ -1047,12 +1043,13 @@ Public Class frmBugPhotos
     tvTaxon.Visible = True
     cmdCloseTree.Visible = True
 
-    dset = getDS("SELECT * FROM taxatable WHERE taxon = @parm1", "Arthropoda")
+    'matches = queryTax("select * from taxatable where taxon = @parm1", "arthropoda")
+    matches = queryTax("select * from gbif.tax where name = @parm1 and usable = 'yes'", "arthropoda")
+    'matches = mergeMatches(matches, gmatches)
 
-    If dset IsNot Nothing AndAlso dset.Tables(0).Rows.Count > 0 Then
-      getTaxon(dset.Tables(0).Rows(0), match)
-      nd = tvTaxon.Nodes.Add(taxaLabel(match, False, False))
-      nd.Tag = match.id
+    If matches.Count > 0 Then
+      nd = tvTaxon.Nodes.Add(taxaLabel(matches(0), False, False))
+      nd.Tag = matches(0).id
     End If
 
     populate(nd, False)  ' load Arthropoda
@@ -1136,13 +1133,15 @@ Public Class frmBugPhotos
 
   Private Sub tvTaxon_Doubleclick(ByVal sender As Object, ByVal e As System.EventArgs) Handles tvTaxon.NodeMouseDoubleClick
 
-    Dim match As New bugMain.taxrec
+    Dim match As New taxrec
+    Dim matches As List(Of taxrec)
 
     If tvTaxon.SelectedNode Is Nothing Then Exit Sub
 
-    taxonid = Int(tvTaxon.SelectedNode.Tag)
+    taxonid = tvTaxon.SelectedNode.Tag
 
-    getTaxonByID(taxonid, match)
+    matches = getTaxrecByID(taxonid)
+    If matches.Count <= 0 Then match = New taxrec Else match = matches(0)
 
     txTaxon.Text = match.taxonkey
     txCommon.Text = getDescr(match, False)
@@ -1480,32 +1479,39 @@ Public Class frmBugPhotos
 
   End Sub
 
-  Function setimageCount(ByVal taxid As Integer) As Integer
+  Function setimageCount(ByVal taxid As String) As Integer
 
     ' sets the childimagecounter of taxid, descends recursively 
+    ' works on taxatable or gbif.tax, depending on initial taxid
 
-    Dim id As Integer = 0
     Dim count As Integer = 0
-    Dim dset As New DataSet
-    Dim drow As DataRow
     Dim imageCounter As Integer
     Dim childImageCounter As Integer
     Dim i As Integer
+    Dim matches As List(Of taxrec)
 
     imageCounter = getScalar("select count(*) from images where images.taxonid = @parm1", taxid)
 
-    dset = getDS("select id from taxatable where parentid = @parm1", taxid)
-    childImageCounter = imageCounter
-    If dset IsNot Nothing Then
-      For Each drow In dset.Tables(0).Rows ' children
-        i = setimageCount(drow("id"))
-        childImageCounter = childImageCounter + i
-      Next drow
+    If taxid.StartsWith("g") Then
+      matches = queryTax("select id from gbif.tax where parent = @parm1 and usable = 'yes'", taxid)
+    Else
+      matches = queryTax("select id from taxatable where parentid = @parm1", taxid)
     End If
 
+    childImageCounter = imageCounter
+    For Each m As taxrec In matches ' children
+      i = setimageCount(m.id)
+      childImageCounter = childImageCounter + i
+    Next m
+
     If childImageCounter <> 0 Then
-      i = nonQuery("update taxatable set imagecounter = @parm1, childimagecounter = @parm2 where id = @parm3", _
-            imageCounter, childImageCounter, taxid)
+      If taxid.StartsWith("g") Then
+        i = nonQuery("update gbif.tax set imagecounter = @parm1, childimagecounter = @parm2 where id = @parm3", _
+              imageCounter, childImageCounter, taxid)
+      Else
+        i = nonQuery("update taxatable set imagecounter = @parm1, childimagecounter = @parm2 where id = @parm3", _
+              imageCounter, childImageCounter, taxid)
+      End If
     End If
 
     Return childImageCounter
@@ -1518,42 +1524,68 @@ Public Class frmBugPhotos
     Dim s As String
     Dim sb As New StringBuilder
 
-    Dim ds As New DataSet
     Dim ds2 As New DataSet
-    Dim dr As DataRow
+    Dim matches As List(Of taxrec)
+    Dim gmatches As List(Of taxrec)
+    Dim mParents As List(Of taxrec)
 
-    Dim ranks() As String = {"phylum", "subphylum", "class", "subclass", "superorder", "order", "suborder", "infraorder", "superfamily", _
-                                        "family", "subfamily", "supertribe", "tribe", "subtribe", "genus", "species", "subspecies"}
+    Dim ranks() As String = {
+        "kingdom",
+        "phylum",
+        "subphylum",
+        "superclass",
+        "class",
+        "subclass",
+        "superorder",
+        "order",
+        "suborder",
+        "infraorder",
+        "superfamily",
+        "epifamily",
+        "family",
+        "subfamily",
+        "supertribe",
+        "tribe",
+        "subtribe",
+        "genus",
+        "species",
+        "subspecies"}
+
     Dim rankCount(UBound(ranks)) As Integer
     Dim rankCountTotal(UBound(ranks)) As Integer
 
-    ds = getDS("select * from taxatable where childimagecounter > 0")
+    matches = queryTax("select * from taxatable where childimagecounter > 0", "")
+    gmatches = queryTax("select * from gbif.tax where childimagecounter > 0", "")
+    matches = mergeMatches(matches, gmatches)
 
-    If ds.Tables.Count > 0 And ds.Tables(0).Rows.Count > 0 Then
-      For Each dr In ds.Tables(0).Rows
-        s = LCase(dr("rank"))
-        i = Array.IndexOf(ranks, s)
-        If i >= 0 Then
-          rankCountTotal(i) += 1
-          k = dr("imagecounter")
-          If k > 0 Then rankCount(i) += 1
+    For Each m As taxrec In matches
+      s = m.rank
+      i = Array.IndexOf(ranks, s)
+      If i >= 0 Then
+        rankCountTotal(i) += 1
+        k = m.imageCounter
+        If k > 0 Then rankCount(i) += 1
+      End If
+    Next m
+
+    matches = queryTax("select * from taxatable where imagecounter > 0 and rank = 'no taxon'", "")
+    matches = queryTax("select * from gbif.tax where imagecounter > 0 and rank = 'no taxon'", "")
+    matches = mergeMatches(matches, gmatches)
+    For Each m As taxrec In matches
+      pid = m.parentid
+      i = -1
+      Do While i < 0 And pid > 0
+        mParents = getTaxrecByID(m.parentid)
+        If mParents.Count = 0 Then Exit Do
+        i = Array.IndexOf(ranks, mParents(0).rank)
+        If i < 0 Then
+          mParents = getTaxrecByID(m.parentid)
+          If mParents.Count = 0 Then Exit Do
+          pid = mParents(0).parentid
         End If
-      Next dr
-    End If
-
-    ds = getDS("select * from taxatable where imagecounter > 0 and rank = 'no taxon'")
-    If ds.Tables.Count > 0 And ds.Tables(0).Rows.Count > 0 Then
-      For Each dr In ds.Tables(0).Rows
-        pid = dr("parentid")
-        i = -1
-        Do While i < 0 And pid > 0
-          s = LCase(getScalar("select rank from taxatable where id = @parm1", pid))
-          i = Array.IndexOf(ranks, s)
-          If i < 0 Then pid = getScalar("select parentid from taxatable where id = @parm1", pid)
-        Loop
-        If i >= 0 Then rankCount(i) += 1
-      Next dr
-    End If
+      Loop
+      If i >= 0 Then rankCount(i) += 1
+    Next m
 
     iCount = 0
     For i = 0 To UBound(ranks)
@@ -1577,12 +1609,12 @@ Public Class frmBugPhotos
 
   Private Sub cmdImageUpdate_click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdImageUpdate.Click
 
-    Dim id As Integer = 0
+    Dim id As String = ""
     Dim count As Integer = 0
     Dim cmd As MySqlCommand
     Dim ds As New DataSet
     Dim dr As DataRow
-    Dim i, k As Integer
+    Dim i, k, i1, k1 As Integer
     Dim setid, imageid, lastimage As Integer
     Dim s As String = ""
     Dim ss() As String
@@ -1601,6 +1633,7 @@ Public Class frmBugPhotos
     Dim lastFilename As String
     Dim mres As MsgBoxResult
     Dim xLat, xLon As Double
+    Dim matches As List(Of taxrec)
 
     Me.Cursor = Cursors.WaitCursor
 
@@ -1613,12 +1646,19 @@ Public Class frmBugPhotos
     If 1 = 0 Then
       Me.Cursor = Cursors.WaitCursor
       i = nonQuery("update taxatable set imagecounter = 0, childimagecounter = 0 where childimagecounter <> 0")
-      id = getScalar("select id from taxatable where taxon = 'arthropoda'")
-
+      matches = queryTax("select * from taxatable where taxon = 'arthropoda'", "")
+      id = matches(0).id
       i = setimageCount(id)
-
       k = getScalar("select count(*) from taxatable where imagecounter > 0")
-      MsgBox(Format(i, "#,#") & " photos of " & Format(k, "#,#") & " bugs.")
+
+      i1 = nonQuery("update gbif.tax set imagecounter = 0, childimagecounter = 0 where childimagecounter <> 0")
+      matches = queryTax("select * from gbif.taxa where taxon = 'arthropoda' and usable = 'yes'", "")
+      id = matches(0).id
+      i1 = setimageCount(id)
+      k1 = getScalar("select count(*) from gbif.tax where imagecounter > 0")
+
+      MsgBox(Format(i, "#,#") & " photos of " & Format(k, "#,#") & " bugs." & vbCrLf &
+             Format(i1, "#,#") & " photos of " & Format(k1, "#,#") & " bugs in gbif.")
 
       Me.Cursor = Cursors.Default
       If 1 = 1 Then Exit Sub
@@ -1848,7 +1888,6 @@ Public Class frmBugPhotos
 
 
     Dim cmd As New MySqlCommand
-    Dim ds As DataSet
 
     Dim client As New cWebClient
 
@@ -1869,6 +1908,8 @@ Public Class frmBugPhotos
 
     Dim links() As String
     Dim i, i1, i2, i3, k As Integer
+
+    Dim matches As New List(Of taxrec)
 
     Me.Cursor = Cursors.WaitCursor
 
@@ -2006,8 +2047,8 @@ Public Class frmBugPhotos
             taxKey = Mid(taxKey, i + 1, i1 - i - 1)
           End If
 
-          ds = TaxonkeySearch(taxKey, False)
-          If ds.Tables.Count > 0 AndAlso ds.Tables(0).Rows.Count > 0 Then taxID = ds.Tables(0).Rows(0)("id") Else taxID = 0
+          matches = TaxonkeySearch(taxKey, False)
+          If matches.Count > 0 Then taxID = matches(0).id Else taxID = ""
 
           Using conn As New MySqlConnection(iniDBConnStr)
             conn.Open()
@@ -2096,7 +2137,7 @@ Public Class frmBugPhotos
 
     setid = txImageSet.Text
 
-    dset = getDS("SELECT * FROM imagesets WHERE setid = @parm1", setid)
+    dset = getDS("select * from imagesets where setid = @parm1", setid)
 
     i = -1
     If dset IsNot Nothing AndAlso dset.Tables.Count >= 0 Then
@@ -2188,8 +2229,8 @@ Public Class frmBugPhotos
     Dim link As String
     Dim taxonkey As String
     Dim i, j, k As Integer
-    Dim ds As DataSet
-    Dim match As New taxrec
+    Dim matches As List(Of taxrec)
+    Dim gmatches As List(Of taxrec)
     Dim sb As New StringBuilder
 
     Dim cook As Cookie
@@ -2225,57 +2266,57 @@ Public Class frmBugPhotos
     cook.Value = "06-Dec-2017"
     client.cc.Add(cook)
 
-    ds = getDS("select * from taxatable where imagecounter > 0 and rank = @parm1 order by id;", "Species")
-    If ds IsNot Nothing Then
-      For Each dr As DataRow In ds.Tables(0).Rows ' children
-        getTaxon(dr, match)
+    matches = queryTax("select * from taxatable where imagecounter > 0 and rank = @parm1 order by id;", "Species")
+    gmatches = queryTax("select * from gbif.tax where imagecounter > 0 and rank = @parm1 order by id;", "Species")
+    matches = mergeMatches(matches, gmatches)
 
-        taxonkey = getTaxonKey(match.parentid, match.rank, match.taxon)
+    For Each match As taxrec In matches ' children
 
-        link = "https://en.wikipedia.org/w/index.php?title=" & taxonkey.Replace(" ", "_") & "&action=edit"
+      taxonkey = getTaxonKey(match.parentid, match.rank, match.taxon)
 
-        j = 0
-        s = client.DownloadString(link)
-        'File.WriteAllText("c:\tmp.htm", s)
-        s = LCase(s)
-        i = InStr(s, "{{speciesbox")
-        If i <= 0 Then i = InStr(s, "{{taxobox")
-        If i > 0 Then
-          k = InStr(i, s, "}}")
-          If k > 0 Then
-            s = LCase(Mid(s, i, k - i + 1))
-            s1 = s.Replace(" ", "")
-            j = InStr(s1, "|image=")
-            If j = 0 Then
-              sb.AppendLine("need picture" & vbTab & taxonkey & vbTab & match.taxon & vbTab & link)
-            Else
-              sb.AppendLine("has picture" & vbTab & taxonkey & vbTab & match.taxon & vbTab & link)
-            End If
-          End If
+      link = "https://en.wikipedia.org/w/index.php?title=" & taxonkey.Replace(" ", "_") & "&action=edit"
 
-        Else ' no {{species and no {{taxobox -- not a normal entry
-          If InStr(s, "<title>editing " & LCase(taxonkey)) > 0 Then
-            If InStr(s, LCase("#REDIRECT [[")) > 0 Then ' redirect
-              i = InStr(taxonkey, " ")
-              If i > 0 Then s1 = Mid(taxonkey, 1, i - 1) Else s1 = "" ' s1 is genus?
-              If s1 <> "" AndAlso InStr(s, LCase("#REDIRECT [[" & s1 & "]]")) > 0 Then ' redirect to genus
-                sb.AppendLine("redirect genus" & vbTab & taxonkey & vbTab & match.taxon & vbTab & link)
-              Else ' redirect probably to common name
-                sb.AppendLine("editing - redirect" & vbTab & taxonkey & vbTab & match.taxon & vbTab & link)
-              End If
-            Else
-              sb.AppendLine("editing - redirectless" & vbTab & taxonkey & vbTab & match.taxon & vbTab & link)
-            End If
-          ElseIf InStr(s, "<title>creating") > 0 Then
-            sb.AppendLine("creating" & vbTab & taxonkey & vbTab & match.taxon & vbTab & link)
-          ElseIf InStr(s, "permission error") > 0 Then
-            sb.AppendLine("create (permission)" & vbTab & taxonkey & vbTab & match.taxon & vbTab & link)
+      j = 0
+      s = client.DownloadString(link)
+      'File.WriteAllText("c:\tmp.htm", s)
+      s = LCase(s)
+      i = InStr(s, "{{speciesbox")
+      If i <= 0 Then i = InStr(s, "{{taxobox")
+      If i > 0 Then
+        k = InStr(i, s, "}}")
+        If k > 0 Then
+          s = LCase(Mid(s, i, k - i + 1))
+          s1 = s.Replace(" ", "")
+          j = InStr(s1, "|image=")
+          If j = 0 Then
+            sb.AppendLine("need picture" & vbTab & taxonkey & vbTab & match.taxon & vbTab & link)
           Else
-            sb.AppendLine("other" & vbTab & taxonkey & vbTab & match.taxon & vbTab & link)
+            sb.AppendLine("has picture" & vbTab & taxonkey & vbTab & match.taxon & vbTab & link)
           End If
         End If
-      Next dr
-    End If
+
+      Else ' no {{species and no {{taxobox -- not a normal entry
+        If InStr(s, "<title>editing " & LCase(taxonkey)) > 0 Then
+          If InStr(s, LCase("#REDIRECT [[")) > 0 Then ' redirect
+            i = InStr(taxonkey, " ")
+            If i > 0 Then s1 = Mid(taxonkey, 1, i - 1) Else s1 = "" ' s1 is genus?
+            If s1 <> "" AndAlso InStr(s, LCase("#REDIRECT [[" & s1 & "]]")) > 0 Then ' redirect to genus
+              sb.AppendLine("redirect genus" & vbTab & taxonkey & vbTab & match.taxon & vbTab & link)
+            Else ' redirect probably to common name
+              sb.AppendLine("editing - redirect" & vbTab & taxonkey & vbTab & match.taxon & vbTab & link)
+            End If
+          Else
+            sb.AppendLine("editing - redirectless" & vbTab & taxonkey & vbTab & match.taxon & vbTab & link)
+          End If
+        ElseIf InStr(s, "<title>creating") > 0 Then
+          sb.AppendLine("creating" & vbTab & taxonkey & vbTab & match.taxon & vbTab & link)
+        ElseIf InStr(s, "permission error") > 0 Then
+          sb.AppendLine("create (permission)" & vbTab & taxonkey & vbTab & match.taxon & vbTab & link)
+        Else
+          sb.AppendLine("other" & vbTab & taxonkey & vbTab & match.taxon & vbTab & link)
+        End If
+      End If
+    Next match
 
     s = sb.ToString
     File.WriteAllText("c:\tmp1.txt", s)
@@ -2317,10 +2358,13 @@ Public Class frmBugPhotos
 
     Dim s, s1 As String
     Dim match As New bugMain.taxrec
+    Dim matches As New List(Of taxrec)
     Dim ancestor As New List(Of taxrec)
     Dim dset As New DataSet
 
     Me.Cursor = Cursors.WaitCursor
+
+    matches = getTaxrecByID("g2427091")
 
     s = picpath ' path
     s &= vbTab & txTaxon.Text & " " & Path.GetFileNameWithoutExtension(picpath) ' name
@@ -2364,13 +2408,8 @@ Public Class frmBugPhotos
       s &= vbTab & ""
     End If
 
-    dset = TaxonkeySearch(txTaxon.Text, False)
-
-    If dset IsNot Nothing Then
-      For Each drow As DataRow In dset.Tables(0).Rows
-        getTaxon(drow, match)
-      Next drow ' should only be one
-    End If
+    matches = TaxonkeySearch(txTaxon.Text, False)
+    If matches.Count > 0 Then match = matches(0) ' should only be one
 
     'ancestor.Clear()
     'ancestor.Add(match)
