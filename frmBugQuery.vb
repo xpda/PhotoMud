@@ -148,7 +148,7 @@ Public Class frmBugQuery
         sTaxon = Split(txTaxon.Text.Trim, " ", 2) ' separate 1st word
         matches = queryTax("select * from taxatable where taxon = @parm1", sTaxon(UBound(sTaxon)))
         gmatches = queryTax(
-          "select * from gbif.tax where name like @parm1 and usable = 'yes'", "%" & sTaxon(UBound(sTaxon)))
+          "select * from gbif.tax where name = @parm1 and usable = 'yes'", sTaxon(UBound(sTaxon)))
         matches = mergeMatches(matches, gmatches)
 
         'sql = "select images.*, taxatable.parentid, taxatable.rank, taxatable.taxon " &
@@ -212,6 +212,46 @@ Public Class frmBugQuery
 
     ' process the children
     ' change to include children from both databases
+    matches = getChildren(inmatch, False, 9, True)
+
+    For Each match As taxrec In matches
+      If match.childimageCounter > 0 Then
+        ' grab filenames
+        dset.Clear()
+        i = imgCmd.Parameters.IndexOf("@id")
+        If i >= 0 Then imgCmd.Parameters.RemoveAt(i)
+        imgCmd.Parameters.AddWithValue("@id", match.id)
+        adapt.SelectCommand = imgCmd
+        adapt.Fill(dset)
+        For Each drow In dset.Tables(0).Rows
+          If Not IsDBNull(drow("filename")) Then
+            s = folderPath & drow("filename")
+            If Not queryNames.Contains(s) Then queryNames.Add(s)
+          End If
+        Next drow
+
+        ' process child
+        addChildren(match, queryNames, imgCmd)
+      End If
+
+    Next match
+  End Sub
+
+  Sub addChildrenx(ByRef inmatch As taxrec, ByRef queryNames As List(Of String), ByRef imgCmd As MySqlCommand)
+
+    ' adds the current tid filename, and recurses for the children
+
+    Dim adapt As New MySqlDataAdapter
+    Dim dset As New DataSet
+    Dim drow As DataRow
+    Dim matches As List(Of taxrec)
+    Dim i As Integer
+    Dim s As String
+
+    nn = nn + 1
+
+    ' process the children
+    ' change to include children from both databases
     If inmatch.id.StartsWith("g") Then
       matches = queryTax("select * from gbif.tax where parent = @parm1 and childimagecounter > 0", inmatch.id)
     Else
@@ -240,73 +280,6 @@ Public Class frmBugQuery
 
     Next match
   End Sub
-
-  Function taxonQsearch(ByVal findme As String, ByVal isQuery As Boolean) As List(Of taxrec)
-
-    Dim taxi As String
-    Dim cmd As String
-    Dim i As Integer
-    Dim suffixg, suffix, suffixp As String
-    Dim ds As New DataSet
-    Dim matches As List(Of taxrec)
-
-    findme = findme.Trim
-
-    If isQuery Then
-      suffix = " and (childimagecounter > 0) order by taxon"
-      suffixg = " and (childimagecounter > 0) and usable = 'yes' order by name"
-      suffixp = " and (childimagecounter > 0) order by @p"
-    Else
-      suffix = " order by taxonkey"
-      suffixg = "  and usable = 'yes' order by name"
-      suffixp = " order by @p"
-    End If
-
-    i = InStr(findme, " ")
-    If i <= 0 Then ' no space -- one-word search
-      matches = queryTax("select * from taxatable where taxon = @parm1" & suffix, findme)
-      If matches.Count = 0 Then matches = queryTax("select * from gbif.tax where name = @parm1" & suffixg, findme)
-      If matches.Count = 0 Then
-        matches = queryTax("select * from taxatable where (taxon like @parm1)" & suffix, findme & "%")
-        If matches.Count = 0 Then matches = queryTax("select * from gbif.tax where (name like @parm1)" & suffixg, findme & "%")
-      End If
-
-    Else ' multi-word search
-      i = InStr(findme, " ")
-      taxi = Mid(findme, i + 1) & "%" ' taxi is all but the first word
-      ' search genus and species
-      matches = queryTax("select * from taxatable where taxon like @parm2 and " &
-                 "substr(@p := taxon, 1, instr(@p, ' ') - 1) = @parm1" & suffixp, findme, taxi)
-      If matches.Count = 0 Then matches = queryTax("select * from gbif.tax where name = @parm1" & suffixg, findme) ' name includes genus
-    End If
-
-    If matches.Count = 0 Then ' search descr
-      taxi = findme.Replace("-", "`") ' accept either space or dash, so "eastern tailed blue" finds "eastern tailed-blue". Only works with rlike (mysql bug).
-      taxi = taxi.Replace(" ", "[- ]")
-      taxi = taxi.Replace("`", "[- ]")
-      taxi = "%" & taxi & "%"
-      matches = queryTax("select * from taxatable where (descr like @parm1)" & suffix, taxi)
-
-      If matches.Count = 0 Then
-        ds = getDS("select * from gbif.vernacularname where vernacularname like @parm1 and language = 'en'", taxi)
-        If ds IsNot Nothing AndAlso ds.Tables(0).Rows.Count > 0 Then
-          cmd = "select * from gbif.tax where ("
-          For Each dr As DataRow In ds.Tables(0).Rows
-            cmd = "taxid = g" & (dr("taxonid")) & " or "
-          Next dr
-          If cmd.EndsWith(" or ") Then
-            cmd = cmd.Substring(0, cmd.Length - 4)
-            cmd &= ") and usable = 'yes' order by name"
-            matches = queryTax(cmd, "")
-          End If
-        End If
-      End If
-    End If
-
-    Return matches
-
-  End Function
-
   Function queryparms(sql As String, orderBy As String, useTaxon As Boolean, useRank As Boolean,
                       ByRef conn As MySqlConnection) As MySqlCommand
 

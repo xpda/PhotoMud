@@ -1114,36 +1114,49 @@ Public Module bugMain
 
   End Function
 
-  Function getChildren(tMatch As taxrec, addon As Boolean, dballowed As Integer) As List(Of taxrec)
+  Function getChildren(tMatch As taxrec, addon As Boolean, dballowed As Integer, withPics As Boolean) As List(Of taxrec)
 
     ' get all the immediate children of tmatch, in all database tables
 
-    Dim ds As DataSet
     Dim desc As New List(Of taxrec)
+    Dim descg As New List(Of taxrec)
+    Dim matches As List(Of taxrec)
     Dim childNames As New List(Of String)
-    Dim m As New taxrec
+    Dim pics As String = ""
+
+    If withPics Then pics = " and childimagecounter > 0 "
 
     If (dballowed And 1) Then
-      If tMatch.id > 0 Then
-        ds = getDS("select * from taxatable where parentid = @parm1", tMatch.id)
-        For Each dr As DataRow In ds.Tables(0).Rows
-          m = getTaxrec(dr)
-          desc.Add(m)
-          childNames.Add(m.taxon)
-        Next dr
+      If tMatch.id.StartsWith("g") Then
+        matches = queryTax("select * from taxatable where taxon = @parm1" & pics, tMatch.taxon)
+        For Each m As taxrec In matches
+          desc = queryTax("select * from taxatable where parentid = @parm1" & pics, matches(0).id)
+        Next m
+      Else
+        desc = queryTax("select * from taxatable where parentid = @parm1" & pics, tMatch.id)
       End If
+
+      For Each m As taxrec In desc
+        childNames.Add(m.taxon)
+      Next m
     End If
 
     If (dballowed And 8) Then
-      ds = getDS("select * from gbif.tax " &
-                 "where parent = @parm1 and (status = 'accepted' or status = 'type specimen');", tMatch.id)
-      For Each dr As DataRow In ds.Tables(0).Rows
-        m = getTaxrecg(dr)
-        If childNames.IndexOf(m.taxon) < 0 Then ' new match
-          desc.Add(m)
+      If Not tMatch.id.StartsWith("g") Then
+        matches = queryTax("select * from gbif.tax where name = @parm1" & pics, tMatch.taxon)
+        For Each m As taxrec In matches
+          descg = queryTax("select * from gbif.tax where parent = @parm1" & pics, m.id.Substring(1))
+        Next m
+      Else
+        descg = queryTax("select * from gbif.tax where parent = @parm1" & pics, tMatch.id.Substring(1))
+      End If
+
+      For Each m As taxrec In descg
+        If childNames.IndexOf(m.taxon) < 0 Then
           childNames.Add(m.taxon)
+          desc.Add(m)
         End If
-      Next dr
+      Next m
     End If
 
     Return desc
@@ -1222,34 +1235,32 @@ Public Module bugMain
     Dim desc As New List(Of taxrec) ' all the descendants to return
     Dim childName As New List(Of String)
     Dim descName As New List(Of String)
-    Dim validName As String
+    'Dim validName As String
     Dim recRank As String
-    Dim i As Integer
 
-    children = getChildren(tMatch, True, 31) ' get immediate children, sources = dballowed
+    children = getChildren(tMatch, True, 9, False) ' get immediate children, sources = dballowed, include with or without pics
 
     For i1 As Integer = children.Count - 1 To 0 Step -1
-      validName = validTaxon(children(i1))
-      If validName = "" Then
-        recRank = children(i1).rank
-        If rank = "" OrElse eqstr(rank, recRank) Then
-          If descName.IndexOf(children(i1).taxon) < 0 Then ' add new taxrec
-            descName.Add(children(i1).taxon)
-            desc.Add(children(i1))
-          Else
-            children.RemoveAt(i1)
-          End If
-
-        ElseIf (itisRankID.ContainsKey(recRank) AndAlso itisRankID(rank) <= itisRankID(recRank)) Then ' rank is as low as target
+      'validName = validTaxon(children(i1))
+      'If validName = "" Then
+      recRank = children(i1).rank
+      If rank = "" OrElse eqstr(rank, recRank) Then
+        If descName.IndexOf(children(i1).taxon) < 0 Then ' add new taxrec
+          descName.Add(children(i1).taxon)
+          desc.Add(children(i1))
+        Else
           children.RemoveAt(i1)
         End If
 
+      ElseIf (itisRankID.ContainsKey(recRank) AndAlso itisRankID(rank) <= itisRankID(recRank)) Then ' rank is as low as target
+        children.RemoveAt(i1)
       End If
+
+      'End If
     Next i1
 
     For Each m As taxrec In children
       chil = allDescendants(m, rank)
-      If m.taxon = "Aedeastria" Then i = i
       For Each m2 As taxrec In chil
         If descName.IndexOf(m2.taxon) < 0 Then ' add new taxrec
           descName.Add(m2.taxon)
@@ -1286,17 +1297,8 @@ Public Module bugMain
 
   End Sub
 
-
-
-
-
-
-
-
-
-
-
 End Module
+
 
 
 Public Class pixClass
