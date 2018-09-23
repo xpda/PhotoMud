@@ -453,6 +453,7 @@ Public Module main
     frmExplore = New frmExploref
 
     ProgramInit()
+    buginit()
     setDefaults()
     getini()
 

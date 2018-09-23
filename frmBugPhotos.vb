@@ -110,12 +110,12 @@ Public Class frmBugPhotos
     Dim cmd As MySqlCommand
     Dim sql As String
     Dim fName As String
-    Dim id As String = "0"
+    Dim id As String = ""
     Dim k As Integer
     Dim match As New taxrec
     Dim matches As New List(Of taxrec)
     Dim setID As Integer
-    Dim oldTaxid As Integer
+    Dim oldTaxid As String = ""
 
     Me.Cursor = Cursors.WaitCursor
     fName = Trim(txFileName.Text)
@@ -130,7 +130,7 @@ Public Class frmBugPhotos
     Try
       ' does it exist?
       id = getScalar("select id from images where filename = @parm1", fName)
-      If id > 0 Then ' record already exists if id > 0
+      If id <> "" Then ' record already exists if id <> ""
         mResult = MsgBox("Database record for " & fName & " already exists. Overwrite?", MsgBoxStyle.YesNoCancel)
         If mResult <> MsgBoxResult.Yes Then
           Me.Cursor = Cursors.Default
@@ -138,7 +138,7 @@ Public Class frmBugPhotos
         End If
         oldTaxid = getScalar("select taxonid from images where id = @parm1", id)
       Else
-        oldTaxid = -1
+        oldTaxid = ""
       End If
 
       ' make sure there is one taxon
@@ -178,7 +178,7 @@ Public Class frmBugPhotos
       Using conn As New MySqlConnection(iniDBConnStr)
         conn.Open()
 
-        If id > 0 Then
+        If id <> "" Then
           ' "on duplicate key update" autoincrements, messes up stuff.
           sql = "update images set " & _
             " filename = @filename, " & _
@@ -225,7 +225,7 @@ Public Class frmBugPhotos
         cmd.Parameters.AddWithValue("@remarks", Trim(txRemarks.Text))
         If IsNumeric(txBugguide.Text) Then cmd.Parameters.AddWithValue("@bugguide", Int(txBugguide.Text)) Else cmd.Parameters.AddWithValue("@bugguide", 0)
         cmd.Parameters.AddWithValue("@originalpath", Trim(txOriginalPath.Text))
-        If id > 0 Then cmd.Parameters.AddWithValue("@id", id)
+        If id <> "" Then cmd.Parameters.AddWithValue("@id", id)
 
         k = cmd.ExecuteNonQuery()
         If k <= 0 Then MsgBox("savedata: Could not add image.")
@@ -251,7 +251,7 @@ Public Class frmBugPhotos
     End If
 
     If oldTaxid <> taxonid Then ' increment image counters
-      If oldTaxid > 0 Then incImageCounter(oldTaxid, -1) ' decrement old
+      If oldTaxid <> "" Then incImageCounter(oldTaxid, -1) ' decrement old
       incImageCounter(taxonid, 1) ' increment new
     End If
 
@@ -425,12 +425,12 @@ Public Class frmBugPhotos
       End If
     End If
 
-    If match.taxonkey = "" Then  ' try to get the taxon from the jpg comment
+    If match.taxon = "" Then  ' try to get the taxon from the jpg comment
       grabTaxon(uDescription, match)
       taxonid = match.id
     End If
-    taxonkey = match.taxonkey
-    txTaxon.Text = match.taxonkey
+    taxonkey = match.taxon
+    txTaxon.Text = match.taxon
     txCommon.Text = getDescr(match, False)
 
     ' put into the label the count of database records for this original path
@@ -553,7 +553,7 @@ Public Class frmBugPhotos
       matches = TaxonkeySearch(s, False)
 
       If matches.Count > 0 Then
-        txTaxon.Text = matches(0).taxonkey
+        txTaxon.Text = matches(0).taxon
         taxonid = matches(0).id
       End If
 
@@ -959,7 +959,7 @@ Public Class frmBugPhotos
 
       Case 114 ' F3 = restore the previous values
         txTaxon.Text = lastbugTaxon
-        inMatch.taxonkey = lastbugTaxon
+        inMatch.taxon = lastbugTaxon
         taxonid = lastbugTaxonID
         inMatch.id = lastbugTaxonID
         txCommon.Text = lastbugCommon
@@ -1034,6 +1034,7 @@ Public Class frmBugPhotos
 
     Dim match As New bugMain.taxrec
     Dim matches As List(Of taxrec)
+    Dim gmatches As List(Of taxrec)
     Dim nd As TreeNode = Nothing
     Dim ndc As TreeNode = Nothing
 
@@ -1043,9 +1044,9 @@ Public Class frmBugPhotos
     tvTaxon.Visible = True
     cmdCloseTree.Visible = True
 
-    'matches = queryTax("select * from taxatable where taxon = @parm1", "arthropoda")
-    matches = queryTax("select * from gbif.tax where name = @parm1 and usable = 'yes'", "arthropoda")
-    'matches = mergeMatches(matches, gmatches)
+    matches = queryTax("select * from taxatable where taxon = @parm1", "arthropoda")
+    gmatches = queryTax("select * from gbif.tax where name = @parm1 and usable = 'yes'", "animalia")
+    matches = mergeMatches(matches, gmatches)
 
     If matches.Count > 0 Then
       nd = tvTaxon.Nodes.Add(taxaLabel(matches(0), False, False))
@@ -1143,7 +1144,7 @@ Public Class frmBugPhotos
     matches = getTaxrecByID(taxonid)
     If matches.Count <= 0 Then match = New taxrec Else match = matches(0)
 
-    txTaxon.Text = match.taxonkey
+    txTaxon.Text = match.taxon
     txCommon.Text = getDescr(match, False)
     txLocation.Select()
 
@@ -1520,7 +1521,8 @@ Public Class frmBugPhotos
 
   Function rankCounts() As String
 
-    Dim i, k, pid, iCount As Integer
+    Dim i, k, iCount As Integer
+    Dim pid As String = ""
     Dim s As String
     Dim sb As New StringBuilder
 
@@ -1574,7 +1576,7 @@ Public Class frmBugPhotos
     For Each m As taxrec In matches
       pid = m.parentid
       i = -1
-      Do While i < 0 And pid > 0
+      Do While i < 0 And pid <> ""
         mParents = getTaxrecByID(m.parentid)
         If mParents.Count = 0 Then Exit Do
         i = Array.IndexOf(ranks, mParents(0).rank)
@@ -1652,7 +1654,7 @@ Public Class frmBugPhotos
       k = getScalar("select count(*) from taxatable where imagecounter > 0")
 
       i1 = nonQuery("update gbif.tax set imagecounter = 0, childimagecounter = 0 where childimagecounter <> 0")
-      matches = queryTax("select * from gbif.taxa where taxon = 'arthropoda' and usable = 'yes'", "")
+      matches = queryTax("select * from gbif.taxa where taxon = 'animalia' and usable = 'yes'", "")
       id = matches(0).id
       i1 = setimageCount(id)
       k1 = getScalar("select count(*) from gbif.tax where imagecounter > 0")
@@ -2272,7 +2274,7 @@ Public Class frmBugPhotos
 
     For Each match As taxrec In matches ' children
 
-      taxonkey = getTaxonKey(match.parentid, match.rank, match.taxon)
+      taxonkey = match.taxon
 
       link = "https://en.wikipedia.org/w/index.php?title=" & taxonkey.Replace(" ", "_") & "&action=edit"
 

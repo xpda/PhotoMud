@@ -52,24 +52,24 @@ Public Class frmBugQuery
     tvTaxon.Nodes.Clear()
 
     matches = queryTax("select * from taxatable where taxon = @parm1", "arthropoda")
-    gmatches = queryTax("select * from gbif.tax where name = @parm1 and usable = 'yes'", "arthropoda")
+    gmatches = queryTax("select * from gbif.tax where name = @parm1 and usable = 'yes'", "animalia")
     matches = mergeMatches(matches, gmatches)
 
-    If matches.Count > 0 Then
-      nd = tvTaxon.Nodes.Add(taxaLabel(matches(0), True, True))
-      nd.Tag = matches(0).id
-    End If
+    For Each m As taxrec In matches
+      nd = tvTaxon.Nodes.Add(taxaLabel(m, True, True))
+      nd.Tag = m.id
 
-    populate(nd, True)  ' load Arthropoda
-    nd.ExpandAll()
-    ' Now get down through hexapoda
-    For Each ndc In nd.Nodes
-      If Mid(ndc.Text, 1, 7) = "Hexapoda" Then
-        populate(ndc, True)  ' load Hexapoda
-        ndc.Expand()
-        Exit For
-      End If
-    Next ndc
+      populate(nd, True)  ' load Arthropoda
+      nd.ExpandAll()
+      ' Now get down through hexapoda
+      For Each ndc In nd.Nodes
+        If Mid(ndc.Text, 1, 7) = "Hexapoda" Then
+          populate(ndc, True)  ' load Hexapoda
+          ndc.Expand()
+          Exit For
+        End If
+      Next ndc
+    Next m
 
     If txTaxon.Text <> "" Then
       match = popuTaxon(txTaxon.Text, tvTaxon, True)
@@ -95,6 +95,7 @@ Public Class frmBugQuery
     Dim cmd As MySqlCommand = Nothing
     Dim imgCmd As MySqlCommand = Nothing
     Dim adapt As New MySqlDataAdapter
+    Dim adaptg As New MySqlDataAdapter
     Dim dset As New DataSet
     Dim drow As DataRow
     Dim matches As New List(Of taxrec)
@@ -109,36 +110,45 @@ Public Class frmBugQuery
     If tvTaxon.Focused Then Exit Sub
     Me.Cursor = Cursors.WaitCursor
 
+    queryNames = New List(Of String)
+    folderPath = iniBugPath
+    If Not folderPath.EndsWith("\") Then folderPath &= "\"
+    s = txTaxon.Text.Trim
+
     Using conn As New MySqlConnection(iniDBConnStr)
       conn.Open()
       sql = "select images.filename, taxatable.parentid, taxatable.rank, taxatable.taxon " &
             "  from images, taxatable where images.taxonid = taxatable.id "
       cmd = queryparms(sql, "photodate", True, True, conn)
-      If cmd Is Nothing Then
-        Me.Cursor = Cursors.Default()
-        Exit Sub
+      If cmd IsNot Nothing Then
+        adapt.SelectCommand = cmd
+        adapt.Fill(dset)
+        For Each drow In dset.Tables(0).Rows
+          s1 = drow("taxon")
+          If s = "" OrElse eqstr(s, s1) Then ' taxonkey matches
+            If Not IsDBNull(drow("filename")) Then queryNames.Add(folderPath & drow("filename"))
+          End If
+        Next drow
       End If
 
-      adapt.SelectCommand = cmd
-      adapt.Fill(dset)
-
-      queryNames = New List(Of String)
-      folderPath = iniBugPath
-      If Not folderPath.EndsWith("\") Then folderPath &= "\"
-
-      s = txTaxon.Text.Trim
-      For Each drow In dset.Tables(0).Rows
-        s1 = getTaxonKey(drow("parentid"), drow("rank"), drow("taxon"))
-        If s = "" OrElse eqstr(s, s1) Then ' taxonkey matches
-          If Not IsDBNull(drow("filename")) Then queryNames.Add(folderPath & drow("filename"))
-        End If
-      Next drow
+      sql = "select images.filename, gbif.tax.name from images, gbif.tax where images.taxonid = concat('g',gbif.tax.taxid) "
+      cmd = queryparms(sql, "photodate", True, True, conn)
+      If cmd IsNot Nothing Then
+        adapt.SelectCommand = cmd
+        adapt.Fill(dset)
+        For Each drow In dset.Tables(0).Rows
+          s1 = drow("taxon")
+          If s = "" OrElse eqstr(s, s1) Then ' taxonkey matches
+            If Not IsDBNull(drow("filename")) Then queryNames.Add(folderPath & drow("filename"))
+          End If
+        Next drow
+      End If
 
       If chkDescendants.Checked And txTaxon.Text.Trim <> "" Then
         sTaxon = Split(txTaxon.Text.Trim, " ", 2) ' separate 1st word
         matches = queryTax("select * from taxatable where taxon = @parm1", sTaxon(UBound(sTaxon)))
         gmatches = queryTax(
-          "select * from gbif.tax where name like = @parm1 and usable = 'yes'", " %" & sTaxon(UBound(sTaxon)))
+          "select * from gbif.tax where name like @parm1 and usable = 'yes'", "%" & sTaxon(UBound(sTaxon)))
         matches = mergeMatches(matches, gmatches)
 
         'sql = "select images.*, taxatable.parentid, taxatable.rank, taxatable.taxon " &
@@ -149,8 +159,7 @@ Public Class frmBugQuery
 
         s = txTaxon.Text.Trim
         For Each match As taxrec In matches
-          s1 = getTaxonKey(match.parentid, match.rank, match.taxon)
-          If eqstr(s, s1) Then ' taxonkey matches
+          If eqstr(s, match.taxon) Then ' taxonkey matches
             addChildren(match, queryNames, imgCmd)
           End If
         Next match
@@ -161,13 +170,13 @@ Public Class frmBugQuery
         newNames = New List(Of String)
         For Each fname In queryNames
           id = getScalar("select id from images where filename = @parm1", Path.GetFileName(fname))
-          setid = getScalar("select setid from imagesets WHERE imageid = @parm1 limit 1", id)
+          setid = getScalar("select setid from imagesets where imageid = @parm1 limit 1", id)
           dset = getDS("select * from imagesets where setid = @parm1", setid)
 
           If dset IsNot Nothing Then
             For Each drow In dset.Tables(0).Rows
               If Not IsDBNull(drow("imageid")) Then
-                s = folderPath & getScalar("SELECT filename FROM images WHERE id = @parm1", drow("imageid"))
+                s = folderPath & getScalar("select filename from images where id = @parm1", drow("imageid"))
                 If Not queryNames.Contains(s) Then newNames.Add(s)
               End If
             Next drow
@@ -196,7 +205,6 @@ Public Class frmBugQuery
     Dim dset As New DataSet
     Dim drow As DataRow
     Dim matches As List(Of taxrec)
-    Dim gmatches As List(Of taxrec)
     Dim i As Integer
     Dim s As String
 
@@ -204,9 +212,11 @@ Public Class frmBugQuery
 
     ' process the children
     ' change to include children from both databases
-    matches = queryTax("select * from taxatable where parentid = @parm1 and childimagecounter > 0", inmatch.id)
-    gmatches = queryTax("select * from gbif.tax where parent = @parm1 and childimagecounter > 0", inmatch.id)
-    matches = mergeMatches(matches, gmatches)
+    If inmatch.id.StartsWith("g") Then
+      matches = queryTax("select * from gbif.tax where parent = @parm1 and childimagecounter > 0", inmatch.id)
+    Else
+      matches = queryTax("select * from taxatable where parentid = @parm1 and childimagecounter > 0", inmatch.id)
+    End If
 
     For Each match As taxrec In matches
       If match.childimageCounter > 0 Then
@@ -266,7 +276,7 @@ Public Class frmBugQuery
       taxi = Mid(findme, i + 1) & "%" ' taxi is all but the first word
       ' search genus and species
       matches = queryTax("select * from taxatable where taxon like @parm2 and " &
-                 "substr(@p := gettaxonkey(parentid, rank, taxon), 1, instr(@p, ' ') - 1) = @parm1" & suffixp, findme, taxi)
+                 "substr(@p := taxon, 1, instr(@p, ' ') - 1) = @parm1" & suffixp, findme, taxi)
       If matches.Count = 0 Then matches = queryTax("select * from gbif.tax where name = @parm1" & suffixg, findme) ' name includes genus
     End If
 
@@ -307,8 +317,13 @@ Public Class frmBugQuery
     Dim i As Integer
     Dim cmd As New MySqlCommand
 
-    If useTaxon AndAlso txTaxon.Text.Trim <> "" Then qlist.Add("taxatable.taxon = @taxon")
-    If useRank AndAlso txRank.Text.Trim <> "" Then qlist.Add("taxatable.rank = @rank")
+    If sql.Contains("gbif.") Then
+      If useTaxon AndAlso txTaxon.Text.Trim <> "" Then qlist.Add("gbif.tax.name = @gname")
+      If useRank AndAlso txRank.Text.Trim <> "" Then qlist.Add("gbif.tax.rank = @rank")
+    Else
+      If useTaxon AndAlso txTaxon.Text.Trim <> "" Then qlist.Add("taxatable.taxon = @taxon")
+      If useRank AndAlso txRank.Text.Trim <> "" Then qlist.Add("taxatable.rank = @rank")
+    End If
     If txLocation.Text.Trim <> "" Then qlist.Add("images.location like @location")
     If txCounty.Text.Trim <> "" Then qlist.Add("images.county like @county")
     If txState.Text.Trim <> "" Then qlist.Add("images.state like @state")
@@ -342,7 +357,10 @@ Public Class frmBugQuery
       i = s.LastIndexOf(" ")
       If i > 0 Then s = s.Substring(i + 1)
       cmd.Parameters.AddWithValue("@taxon", s)
+      s = txTaxon.Text.Trim
+      cmd.Parameters.AddWithValue("@gname", s) ' for gbif
     End If
+
     If txLocation.Text.Trim <> "" Then cmd.Parameters.AddWithValue("@location", "%" & txLocation.Text.Trim & "%")
     If txCounty.Text.Trim <> "" Then cmd.Parameters.AddWithValue("@county", "%" & txCounty.Text.Trim & "%")
     If txState.Text.Trim <> "" Then cmd.Parameters.AddWithValue("@state", "%" & txState.Text.Trim & "%")
@@ -441,7 +459,7 @@ Public Class frmBugQuery
     matches = getTaxrecByID(taxonid)
     If matches.count <= 0 Then match = New taxrec Else match = matches(0)
 
-    txTaxon.Text = match.taxonkey
+    txTaxon.Text = match.taxon
     txCommon.Text = getDescr(match, False)
 
   End Sub

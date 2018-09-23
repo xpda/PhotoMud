@@ -30,9 +30,11 @@ Public Module bugMain
     Dim childimageCounter As Integer
     Dim link As String
     Dim authority As String
-    Dim taxonkey As String
   End Structure
 
+  Public itisRankID As New Dictionary(Of String, Integer)(System.StringComparer.OrdinalIgnoreCase)
+  Public itisRanks As New Dictionary(Of Integer, String)
+  Public mainRank As New List(Of String)
 
   Public nodeMatchColor As Color = Color.Cornsilk
   Public queryNames As New List(Of String) ' used by frmexpore and frmbugphotos
@@ -59,6 +61,78 @@ Public Module bugMain
   Public bugPrevFilename As String = ""
 
   'Public QueryTaxon As String = ""  ' for shortcut -- temporary!
+
+  Sub buginit()
+
+    itisRankID.Add("kingdom", 10)
+    itisRankID.Add("subkingdom", 20)
+    itisRankID.Add("infrakingdom", 25)
+    itisRankID.Add("superphylum", 27)
+    itisRankID.Add("phylum", 30)
+    itisRankID.Add("subphylum", 40)
+    itisRankID.Add("infraphylum", 45)
+    itisRankID.Add("superclass", 50)
+    itisRankID.Add("class", 60)
+    itisRankID.Add("subclass", 70)
+    itisRankID.Add("infraclass", 80)
+    itisRankID.Add("superorder", 90)
+    itisRankID.Add("order", 100)
+    itisRankID.Add("suborder", 110)
+    itisRankID.Add("infraorder", 120)
+    itisRankID.Add("section", 124)
+    itisRankID.Add("subsection", 126)
+    itisRankID.Add("superfamily", 130)
+    itisRankID.Add("epifamily", 135)
+    itisRankID.Add("family", 140)
+    itisRankID.Add("subfamily", 150)
+    itisRankID.Add("supertribe", 155)
+    itisRankID.Add("tribe", 160)
+    itisRankID.Add("subtribe", 170)
+    itisRankID.Add("genus", 180)
+    itisRankID.Add("subgenus", 190)
+    itisRankID.Add("species", 220)
+    itisRankID.Add("subspecies", 230)
+
+    itisRanks.Add(10, "kingdom")
+    itisRanks.Add(20, "subkingdom")
+    itisRanks.Add(25, "infrakingdom")
+    itisRanks.Add(27, "superphylum")
+    itisRanks.Add(30, "phylum")
+    itisRanks.Add(40, "subphylum")
+    itisRanks.Add(45, "infraphylum")
+    itisRanks.Add(50, "superclass")
+    itisRanks.Add(60, "class")
+    itisRanks.Add(70, "subclass")
+    itisRanks.Add(80, "infraclass")
+    itisRanks.Add(90, "superorder")
+    itisRanks.Add(100, "order")
+    itisRanks.Add(110, "suborder")
+    itisRanks.Add(120, "infraorder")
+    itisRanks.Add(124, "section")
+    itisRanks.Add(126, "subsection")
+    itisRanks.Add(130, "superfamily")
+    itisRanks.Add(135, "epifamily")
+    itisRanks.Add(140, "family")
+    itisRanks.Add(150, "subfamily")
+    itisRanks.Add(155, "supertribe")
+    itisRanks.Add(160, "tribe")
+    itisRanks.Add(170, "subtribe")
+    itisRanks.Add(180, "genus")
+    itisRanks.Add(190, "subgenus")
+    itisRanks.Add(220, "species")
+    itisRanks.Add(230, "subspecies")
+
+    mainRank.Add("phylum")
+    mainRank.Add("class")
+    mainRank.Add("order")
+    mainRank.Add("superfamily")
+    mainRank.Add("family")
+    mainRank.Add("tribe")
+    mainRank.Add("genus")
+    mainRank.Add("species")
+    mainRank.Add("subspecies")
+  End Sub
+
 
   Sub linkBugPhotos()
     ' link the tagged images in the bug database -- changes the database only.
@@ -96,17 +170,17 @@ Public Module bugMain
 
     i1 = 0 : i2 = 0
     Do While i1 < matches.Count
-      Do While gmatches(i2).taxonkey < matches(i1).taxonkey And i2 < gmatches.Count
+      Do While i2 < gmatches.Count AndAlso gmatches(i2).taxon < matches(i1).taxon
         ms.Add(gmatches(i2))
         i2 += 1
       Loop
-      If i2 < gmatches.Count AndAlso gmatches(i2).taxonkey = matches(i1).taxonkey Then i2 += 1
+      If i2 < gmatches.Count AndAlso gmatches(i2).taxon = matches(i1).taxon Then i2 += 1
 
       ms.Add(matches(i1))
       i1 += 1
     Loop
 
-    If i2 < gmatches.Count AndAlso gmatches(i2).taxonkey = matches(i1).taxonkey Then i2 += 1
+    If i2 < gmatches.Count AndAlso i1 < matches.Count AndAlso gmatches(i2).taxon = matches(i1).taxon Then i2 += 1
     Do While i2 < gmatches.Count
       ms.Add(gmatches(i2))
       i2 += 1
@@ -167,8 +241,6 @@ Public Module bugMain
     If IsDBNull(dr("link")) Then match.link = "" Else match.link = dr("link")
     If IsDBNull(dr("authority")) Then match.authority = "" Else match.authority = dr("authority")
 
-    match.taxonkey = getTaxonKey(match.parentid, match.rank, match.taxon)
-
     Return match
 
   End Function
@@ -184,11 +256,11 @@ Public Module bugMain
 
 
     If IsDBNull(dr("taxid")) Then taxid = "" Else taxid = dr("taxid")
-    match.id = "g" & taxid ' gbif id prefix
+    If taxid <> "" Then match.id = "g" & taxid ' gbif id prefix
 
     ' load dr into match
     If IsDBNull(dr("rank")) Then match.rank = "" Else match.rank = dr("rank")
-    If IsDBNull(dr("name")) Then match.taxon = "" Else match.taxonkey = dr("name")
+    If IsDBNull(dr("name")) Then match.taxon = "" Else match.taxon = dr("name")
     If IsDBNull(dr("parent")) Then match.parentid = "" Else match.parentid = "g" & dr("parent")
     If IsDBNull(dr("imagecounter")) Then match.imageCounter = 0 Else match.imageCounter = dr("imagecounter")
     If IsDBNull(dr("childimagecounter")) Then match.childimageCounter = 0 Else match.childimageCounter = dr("childimagecounter")
@@ -196,15 +268,14 @@ Public Module bugMain
 
     match.link = "https://www.gbif.org/species/" & match.id.Substring(1) ' no "g"
 
-    sq = match.taxonkey.Split(" ")
+    sq = match.taxon.Split(" ")
     If sq.Count >= 0 Then
       match.taxon = sq(sq.Count - 1)
     Else
       match.taxon = ""
     End If
 
-    match.id.Substring(1) ' no "g"
-
+    taxid = match.id.Substring(1) ' no "g"
     ds = getDS("select * from gbif.vernacularname where taxonid = @parm1 and language = 'en'", taxid)
     match.descr = ""
 
@@ -226,22 +297,13 @@ Public Module bugMain
 
   End Function
 
-  Function getTaxonKey(ByVal parentid As String, ByVal rank As String, ByVal taxon As String) As String
-
-    ' adds the genus to species, and both of those to subspecies
-    If String.Compare(rank, "species", True) <> 0 And String.Compare(rank, "subspecies", True) <> 0 Then Return taxon
-
-    getTaxonKey = getScalar("SELECT getTaxonkey(@parm1, @parm2, @parm3)", parentid, rank, taxon)
-
-  End Function
-
   Function taxaLabel(ByVal match As taxrec, ByVal verbose As Boolean, ByVal isQuery As Boolean) As String
 
     ' get a taxon label for treeview, etc.
 
     Dim s, descr As String
 
-    s = match.taxonkey
+    s = match.taxon
 
     If verbose Then
       If String.Compare(match.rank, "species", True) <> 0 And String.Compare(match.rank, "subspecies", True) <> 0 Then
@@ -383,7 +445,7 @@ Public Module bugMain
     targetLevel = 999
 
     For Each match As taxrec In matches
-      ancestor = getancestors(match, False, "phylum")  ' retrieve ancestors of ancestor(0). false = don't exclude "no taxons"
+      ancestor = getancestors(match, False, "animalia")  ' retrieve ancestors of ancestor(0). false = don't exclude "no taxons"
 
       'ndParent = Nothing
       'For Each nd In tvTax.Nodes(0).Nodes
@@ -445,7 +507,7 @@ Public Module bugMain
 
   End Function
 
-  Function getancestors(m As taxrec, ByVal excludeNoTaxon As Boolean, ByVal StopAt As String) As List(Of taxrec)
+  Function getancestors(m As taxrec, excludeNoTaxon As Boolean, StopAt As String) As List(Of taxrec)
 
     Dim matches As List(Of taxrec)
     Dim ancestor As New List(Of taxrec)
@@ -457,7 +519,7 @@ Public Module bugMain
 
     Do While id <> "" And iter < 50
       matches = getTaxrecByID(id)
-      If matches.Count <= 0 Then Return Nothing
+      If matches.Count <= 0 Then Return ancestor
       ancestor.Add(matches(0))
       If eqstr(matches(0).rank, StopAt) Then Exit Do
       id = matches(0).parentid
@@ -634,7 +696,7 @@ Public Module bugMain
       i = nonQuery("delete from imagesets where setid = @parm1", setID)
     End If
 
-    Call incImageCounter(taxID, -1)
+    incImageCounter(taxID, -1)
 
   End Sub
 
@@ -851,7 +913,7 @@ Public Module bugMain
     Else ' multi-word search, search genus and species, for example
       qspecies = ss(UBound(ss)) ' last word, could be subspecies
       matches = queryTax(
-        "select * from taxatable where taxon = @parm2 and @p := gettaxonkey(parentid, rank, taxon) = @parm1" &
+        "select * from taxatable where taxon = @parm2 and @p := taxon = @parm1" &
         suffixp, findme, qspecies)
       If matches.Count = 0 Then matches = queryTax("select * from gbif.tax where name = @parm1" & suffixg, findme) ' name includes genus
     End If
@@ -920,13 +982,19 @@ Public Module bugMain
     imageCounter += inc
     childImageCounter += inc
 
-    i = nonQuery("update taxatable set imagecounter = @parm1, childimagecounter = @parm2 where id = @parm3", _
-      imageCounter, childImageCounter, taxid)
+    If taxid.StartsWith("g") Then
+      i = nonQuery("update gbif.tax set imagecounter = @parm1, childimagecounter = @parm2 where taxid = @parm3", _
+        imageCounter, childImageCounter, taxid.Substring(1)) ' remove "g"
+    Else
+      i = nonQuery("update taxatable set imagecounter = @parm1, childimagecounter = @parm2 where id = @parm3", _
+        imageCounter, childImageCounter, taxid)
+    End If
+    If i <> 1 Then Stop
 
     parentID = m.parentid
     ' follow parentID up the taxon tree, incrementing childImageCounter
     For k As Integer = 1 To 200
-      If parentID = "" Then Exit For
+      If parentID = "" Or parentID = "g" Then Exit For
 
       matches = getTaxrecByID(parentID)
       If matches.Count <> 1 Then Exit For ' error
@@ -935,7 +1003,14 @@ Public Module bugMain
       childImageCounter = m.childimageCounter
       childImageCounter += inc
 
-      i = nonQuery("update taxatable set childimagecounter = @parm1 where id = @parm2", childImageCounter, parentID)
+      If parentID.StartsWith("g") Then
+        i = nonQuery("update gbif.tax set childimagecounter = @parm1 where taxid = @parm2",
+                     childImageCounter, parentID.Substring(1)) ' remove "g"
+        If i <> 1 Then Stop
+      Else
+        i = nonQuery("update taxatable set childimagecounter = @parm1 where id = @parm2", childImageCounter, parentID)
+        If i <> 1 Then Stop
+      End If
       If i = 1 Then parentID = m.parentid
     Next k
 
@@ -949,7 +1024,7 @@ Public Module bugMain
 
     s = ""
 
-    taxonkey = getTaxonKey(pic.match.parentid, pic.match.rank, pic.match.taxon)
+    taxonkey = pic.match.taxon
     s += "<i>" & taxonkey & "</i>"
     If String.Compare(pic.match.rank, "species", True) <> 0 And String.Compare(pic.match.rank, "subspecies", True) <> 0 And _
       String.Compare(pic.match.rank, "no taxon", True) <> 0 Then
@@ -983,7 +1058,7 @@ Public Module bugMain
 
     s = ""
 
-    taxonkey = getTaxonKey(pic.match.parentid, pic.match.rank, pic.match.taxon)
+    taxonkey = pic.match.taxon
     s += taxonkey ' tags will be removed on output
     If String.Compare(pic.match.rank, "species", True) <> 0 And String.Compare(pic.match.rank, "subspecies", True) <> 0 And _
       String.Compare(pic.match.rank, "no taxon", True) <> 0 Then
@@ -1039,6 +1114,188 @@ Public Module bugMain
 
   End Function
 
+  Function getChildren(tMatch As taxrec, addon As Boolean, dballowed As Integer) As List(Of taxrec)
+
+    ' get all the immediate children of tmatch, in all database tables
+
+    Dim ds As DataSet
+    Dim desc As New List(Of taxrec)
+    Dim childNames As New List(Of String)
+    Dim m As New taxrec
+
+    If (dballowed And 1) Then
+      If tMatch.id > 0 Then
+        ds = getDS("select * from taxatable where parentid = @parm1", tMatch.id)
+        For Each dr As DataRow In ds.Tables(0).Rows
+          m = getTaxrec(dr)
+          desc.Add(m)
+          childNames.Add(m.taxon)
+        Next dr
+      End If
+    End If
+
+    If (dballowed And 8) Then
+      ds = getDS("select * from gbif.tax " &
+                 "where parent = @parm1 and (status = 'accepted' or status = 'type specimen');", tMatch.id)
+      For Each dr As DataRow In ds.Tables(0).Rows
+        m = getTaxrecg(dr)
+        If childNames.IndexOf(m.taxon) < 0 Then ' new match
+          desc.Add(m)
+          childNames.Add(m.taxon)
+        End If
+      Next dr
+    End If
+
+    Return desc
+
+  End Function
+
+  Function validTaxon(m As taxrec) As String
+
+    Dim ds As DataSet = Nothing
+    Dim ds2 As DataSet = Nothing
+    Dim ds3 As DataSet = Nothing
+    Dim dr As DataRow = Nothing
+    Dim dr2 As DataRow = Nothing
+    'Dim n, iRow As Integer
+    Dim s As String
+
+    s = LCase(m.taxon)
+    If s.Split(" ").Length >= 3 OrElse
+        s.Contains(" ") OrElse
+        s.Contains("""") OrElse
+        s.Contains("(") OrElse
+        s.Contains("--") OrElse
+        s.Contains("-cf-") OrElse
+        s.Contains("-new-") OrElse
+        s.Contains("-non-") OrElse
+        s.Contains("-nr-") OrElse
+        s.Contains("-or-") OrElse
+        s.Contains("-sp-") OrElse
+        s.Contains("-idae") OrElse
+        s.Contains(".") OrElse
+        s.Contains("/") OrElse
+        s.Contains("assigned") OrElse
+        s.Contains("adventive") OrElse
+        s.Contains("established") OrElse
+        s.Contains("incertae") OrElse
+        s.Contains("introduction") OrElse
+        s.Contains("maybe") OrElse
+        s.Contains("near-") OrElse
+        s.Contains("possible") OrElse
+        s.Contains("possibly") OrElse
+        s.Contains("likely") OrElse
+        s.Contains("probably") OrElse
+        s.Contains("sensu lato") OrElse
+        s.Contains("suspected") OrElse
+        s.Contains("undescribed") OrElse
+        s.Contains("undetermined") OrElse
+        s.Contains("known") OrElse
+        s.Contains("unnamed") OrElse
+        s.Contains("placed") OrElse
+        s.EndsWith("-cf") OrElse
+        s.EndsWith("-like") OrElse
+        s.EndsWith("-sp") OrElse
+        s.EndsWith("complex") OrElse
+        s.EndsWith("group") OrElse
+        s.EndsWith("pseudo") OrElse
+        s.StartsWith("cf-") OrElse
+        s.StartsWith("n-") OrElse
+        s.StartsWith("new-") OrElse
+        s.StartsWith("non-") OrElse
+        s.StartsWith("nr-") OrElse
+        s.StartsWith("on-") OrElse
+        s.StartsWith("-xxxx") OrElse
+        s.StartsWith("sp-") Then Return "non-taxonomic text in name."
+
+    If Not itisRankID.ContainsKey(m.rank) Then Return "Invalid rank in taxa."
+
+    Return ""
+
+  End Function
+
+  Function allDescendants(tMatch As taxrec, rank As String) As List(Of taxrec)
+    ' returns a sorted list of itis + bugguide descendant names, at rank (or all descendants if rank is "")
+
+    Dim children As New List(Of taxrec)
+    Dim chil As New List(Of taxrec)
+    Dim desc As New List(Of taxrec) ' all the descendants to return
+    Dim childName As New List(Of String)
+    Dim descName As New List(Of String)
+    Dim validName As String
+    Dim recRank As String
+    Dim i As Integer
+
+    children = getChildren(tMatch, True, 31) ' get immediate children, sources = dballowed
+
+    For i1 As Integer = children.Count - 1 To 0 Step -1
+      validName = validTaxon(children(i1))
+      If validName = "" Then
+        recRank = children(i1).rank
+        If rank = "" OrElse eqstr(rank, recRank) Then
+          If descName.IndexOf(children(i1).taxon) < 0 Then ' add new taxrec
+            descName.Add(children(i1).taxon)
+            desc.Add(children(i1))
+          Else
+            children.RemoveAt(i1)
+          End If
+
+        ElseIf (itisRankID.ContainsKey(recRank) AndAlso itisRankID(rank) <= itisRankID(recRank)) Then ' rank is as low as target
+          children.RemoveAt(i1)
+        End If
+
+      End If
+    Next i1
+
+    For Each m As taxrec In children
+      chil = allDescendants(m, rank)
+      If m.taxon = "Aedeastria" Then i = i
+      For Each m2 As taxrec In chil
+        If descName.IndexOf(m2.taxon) < 0 Then ' add new taxrec
+          descName.Add(m2.taxon)
+          desc.Add(m2)
+        End If
+      Next m2
+    Next m
+
+    sortTaxrec(desc)
+
+    Return desc
+
+  End Function
+
+  Sub sortTaxrec(ByRef children As List(Of taxrec))
+    ' sort a list of taxrecs
+    ' this is ugly. I am lazy.
+
+    Dim ix As New List(Of Integer)
+    Dim keys As New List(Of String)
+    Dim sorted As New List(Of taxrec)
+
+    For i1 As Integer = 0 To children.Count - 1
+      ix.Add(i1)
+      keys.Add(children(i1).taxon)
+      sorted.Add(New taxrec)
+    Next i1
+    MergeSort(keys, ix, 0, ix.Count - 1)
+    For i1 As Integer = 0 To ix.Count - 1
+      sorted(i1) = children(ix(i1))
+    Next i1
+    children = New List(Of taxrec)
+    children.AddRange(sorted)
+
+  End Sub
+
+
+
+
+
+
+
+
+
+
+
 End Module
 
 
@@ -1068,7 +1325,7 @@ Public Class pixClass
 
     match = New taxrec
     match.taxon = dr("taxon")
-    ' match.taxonkey = dr("taxonkey")
+    ' match.taxon = dr("taxonkey")
     match.descr = dr("descr")
     match.rank = dr("rank")
     match.id = dr("taxonid")

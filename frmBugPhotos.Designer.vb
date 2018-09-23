@@ -585,7 +585,7 @@ Partial Class frmBugPhotos
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
     Me.tvTaxon.LabelEdit = True
-    Me.tvTaxon.Location = New System.Drawing.Point(628, 66)
+    Me.tvTaxon.Location = New System.Drawing.Point(638, 81)
     Me.tvTaxon.Name = "tvTaxon"
     Me.tvTaxon.ShowNodeToolTips = True
     Me.tvTaxon.Size = New System.Drawing.Size(525, 529)
