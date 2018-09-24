@@ -250,7 +250,6 @@ Public Module bugMain
     Dim matches As New List(Of taxrec)
     Dim vnames As New List(Of String)
     Dim s As String
-    Dim sq() As String
     Dim taxid As String
     Dim ds As DataSet
 
@@ -267,13 +266,6 @@ Public Module bugMain
     If IsDBNull(dr("authority")) Then match.authority = "" Else match.authority = dr("authority")
 
     match.link = "https://www.gbif.org/species/" & match.id.Substring(1) ' no "g"
-
-    sq = match.taxon.Split(" ")
-    If sq.Count >= 0 Then
-      match.taxon = sq(sq.Count - 1)
-    Else
-      match.taxon = ""
-    End If
 
     taxid = match.id.Substring(1) ' no "g"
     ds = getDS("select * from gbif.vernacularname where taxonid = @parm1 and language = 'en'", taxid)

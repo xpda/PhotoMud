@@ -285,7 +285,6 @@ Public Class frmBugPhotos
     Dim s As String = ""
     Dim s1 As String = ""
     Dim i, i1 As Integer
-    Dim taxonkey As String = ""
     Dim lens, camera As String
     Dim uComments As uExif
     Dim xLat, xLon As Double
@@ -429,7 +428,6 @@ Public Class frmBugPhotos
       grabTaxon(uDescription, match)
       taxonid = match.id
     End If
-    taxonkey = match.taxon
     txTaxon.Text = match.taxon
     txCommon.Text = getDescr(match, False)
 
