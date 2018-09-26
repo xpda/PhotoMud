@@ -1,4 +1,5 @@
 ﻿Imports System.Net
+Imports System.Net.Http
 Imports vb = Microsoft.VisualBasic
 Imports System.Collections.Generic
 Imports System.Drawing.Drawing2D
@@ -12,6 +13,10 @@ Imports MySql.Data.MySqlClient
 
 Imports System.Xml
 Imports System.Xml.Serialization
+
+Imports Newtonsoft.Json
+Imports Newtonsoft.Json.Linq
+
 
 Public Module bugMain
 
@@ -59,6 +64,11 @@ Public Module bugMain
   Public iniBugPixelsPerMM As Double = 274.5 ' gx1: 268.4 macro, 56.5 for zoom, gh4: 274.5 macro, 57.8 zoom
 
   Public bugPrevFilename As String = ""
+
+  Public cookies As CookieContainer
+  Public handler As HttpClientHandler
+  Public qClient As HttpClient ' need these for cookies
+
 
   'Public QueryTaxon As String = ""  ' for shortcut -- temporary!
 
@@ -203,7 +213,7 @@ Public Module bugMain
     If id = "" Then Return Nothing
 
     If eqstr(id.Substring(0, 1), "g") Then ' gbif database
-      ds = getDS("select * from gbif.tax where taxid = @parm1 and usable = 'yes';",
+      ds = getDS("select * from gbif.tax where taxid = @parm1 and usable = 'ok';",
                  id.Substring(1).Trim)
       If ds IsNot Nothing Then
         For Each dr As DataRow In ds.Tables(0).Rows
@@ -351,7 +361,7 @@ Public Module bugMain
       End If
     Else
       If node.Tag.startswith("g") Then
-        matches = queryTax("select * from gbif.tax where parent = @parm1 and usable = 'yes' order by name", node.Tag.substring(1))
+        matches = queryTax("select * from gbif.tax where parent = @parm1 and usable = 'ok' order by name", node.Tag.substring(1))
       Else
         matches = queryTax("select * from taxatable where parentid = @parm1 order by taxon", node.Tag)
       End If
@@ -748,39 +758,37 @@ Public Module bugMain
 
     ' gets the County, State from Google for the latlon
 
-    Dim link As String
+    Dim url As String
     Dim s As String
     Dim dLat, dLon As Double
     Dim xmldoc As New XmlDocument
-    Dim nodes As XmlNodeList
+
+    Dim jq As JObject
 
     Dim deserializer As New XmlSerializer(GetType(GeocodeResponse))
-
-    Dim client As New cWebClient
 
     s = LCase(latlon)
     Call latlonVerify(s, dLat, dLon)
 
-    link = "http://maps.googleapis.com/maps/api/geocode/xml?sensor=true&latlng=" & Format(dLat, "###.#####") & "," & Format(dLon, "###.#####")
+    'link = "http://maps.googleapis.com/maps/api/geocode/xml?sensor=true&latlng=" & Format(dLat, "###.#####") & "," & Format(dLon, "###.#####")
+    url = "https://nominatim.openstreetmap.org/reverse?format=json&lat=" & Format(dLat, "###.#####") & "&lon=" & Format(dLon, "###.#####") &
+           "&zoom=18&addressdetails=1&email=bob-mud@xpda.com"
 
     Try
-      s = client.DownloadString(link)
+      s = qClient.GetStringAsync(url).Result
     Catch ex As Exception
       MsgBox(ex.Message)
       Exit Sub
     End Try
 
-    xmldoc.LoadXml(s)
+    jq = JObject.Parse(s)
 
-    nodes = xmldoc.GetElementsByTagName("result")
-    nodes = xmldoc.SelectNodes("GeocodeResponse/result[type='political']/address_component[type='administrative_area_level_2']/short_name") ' added political 9/2015
-    If nodes.Count >= 1 Then county = nodes(0).InnerText Else county = ""
-    nodes = xmldoc.SelectNodes("GeocodeResponse/result/address_component[type='administrative_area_level_1']/short_name")
-    If nodes.Count >= 1 Then state = nodes(0).InnerText Else state = ""
-    nodes = xmldoc.SelectNodes("GeocodeResponse/result/address_component[type='country']/long_name")
-    If nodes.Count >= 1 Then country = nodes(0).InnerText Else country = ""
-    nodes = xmldoc.SelectNodes("GeocodeResponse/result/address_component[type='locality']/short_name")
-    If nodes.Count >= 1 Then locale = nodes(0).InnerText Else locale = ""
+    If jq.SelectToken("address") IsNot Nothing Then
+      If jq.SelectToken("address.locale") IsNot Nothing Then locale = jq.SelectToken("address.city").ToString Else locale = ""
+      If jq.SelectToken("address.county") IsNot Nothing Then county = jq.SelectToken("address.county").ToString Else county = ""
+      If jq.SelectToken("address.state") IsNot Nothing Then state = jq.SelectToken("address.state").ToString Else state = ""
+      If jq.SelectToken("address.country") IsNot Nothing Then country = jq.SelectToken("address.country").ToString Else country = ""
+    End If
 
     If LCase(county).EndsWith(" county") Then county = county.Substring(0, county.Length - 7)
     If LCase(locale) = "pryor creek" Then locale = "Pryor"
@@ -885,11 +893,11 @@ Public Module bugMain
 
     If isQuery Then
       suffix = " and (childimagecounter > 0) order by taxon"
-      suffixg = " and (childimagecounter > 0) and usable = 'yes' order by name"
+      suffixg = " and (childimagecounter > 0) and usable = 'ok' order by name"
       suffixp = " and (childimagecounter > 0) order by @p"
     Else
       suffix = " order by taxon"
-      suffixg = "  and usable = 'yes' order by name"
+      suffixg = "  and usable = 'ok' order by name"
       suffixp = " order by @p"
     End If
 
@@ -925,7 +933,7 @@ Public Module bugMain
           Next dr
           If cmd.EndsWith(" or ") Then
             cmd = cmd.Substring(0, cmd.Length - 4)
-            cmd &= ") and usable = 'yes' order by name"
+            cmd &= ") and usable = 'ok' order by name"
             matches = queryTax(cmd, "")
           End If
         End If

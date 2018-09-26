@@ -32,6 +32,7 @@
 ' rebuild and upload bugpage.aspx
 
 Imports System.Net
+Imports System.Net.Http
 Imports System.Text
 Imports System.Collections.Generic
 Imports System.Drawing.Drawing2D
@@ -1043,7 +1044,7 @@ Public Class frmBugPhotos
     cmdCloseTree.Visible = True
 
     matches = queryTax("select * from taxatable where taxon = @parm1", "arthropoda")
-    gmatches = queryTax("select * from gbif.tax where name = @parm1 and usable = 'yes'", "animalia")
+    gmatches = queryTax("select * from gbif.tax where name = @parm1 and usable = 'ok'", "animalia")
     matches = mergeMatches(matches, gmatches)
 
     If matches.Count > 0 Then
@@ -1275,6 +1276,11 @@ Public Class frmBugPhotos
       iPic = 0
     End If
 
+    cookies = New CookieContainer
+    handler = New HttpClientHandler
+    handler.CookieContainer = cookies
+    qClient = New HttpClient(handler) ' need this for cookies
+
     processing = False
     Me.Cursor = Cursors.Default
 
@@ -1492,7 +1498,7 @@ Public Class frmBugPhotos
     imageCounter = getScalar("select count(*) from images where images.taxonid = @parm1", taxid)
 
     If taxid.StartsWith("g") Then
-      matches = queryTax("select id from gbif.tax where parent = @parm1 and usable = 'yes'", taxid)
+      matches = queryTax("select id from gbif.tax where parent = @parm1 and usable = 'ok'", taxid)
     Else
       matches = queryTax("select id from taxatable where parentid = @parm1", taxid)
     End If
@@ -1652,7 +1658,7 @@ Public Class frmBugPhotos
       k = getScalar("select count(*) from taxatable where imagecounter > 0")
 
       i1 = nonQuery("update gbif.tax set imagecounter = 0, childimagecounter = 0 where childimagecounter <> 0")
-      matches = queryTax("select * from gbif.taxa where taxon = 'animalia' and usable = 'yes'", "")
+      matches = queryTax("select * from gbif.taxa where taxon = 'animalia' and usable = 'ok'", "")
       id = matches(0).id
       i1 = setimageCount(id)
       k1 = getScalar("select count(*) from gbif.tax where imagecounter > 0")
@@ -2433,7 +2439,6 @@ Public Class frmBugPhotos
     Me.Cursor = Cursors.Default
 
   End Sub
-
 
 End Class
 

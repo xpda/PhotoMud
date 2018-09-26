@@ -10008,12 +10008,13 @@ Public Module ImageInfo
       If IsArray(v) Then
         v = makerTags.Item(sTag(&H1003)).value
         k = 0
-        For Each i In v
+        For Each x In v
+          If x < 100000 Then i = x Else i = 0 ' prevent overflow
           If i <> 0 Then
             k = 1
             Exit For
           End If
-        Next i
+        Next x
         If k > 0 AndAlso UBound(v) >= 10 Then
           note = note & "Panorama Full Width:" & tb & Format(v(0), "##,##0") & "\par "
           note = note & "Panorama Full Height:" & tb & Format(v(1), "##,##0") & "\par "
