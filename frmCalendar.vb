@@ -192,23 +192,31 @@ Public Class frmCalendar
       calCaption.Add("")
       ixCal.Add(j)
       If useQuery Then ' add bug descriptions
-        ds = getDS("select * from images join taxatable on images.taxonid = taxatable.id where filename = @parm1", Path.GetFileName(tagPath(j + 1)))
+        ds = getDS("select * from images, taxatable where filename = @parm1 and images.taxonid = taxatable.id",
+                   Path.GetFileName(tagPath(j + 1)))
         If ds IsNot Nothing AndAlso ds.Tables.Count > 0 AndAlso ds.Tables(0).Rows.Count > 0 Then
-          pic = New pixClass(ds.Tables(0).Rows(0))
+          pic = New pixClass(ds.Tables(0).Rows(0), "")
           calCaption(j) = getCalCaption(pic)
+        Else
+          ds = getDS("select * from images, gbif where filename = @parm1 and substring(images.taxonid, 2) = gbif.tax.taxid",
+                     Path.GetFileName(tagPath(j + 1)))
+          If ds IsNot Nothing AndAlso ds.Tables.Count > 0 AndAlso ds.Tables(0).Rows.Count > 0 Then
+            pic = New pixClass(ds.Tables(0).Rows(0), "gbif")
+            calCaption(j) = getCalCaption(pic)
+          End If
         End If
 
       Else ' normal caption -- exif comment or date
-        If dt <> Nothing AndAlso dt.Year > 1 Then
-          If s = "" Then
-            s = "Photo taken "
+          If dt <> Nothing AndAlso dt.Year > 1 Then
+            If s = "" Then
+              s = "Photo taken "
+            Else
+              s = s & ", "
+            End If
+            calCaption(j) = s & Format(dt, "MMMM") & " " & Format(dt, "yyyy")
           Else
-            s = s & ", "
+            calCaption(j) = s
           End If
-          calCaption(j) = s & Format(dt, "MMMM") & " " & Format(dt, "yyyy")
-        Else
-          calCaption(j) = s
-        End If
       End If
 
     Next j

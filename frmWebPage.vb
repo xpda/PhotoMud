@@ -204,7 +204,7 @@ Public Class frmWebPage
       frm.ShowDialog()
     End Using
     clearBitmap(qImage)
-    Me.select()
+    Me.Select()
 
   End Sub
 
@@ -417,14 +417,14 @@ Public Class frmWebPage
 
     If e.KeyCode = 9 Then
       e.Handled = True
-      lstFiles.select()
+      lstFiles.Select()
     End If
 
   End Sub
 
   Private Sub txtCaption_Leave(ByVal Sender As Object, ByVal e As EventArgs) Handles txCaption.Leave
 
-    ' the variable lastCaption is used because listindex gets out of synch
+    ' the variable lastCaption is used because listindex gets out of sync
     webCaption(ix(lastCaption)) = txCaption.Text.Trim
 
   End Sub
@@ -444,7 +444,7 @@ Public Class frmWebPage
       MsgBox(ex.Message)
     End Try
 
-    Me.select()
+    Me.Select()
 
     If result <> DialogResult.OK OrElse Len(saveDialog1.FileName) = 0 Then Exit Sub ' cancel or error
 
@@ -752,13 +752,19 @@ Public Class frmWebPage
             End If
 
             If useQuery Then ' add bug descriptions
-              ds = getDS("select * from images join taxatable on images.taxonid = taxatable.id where filename = @parm1", imgName(ix(k)))
-              If ds IsNot Nothing AndAlso ds.Tables.Count > 0 AndAlso ds.Tables(0).Rows.Count > 0 Then
-                pic = New pixClass(ds.Tables(0).Rows(0))
+              ds = getDS("select * from images, taxatable where filename = @parm1 and images.taxonid = taxatable.id", imgName(ix(k)))
+              If ds IsNot Nothing AndAlso ds.Tables(0).Rows.Count > 0 Then
+                pic = New pixClass(ds.Tables(0).Rows(0), "")
                 s = getCaption(pic)
                 sComment = sComment & s
+              Else
+                ds = getDS("select * from images, gbif.tax where filename = @parm1 and substring(images.taxonid, 2) = gbif.tax.taxid", imgName(ix(k)))
+                If ds IsNot Nothing AndAlso ds.Tables(0).Rows.Count > 0 Then
+                  pic = New pixClass(ds.Tables(0).Rows(0), "gbif")
+                  s = getCaption(pic)
+                  sComment = sComment & s
+                End If
               End If
-
             End If
           End If
 
@@ -896,7 +902,7 @@ Public Class frmWebPage
       callingForm = Me
       dResult = frm.ShowDialog()
     End Using
-    Me.select()
+    Me.Select()
     Me.Refresh()
     If dResult = DialogResult.No Then Return 0 ' don't save
 
@@ -985,7 +991,7 @@ Public Class frmWebPage
       ' gps coordinates
 
       pcomments = readPropertyItems(imgPath(ix(i)))
-      getGPSLocation(pcomments, Location, Altitude, xLat, xLon, ialtitude)
+      getGPSLocation(pcomments, Location, Altitude, xLat, xLon, iAltitude)
       If Location <> "" Then
         imgLatLon(ix(i)) = Location.Replace("°", " ")
         imgLatLon(ix(i)) = imgLatLon(ix(i)).Replace("'", "")
@@ -1040,7 +1046,7 @@ Public Class frmWebPage
       OptionTab = frm.tabWebPage
       frm.ShowDialog()
     End Using
-    Me.select()
+    Me.Select()
     GetSettings()
   End Sub
 

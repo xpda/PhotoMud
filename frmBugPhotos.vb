@@ -117,6 +117,7 @@ Public Class frmBugPhotos
     Dim matches As New List(Of taxrec)
     Dim setID As Integer
     Dim oldTaxid As String = ""
+    Dim status As String
 
     Me.Cursor = Cursors.WaitCursor
     fName = Trim(txFileName.Text)
@@ -151,17 +152,21 @@ Public Class frmBugPhotos
         txCommon.Text = matches(0).descr
 
       ElseIf matches.Count > 1 Then
-        k = -1
-        ' omit all the species and subspecies and see if there is one match
-        For i As Integer = 0 To matches.Count - 1
-          If (Not eqstr(matches(i).rank, "species")) And (Not eqstr(matches(i).rank, "subspecies")) Then
-            ' found a genus or higher. Theoretically there is only one.
-            taxonid = matches(k).id
-            txCommon.Text = matches(k).descr
-            k = i
+        taxonid = ""
+        ' omit all the doubtfuls and see if there is one match
+        For i As Integer = matches.Count - 1 To 0 Step -1
+          If matches(i).id.StartsWith("g") Then ' gbif record, check status
+            status = getScalar("select status from gbif.tax where taxid = @parm1", matches(i).id.Substring(1))
+            If Not eqstr(status, "accepted") Then
+              matches.RemoveAt(i)
+            End If
           End If
         Next i
-        If taxonid = "" Then ' abort
+        If matches.Count = 1 Then ' exactly one accepted or taxatable
+          taxonid = matches(0).id
+          txCommon.Text = matches(0).descr
+
+        Else ' abort
           MsgBox("There is more than one " & txTaxon.Text & " in the Database.", MsgBoxStyle.OkOnly)
           Me.Cursor = Cursors.Default
           cmdTaxon_Click(Nothing, Nothing)
@@ -388,7 +393,7 @@ Public Class frmBugPhotos
       If Not IsDBNull(drow("taxonid")) Then
         taxonid = drow("taxonid")
         matches = getTaxrecByID(taxonid)
-        If matches.count < 0 Then match = New taxrec Else match = matches(0)
+        If matches.Count < 0 Then match = New taxrec Else match = matches(0)
       End If
 
       If Not IsDBNull(drow("photodate")) Then txDate.Text = Format(drow("photodate"), "MM/dd/yyyy HH:mm:ss")
@@ -1033,7 +1038,7 @@ Public Class frmBugPhotos
 
     Dim match As New bugMain.taxrec
     Dim matches As List(Of taxrec)
-    Dim gmatches As List(Of taxrec)
+    'Dim gmatches As List(Of taxrec)
     Dim nd As TreeNode = Nothing
     Dim ndc As TreeNode = Nothing
 
@@ -1043,9 +1048,8 @@ Public Class frmBugPhotos
     tvTaxon.Visible = True
     cmdCloseTree.Visible = True
 
-    matches = queryTax("select * from taxatable where taxon = @parm1", "arthropoda")
-    gmatches = queryTax("select * from gbif.tax where name = @parm1 and usable = 'ok'", "animalia")
-    matches = mergeMatches(matches, gmatches)
+    'matches = queryTax("select * from taxatable where taxon = @parm1", "arthropoda")
+    matches = queryTax("select * from gbif.tax where name = @parm1 and usable = 'ok'", "animalia")
 
     If matches.Count > 0 Then
       nd = tvTaxon.Nodes.Add(taxaLabel(matches(0), False, False))
@@ -1275,11 +1279,6 @@ Public Class frmBugPhotos
       filenames.Add(currentpicPath) ' should never happen
       iPic = 0
     End If
-
-    cookies = New CookieContainer
-    handler = New HttpClientHandler
-    handler.CookieContainer = cookies
-    qClient = New HttpClient(handler) ' need this for cookies
 
     processing = False
     Me.Cursor = Cursors.Default
@@ -1532,8 +1531,10 @@ Public Class frmBugPhotos
 
     Dim ds2 As New DataSet
     Dim matches As List(Of taxrec)
+    Dim amatches As New List(Of taxrec)
     Dim gmatches As List(Of taxrec)
     Dim mParents As List(Of taxrec)
+    Dim anc As List(Of taxrec)
 
     Dim ranks() As String = {
         "kingdom",
@@ -1559,47 +1560,46 @@ Public Class frmBugPhotos
 
     Dim rankCount(UBound(ranks)) As Integer
     Dim rankCountTotal(UBound(ranks)) As Integer
+    Dim arthropodCount(UBound(ranks)) As Integer
+    Dim arthropodCountTotal(UBound(ranks)) As Integer
 
     matches = queryTax("select * from taxatable where childimagecounter > 0", "")
     gmatches = queryTax("select * from gbif.tax where childimagecounter > 0", "")
     matches = mergeMatches(matches, gmatches)
 
     For Each m As taxrec In matches
-      s = m.rank
-      i = Array.IndexOf(ranks, s)
-      If i >= 0 Then
-        rankCountTotal(i) += 1
-        k = m.imageCounter
-        If k > 0 Then rankCount(i) += 1
-      End If
+      anc = getancestors(m, False, "phylum")
+      If eqstr(anc(anc.Count - 1).taxon, "arthropoda") Then amatches.Add(m)
     Next m
 
-    matches = queryTax("select * from taxatable where imagecounter > 0 and rank = 'no taxon'", "")
-    matches = queryTax("select * from gbif.tax where imagecounter > 0 and rank = 'no taxon'", "")
-    matches = mergeMatches(matches, gmatches)
     For Each m As taxrec In matches
-      pid = m.parentid
-      i = -1
-      Do While i < 0 And pid <> ""
-        mParents = getTaxrecByID(m.parentid)
-        If mParents.Count = 0 Then Exit Do
-        i = Array.IndexOf(ranks, mParents(0).rank)
-        If i < 0 Then
-          mParents = getTaxrecByID(m.parentid)
-          If mParents.Count = 0 Then Exit Do
-          pid = mParents(0).parentid
+      anc = getancestors(m, False, "phylum")
+      i = Array.IndexOf(ranks, LCase(m.rank))
+      If i < 0 Then ' get next ancestor with legit rank
+        For i1 As Integer = 1 To anc.Count - 1
+          i = Array.IndexOf(ranks, LCase(anc(i1).rank))
+          If i >= 0 Then Exit For
+        Next i1
+      End If
+
+      If i >= 0 Then
+        rankCountTotal(i) += 1
+        If m.imageCounter > 0 Then rankCount(i) += 1
+
+        If eqstr(anc(anc.Count - 1).taxon, "arthropoda") Then
+          arthropodCountTotal(i) += 1
+          If m.imageCounter > 0 Then arthropodCount(i) += 1
         End If
-      Loop
-      If i >= 0 Then rankCount(i) += 1
+      End If
     Next m
 
     iCount = 0
     For i = 0 To UBound(ranks)
-      If rankCountTotal(i) > 0 Then
-        If rankCount(i) > 0 Then
-          s = rankCountTotal(i) & Chr(9) & "(" & rankCount(i) & ")"
+      If rankCountTotal(i) - arthropodCountTotal(i) > 0 Then
+        If rankCount(i) - arthropodCount(i) > 0 Then
+          s = rankCountTotal(i) - arthropodCountTotal(i) & Chr(9) & "(" & rankCount(i) - arthropodCount(i) & ")"
         Else
-          s = rankCountTotal(i) & Chr(9)
+          s = rankCountTotal(i) - arthropodCountTotal(i) & Chr(9)
         End If
         sb.AppendLine(s & Chr(9) & ranks(i))
         iCount += rankCount(i)
@@ -1607,6 +1607,23 @@ Public Class frmBugPhotos
     Next i
 
     sb.AppendLine(iCount & Chr(9) & "total")
+
+    sb.AppendLine()
+    iCount = 0
+    For i = 0 To UBound(ranks)
+      If arthropodCountTotal(i) > 0 Then
+        If arthropodCount(i) > 0 Then
+          s = arthropodCountTotal(i) & Chr(9) & "(" & arthropodCount(i) & ")"
+        Else
+          s = arthropodCountTotal(i) & Chr(9)
+        End If
+        sb.AppendLine(s & Chr(9) & ranks(i))
+        iCount += arthropodCount(i)
+      End If
+    Next i
+
+    sb.AppendLine(iCount & Chr(9) & "total arthropods")
+
 
     Return sb.ToString
 
@@ -2112,10 +2129,10 @@ Public Class frmBugPhotos
     processing = True
     GPSLocate(txGPS.Text, locale, county, state, country)
 
-    If locale <> "" Then txLocation.Text = locale
-    If county <> "" Then txCounty.Text = county
-    If state <> "" Then txState.Text = state
-    If country <> "" Then txCountry.Text = country
+    txLocation.Text = locale
+    txCounty.Text = county
+    txState.Text = state
+    txCountry.Text = country
 
     processing = False
 

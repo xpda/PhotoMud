@@ -271,14 +271,14 @@
     Me.mnu.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuFile, Me.mnuEdit, Me.mnuView, Me.mnuTools, Me.mnuWindow, Me.mnuHelp})
     Me.mnu.Location = New System.Drawing.Point(0, 0)
     Me.mnu.Name = "mnu"
-    Me.mnu.Size = New System.Drawing.Size(977, 26)
+    Me.mnu.Size = New System.Drawing.Size(977, 28)
     Me.mnu.TabIndex = 8
     '
     'mnuFile
     '
     Me.mnuFile.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuFileOpen, Me.mnuFileOpenCurrent, Me.mnuFileSaveAs, Me.mnuFileNew, Me.fileline3, Me.mnuFileAcquire, Me.mnufileline12, Me.mnuFilePrint, Me.mnuFilePrintTagged, Me.fileline1, Me.mnuFileSend, Me.mnuFileSendTagged, Me.mnuFileLine4, Me.mnuFileCopy, Me.mnuFileConvert, Me.fileline5, Me.mnufileedit, Me.mnuFileCloseAll, Me.fileline2, Me.mnuFileExit, Me.ToolStripSeparator1, Me.mnuFileMru1, Me.mnuFileMru2, Me.mnuFileMru3, Me.mnuFileMru4, Me.mnuFileMru5, Me.mnuFileMru6, Me.mnuFileMru7, Me.mnuFileMru8, Me.mnuFileMru9, Me.mnuLine4})
     Me.mnuFile.Name = "mnuFile"
-    Me.mnuFile.Size = New System.Drawing.Size(40, 22)
+    Me.mnuFile.Size = New System.Drawing.Size(40, 24)
     Me.mnuFile.Text = "&File"
     '
     'mnuFileOpen
@@ -507,7 +507,7 @@
     '
     Me.mnuEdit.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuEditCopyFile, Me.mnuEditCopyImage, Me.mnuEditCopyfilename, Me.mnuEditPaste, Me.mnuEditPasteNew, Me.editline7, Me.mnuEditDelete, Me.mnuEditRename, Me.editline3, Me.mnuEditRotateLeft, Me.mnuEditRotateRight, Me.mnuEditLine1, Me.mnuEditTagselectedfiles, Me.mnuEditSelecttagged, Me.mnuEditCleartags, Me.mnuEditTagDirMatches, Me.mnuEditTagPrevious, Me.editline2, Me.mnuEditSelectall})
     Me.mnuEdit.Name = "mnuEdit"
-    Me.mnuEdit.Size = New System.Drawing.Size(43, 22)
+    Me.mnuEdit.Size = New System.Drawing.Size(43, 24)
     Me.mnuEdit.Text = "&Edit"
     '
     'mnuEditCopyFile
@@ -646,7 +646,7 @@
     '
     Me.mnuView.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuUpOneLevel, Me.mnuViewPrevious, Me.mnuViewNext, Me.mnuviewline3, Me.mnuViewFullscreen, Me.mnuViewToolbar, Me.mnuViewRefresh, Me.viewline1, Me.mnuViewStyleThumbnails, Me.mnuViewStyleDetails})
     Me.mnuView.Name = "mnuView"
-    Me.mnuView.Size = New System.Drawing.Size(49, 22)
+    Me.mnuView.Size = New System.Drawing.Size(49, 24)
     Me.mnuView.Text = "&View"
     '
     'mnuUpOneLevel
@@ -725,7 +725,7 @@
     '
     Me.mnuTools.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuToolsInfo, Me.mnuToolsComment, Me.mnuToolsBatchInfoCopy, Me.mnuToolsBugseparator, Me.mnuToolsBugPhotos, Me.mnuToolsLinkBugPhotos, Me.mnuToolsBugQuery, Me.toolsline1, Me.mnuToolsWebpage, Me.mnuToolsWallpaper, Me.mnuToolsSlideshow, Me.mnuToolsMergeColor, Me.toolsline9, Me.mnuToolsSearch, Me.mnuToolsPicSearch, Me.toolsline2, Me.mnuToolsAssoc, Me.mnuToolsFileFilter, Me.ToolStripSeparator8, Me.mnuToolsCalendar, Me.ToolStripSeparator9, Me.mnuToolsToolbar, Me.mnuToolsOptions})
     Me.mnuTools.Name = "mnuTools"
-    Me.mnuTools.Size = New System.Drawing.Size(55, 22)
+    Me.mnuTools.Size = New System.Drawing.Size(55, 24)
     Me.mnuTools.Text = "&Tools"
     '
     'mnuToolsInfo
@@ -881,20 +881,20 @@
     '
     Me.mnuWindow.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripSeparator7})
     Me.mnuWindow.Name = "mnuWindow"
-    Me.mnuWindow.Size = New System.Drawing.Size(70, 22)
+    Me.mnuWindow.Size = New System.Drawing.Size(70, 24)
     Me.mnuWindow.Text = "&Window"
     '
     'ToolStripSeparator7
     '
     Me.ToolStripSeparator7.Name = "ToolStripSeparator7"
-    Me.ToolStripSeparator7.Size = New System.Drawing.Size(178, 6)
+    Me.ToolStripSeparator7.Size = New System.Drawing.Size(63, 6)
     '
     'mnuHelp
     '
     Me.mnuHelp.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuHelpHelpTopics, Me.mnuHelpHelpIndex, Me.mnuHelpTips, Me.helpLine1, Me.mnuHelpRegister, Me.mnuHelpUpdate, Me.helpline2, Me.mnuHelpAbout})
     Me.mnuHelp.Name = "mnuHelp"
     Me.mnuHelp.ShortcutKeys = CType((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.F), System.Windows.Forms.Keys)
-    Me.mnuHelp.Size = New System.Drawing.Size(48, 22)
+    Me.mnuHelp.Size = New System.Drawing.Size(48, 24)
     Me.mnuHelp.Text = "&Help"
     '
     'mnuHelpHelpTopics
@@ -1138,7 +1138,7 @@
     Me.Toolstrip1.Font = New System.Drawing.Font("Tahoma", 8.0!)
     Me.Toolstrip1.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
     Me.Toolstrip1.ImageScalingSize = New System.Drawing.Size(24, 24)
-    Me.Toolstrip1.Location = New System.Drawing.Point(0, 26)
+    Me.Toolstrip1.Location = New System.Drawing.Point(0, 28)
     Me.Toolstrip1.Name = "Toolstrip1"
     Me.Toolstrip1.Size = New System.Drawing.Size(977, 25)
     Me.Toolstrip1.TabIndex = 2
@@ -1155,8 +1155,8 @@
     '
     Me.SplitContainer2.Panel2.Controls.Add(Me.ListView1)
     Me.SplitContainer2.Panel2.Controls.Add(Me.StatusStrip1)
-    Me.SplitContainer2.Size = New System.Drawing.Size(695, 599)
-    Me.SplitContainer2.SplitterDistance = 431
+    Me.SplitContainer2.Size = New System.Drawing.Size(695, 597)
+    Me.SplitContainer2.SplitterDistance = 428
     Me.SplitContainer2.TabIndex = 12
     Me.SplitContainer2.TabStop = False
     '
@@ -1172,7 +1172,7 @@
     Me.ListView1.LargeImageList = Me.imgThumbnails
     Me.ListView1.Location = New System.Drawing.Point(0, 0)
     Me.ListView1.Name = "ListView1"
-    Me.ListView1.Size = New System.Drawing.Size(695, 139)
+    Me.ListView1.Size = New System.Drawing.Size(695, 140)
     Me.ListView1.SmallImageList = Me.imgSmallIcons
     Me.ListView1.TabIndex = 0
     Me.ListView1.UseCompatibleStateImageBehavior = False
@@ -1181,7 +1181,7 @@
     '
     Me.StatusStrip1.ImageScalingSize = New System.Drawing.Size(20, 20)
     Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.lbStatus})
-    Me.StatusStrip1.Location = New System.Drawing.Point(0, 139)
+    Me.StatusStrip1.Location = New System.Drawing.Point(0, 140)
     Me.StatusStrip1.Name = "StatusStrip1"
     Me.StatusStrip1.Size = New System.Drawing.Size(695, 25)
     Me.StatusStrip1.SizingGrip = False
@@ -1223,7 +1223,7 @@
     Me.TreeView.Margin = New System.Windows.Forms.Padding(4)
     Me.TreeView.Name = "TreeView"
     Me.TreeView.SelectedImageIndex = 0
-    Me.TreeView.Size = New System.Drawing.Size(278, 574)
+    Me.TreeView.Size = New System.Drawing.Size(278, 572)
     Me.TreeView.StateImageList = Me.imgTreeView
     Me.TreeView.TabIndex = 6
     '
@@ -1278,7 +1278,7 @@
     'SplitContainer1
     '
     Me.SplitContainer1.Dock = System.Windows.Forms.DockStyle.Fill
-    Me.SplitContainer1.Location = New System.Drawing.Point(0, 51)
+    Me.SplitContainer1.Location = New System.Drawing.Point(0, 53)
     Me.SplitContainer1.Name = "SplitContainer1"
     '
     'SplitContainer1.Panel1
@@ -1289,7 +1289,7 @@
     'SplitContainer1.Panel2
     '
     Me.SplitContainer1.Panel2.Controls.Add(Me.SplitContainer2)
-    Me.SplitContainer1.Size = New System.Drawing.Size(977, 599)
+    Me.SplitContainer1.Size = New System.Drawing.Size(977, 597)
     Me.SplitContainer1.SplitterDistance = 278
     Me.SplitContainer1.TabIndex = 10
     Me.SplitContainer1.TabStop = False

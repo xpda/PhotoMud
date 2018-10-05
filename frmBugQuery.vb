@@ -11,7 +11,6 @@ Imports MySql.Data.MySqlClient
 
 Public Class frmBugQuery
 
-
   Dim processing As Boolean
   Dim nn As Integer = 0
   Dim folderPath As String
@@ -131,13 +130,15 @@ Public Class frmBugQuery
         Next drow
       End If
 
-      sql = "select images.filename, gbif.tax.name from images, gbif.tax where images.taxonid = concat('g',gbif.tax.taxid) "
+      sql = "select images.filename, gbif.tax.name from images, gbif.tax where " &
+        "substring(images.taxonid, 2) = gbif.tax.taxid and substring(images.taxonid, 1, 1) = 'g' "
       cmd = queryparms(sql, "photodate", True, True, conn)
+      dset.Clear()
       If cmd IsNot Nothing Then
         adapt.SelectCommand = cmd
         adapt.Fill(dset)
         For Each drow In dset.Tables(0).Rows
-          s1 = drow("taxon")
+          s1 = drow("name")
           If s = "" OrElse eqstr(s, s1) Then ' taxonkey matches
             If Not IsDBNull(drow("filename")) Then queryNames.Add(folderPath & drow("filename"))
           End If

@@ -141,8 +141,13 @@ Public Module bugMain
     mainRank.Add("genus")
     mainRank.Add("species")
     mainRank.Add("subspecies")
-  End Sub
 
+    cookies = New CookieContainer
+    handler = New HttpClientHandler
+    handler.CookieContainer = cookies
+    qClient = New HttpClient(handler) ' need this for cookies
+
+  End Sub
 
   Sub linkBugPhotos()
     ' link the tagged images in the bug database -- changes the database only.
@@ -761,11 +766,7 @@ Public Module bugMain
     Dim url As String
     Dim s As String
     Dim dLat, dLon As Double
-    Dim xmldoc As New XmlDocument
-
     Dim jq As JObject
-
-    Dim deserializer As New XmlSerializer(GetType(GeocodeResponse))
 
     s = LCase(latlon)
     Call latlonVerify(s, dLat, dLon)
@@ -784,7 +785,13 @@ Public Module bugMain
     jq = JObject.Parse(s)
 
     If jq.SelectToken("address") IsNot Nothing Then
-      If jq.SelectToken("address.locale") IsNot Nothing Then locale = jq.SelectToken("address.city").ToString Else locale = ""
+      If jq.SelectToken("address.city") IsNot Nothing Then
+        locale = jq.SelectToken("address.city").ToString
+      ElseIf jq.SelectToken("address.town") IsNot Nothing Then
+        locale = jq.SelectToken("address.town").ToString
+        'ElseIf jq.SelectToken("address.village") IsNot Nothing Then
+        '  locale = jq.SelectToken("address.village").ToString
+      End If
       If jq.SelectToken("address.county") IsNot Nothing Then county = jq.SelectToken("address.county").ToString Else county = ""
       If jq.SelectToken("address.state") IsNot Nothing Then state = jq.SelectToken("address.state").ToString Else state = ""
       If jq.SelectToken("address.country") IsNot Nothing Then country = jq.SelectToken("address.country").ToString Else country = ""
@@ -880,14 +887,12 @@ Public Module bugMain
 
     ' get dataset taxatable record for taxonkey or common name findme
 
-    Dim qspecies As String
     Dim cmd As String
     Dim m As New taxrec
     Dim matches As New List(Of taxrec)
     Dim s As String
     Dim suffix, suffixg, suffixp As String
     Dim ds As New DataSet
-    Dim ss() As String
 
     findme = findme.Trim
 
@@ -901,21 +906,11 @@ Public Module bugMain
       suffixp = " order by @p"
     End If
 
-    ss = Split(findme, " ")
-    If UBound(ss) = 0 Then ' no space -- one-word search
-      matches = queryTax("select * from taxatable where taxon = @parm1" & suffix, findme)
-      If matches.Count = 0 Then matches = queryTax("select * from gbif.tax where name = @parm1" & suffixg, findme)
-      If matches.Count = 0 Then
-        matches = queryTax("select * from taxatable where (taxon like @parm1)" & suffix, findme & "%")
-        ' If matches.Count = 0 Then matches = queryTax("select * from gbif.tax where (name like @parm1)" & suffixg, findme & "%") ' exact search only for gbif
-      End If
-
-    Else ' multi-word search, search genus and species, for example
-      qspecies = ss(UBound(ss)) ' last word, could be subspecies
-      matches = queryTax(
-        "select * from taxatable where taxon = @parm2 and @p := taxon = @parm1" &
-        suffixp, findme, qspecies)
-      If matches.Count = 0 Then matches = queryTax("select * from gbif.tax where name = @parm1" & suffixg, findme) ' name includes genus
+    matches = queryTax("select * from taxatable where taxon = @parm1" & suffix, findme)
+    If matches.Count = 0 Then matches = queryTax("select * from gbif.tax where name = @parm1" & suffixg, findme)
+    If matches.Count = 0 Then
+      matches = queryTax("select * from taxatable where (taxon like @parm1)" & suffix, findme & "%")
+      ' If matches.Count = 0 Then matches = queryTax("select * from gbif.tax where (name like @parm1)" & suffixg, findme & "%") ' exact search only for gbif
     End If
 
     If matches.Count = 0 Then  ' search descr
@@ -1020,9 +1015,13 @@ Public Module bugMain
 
     Dim s As String
     Dim s1 As String
+    Dim descr As String
     Dim taxonkey As String
 
     s = ""
+
+    descr = getDescr(pic.match, False)
+    If descr <> "" AndAlso Not descr.Contains(":") Then s += descr & "<br>"
 
     taxonkey = pic.match.taxon
     s += "<i>" & taxonkey & "</i>"
@@ -1032,8 +1031,7 @@ Public Module bugMain
     End If
     s += "<br>"
 
-    s1 = getDescr(pic.match, False)
-    If s1 <> "" Then s += s1 & "<br>"
+    If descr <> "" AndAlso descr.Contains(":") Then s += descr & "<br>"
 
     s1 = LocationLabel(pic)
     If s1 <> "" Then s += s1 & "<br>"
@@ -1313,7 +1311,9 @@ Public Class pixClass
   Public Remarks As String
   Public match As taxrec
 
-  Sub New(ByRef dr As DataRow)
+  Sub New(ByRef dr As DataRow, sourceDB As String)
+
+    ' sourceDB is blank for taxatable
 
     fName = dr("filename")
     photoDate = dr("photodate")
@@ -1325,15 +1325,11 @@ Public Class pixClass
     ID = dr("id")
     Remarks = dr("remarks")
 
-    match = New taxrec
-    match.taxon = dr("taxon")
-    ' match.taxon = dr("taxonkey")
-    match.descr = dr("descr")
-    match.rank = dr("rank")
-    match.id = dr("taxonid")
-    match.parentid = dr("parentid")
-    match.imageCounter = dr("imageCounter")
-    match.childimageCounter = dr("childimageCounter")
+    If sourceDB = "gbif" Then
+      match = getTaxrecg(dr)
+    Else
+      match = getTaxrec(dr)
+    End If
 
   End Sub
 
