@@ -39,6 +39,7 @@ Public Module bugMain
 
   Public itisRankID As New Dictionary(Of String, Integer)(System.StringComparer.OrdinalIgnoreCase)
   Public itisRanks As New Dictionary(Of Integer, String)
+  Public states As New Dictionary(Of String, String)(System.StringComparer.OrdinalIgnoreCase)
   Public mainRank As New List(Of String)
 
   Public nodeMatchColor As Color = Color.Cornsilk
@@ -73,6 +74,58 @@ Public Module bugMain
   'Public QueryTaxon As String = ""  ' for shortcut -- temporary!
 
   Sub buginit()
+
+    states.Add("Alabama", "AL")
+    states.Add("Alaska", "AK")
+    states.Add("Arizona", "AZ")
+    states.Add("Arkansas", "AR")
+    states.Add("California", "CA")
+    states.Add("Colorado", "CO")
+    states.Add("Connecticut", "CT")
+    states.Add("Delaware", "DL")
+    states.Add("Florida", "FL")
+    states.Add("Georgia", "GA")
+    states.Add("Hawaii", "HI")
+    states.Add("Idaho", "ID")
+    states.Add("Illinois", "IL")
+    states.Add("Indiana", "IN")
+    states.Add("Iowa", "IA")
+    states.Add("Kansas", "KS")
+    states.Add("Kentucky", "KY")
+    states.Add("Louisiana", "LA")
+    states.Add("Maine", "ME")
+    states.Add("Maryland", "MD")
+    states.Add("Massachusetts", "MA")
+    states.Add("Michigan", "MI")
+    states.Add("Minnesota", "MN")
+    states.Add("Mississippi", "MS")
+    states.Add("Missouri", "MO")
+    states.Add("Montana", "MT")
+    states.Add("Nebraska", "NE")
+    states.Add("Nevada", "NV")
+    states.Add("New Hampshire", "NH")
+    states.Add("New Jersey", "NJ")
+    states.Add("New Mexico", "NM")
+    states.Add("New York", "NY")
+    states.Add("North Carolina", "NC")
+    states.Add("North Dakota", "ND")
+    states.Add("Ohio", "OH")
+    states.Add("Oklahoma", "OK")
+    states.Add("Oregon", "OR")
+    states.Add("Pennsylvania", "PA")
+    states.Add("Rhode Island", "RI")
+    states.Add("South Carolina", "SC")
+    states.Add("South Dakota", "SD")
+    states.Add("Tennessee", "TN")
+    states.Add("Texas", "TX")
+    states.Add("Utah", "UT")
+    states.Add("Vermont", "VT")
+    states.Add("Virginia", "VA")
+    states.Add("Washington", "WA")
+    states.Add("West Virginia", "WV")
+    states.Add("Wisconsin", "WI")
+    states.Add("Wyoming", "WY")
+    states.Add("Puerto Rico", "PR")
 
     itisRankID.Add("kingdom", 10)
     itisRankID.Add("subkingdom", 20)
@@ -218,7 +271,7 @@ Public Module bugMain
     If id = "" Then Return Nothing
 
     If eqstr(id.Substring(0, 1), "g") Then ' gbif database
-      ds = getDS("select * from gbif.tax where taxid = @parm1 and usable = 'ok';",
+      ds = getDS("select * from gbif.tax join taxa.gbifplus using (taxid) where taxid = @parm1 and usable = 'ok';",
                  id.Substring(1).Trim)
       If ds IsNot Nothing Then
         For Each dr As DataRow In ds.Tables(0).Rows
@@ -259,6 +312,7 @@ Public Module bugMain
     Return match
 
   End Function
+
   Function getTaxrecg(ByRef dr As DataRow) As taxrec
     ' get a taxref from gbif database
     Dim match As New taxrec
@@ -360,13 +414,13 @@ Public Module bugMain
 
     If isQuery Then
       If node.Tag.startswith("g") Then
-        matches = queryTax("select * from gbif.tax where parent = @parm1 and childimagecounter > 0 order by name", node.Tag.substring(1))
+        matches = queryTax("select * from gbif.tax join taxa.gbifplus using (taxid) where parent = @parm1 and childimagecounter > 0 order by name", node.Tag.substring(1))
       Else
         matches = queryTax("select * from taxatable where parentid = @parm1 and childimagecounter > 0 order by taxon", node.Tag)
       End If
     Else
       If node.Tag.startswith("g") Then
-        matches = queryTax("select * from gbif.tax where parent = @parm1 and usable = 'ok' order by name", node.Tag.substring(1))
+        matches = queryTax("select * from gbif.tax join taxa.gbifplus using (taxid) where parent = @parm1 and usable = 'ok' order by name", node.Tag.substring(1))
       Else
         matches = queryTax("select * from taxatable where parentid = @parm1 order by taxon", node.Tag)
       End If
@@ -446,7 +500,7 @@ Public Module bugMain
     tvTax.Visible = True
 
     ' search for the taxon
-    matches = TaxonkeySearch(xtaxi, isQuery)
+    matches = TaxonSearch(xtaxi, isQuery)
 
     ndTarget = Nothing
     targetLevel = 999
@@ -528,7 +582,7 @@ Public Module bugMain
       matches = getTaxrecByID(id)
       If matches.Count <= 0 Then Return ancestor
       ancestor.Add(matches(0))
-      If eqstr(matches(0).rank, StopAt) Then Exit Do
+      If eqstr(matches(0).rank, StopAt) Then Return ancestor
       id = matches(0).parentid
       iter = iter + 1
     Loop
@@ -799,8 +853,9 @@ Public Module bugMain
 
     If LCase(county).EndsWith(" county") Then county = county.Substring(0, county.Length - 7)
     If LCase(locale) = "pryor creek" Then locale = "Pryor"
+    If states.ContainsKey(state) Then state = states(state) ' get state abbreviation
 
-    If country = "United States" Then country = ""
+    If country = "United States" Or country = "USA" Or country = "U.S." Or country = "United States of America" Then country = ""
     If country = "United Kingdom" Then country = "UK"
 
   End Sub
@@ -883,15 +938,15 @@ Public Module bugMain
 
   End Function
 
-  Function TaxonkeySearch(ByVal findme As String, ByVal isQuery As Boolean) As List(Of taxrec)
+  Function TaxonSearch(findme As String, isQuery As Boolean) As List(Of taxrec)
 
-    ' get dataset taxatable record for taxonkey or common name findme
+    ' get dataset taxatable record for taxon or common name findme
 
     Dim cmd As String
     Dim m As New taxrec
     Dim matches As New List(Of taxrec)
     Dim s As String
-    Dim suffix, suffixg, suffixp As String
+    Dim suffix, suffixg As String
     Dim ds As New DataSet
 
     findme = findme.Trim
@@ -899,17 +954,17 @@ Public Module bugMain
     If isQuery Then
       suffix = " and (childimagecounter > 0) order by taxon"
       suffixg = " and (childimagecounter > 0) and usable = 'ok' order by name"
-      suffixp = " and (childimagecounter > 0) order by @p"
     Else
       suffix = " order by taxon"
       suffixg = "  and usable = 'ok' order by name"
-      suffixp = " order by @p"
     End If
 
     matches = queryTax("select * from taxatable where taxon = @parm1" & suffix, findme)
-    If matches.Count = 0 Then matches = queryTax("select * from gbif.tax where name = @parm1" & suffixg, findme)
     If matches.Count = 0 Then
-      matches = queryTax("select * from taxatable where (taxon like @parm1)" & suffix, findme & "%")
+      matches = queryTax("select * from gbif.tax join taxa.gbifplus using (taxid) where name = @parm1" & suffixg, findme)
+    End If
+    If matches.Count = 0 Then
+      matches = queryTax("select * from taxatable where (taxon like @parm1)" & suffix, "%" & findme & "%")
       ' If matches.Count = 0 Then matches = queryTax("select * from gbif.tax where (name like @parm1)" & suffixg, findme & "%") ' exact search only for gbif
     End If
 
@@ -922,7 +977,7 @@ Public Module bugMain
       If matches.Count = 0 Then
         ds = getDS("select * from gbif.vernacularname where vernacularname rlike @parm1 and language = 'en'", s)
         If ds IsNot Nothing AndAlso ds.Tables(0).Rows.Count > 0 Then
-          cmd = "select * from gbif.tax where ("
+          cmd = "select * from gbif.tax join taxa.gbifplus using (taxid) where ("
           For Each dr As DataRow In ds.Tables(0).Rows
             If cmd.IndexOf(dr("taxonid")) < 0 Then cmd &= "taxid = '" & (dr("taxonid")) & "' or "
           Next dr
@@ -978,7 +1033,7 @@ Public Module bugMain
     childImageCounter += inc
 
     If taxid.StartsWith("g") Then
-      i = nonQuery("update gbif.tax set imagecounter = @parm1, childimagecounter = @parm2 where taxid = @parm3", _
+      i = nonQuery("update gbifplus set imagecounter = @parm1, childimagecounter = @parm2 where taxid = @parm3", _
         imageCounter, childImageCounter, taxid.Substring(1)) ' remove "g"
     Else
       i = nonQuery("update taxatable set imagecounter = @parm1, childimagecounter = @parm2 where id = @parm3", _
@@ -999,7 +1054,7 @@ Public Module bugMain
       childImageCounter += inc
 
       If parentID.StartsWith("g") Then
-        i = nonQuery("update gbif.tax set childimagecounter = @parm1 where taxid = @parm2",
+        i = nonQuery("update gbifplus set childimagecounter = @parm1 where taxid = @parm2",
                      childImageCounter, parentID.Substring(1)) ' remove "g"
         If i <> 1 Then Stop
       Else
@@ -1141,12 +1196,12 @@ Public Module bugMain
 
     If (dballowed And 8) Then
       If Not tMatch.id.StartsWith("g") Then
-        matches = queryTax("select * from gbif.tax where name = @parm1" & pics, tMatch.taxon)
+        matches = queryTax("select * from gbif.tax join taxa.gbifplus using (taxid) where name = @parm1" & pics, tMatch.taxon)
         For Each m As taxrec In matches
-          descg = queryTax("select * from gbif.tax where parent = @parm1" & pics, m.id.Substring(1))
+          descg = queryTax("select * from gbif.tax join taxa.gbifplus using (taxid) where parent = @parm1" & pics, m.id.Substring(1))
         Next m
       Else
-        descg = queryTax("select * from gbif.tax where parent = @parm1" & pics, tMatch.id.Substring(1))
+        descg = queryTax("select * from gbif.tax join taxa.gbifplus using (taxid) where parent = @parm1" & pics, tMatch.id.Substring(1))
       End If
 
       For Each m As taxrec In descg
@@ -1311,9 +1366,10 @@ Public Class pixClass
   Public Remarks As String
   Public match As taxrec
 
-  Sub New(ByRef dr As DataRow, sourceDB As String)
+  Sub New(ByRef dr As DataRow)
 
     ' sourceDB is blank for taxatable
+    Dim s As String
 
     fName = dr("filename")
     photoDate = dr("photodate")
@@ -1325,7 +1381,9 @@ Public Class pixClass
     ID = dr("id")
     Remarks = dr("remarks")
 
-    If sourceDB = "gbif" Then
+    s = dr("taxonid")
+
+    If s.StartsWith("g") Then
       match = getTaxrecg(dr)
     Else
       match = getTaxrec(dr)

@@ -754,13 +754,13 @@ Public Class frmWebPage
             If useQuery Then ' add bug descriptions
               ds = getDS("select * from images, taxatable where filename = @parm1 and images.taxonid = taxatable.id", imgName(ix(k)))
               If ds IsNot Nothing AndAlso ds.Tables(0).Rows.Count > 0 Then
-                pic = New pixClass(ds.Tables(0).Rows(0), "")
+                pic = New pixClass(ds.Tables(0).Rows(0))
                 s = getCaption(pic)
                 sComment = sComment & s
               Else
                 ds = getDS("select * from images, gbif.tax where filename = @parm1 and substring(images.taxonid, 2) = gbif.tax.taxid", imgName(ix(k)))
                 If ds IsNot Nothing AndAlso ds.Tables(0).Rows.Count > 0 Then
-                  pic = New pixClass(ds.Tables(0).Rows(0), "gbif")
+                  pic = New pixClass(ds.Tables(0).Rows(0))
                   s = getCaption(pic)
                   sComment = sComment & s
                 End If

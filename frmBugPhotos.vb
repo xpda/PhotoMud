@@ -144,7 +144,7 @@ Public Class frmBugPhotos
       End If
 
       ' make sure there is one taxon
-      matches = TaxonkeySearch(txTaxon.Text, False)
+      matches = TaxonSearch(txTaxon.Text, False)
       taxonid = ""
 
       If matches.Count = 1 Then
@@ -215,7 +215,7 @@ Public Class frmBugPhotos
 
         cmd = New MySqlCommand(sql, conn)
         cmd.Parameters.AddWithValue("@filename", fName)
-        cmd.Parameters.AddWithValue("@photodate", CDate(txDate.Text))
+        If IsDate(txDate.Text) Then cmd.Parameters.AddWithValue("@photodate", CDate(txDate.Text))
         cmd.Parameters.AddWithValue("@dateadded", CDate(txDateAdded.Text))
         cmd.Parameters.AddWithValue("@modified", Now)
         cmd.Parameters.AddWithValue("@taxonid", taxonid)
@@ -393,7 +393,7 @@ Public Class frmBugPhotos
       If Not IsDBNull(drow("taxonid")) Then
         taxonid = drow("taxonid")
         matches = getTaxrecByID(taxonid)
-        If matches.Count < 0 Then match = New taxrec Else match = matches(0)
+        If matches.Count = 0 Then match = New taxrec Else match = matches(0)
       End If
 
       If Not IsDBNull(drow("photodate")) Then txDate.Text = Format(drow("photodate"), "MM/dd/yyyy HH:mm:ss")
@@ -554,7 +554,7 @@ Public Class frmBugPhotos
     s = s.Trim  ' s is the taxon from the jpg comment (possibly)
 
     If s <> "" Then
-      matches = TaxonkeySearch(s, False)
+      matches = TaxonSearch(s, False)
 
       If matches.Count > 0 Then
         txTaxon.Text = matches(0).taxon
@@ -1049,7 +1049,7 @@ Public Class frmBugPhotos
     cmdCloseTree.Visible = True
 
     'matches = queryTax("select * from taxatable where taxon = @parm1", "arthropoda")
-    matches = queryTax("select * from gbif.tax where name = @parm1 and usable = 'ok'", "animalia")
+    matches = queryTax("select * from gbif.tax join taxa.gbifplus using (taxid) where name = @parm1 and usable = 'ok'", "animalia")
 
     If matches.Count > 0 Then
       nd = tvTaxon.Nodes.Add(taxaLabel(matches(0), False, False))
@@ -1497,9 +1497,9 @@ Public Class frmBugPhotos
     imageCounter = getScalar("select count(*) from images where images.taxonid = @parm1", taxid)
 
     If taxid.StartsWith("g") Then
-      matches = queryTax("select id from gbif.tax where parent = @parm1 and usable = 'ok'", taxid)
+      matches = queryTax("select * from gbif.tax join taxa.gbifplus using (taxid) where parent = @parm1 and usable = 'ok'", taxid.Substring(1))
     Else
-      matches = queryTax("select id from taxatable where parentid = @parm1", taxid)
+      matches = queryTax("select * from taxatable where parentid = @parm1", taxid)
     End If
 
     childImageCounter = imageCounter
@@ -1510,11 +1510,13 @@ Public Class frmBugPhotos
 
     If childImageCounter <> 0 Then
       If taxid.StartsWith("g") Then
-        i = nonQuery("update gbif.tax set imagecounter = @parm1, childimagecounter = @parm2 where id = @parm3", _
-              imageCounter, childImageCounter, taxid)
+        i = nonQuery("update gbifplus set imagecounter = @parm1, childimagecounter = @parm2 where taxid = @parm3", _
+              imageCounter, childImageCounter, taxid.Substring(1))
+        If i <> 1 Then Stop
       Else
         i = nonQuery("update taxatable set imagecounter = @parm1, childimagecounter = @parm2 where id = @parm3", _
               imageCounter, childImageCounter, taxid)
+        If i <> 1 Then Stop
       End If
     End If
 
@@ -1524,7 +1526,7 @@ Public Class frmBugPhotos
 
   Function rankCounts() As String
 
-    Dim i, k, iCount As Integer
+    Dim i, iCount As Integer
     Dim pid As String = ""
     Dim s As String
     Dim sb As New StringBuilder
@@ -1533,7 +1535,6 @@ Public Class frmBugPhotos
     Dim matches As List(Of taxrec)
     Dim amatches As New List(Of taxrec)
     Dim gmatches As List(Of taxrec)
-    Dim mParents As List(Of taxrec)
     Dim anc As List(Of taxrec)
 
     Dim ranks() As String = {
@@ -1564,13 +1565,8 @@ Public Class frmBugPhotos
     Dim arthropodCountTotal(UBound(ranks)) As Integer
 
     matches = queryTax("select * from taxatable where childimagecounter > 0", "")
-    gmatches = queryTax("select * from gbif.tax where childimagecounter > 0", "")
+    gmatches = queryTax("select * from gbif.tax join taxa.gbifplus using (taxid) where childimagecounter > 0", "")
     matches = mergeMatches(matches, gmatches)
-
-    For Each m As taxrec In matches
-      anc = getancestors(m, False, "phylum")
-      If eqstr(anc(anc.Count - 1).taxon, "arthropoda") Then amatches.Add(m)
-    Next m
 
     For Each m As taxrec In matches
       anc = getancestors(m, False, "phylum")
@@ -1602,7 +1598,7 @@ Public Class frmBugPhotos
           s = rankCountTotal(i) - arthropodCountTotal(i) & Chr(9)
         End If
         sb.AppendLine(s & Chr(9) & ranks(i))
-        iCount += rankCount(i)
+        iCount += (rankCount(i) - arthropodCount(i))
       End If
     Next i
 
@@ -1652,7 +1648,7 @@ Public Class frmBugPhotos
     Dim county As String
     Dim location As String
     Dim lastDate As DateTime
-    Dim lastTaxon As Integer
+    Dim lastTaxon As String
     Dim lastFilename As String
     Dim mres As MsgBoxResult
     Dim xLat, xLon As Double
@@ -1665,7 +1661,7 @@ Public Class frmBugPhotos
     mres = MsgBox(s, MsgBoxStyle.OkCancel)
     If mres = MsgBoxResult.Cancel Then Exit Sub
 
-    ' should only be necessary after database changes after 4/30/14 - slow
+    ' should only be necessary after database changes - slow
     If 1 = 0 Then
       Me.Cursor = Cursors.WaitCursor
       i = nonQuery("update taxatable set imagecounter = 0, childimagecounter = 0 where childimagecounter <> 0")
@@ -1674,11 +1670,11 @@ Public Class frmBugPhotos
       i = setimageCount(id)
       k = getScalar("select count(*) from taxatable where imagecounter > 0")
 
-      i1 = nonQuery("update gbif.tax set imagecounter = 0, childimagecounter = 0 where childimagecounter <> 0")
-      matches = queryTax("select * from gbif.taxa where taxon = 'animalia' and usable = 'ok'", "")
+      i1 = nonQuery("update gbifplus set imagecounter = 0, childimagecounter = 0 where childimagecounter <> 0")
+      matches = queryTax("select * from gbif.tax join taxa.gbifplus using (taxid) where name = 'animalia' and usable = 'ok'", "")
       id = matches(0).id
       i1 = setimageCount(id)
-      k1 = getScalar("select count(*) from gbif.tax where imagecounter > 0")
+      k1 = getScalar("select count(*) from gbif.tax join taxa.gbifplus using (taxid) where imagecounter > 0")
 
       MsgBox(Format(i, "#,#") & " photos of " & Format(k, "#,#") & " bugs." & vbCrLf &
              Format(i1, "#,#") & " photos of " & Format(k1, "#,#") & " bugs in gbif.")
@@ -1771,7 +1767,7 @@ Public Class frmBugPhotos
     useQuery = True
 
     For Each dr In ds.Tables(0).Rows
-      If DateDiff(DateInterval.Minute, lastDate, dr("photodate")) < 2 And lastTaxon = dr("taxonid") Then ' add to potential imagesets
+      If DateDiff(DateInterval.Minute, lastDate, dr("photodate")) < 2 AndAlso lastTaxon = dr("taxonid") Then ' add to potential imagesets
         If lastFilename <> "" Then queryNames.Add(iniBugPath & "\" & lastFilename)
         lastFilename = ""
         queryNames.Add(iniBugPath & "\" & dr("filename"))
@@ -2070,7 +2066,7 @@ Public Class frmBugPhotos
             taxKey = Mid(taxKey, i + 1, i1 - i - 1)
           End If
 
-          matches = TaxonkeySearch(taxKey, False)
+          matches = TaxonSearch(taxKey, False)
           If matches.Count > 0 Then taxID = matches(0).id Else taxID = ""
 
           Using conn As New MySqlConnection(iniDBConnStr)
@@ -2127,6 +2123,7 @@ Public Class frmBugPhotos
     Dim country As String = ""
 
     processing = True
+    Me.Cursor = Cursors.WaitCursor
     GPSLocate(txGPS.Text, locale, county, state, country)
 
     txLocation.Text = locale
@@ -2134,6 +2131,7 @@ Public Class frmBugPhotos
     txState.Text = state
     txCountry.Text = country
 
+    Me.Cursor = Cursors.Default
     processing = False
 
   End Sub
@@ -2290,7 +2288,7 @@ Public Class frmBugPhotos
     client.cc.Add(cook)
 
     matches = queryTax("select * from taxatable where imagecounter > 0 and rank = @parm1 order by id;", "Species")
-    gmatches = queryTax("select * from gbif.tax where imagecounter > 0 and rank = @parm1 order by id;", "Species")
+    gmatches = queryTax("select * from gbif.tax join taxa.gbifplus using (taxid) where imagecounter > 0 and rank = @parm1 order by id;", "Species")
     matches = mergeMatches(matches, gmatches)
 
     For Each match As taxrec In matches ' children
@@ -2431,7 +2429,7 @@ Public Class frmBugPhotos
       s &= vbTab & ""
     End If
 
-    matches = TaxonkeySearch(txTaxon.Text, False)
+    matches = TaxonSearch(txTaxon.Text, False)
     If matches.Count > 0 Then match = matches(0) ' should only be one
 
     'ancestor.Clear()
