@@ -30,7 +30,7 @@ Public Module bugMain
     Dim rank As String
     Dim taxon As String
     Dim descr As String
-    Dim id As String
+    Dim taxid As String
     Dim parentid As String
     Dim imageCounter As Integer
     Dim childimageCounter As Integer
@@ -261,7 +261,7 @@ Public Module bugMain
   End Function
 
 
-  Function getTaxrecByID(ByVal id As String) As List(Of taxrec)
+  Function getTaxrecByID(ByVal taxid As String) As List(Of taxrec)
 
     ' gbif ids start with g: g1234, for example.
 
@@ -269,11 +269,11 @@ Public Module bugMain
     Dim m As New taxrec
     Dim matches As New List(Of taxrec)
 
-    If id = "" Then Return Nothing
+    If taxid = "" Then Return Nothing
 
-    If eqstr(id.Substring(0, 1), "g") Then ' gbif database
-      ds = getDS("select * from gbif.tax join taxa.gbifplus using (taxid) where taxid = @parm1 and usable = 'ok';",
-                 id.Substring(1).Trim)
+    If eqstr(taxid.Substring(0, 1), "g") Then ' gbif database
+      ds = getDS("select * from gbif.tax where taxid = @parm1 and usable = 'ok';",
+                 taxid.Substring(1).Trim)
       If ds IsNot Nothing Then
         For Each dr As DataRow In ds.Tables(0).Rows
           m = getTaxrecg(dr)
@@ -282,7 +282,7 @@ Public Module bugMain
       End If
 
     Else ' taxatable database
-      ds = getDS("select * from taxatable where id = @parm1", id)
+      ds = getDS("select * from taxatable where taxid = @parm1", taxid)
       If ds IsNot Nothing Then
         For Each dr As DataRow In ds.Tables(0).Rows
           m = getTaxrec(dr)
@@ -303,7 +303,7 @@ Public Module bugMain
     If IsDBNull(dr("rank")) Then match.rank = "" Else match.rank = dr("rank")
     If IsDBNull(dr("taxon")) Then match.taxon = "" Else match.taxon = dr("taxon")
     If IsDBNull(dr("descr")) Then match.descr = "" Else match.descr = dr("descr")
-    If IsDBNull(dr("id")) Then match.id = "" Else match.id = dr("id")
+    If IsDBNull(dr("taxid")) Then match.taxid = "" Else match.taxid = dr("taxid")
     If IsDBNull(dr("parentid")) Then match.parentid = "" Else match.parentid = dr("parentid")
     If IsDBNull(dr("imagecounter")) Then match.imageCounter = 0 Else match.imageCounter = dr("imagecounter")
     If IsDBNull(dr("childimagecounter")) Then match.childimageCounter = 0 Else match.childimageCounter = dr("childimagecounter")
@@ -322,22 +322,34 @@ Public Module bugMain
     Dim s As String
     Dim taxid As String
     Dim ds As DataSet
-
+    Dim drplus As DataRow
 
     If IsDBNull(dr("taxid")) Then taxid = "" Else taxid = dr("taxid")
-    If taxid <> "" Then match.id = "g" & taxid ' gbif id prefix
+    If taxid <> "" Then match.taxid = "g" & taxid ' gbif id prefix
 
     ' load dr into match
     If IsDBNull(dr("rank")) Then match.rank = "" Else match.rank = dr("rank")
     If IsDBNull(dr("name")) Then match.taxon = "" Else match.taxon = dr("name")
     If IsDBNull(dr("parent")) Then match.parentid = "" Else match.parentid = "g" & dr("parent")
-    If IsDBNull(dr("imagecounter")) Then match.imageCounter = 0 Else match.imageCounter = dr("imagecounter")
-    If IsDBNull(dr("childimagecounter")) Then match.childimageCounter = 0 Else match.childimageCounter = dr("childimagecounter")
+    'If IsDBNull(dr("imagecounter")) Then match.imageCounter = 0 Else match.imageCounter = dr("imagecounter")
+    'If IsDBNull(dr("childimagecounter")) Then match.childimageCounter = 0 Else match.childimageCounter = dr("childimagecounter")
     If IsDBNull(dr("authority")) Then match.authority = "" Else match.authority = dr("authority")
 
-    match.link = "https://www.gbif.org/species/" & match.id.Substring(1) ' no "g"
+    taxid = match.taxid.Substring(1) ' no "g"
 
-    taxid = match.id.Substring(1) ' no "g"
+    ds = getDS("select * from taxa.gbifplus where taxid = @parm1", match.taxid.Substring(1)) ' no "g" in taxid
+
+    If ds IsNot Nothing AndAlso ds.Tables(0).Rows.Count > 0 Then
+      drplus = ds.Tables(0).Rows(0)
+      match.imageCounter = drplus("imagecounter")
+      match.childimageCounter = drplus("childimagecounter")
+      match.link = drplus("link")
+    Else
+      match.imageCounter = 0
+      match.childimageCounter = 0
+      match.link = "https://www.gbif.org/species/" & match.taxid.Substring(1) ' no "g"
+    End If
+
     ds = getDS("select * from gbif.vernacularname where taxonid = @parm1 and language = 'en'", taxid)
     match.descr = ""
 
@@ -395,7 +407,7 @@ Public Module bugMain
         Else
           match = getTaxrec(dr)
         End If
-        If match.id <> "" Then matches.Add(match)
+        If match.taxid <> "" Then matches.Add(match)
       Next dr
     End If
 
@@ -421,7 +433,7 @@ Public Module bugMain
       End If
     Else
       If node.Tag.startswith("g") Then
-        matches = queryTax("select * from gbif.tax join taxa.gbifplus using (taxid) where parent = @parm1 and usable = 'ok' order by name", node.Tag.substring(1))
+        matches = queryTax("select * from gbif.tax where parent = @parm1 and usable = 'ok' order by name", node.Tag.substring(1))
       Else
         matches = queryTax("select * from taxatable where parentid = @parm1 order by taxon", node.Tag)
       End If
@@ -430,7 +442,7 @@ Public Module bugMain
     For Each m As taxrec In matches
       found = False
       For Each nd In node.Nodes
-        If nd.Tag = m.id Then ' don't add duplicate
+        If nd.Tag = m.taxid Then ' don't add duplicate
           found = True
           Exit For
         End If
@@ -439,7 +451,7 @@ Public Module bugMain
       If Not found Then
         nd = node.Nodes.Add(taxaLabel(m, False, isQuery))
         nd.ToolTipText = m.rank
-        nd.Tag = m.id
+        nd.Tag = m.taxid
       End If
     Next m
 
@@ -458,7 +470,7 @@ Public Module bugMain
 
     If inMatch.parentid = "" Then ' inmatch might only have the taxonid
       ' load everything else into inmatch
-      i = inMatch.id
+      i = inMatch.taxid
       matches = getTaxrecByID(i)
       If matches.Count > 0 Then inMatch = matches(0)
     End If
@@ -507,7 +519,7 @@ Public Module bugMain
     targetLevel = 999
 
     For Each match As taxrec In matches
-      ancestor = getancestors(match, False, "animalia")  ' retrieve ancestors of ancestor(0). false = don't exclude "no taxons"
+      ancestor = getancestors(match, False, "kingdom")  ' retrieve ancestors of ancestor(0). false = don't exclude "no taxons"
 
       'ndParent = Nothing
       'For Each nd In tvTax.Nodes(0).Nodes
@@ -524,7 +536,7 @@ Public Module bugMain
       For i = ancestor.Count - 2 To 0 Step -1  ' go through ancestors top down, starting at arthropoda children
         ndc = Nothing
         For Each nd In ndParent.Nodes          ' search for next match
-          If nd.Tag = ancestor(i).id Then
+          If nd.Tag = ancestor(i).taxid Then
             ndc = nd
             Exit For
           End If
@@ -539,7 +551,7 @@ Public Module bugMain
           '  ndc = ndParent.Nodes.Add(ancestor(i).taxon & " -- " & ancestor(i).descr)
           '  End If
           ndc.ToolTipText = ancestor(i).rank
-          ndc.Tag = ancestor(i).id
+          ndc.Tag = ancestor(i).taxid
         End If
 
         If ndc.Nodes.Count = 0 Then populate(ndc, isQuery)
@@ -574,17 +586,17 @@ Public Module bugMain
     Dim matches As List(Of taxrec)
     Dim ancestor As New List(Of taxrec)
     Dim iter As Integer = 0
-    Dim id As String
+    Dim taxid As String
 
     ancestor.Add(m)
-    id = m.parentid
+    taxid = m.parentid
 
-    Do While id <> "" And iter < 50
-      matches = getTaxrecByID(id)
+    Do While taxid <> "" And iter < 50
+      matches = getTaxrecByID(taxid)
       If matches.Count <= 0 Then Return ancestor
       ancestor.Add(matches(0))
       If eqstr(matches(0).rank, StopAt) Then Return ancestor
-      id = matches(0).parentid
+      taxid = matches(0).parentid
       iter = iter + 1
     Loop
 
@@ -664,7 +676,7 @@ Public Module bugMain
     Dim linktoID As Integer = 0
 
     ' get imageset.imageid from filenames
-    linktoID = getScalar("select id from images where filename = @parm1 limit 1", linktoFname)
+    linktoID = getScalar("select imageid from images where filename = @parm1 limit 1", linktoFname)
     If linktoID <= 0 Then Exit Sub
 
     ' find existing previous link
@@ -707,7 +719,7 @@ Public Module bugMain
     Dim newUid, oldSetid As Integer
     Dim imageID As Integer = 0
 
-    imageID = getScalar("select id from images where filename = @parm1 limit 1", fName)
+    imageID = getScalar("select imageid from images where filename = @parm1 limit 1", fName)
 
     If imageID <= 0 Then Exit Sub
 
@@ -747,8 +759,8 @@ Public Module bugMain
     Dim i, imageID, setID As Integer
     Dim taxID As String
 
-    imageID = getScalar("select id from images where filename = @parm1 limit 1", fName)
-    taxID = getScalar("select taxonid from images where id = @parm1 limit 1", imageID)
+    imageID = getScalar("select imageid from images where filename = @parm1 limit 1", fName)
+    taxID = getScalar("select taxonid from images where imageid = @parm1 limit 1", imageID)
     setID = getScalar("select setid from imagesets where imageid = @parm1", imageID) ' save to check 1-member sets
     i = nonQuery("delete from imagesets where imageid = @parm1", imageID) ' delete the imageset record
     i = nonQuery("delete from images where filename = @parm1", fName) ' delete the image record
@@ -768,7 +780,7 @@ Public Module bugMain
     Dim imageID As Integer = 0
     Dim i As Integer
 
-    imageID = getScalar("select id from images where filename = @parm1 limit 1", fName)
+    imageID = getScalar("select imageid from images where filename = @parm1 limit 1", fName)
     If imageID > 0 Then i = nonQuery("delete from imagesets where imageid = @parm1", imageID)
 
   End Sub
@@ -973,6 +985,8 @@ Public Module bugMain
       s = findme.Replace("-", "`") ' accept either space or dash, so "eastern tailed blue" finds "eastern tailed-blue". Only works with rlike (mysql bug).
       s = s.Replace(" ", "[- ]")
       s = s.Replace("`", "[- ]")
+      s = s.Replace("(", "\(")
+      s = s.Replace(")", "\)")
       matches = queryTax("select * from taxatable where (descr rlike @parm1)" & suffix, s)
 
       If matches.Count = 0 Then
@@ -1037,7 +1051,7 @@ Public Module bugMain
       i = nonQuery("update gbifplus set imagecounter = @parm1, childimagecounter = @parm2 where taxid = @parm3", _
         imageCounter, childImageCounter, taxid.Substring(1)) ' remove "g"
     Else
-      i = nonQuery("update taxatable set imagecounter = @parm1, childimagecounter = @parm2 where id = @parm3", _
+      i = nonQuery("update taxatable set imagecounter = @parm1, childimagecounter = @parm2 where taxid = @parm3", _
         imageCounter, childImageCounter, taxid)
     End If
     If i <> 1 Then Stop
@@ -1059,7 +1073,7 @@ Public Module bugMain
                      childImageCounter, parentID.Substring(1)) ' remove "g"
         If i <> 1 Then Stop
       Else
-        i = nonQuery("update taxatable set childimagecounter = @parm1 where id = @parm2", childImageCounter, parentID)
+        i = nonQuery("update taxatable set childimagecounter = @parm1 where taxid = @parm2", childImageCounter, parentID)
         If i <> 1 Then Stop
       End If
       If i = 1 Then parentID = m.parentid
@@ -1181,13 +1195,13 @@ Public Module bugMain
     If withPics Then pics = " and childimagecounter > 0 "
 
     If (dballowed And 1) Then
-      If tMatch.id.StartsWith("g") Then
+      If tMatch.taxid.StartsWith("g") Then
         matches = queryTax("select * from taxatable where taxon = @parm1" & pics, tMatch.taxon)
         For Each m As taxrec In matches
-          desc = queryTax("select * from taxatable where parentid = @parm1" & pics, matches(0).id)
+          desc = queryTax("select * from taxatable where parentid = @parm1" & pics, matches(0).taxid)
         Next m
       Else
-        desc = queryTax("select * from taxatable where parentid = @parm1" & pics, tMatch.id)
+        desc = queryTax("select * from taxatable where parentid = @parm1" & pics, tMatch.taxid)
       End If
 
       For Each m As taxrec In desc
@@ -1196,13 +1210,13 @@ Public Module bugMain
     End If
 
     If (dballowed And 8) Then
-      If Not tMatch.id.StartsWith("g") Then
+      If Not tMatch.taxid.StartsWith("g") Then
         matches = queryTax("select * from gbif.tax join taxa.gbifplus using (taxid) where name = @parm1" & pics, tMatch.taxon)
         For Each m As taxrec In matches
-          descg = queryTax("select * from gbif.tax join taxa.gbifplus using (taxid) where parent = @parm1" & pics, m.id.Substring(1))
+          descg = queryTax("select * from gbif.tax join taxa.gbifplus using (taxid) where parent = @parm1" & pics, m.taxid.Substring(1))
         Next m
       Else
-        descg = queryTax("select * from gbif.tax join taxa.gbifplus using (taxid) where parent = @parm1" & pics, tMatch.id.Substring(1))
+        descg = queryTax("select * from gbif.tax join taxa.gbifplus using (taxid) where parent = @parm1" & pics, tMatch.taxid.Substring(1))
       End If
 
       For Each m As taxrec In descg
@@ -1363,7 +1377,7 @@ Public Class pixClass
   Public State As String
   Public Country As String
   Public Size As String
-  Public ID As Integer
+  Public imageid As Integer
   Public Remarks As String
   Public match As taxrec
 
@@ -1379,7 +1393,7 @@ Public Class pixClass
     State = dr("state")
     Country = dr("country")
     Size = dr("size")
-    ID = dr("id")
+    imageid = dr("imageid")
     Remarks = dr("remarks")
 
     s = dr("taxonid")

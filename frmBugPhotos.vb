@@ -131,14 +131,14 @@ Public Class frmBugPhotos
 
     Try
       ' does it exist?
-      id = getScalar("select id from images where filename = @parm1", fName)
+      id = getScalar("select imageid from images where filename = @parm1", fName)
       If id <> "" Then ' record already exists if id <> ""
         mResult = MsgBox("Database record for " & fName & " already exists. Overwrite?", MsgBoxStyle.YesNoCancel)
         If mResult <> MsgBoxResult.Yes Then
           Me.Cursor = Cursors.Default
           Return 0
         End If
-        oldTaxid = getScalar("select taxonid from images where id = @parm1", id)
+        oldTaxid = getScalar("select taxonid from images where imageid = @parm1", id)
       Else
         oldTaxid = ""
       End If
@@ -148,22 +148,22 @@ Public Class frmBugPhotos
       taxonid = ""
 
       If matches.Count = 1 Then
-        taxonid = matches(0).id
+        taxonid = matches(0).taxid
         txCommon.Text = matches(0).descr
 
       ElseIf matches.Count > 1 Then
         taxonid = ""
         ' omit all the doubtfuls and see if there is one match
         For i As Integer = matches.Count - 1 To 0 Step -1
-          If matches(i).id.StartsWith("g") Then ' gbif record, check status
-            status = getScalar("select status from gbif.tax where taxid = @parm1", matches(i).id.Substring(1))
+          If matches(i).taxid.StartsWith("g") Then ' gbif record, check status
+            status = getScalar("select status from gbif.tax where taxid = @parm1", matches(i).taxid.Substring(1))
             If Not eqstr(status, "accepted") Then
               matches.RemoveAt(i)
             End If
           End If
         Next i
         If matches.Count = 1 Then ' exactly one accepted or taxatable
-          taxonid = matches(0).id
+          taxonid = matches(0).taxid
           txCommon.Text = matches(0).descr
 
         Else ' abort
@@ -203,7 +203,7 @@ Public Class frmBugPhotos
             " confidence = @confidence, " & _
             " remarks = @remarks, " & _
             " bugguide = @bugguide" & _
-            " where id = @id"
+            " where imageid = @id"
 
         Else
           sql = "insert into images " & _
@@ -432,7 +432,7 @@ Public Class frmBugPhotos
 
     If match.taxon = "" Then  ' try to get the taxon from the jpg comment
       grabTaxon(uDescription, match)
-      taxonid = match.id
+      taxonid = match.taxid
     End If
     txTaxon.Text = match.taxon
     txCommon.Text = getDescr(match, False)
@@ -441,7 +441,7 @@ Public Class frmBugPhotos
     ' i = getScalar("select count(*) from images where originalpath = @parm1", txOriginalPath.Text)
 
     ' add the setid, if there is one
-    i = getScalar("select setid from imagesets where imageid = (select id from images where filename = @parm1)", txFileName.Text)
+    i = getScalar("select setid from imagesets where imageid = (select imageid from images where filename = @parm1)", txFileName.Text)
     If i > 0 Then
       txImageSet.Text = i
     Else
@@ -558,7 +558,7 @@ Public Class frmBugPhotos
 
       If matches.Count > 0 Then
         txTaxon.Text = matches(0).taxon
-        taxonid = matches(0).id
+        taxonid = matches(0).taxid
       End If
 
       If udescription <> "" Then
@@ -965,7 +965,7 @@ Public Class frmBugPhotos
         txTaxon.Text = lastbugTaxon
         inMatch.taxon = lastbugTaxon
         taxonid = lastbugTaxonID
-        inMatch.id = lastbugTaxonID
+        inMatch.taxid = lastbugTaxonID
         txCommon.Text = lastbugCommon
 
         txLocation.Text = lastbugLocation
@@ -1053,7 +1053,7 @@ Public Class frmBugPhotos
 
     If matches.Count > 0 Then
       nd = tvTaxon.Nodes.Add(taxaLabel(matches(0), False, False))
-      nd.Tag = matches(0).id
+      nd.Tag = matches(0).taxid
     End If
 
     populate(nd, False)  ' load Arthropoda
@@ -1424,8 +1424,8 @@ Public Class frmBugPhotos
     countLinks = 0
     isLinked = False
 
-    previmageID = getScalar("select id from images where filename = @parm1 limit 1", prevName)
-    newimageID = getScalar("select id from images where filename = @parm1 limit 1", newName)
+    previmageID = getScalar("select imageid from images where filename = @parm1 limit 1", prevName)
+    newimageID = getScalar("select imageid from images where filename = @parm1 limit 1", newName)
 
     If newimageID > 0 Then
       ' find existing imageset
@@ -1504,7 +1504,7 @@ Public Class frmBugPhotos
 
     childImageCounter = imageCounter
     For Each m As taxrec In matches ' children
-      i = setimageCount(m.id)
+      i = setimageCount(m.taxid)
       childImageCounter = childImageCounter + i
     Next m
 
@@ -1514,7 +1514,7 @@ Public Class frmBugPhotos
               imageCounter, childImageCounter, taxid.Substring(1))
         If i <> 1 Then Stop
       Else
-        i = nonQuery("update taxatable set imagecounter = @parm1, childimagecounter = @parm2 where id = @parm3", _
+        i = nonQuery("update taxatable set imagecounter = @parm1, childimagecounter = @parm2 where taxid = @parm3", _
               imageCounter, childImageCounter, taxid)
         If i <> 1 Then Stop
       End If
@@ -1666,13 +1666,13 @@ Public Class frmBugPhotos
       Me.Cursor = Cursors.WaitCursor
       i = nonQuery("update taxatable set imagecounter = 0, childimagecounter = 0 where childimagecounter <> 0")
       matches = queryTax("select * from taxatable where taxon = 'arthropoda'", "")
-      id = matches(0).id
+      id = matches(0).taxid
       i = setimageCount(id)
       k = getScalar("select count(*) from taxatable where imagecounter > 0")
 
       i1 = nonQuery("update gbifplus set imagecounter = 0, childimagecounter = 0 where childimagecounter <> 0")
       matches = queryTax("select * from gbif.tax join taxa.gbifplus using (taxid) where name = 'animalia' and usable = 'ok'", "")
-      id = matches(0).id
+      id = matches(0).taxid
       i1 = setimageCount(id)
       k1 = getScalar("select count(*) from gbif.tax join taxa.gbifplus using (taxid) where imagecounter > 0")
 
@@ -1729,7 +1729,7 @@ Public Class frmBugPhotos
 
         If Not File.Exists(s) Then
           sl.Add(dr("originalpath"))
-          delrecs.Add(dr("id"))
+          delrecs.Add(dr("imageid"))
         End If
       Next dr
     End If
@@ -1801,7 +1801,7 @@ Public Class frmBugPhotos
         getGPSLocation(pComments, gps, s, xLat, xLon, k)
 
         If k <> 0 Then
-          i = nonQuery("update images set elevation = @parm2 where id = @parm1", dr("id"), k)
+          i = nonQuery("update images set elevation = @parm2 where imageid = @parm1", dr("imageid"), k)
         End If
       Next dr
     End If
@@ -1813,7 +1813,7 @@ Public Class frmBugPhotos
       For Each dr In ds.Tables(0).Rows
         ' If Not IsDBNull(dr("location")) Then location = dr("location") Else location = ""
         location = ""
-        id = dr("id")
+        id = dr("imageid")
         If Not IsDBNull(dr("state")) Then state = dr("state") Else state = ""
         If Not IsDBNull(dr("county")) Then county = dr("county") Else county = ""
         If Not IsDBNull(dr("country")) Then country = dr("country") Else country = ""
@@ -1873,7 +1873,7 @@ Public Class frmBugPhotos
 
           Using conn As New MySqlConnection(iniDBConnStr)
             conn.Open()
-            cmd = New MySqlCommand("update images set location = @location, county = @county, state = @state, country = @country  where id = @id", conn)
+            cmd = New MySqlCommand("update images set location = @location, county = @county, state = @state, country = @country  where imageid = @id", conn)
             cmd.Parameters.AddWithValue("@id", id)
             cmd.Parameters.AddWithValue("@location", location)
             cmd.Parameters.AddWithValue("@county", county)
@@ -2067,7 +2067,7 @@ Public Class frmBugPhotos
           End If
 
           matches = TaxonSearch(taxKey, False)
-          If matches.Count > 0 Then taxID = matches(0).id Else taxID = ""
+          If matches.Count > 0 Then taxID = matches(0).taxid Else taxID = ""
 
           Using conn As New MySqlConnection(iniDBConnStr)
             conn.Open()
@@ -2165,7 +2165,7 @@ Public Class frmBugPhotos
       For Each drow In dset.Tables(0).Rows
         If Not IsDBNull(drow("imageid")) Then
           imageid = drow("imageid")
-          fName = getScalar("SELECT filename FROM images WHERE id = @parm1", imageid)
+          fName = getScalar("SELECT filename FROM images WHERE imageid = @parm1", imageid)
           If fName <> "" Then
             cbImageSet.Items.Add(fName)
             If fName = txFileName.Text Then i = cbImageSet.Items.Count - 1

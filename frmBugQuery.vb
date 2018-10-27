@@ -56,7 +56,7 @@ Public Class frmBugQuery
 
     For Each m As taxrec In matches
       nd = tvTaxon.Nodes.Add(taxaLabel(m, True, True))
-      nd.Tag = m.id
+      nd.Tag = m.taxid
 
       populate(nd, True)  ' load Arthropoda
       nd.ExpandAll()
@@ -117,7 +117,7 @@ Public Class frmBugQuery
     Using conn As New MySqlConnection(iniDBConnStr)
       conn.Open()
       sql = "select images.filename, taxatable.parentid, taxatable.rank, taxatable.taxon " &
-            "  from images, taxatable where images.taxonid = taxatable.id "
+            "  from images, taxatable where images.taxonid = taxatable.taxid "
       cmd = queryparms(sql, "photodate", True, True, conn)
       If cmd IsNot Nothing Then
         adapt.SelectCommand = cmd
@@ -170,14 +170,14 @@ Public Class frmBugQuery
       If txFilename.Text <> "" Then
         newNames = New List(Of String)
         For Each fname In queryNames
-          id = getScalar("select id from images where filename = @parm1", Path.GetFileName(fname))
+          id = getScalar("select imageid from images where filename = @parm1", Path.GetFileName(fname))
           setid = getScalar("select setid from imagesets where imageid = @parm1 limit 1", id)
           dset = getDS("select * from imagesets where setid = @parm1", setid)
 
           If dset IsNot Nothing Then
             For Each drow In dset.Tables(0).Rows
               If Not IsDBNull(drow("imageid")) Then
-                s = folderPath & getScalar("select filename from images where id = @parm1", drow("imageid"))
+                s = folderPath & getScalar("select filename from images where imageid = @parm1", drow("imageid"))
                 If Not queryNames.Contains(s) Then newNames.Add(s)
               End If
             Next drow
@@ -221,7 +221,7 @@ Public Class frmBugQuery
         dset.Clear()
         i = imgCmd.Parameters.IndexOf("@id")
         If i >= 0 Then imgCmd.Parameters.RemoveAt(i)
-        imgCmd.Parameters.AddWithValue("@id", match.id)
+        imgCmd.Parameters.AddWithValue("@id", match.taxid)
         adapt.SelectCommand = imgCmd
         adapt.Fill(dset)
         For Each drow In dset.Tables(0).Rows
@@ -253,10 +253,10 @@ Public Class frmBugQuery
 
     ' process the children
     ' change to include children from both databases
-    If inmatch.id.StartsWith("g") Then
-      matches = queryTax("select * from gbif.tax join taxa.gbifplus using (taxid) where parent = @parm1 and childimagecounter > 0", inmatch.id)
+    If inmatch.taxid.StartsWith("g") Then
+      matches = queryTax("select * from gbif.tax join taxa.gbifplus using (taxid) where parent = @parm1 and childimagecounter > 0", inmatch.taxid)
     Else
-      matches = queryTax("select * from taxatable where parentid = @parm1 and childimagecounter > 0", inmatch.id)
+      matches = queryTax("select * from taxatable where parentid = @parm1 and childimagecounter > 0", inmatch.taxid)
     End If
 
     For Each match As taxrec In matches
@@ -265,7 +265,7 @@ Public Class frmBugQuery
         dset.Clear()
         i = imgCmd.Parameters.IndexOf("@id")
         If i >= 0 Then imgCmd.Parameters.RemoveAt(i)
-        imgCmd.Parameters.AddWithValue("@id", match.id)
+        imgCmd.Parameters.AddWithValue("@id", match.taxid)
         adapt.SelectCommand = imgCmd
         adapt.Fill(dset)
         For Each drow In dset.Tables(0).Rows
