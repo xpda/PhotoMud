@@ -350,7 +350,7 @@ Public Module bugMain
       match.link = "https://www.gbif.org/species/" & match.taxid.Substring(1) ' no "g"
     End If
 
-    ds = getDS("select * from gbif.vernacularname where taxonid = @parm1 and language = 'en'", taxid)
+    ds = getDS("select * from gbif.vernacularname where taxid = @parm1 and (language = 'en' or language = '')", taxid)
     match.descr = ""
 
     If ds IsNot Nothing Then
@@ -990,11 +990,11 @@ Public Module bugMain
       matches = queryTax("select * from taxatable where (descr rlike @parm1)" & suffix, s)
 
       If matches.Count = 0 Then
-        ds = getDS("select * from gbif.vernacularname where vernacularname rlike @parm1 and language = 'en'", s)
+        ds = getDS("select * from gbif.vernacularname where vernacularname rlike @parm1 and (language = 'en' or language = '')", s)
         If ds IsNot Nothing AndAlso ds.Tables(0).Rows.Count > 0 Then
           cmd = "select * from gbif.tax join taxa.gbifplus using (taxid) where ("
           For Each dr As DataRow In ds.Tables(0).Rows
-            If cmd.IndexOf(dr("taxonid")) < 0 Then cmd &= "taxid = '" & (dr("taxonid")) & "' or "
+            If cmd.IndexOf(dr("taxid")) < 0 Then cmd &= "taxid = '" & (dr("taxid")) & "' or "
           Next dr
           If cmd.EndsWith(" or ") Then
             cmd = cmd.Substring(0, cmd.Length - 4)
