@@ -521,16 +521,6 @@ Public Module bugMain
     For Each match As taxrec In matches
       ancestor = getancestors(match, False, "kingdom")  ' retrieve ancestors of ancestor(0). false = don't exclude "no taxons"
 
-      'ndParent = Nothing
-      'For Each nd In tvTax.Nodes(0).Nodes
-      '  If InStr(nd.Text, "Hexapoda") > 0 Then
-      '    ndParent = nd
-      '    Exit For
-      '    End If
-      '  Next nd
-
-      'If ndParent Is Nothing Then Exit For ' should never happen
-
       ndParent = tvTax.Nodes(0) ' 9/25/14
 
       For i = ancestor.Count - 2 To 0 Step -1  ' go through ancestors top down, starting at arthropoda children
@@ -961,6 +951,7 @@ Public Module bugMain
     Dim s As String
     Dim suffix, suffixg As String
     Dim ds As New DataSet
+    Dim taxid As String
 
     findme = findme.Trim
 
@@ -992,9 +983,10 @@ Public Module bugMain
       If matches.Count = 0 Then
         ds = getDS("select * from gbif.vernacularname where vernacularname rlike @parm1 and (language = 'en' or language = '')", s)
         If ds IsNot Nothing AndAlso ds.Tables(0).Rows.Count > 0 Then
-          cmd = "select * from gbif.tax join taxa.gbifplus using (taxid) where ("
+          cmd = "select * from gbif.tax where ("
           For Each dr As DataRow In ds.Tables(0).Rows
-            If cmd.IndexOf(dr("taxid")) < 0 Then cmd &= "taxid = '" & (dr("taxid")) & "' or "
+            taxid = dr("taxid")
+            If taxid <> "" AndAlso taxid <> "-1" AndAlso cmd.IndexOf(taxid) < 0 Then cmd &= "taxid = '" & taxid & "' or "
           Next dr
           If cmd.EndsWith(" or ") Then
             cmd = cmd.Substring(0, cmd.Length - 4)
