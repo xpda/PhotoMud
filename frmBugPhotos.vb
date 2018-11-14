@@ -1758,7 +1758,7 @@ Public Class frmBugPhotos
 
     ' find images that should be in imagesets
     ' uncomment section at bottom of frmexplore mnuToolsComment_Click
-    ds = getDS("select * from images where (select count(*) from imagesets where images.id = imageid) = 0 order by photodate;")
+    ds = getDS("select * from images where (select count(*) from imagesets where images.imageid = imageid) = 0 order by photodate;")
     lastDate = "1/1/1974"
     lastTaxon = 0
     lastFilename = ""
@@ -1767,7 +1767,7 @@ Public Class frmBugPhotos
     useQuery = True
 
     For Each dr In ds.Tables(0).Rows
-      If DateDiff(DateInterval.Minute, lastDate, dr("photodate")) < 2 AndAlso lastTaxon = dr("taxonid") Then ' add to potential imagesets
+      If IsDate(dr("photodate")) AndAlso DateDiff(DateInterval.Minute, lastDate, dr("photodate")) < 2 AndAlso lastTaxon = dr("taxonid") Then ' add to potential imagesets
         If lastFilename <> "" Then queryNames.Add(iniBugPath & "\" & lastFilename)
         lastFilename = ""
         queryNames.Add(iniBugPath & "\" & dr("filename"))
@@ -1775,7 +1775,7 @@ Public Class frmBugPhotos
         lastFilename = dr("filename")
       End If
       lastTaxon = dr("taxonid")
-      lastDate = dr("photodate")
+      If IsDate(dr("photodate")) Then lastDate = dr("photodate")
     Next dr
 
     useQuery = True

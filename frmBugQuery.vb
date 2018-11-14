@@ -288,11 +288,10 @@ Public Class frmBugQuery
 
     Dim qlist As New List(Of String)
     Dim s As String
-    Dim i As Integer
     Dim cmd As New MySqlCommand
 
     If sql.Contains("gbif.") Then
-      If useTaxon AndAlso txTaxon.Text.Trim <> "" Then qlist.Add("gbif.tax.name = @gname")
+      If useTaxon AndAlso txTaxon.Text.Trim <> "" Then qlist.Add("gbif.tax.name = @taxon")
       If useRank AndAlso txRank.Text.Trim <> "" Then qlist.Add("gbif.tax.rank = @rank")
     Else
       If useTaxon AndAlso txTaxon.Text.Trim <> "" Then qlist.Add("taxatable.taxon = @taxon")
@@ -328,11 +327,11 @@ Public Class frmBugQuery
     cmd = New MySqlCommand(sql, conn)
     If txTaxon.Text.Trim <> "" Then
       s = txTaxon.Text.Trim
-      i = s.LastIndexOf(" ")
-      If i > 0 Then s = s.Substring(i + 1)
+      'i = s.LastIndexOf(" ")
+      'If i > 0 Then s = s.Substring(i + 1)
       cmd.Parameters.AddWithValue("@taxon", s)
-      s = txTaxon.Text.Trim
-      cmd.Parameters.AddWithValue("@gname", s) ' for gbif
+      's = txTaxon.Text.Trim
+      'cmd.Parameters.AddWithValue("@gname", s) ' for gbif
     End If
 
     If txLocation.Text.Trim <> "" Then cmd.Parameters.AddWithValue("@location", "%" & txLocation.Text.Trim & "%")
