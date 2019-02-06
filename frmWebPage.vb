@@ -752,7 +752,7 @@ Public Class frmWebPage
             End If
 
             If useQuery Then ' add bug descriptions
-              ds = getDS("select * from images, taxatable where filename = @parm1 and images.taxonid = taxatable.id", imgName(ix(k)))
+              ds = getDS("select * from images, taxatable where filename = @parm1 and images.taxonid = taxatable.taxid", imgName(ix(k)))
               If ds IsNot Nothing AndAlso ds.Tables(0).Rows.Count > 0 Then
                 pic = New pixClass(ds.Tables(0).Rows(0))
                 s = getCaption(pic)
@@ -969,7 +969,8 @@ Public Class frmWebPage
       ' description
       imgComments(ix(i)) = readPhotoDescription(imgPath(ix(i))).Trim
       ' old Photo Mud and some cameras put in their own comments
-      If eqstr(imgComments(ix(i)), "Minolta DSC") OrElse _
+      If eqstr(imgComments(ix(i)), "Minolta DSC") OrElse
+        eqstr(imgComments(ix(i)), "OLYMPUS DIGITAL CAMERA") OrElse
         eqstr(imgComments(ix(i)), "LEAD Technologies Inc. V1.01") Then imgComments(ix(i)) = ""
 
       picinfo = getPicinfo(imgPath(ix(i)), False, 1)

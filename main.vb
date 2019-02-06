@@ -148,6 +148,13 @@ Public Module main
     End Sub
   End Structure
 
+  Public olympusLens As New Dictionary(Of String, String)(System.StringComparer.OrdinalIgnoreCase)
+  Public olympusCamera As New Dictionary(Of String, String)(System.StringComparer.OrdinalIgnoreCase)
+  Public olympusMagicFilter As New Dictionary(Of Integer, String)
+  Public olympusSceneMode As New Dictionary(Of Integer, String)
+  Public olympusArtFilter As New Dictionary(Of Integer, String)
+  Public olympusArtFilterEffect As New Dictionary(Of Integer, String)
+
   Public frmMain As frmMainf
   Public frmExplore As frmExploref
 
@@ -527,6 +534,8 @@ Public Module main
     fmtCommon.Add(New ImageFormat(".tif", "TIFF", ".tif;.tiff", True, True, False, MagickFormat.Tif))
     fmtCommon.Add(New ImageFormat(".raw", "Photo Raw", ".rw2;.cr2;.crw;.nef;.orf;.arw;.mrw;.dcr;.raf", True, False, False, MagickFormat.Raw))
     fmtCommon.Add(New ImageFormat(".wpg", "Word Perfect Graphics", ".wpg", True, False, False, MagickFormat.Wpg))
+
+    exifInit()
 
     '    s = ".aai;.art;.arw;.avi;.avs;.bmp;.cals;.cr2;.crw;.cur;.cut;.dcr;.dcx;.dib;.djvu;.emf;.epdf;.fax;.fits;.gif;.hdr;" & _
     '       ".hrz;.ico;.icon;.jp2;.jpt;.j2c;.j2k;.jpg;.jpeg;.mat;.miff;.mrw;.mtv;.nef;.orf;.otb;.p7;.palm;.clipboard;.pbm;.pcd;.pcds;" & _
@@ -1745,7 +1754,6 @@ Public Module main
   Function getPicinfo(ByVal fName As String, ByVal totalPages As Boolean, Optional ByVal pageNo As Integer = 1) As pictureInfo
 
     Dim picInfo As New pictureInfo
-    Dim pComments As New List(Of PropertyItem)
 
     Using img As MagickImage = New MagickImage
 
@@ -5164,7 +5172,7 @@ Public Module main
 
   Function readPropertyItems(fName As String) As List(Of PropertyItem)
 
-    ' read a list of propertyitems from a bitmap file
+    ' read a list of propertyitems from a bitmap file, using windows .PropertyItems
 
     Dim p As New List(Of PropertyItem)
 

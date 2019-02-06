@@ -66,19 +66,19 @@ Public Module ImageInfo
 
             ' makernote
             If processMakerNote AndAlso tg.IFD.tagExists(uExif.TagID.makernote) Then
-              If tg.Link > 0 And ux.tagExists(uExif.TagID.Make) And ux.tagExists(uExif.TagID.Model) Then
+              If tg.Link > 0 And ux.tagExists(uExif.TagID.make) And ux.tagExists(uExif.TagID.model) Then
                 If ux.IntelNumbers Then i = 1 Else i = 0
                 tg = tg.IFD.Tags.Item(sTag(uExif.TagID.makernote))
-                make = ux.Tags(sTag(uExif.TagID.Make)).singlevalue
-                model = ux.Tags(sTag(uExif.TagID.Model)).singlevalue
+                make = ux.Tags(sTag(uExif.TagID.make)).singlevalue
+                model = ux.Tags(sTag(uExif.TagID.model)).singlevalue
                 readMakernote(ux.fdata, tg, i, 1, make, model) ' the makernote tag has both a value (for saving) and an IFD (for display)
               End If
             End If
           End If
         End If
 
-        If ux.tagExists(uExif.TagID.gpspointer) Then
-          tg = ux.Tags.Item(sTag(uExif.TagID.gpspointer))
+        If ux.tagExists(uExif.TagID.GPSpointer) Then
+          tg = ux.Tags.Item(sTag(uExif.TagID.GPSpointer))
           If tg.IFD IsNot Nothing Then
             gpsTags = tg.IFD.Tags
             tagVerify(gpsTags)
@@ -116,9 +116,9 @@ Public Module ImageInfo
 
     If picinfo.FormatID <> MagickFormat.Unknown Then
       parm = System.Enum.GetName(GetType(MagickFormat), picinfo.FormatID).ToLower & ", " & picinfo.FormatDescription
-      strInfo = strInfo & "File Type: " & tb & parm & "\par "
+      strInfo &= "File Type: " & tb & parm & "\par "
     End If
-    If picinfo.Width > 0 And picinfo.Height > 0 Then strInfo = strInfo & "Image Size: " & tb & picinfo.Width & " x " & picinfo.Height & "\par "
+    If picinfo.Width > 0 And picinfo.Height > 0 Then strInfo &= "Image Size: " & tb & picinfo.Width & " x " & picinfo.Height & "\par "
 
     ' output resolution and units
     If picinfo.ResolutionX > 0 And picinfo.ResolutionY > 0 Then
@@ -131,21 +131,21 @@ Public Module ImageInfo
         Case Else
           parm = parm & " dots per inch" ' default
       End Select
-      strInfo = strInfo & "Output resolution: " & tb & parm & "\par "
+      strInfo &= "Output resolution: " & tb & parm & "\par "
 
-      If picinfo.fileSize > 0 Then strInfo = strInfo & "Size on Disk: " & tb & Format(Round(picinfo.fileSize / 1000), "###,###,##0") & " KB" & "\par "
-      strInfo = strInfo & "Has multiple pages: " & tb & picinfo.hasPages & "\par "
+      If picinfo.fileSize > 0 Then strInfo &= "Size on Disk: " & tb & Format(Round(picinfo.fileSize / 1000), "###,###,##0") & " KB" & "\par "
+      strInfo &= "Has multiple pages: " & tb & picinfo.hasPages & "\par "
 
       If picinfo.colorSpace <> ImageMagick.ColorSpace.Undefined Then
         parm = System.Enum.GetName(GetType(ImageMagick.ColorSpace), picinfo.colorSpace)
-        strInfo = strInfo & "Color Space: " & tb & parm & "\par "
+        strInfo &= "Color Space: " & tb & parm & "\par "
       End If
-      If picinfo.colorDepth > 0 Then strInfo = strInfo & "Color Depth: " & tb & picinfo.colorDepth & "\par "
-      If picinfo.Compression <> CompressionMethod.Undefined Then strInfo = strInfo & "Compression Method: " & tb & picinfo.Compression.ToString & "\par "
+      If picinfo.colorDepth > 0 Then strInfo &= "Color Depth: " & tb & picinfo.colorDepth & "\par "
+      If picinfo.Compression <> CompressionMethod.Undefined Then strInfo &= "Compression Method: " & tb & picinfo.Compression.ToString & "\par "
       If picinfo.hasAlpha Then
-        strInfo = strInfo & "Alpha Channel is present." & "\par "
+        strInfo &= "Alpha Channel is present." & "\par "
       Else
-        strInfo = strInfo & "Alpha Channel is not present." & "\par "
+        strInfo &= "Alpha Channel is not present." & "\par "
       End If
 
     End If ' picinfo legit
@@ -164,6 +164,7 @@ Public Module ImageInfo
     Dim nCols, nrows As Integer
     Dim xTags As Collection
     Dim bb As Byte()
+    Dim s1 As String
 
     If ux Is Nothing Then Exit Sub
 
@@ -171,43 +172,43 @@ Public Module ImageInfo
     parm = ""
 
     ' put the description first
-    If ux.tagExists(uExif.TagID.Description) Then
-      parm = ux.TagValue(uExif.TagID.Description, 0)
+    If ux.tagExists(uExif.TagID.description) Then
+      parm = ux.TagValue(uExif.TagID.description, 0)
       If parm Is Nothing Then parm = ""
       parm = splitString(parm)
-      If Len(parm) > 0 Then strInfo = strInfo & "Description:  " & parm & "\par " & "\par " ' String ' 3
+      If Len(parm) > 0 Then strInfo &= "Description:  " & parm & "\par " & "\par " ' String ' 3
     End If
 
     formatPicinfo(picinfo, strInfo)
 
     If ShowAllTags Then ' dump all the tags without descriptions
-      strInfo = strInfo & "\par " & "{\b Main Tags\b0 } " & "\par "
-      strInfo = strInfo & dumpTags(ux.Tags)
+      strInfo &= "\par " & "{\b Main Tags\b0 } " & "\par "
+      strInfo &= dumpTags(ux.Tags)
 
       If ux.tagExists(uExif.TagID.exifpointer) Then
         xTags = ux.Tags(sTag(uExif.TagID.exifpointer)).IFD.Tags
         If xTags IsNot Nothing AndAlso xTags.Count > 0 Then
-          strInfo = strInfo & "\par " & "{\b Exif Tags\b0 } " & "\par "
-          strInfo = strInfo & dumpTags(xTags)
+          strInfo &= "\par " & "{\b Exif Tags\b0 } " & "\par "
+          strInfo &= dumpTags(xTags)
         End If
       End If
 
-      If ux.tagExists(uExif.TagID.gpspointer) Then
-        xTags = ux.Tags(sTag(uExif.TagID.gpspointer)).IFD.Tags
+      If ux.tagExists(uExif.TagID.GPSpointer) Then
+        xTags = ux.Tags(sTag(uExif.TagID.GPSpointer)).IFD.Tags
         If xTags IsNot Nothing AndAlso xTags.Count > 0 Then
-          strInfo = strInfo & "\par " & "{\b GPS Tags\b0 } " & "\par "
-          strInfo = strInfo & dumpTags(xTags)
+          strInfo &= "\par " & "{\b GPS Tags\b0 } " & "\par "
+          strInfo &= dumpTags(xTags)
         End If
       End If
 
       If ux.iptcTags IsNot Nothing AndAlso ux.iptcTags.Count > 0 Then
-        strInfo = strInfo & "\par " & "{\b IPTC Tags\b0 } " & "\par "
-        strInfo = strInfo & dumpTags(ux.iptcTags)
+        strInfo &= "\par " & "{\b IPTC Tags\b0 } " & "\par "
+        strInfo &= dumpTags(ux.iptcTags)
       End If
 
       If showXmp AndAlso ux.xmp IsNot Nothing Then
-        strInfo = strInfo & "\par " & "{\b XMP Info\b0 } " & "\par "
-        strInfo = strInfo & formatXmp(ux.xmp)
+        strInfo &= "\par " & "{\b XMP Info\b0 } " & "\par "
+        strInfo &= formatXmp(ux.xmp)
       End If
 
       If ShowMakernote And ux.tagExists(uExif.TagID.exifpointer) Then
@@ -216,7 +217,7 @@ Public Module ImageInfo
           tg = uz.Tags.Item(sTag(uExif.TagID.makernote))
           If ux.IntelNumbers Then i = 1 Else i = 0
           getMakernote(ux, parm, i, True)
-          If Len(parm) > 0 Then strInfo = strInfo & "\par " & "{\b Maker Note Tags\b0 } " & "\par " & parm & "\par "
+          If Len(parm) > 0 Then strInfo &= "\par " & "{\b Maker Note Tags\b0 } " & "\par " & parm & "\par "
         End If
       End If
       sText = strInfo
@@ -227,7 +228,7 @@ Public Module ImageInfo
     If ux.iptcTagExists(120) Then ' caption
       parm = ux.iptcTags(sTag(120)).singlevalue
       parm = Trim(parm)
-      If Len(parm) > 0 Then strInfo = strInfo & "IPTC Caption: " & tb & parm & "\par "
+      If Len(parm) > 0 Then strInfo &= "IPTC Caption: " & tb & parm & "\par "
     End If
 
     If ux.tagExists(uExif.TagID.xpComment) Then
@@ -244,7 +245,7 @@ Public Module ImageInfo
         End If
       End If
 
-      If Len(parm) > 0 Then strInfo = strInfo & "Windows Comment: " & tb & parm & "\par "
+      If Len(parm) > 0 Then strInfo &= "Windows Comment: " & tb & parm & "\par "
     End If
 
     If ux.tagExists(uExif.TagID.xpKeywords) Then
@@ -260,7 +261,7 @@ Public Module ImageInfo
           parm = splitString(parm)
         End If
       End If
-      If Len(parm) > 0 Then strInfo = strInfo & "Windows Keywords: " & tb & parm & "\par "
+      If Len(parm) > 0 Then strInfo &= "Windows Keywords: " & tb & parm & "\par "
     End If
 
     If ux.tagExists(uExif.TagID.xpTitle) Then
@@ -276,7 +277,7 @@ Public Module ImageInfo
           parm = splitString(parm)
         End If
       End If
-      If Len(parm) > 0 Then strInfo = strInfo & "Windows Title: " & tb & parm & "\par "
+      If Len(parm) > 0 Then strInfo &= "Windows Title: " & tb & parm & "\par "
     End If
 
     If ux.tagExists(uExif.TagID.xpSubject) Then
@@ -292,7 +293,7 @@ Public Module ImageInfo
           parm = splitString(parm)
         End If
       End If
-      If Len(parm) > 0 Then strInfo = strInfo & "Windows Subject: " & tb & parm & "\par "
+      If Len(parm) > 0 Then strInfo &= "Windows Subject: " & tb & parm & "\par "
     End If
 
     If ux.tagExists(uExif.TagID.xpAuthor) Then
@@ -308,27 +309,27 @@ Public Module ImageInfo
           parm = splitString(parm)
         End If
       End If
-      If Len(parm) > 0 Then strInfo = strInfo & "Windows Author: " & tb & parm & "\par "
+      If Len(parm) > 0 Then strInfo &= "Windows Author: " & tb & parm & "\par "
     End If
 
     '-----------------------
     If ux.Tags.Count() > 0 Then
-      strInfo = strInfo & "\par " & "{\b Exif Information\b0 }" & "  \par "
+      strInfo &= "\par " & "{\b Exif Information\b0 }" & "  \par "
     End If
 
     If ux.tagExists(uExif.TagID.artist) Then
       parm = ux.TagValue(uExif.TagID.artist, 0)
       parm = Trim(parm)
-      strInfo = strInfo & "Artist: " & tb & parm & "\par "
+      strInfo &= "Artist: " & tb & parm & "\par "
     End If
 
-    If ux.tagExists(uExif.TagID.Copyright) Then
-      parm = ux.TagValue(uExif.TagID.Copyright, 0)
-      If parm <> "" Then strInfo = strInfo & "Copyright: " & tb & ux.TagValue(uExif.TagID.Copyright, 0) & "\par "
+    If ux.tagExists(uExif.TagID.copyright) Then
+      parm = ux.TagValue(uExif.TagID.copyright, 0)
+      If parm <> "" Then strInfo &= "Copyright: " & tb & ux.TagValue(uExif.TagID.copyright, 0) & "\par "
     End If
 
-    If ux.tagExists(uExif.TagID.DateTime) Then
-      parm = ux.TagValue(uExif.TagID.DateTime, 0)
+    If ux.tagExists(uExif.TagID.dateTime) Then
+      parm = ux.TagValue(uExif.TagID.dateTime, 0)
       If parm Is Nothing Then parm = "" Else parm = parm.Trim(whiteSpace)
       If parm <> "0000:00:00 00:00:00" And Len(parm) = 19 Then
         If parm.Chars(4) = ":" Then
@@ -341,14 +342,14 @@ Public Module ImageInfo
             parm = parm & "." & uz.TagValue(uExif.TagID.subsectime, 0)
           End If
         End If
-        strInfo = strInfo & "Date and Time: " & tb & parm & "\par "
+        strInfo &= "Date and Time: " & tb & parm & "\par "
       End If
     End If
 
     If ux.tagExists(uExif.TagID.exifpointer) And ux.tagIFD(uExif.TagID.exifpointer) IsNot Nothing Then
       uz = ux.tagIFD(uExif.TagID.exifpointer)
-      If uz.tagExists(uExif.TagID.DateTimeOriginal) Then
-        parm = uz.TagValue(uExif.TagID.DateTimeOriginal, 0)
+      If uz.tagExists(uExif.TagID.dateTimeOriginal) Then
+        parm = uz.TagValue(uExif.TagID.dateTimeOriginal, 0)
         If parm Is Nothing Then parm = "" Else parm = parm.Trim(whiteSpace)
         If parm <> "0000:00:00 00:00:00" And Len(parm) >= 19 Then
           If parm.Chars(4) = ":" Then
@@ -358,12 +359,12 @@ Public Module ImageInfo
           If uz.tagExists(uExif.TagID.subsectimeoriginal) Then
             parm = parm & "." & uz.TagValue(uExif.TagID.subsectimeoriginal, 0)
           End If
-          strInfo = strInfo & "Original Date and Time: " & tb & parm & "\par "
+          strInfo &= "Original Date and Time: " & tb & parm & "\par "
         End If
       End If
 
-      If uz.tagExists(uExif.TagID.DateTimeDigitized) Then
-        parm = uz.TagValue(uExif.TagID.DateTimeDigitized, 0)
+      If uz.tagExists(uExif.TagID.dateTimeDigitized) Then
+        parm = uz.TagValue(uExif.TagID.dateTimeDigitized, 0)
         If parm Is Nothing Then parm = "" Else parm = parm.Trim(whiteSpace)
         If parm <> "0000:00:00 00:00:00" And Len(parm) >= 19 Then
           If parm.Chars(4) = ":" Then
@@ -373,21 +374,21 @@ Public Module ImageInfo
           If uz.tagExists(uExif.TagID.subsectimedigitized) Then
             parm = parm & "." & uz.TagValue(uExif.TagID.subsectimedigitized, 0)
           End If
-          strInfo = strInfo & "Date and Time Digitized: " & tb & parm & "\par "
+          strInfo &= "Date and Time Digitized: " & tb & parm & "\par "
         End If
       End If
     End If
 
-    If ux.tagExists(uExif.TagID.Make) Then
-      strInfo = strInfo & "Make: " & tb & ux.TagValue(uExif.TagID.Make, 0) & "\par "
+    If ux.tagExists(uExif.TagID.make) Then
+      strInfo &= "Make: " & tb & ux.TagValue(uExif.TagID.make, 0) & "\par "
     End If
 
-    If ux.tagExists(uExif.TagID.Model) Then
-      strInfo = strInfo & "Model: " & tb & ux.TagValue(uExif.TagID.Model, 0) & "\par "
+    If ux.tagExists(uExif.TagID.model) Then
+      strInfo &= "Model: " & tb & ux.TagValue(uExif.TagID.model, 0) & "\par "
     End If
 
     If ux.tagExists(uExif.TagID.software) Then
-      strInfo = strInfo & "Software: " & tb & ux.TagValue(uExif.TagID.software, 0) & "\par "
+      strInfo &= "Software: " & tb & ux.TagValue(uExif.TagID.software, 0) & "\par "
     End If
 
     '  If ux.tagexists(XResolution) And ux.tagexists(YResolution) Then
@@ -403,7 +404,7 @@ Public Module ImageInfo
     '          end Select
     '      parm = parm
     '        end If
-    '    strInfo = strInfo & "Output Resolution: " & tb & parm & "\par "
+    '    strInfo &= "Output Resolution: " & tb & parm & "\par "
     '      end If
 
     '---------------
@@ -412,23 +413,23 @@ Public Module ImageInfo
       uz = ux.tagIFD(uExif.TagID.exifpointer)
 
       If uz.tagExists(uExif.TagID.hostcomputer) Then
-        strInfo = strInfo & "Host Computer: " & tb & uz.TagValue(uExif.TagID.hostcomputer, 0) & "\par "
+        strInfo &= "Host Computer: " & tb & uz.TagValue(uExif.TagID.hostcomputer, 0) & "\par "
       End If
 
-      If uz.tagExists(uExif.TagID.DocumentName) Then
-        strInfo = strInfo & "Document Name: " & tb & uz.TagValue(uExif.TagID.DocumentName, 0) & "\par "
+      If uz.tagExists(uExif.TagID.documentName) Then
+        strInfo &= "Document Name: " & tb & uz.TagValue(uExif.TagID.documentName, 0) & "\par "
       End If
 
       If uz.tagExists(uExif.TagID.pagename) Then
-        strInfo = strInfo & "Page Name: " & tb & uz.TagValue(uExif.TagID.pagename, 0) & "\par "
+        strInfo &= "Page Name: " & tb & uz.TagValue(uExif.TagID.pagename, 0) & "\par "
       End If
 
-      If uz.tagExists(uExif.TagID.PageNumber) Then
-        strInfo = strInfo & "Page Number: " & tb & uz.TagValue(uExif.TagID.PageNumber, 0) & "\par "
+      If uz.tagExists(uExif.TagID.pageNumber) Then
+        strInfo &= "Page Number: " & tb & uz.TagValue(uExif.TagID.pageNumber, 0) & "\par "
       End If
 
       If uz.tagExists(uExif.TagID.imageuniqueid) Then
-        strInfo = strInfo & "Unique Identifier: " & tb
+        strInfo &= "Unique Identifier: " & tb
         v = uz.TagValue(uExif.TagID.imageuniqueid)
         parm = ""
         If uuBound(v) >= 0 Then
@@ -438,7 +439,7 @@ Public Module ImageInfo
         Else
           parm = v
         End If
-        strInfo = strInfo & parm & "\par "
+        strInfo &= parm & "\par "
       End If
 
       If uz.tagExists(uExif.TagID.usercomment) Then
@@ -450,18 +451,52 @@ Public Module ImageInfo
 
         parm = parm.Trim(whiteSpace)
         parm = splitString(parm)
-        If Len(parm) > 0 Then strInfo = strInfo & "User Comment: " & tb & parm & "\par "
+        If Len(parm) > 0 Then strInfo &= "User Comment: " & tb & parm & "\par "
       End If
 
-      If Right(strInfo, 10) <> "\par \par " Then strInfo = strInfo & "\par "
+      If Right(strInfo, 10) <> "\par \par " Then strInfo &= "\par "
+
+      If uz.tagExists(uExif.TagID.cameraOwnerName) Then
+        strInfo &= "Camera owner name: " & tb & uz.TagValue(uExif.TagID.cameraOwnerName, 0) & "\par "
+      End If
+
+      If uz.tagExists(uExif.TagID.bodySerialNumber) Then
+        strInfo &= "Body serial number: " & tb & uz.TagValue(uExif.TagID.bodySerialNumber, 0) & "\par "
+      End If
+
+      If uz.tagExists(uExif.TagID.lensSpecification) Then
+        v = uz.TagValue(uExif.TagID.lensSpecification)
+        parm = ""
+        If v.length >= 2 And IsNumeric(v(0)) Then
+          parm = "Lens specification:" & tb & Format(v(0), "#") & "-" & Format(v(1), "# mm")
+          If v.length >= 3 Then parm &= ", F" & Format(v(2), "#.0")
+          If v.length = 4 AndAlso v(2) <> v(3) Then parm &= "-" & Format(v(3), "#.0")
+        End If
+        If parm <> "" Then strInfo &= parm & "\par "
+      End If
+
+      If uz.tagExists(uExif.TagID.lensMake) Then
+        strInfo &= "Lens make: " & tb & uz.TagValue(uExif.TagID.lensMake, 0) & "\par "
+      End If
+
+      If uz.tagExists(uExif.TagID.lensModel) Then
+        strInfo &= "Lens model: " & tb & uz.TagValue(uExif.TagID.lensModel, 0) & "\par "
+      End If
+
+      If uz.tagExists(uExif.TagID.lensSerialNumber) Then
+        v = uz.TagValue(uExif.TagID.lensSerialNumber, 0)
+        strInfo &= "Lens serial number: " & tb & uz.TagValue(uExif.TagID.lensSerialNumber, 0) & "\par "
+      End If
+
+      If Right(strInfo, 10) <> "\par \par " Then strInfo &= "\par "
 
       If uz.tagExists(uExif.TagID.shutterspeed) Then
         x = uz.TagValue(uExif.TagID.shutterspeed, 0)
         If Abs(x) < 1000 Then x = 1 / (2 ^ x) Else x = 0
         If x < 1 And x <> 0 Then
-          strInfo = strInfo & "Shutter Speed:" & tb & Format(x, "##0.0###") & " (1/" & Format(1 / x, "##,###") & ") sec." & "\par "
+          strInfo &= "Shutter Speed:" & tb & Format(x, "##0.0###") & " (1/" & Format(1 / x, "##,###") & ") sec." & "\par "
         Else
-          strInfo = strInfo & "Shutter Speed:" & tb & Format(x, "##0.0") & " sec." & "\par "
+          strInfo &= "Shutter Speed:" & tb & Format(x, "##0.0") & " sec." & "\par "
         End If
       End If
 
@@ -469,16 +504,16 @@ Public Module ImageInfo
         x = uz.TagValue(uExif.TagID.exposuretime, 0)
         If x > 0.00000000001 Then
           If x < 1 Then
-            strInfo = strInfo & "Exposure Time:" & tb & Format(x, "##0.0###") & " (1/" & Format(1 / x, "##,###") & ") sec." & "\par "
+            strInfo &= "Exposure Time:" & tb & Format(x, "##0.0###") & " (1/" & Format(1 / x, "##,###") & ") sec." & "\par "
           Else
-            strInfo = strInfo & "Exposure Time:" & tb & Format(x, "##0.0") & " sec." & "\par "
+            strInfo &= "Exposure Time:" & tb & Format(x, "##0.0") & " sec." & "\par "
           End If
         End If
       End If
 
       If uz.tagExists(uExif.TagID.exposurebias) Then
         x = uz.TagValue(uExif.TagID.exposurebias, 0)
-        strInfo = strInfo & "Exposure Bias: " & tb & Format(x, "##0.00") & "\par "
+        strInfo &= "Exposure Bias: " & tb & Format(x, "##0.00") & "\par "
       End If
 
       If uz.tagExists(uExif.TagID.exposureprogram) Then
@@ -502,11 +537,11 @@ Public Module ImageInfo
           Case Else
             parm = uz.TagValue(uExif.TagID.exposureprogram, 0)
         End Select
-        strInfo = strInfo & "Exposure Program: " & tb & parm & "\par " ' Integer ' 160
+        strInfo &= "Exposure Program: " & tb & parm & "\par " ' Integer ' 160
       End If
 
-      If uz.tagExists(uExif.TagID.exposuremode) Then
-        Select Case uz.TagValue(uExif.TagID.exposuremode, 0)
+      If uz.tagExists(uExif.TagID.exposureMode) Then
+        Select Case uz.TagValue(uExif.TagID.exposureMode, 0)
           Case 0
             parm = "Auto Exposure"
           Case 1
@@ -514,44 +549,93 @@ Public Module ImageInfo
           Case 2
             parm = "Auto Bracket"
           Case Else
-            parm = uz.TagValue(uExif.TagID.exposuremode, 0)
+            parm = uz.TagValue(uExif.TagID.exposureMode, 0)
         End Select
-        strInfo = strInfo & "Exposure Mode: " & tb & parm & "\par "
+        strInfo &= "Exposure Mode: " & tb & parm & "\par "
       End If
 
       If uz.tagExists(uExif.TagID.fnumber) Then
         x = uz.TagValue(uExif.TagID.fnumber, 0)
-        If x > 0 Then strInfo = strInfo & "F-Number:" & tb & Format(x, "##0.0") & "\par "
+        If x > 0 Then strInfo &= "F-Number:" & tb & Format(x, "##0.0") & "\par "
       End If
 
       If uz.tagExists(uExif.TagID.aperture) Then
         x = uz.TagValue(uExif.TagID.aperture, 0)
-        If x > 0 Then strInfo = strInfo & "Aperture: " & tb & Format(x, "##0.0") & "\par "
+        If x > 0 Then strInfo &= "Aperture: " & tb & Format(x, "##0.0") & "\par "
       End If
 
       If uz.tagExists(uExif.TagID.maxaperture) Then
         x = uz.TagValue(uExif.TagID.maxaperture, 0)
-        If x > 0 Then strInfo = strInfo & "Max Aperture: " & tb & Format(x, "##0.0") & "\par "
+        If x > 0 Then strInfo &= "Max Aperture: " & tb & Format(x, "##0.0") & "\par "
       End If
 
-      If uz.tagExists(uExif.TagID.isospeedratings) Then
-        v = uz.TagValue(uExif.TagID.isospeedratings)
-        parm = ""
+      If uz.tagExists(uExif.TagID.PhotographicSensitivity) Then
+        v = uz.TagValue(uExif.TagID.PhotographicSensitivity)
+        s1 = "" : parm = ""
         For i = 0 To UBound(v)
-          parm = parm & v(i) & " "
+          s1 = parm & v(i) & " "
         Next i
-        If parm <> "0" Then strInfo = strInfo & "ISO Speed:" & tb & parm & "\par "
+        If s1 <> "0" And s1 <> "" Then
+          If uz.tagExists(uExif.TagID.sensitivityType) Then
+            x = uz.TagValue(uExif.TagID.sensitivityType, 0)
+            If IsNumeric(x) Then i = x Else i = 0
+            Select Case i
+              Case 1
+                parm = "Standard output sensitivity:"
+              Case 2
+                parm = "Recommended exposure index:"
+              Case 3
+                parm = "ISO speed:"
+              Case 4
+                parm = "Standard output sensitivity and recommended exposure index:"
+              Case 5
+                parm = "Standard output sensitivity and ISO speed:"
+              Case 6
+                parm = "Recommended exposure index and ISO speed:"
+              Case 7
+                parm = "Standard output sensitivity, recommended exposure index, and ISO speed:"
+            End Select
+          Else
+            parm = "ISO speed:"
+          End If
+        End If
+        If parm <> "" Then strInfo &= parm & tb & s1 & "\par "
       End If
 
-      If Right(strInfo, 10) <> "\par \par " Then strInfo = strInfo & "\par "
+      If uz.tagExists(uExif.TagID.standardOutputSensitivity) Then
+        x = uz.TagValue(uExif.TagID.standardOutputSensitivity, 0)
+        If x > 0 Then strInfo &= "Standard Output Sensitivity:" & tb & Format(x, "#,#") & "\par "
+      End If
+
+      If uz.tagExists(uExif.TagID.iSOSpeed) Then
+        x = uz.TagValue(uExif.TagID.iSOSpeed, 0)
+        If x > 0 Then strInfo &= "ISO speed:" & tb & Format(x, "#,#") & "\par "
+      End If
+
+      If uz.tagExists(uExif.TagID.recommendedExposureIndex) Then
+        x = uz.TagValue(uExif.TagID.recommendedExposureIndex, 0)
+        If x > 0 Then strInfo &= "Recommended exposure index:" & tb & Format(x, "#,#") & "\par "
+      End If
+
+      If uz.tagExists(uExif.TagID.iSOSpeedLatitudeyyy) Then
+        x = uz.TagValue(uExif.TagID.iSOSpeedLatitudeyyy, 0)
+        If x > 0 Then strInfo &= "ISO speed latitude yyy:" & tb & Format(x, "#,#") & "\par "
+      End If
+
+      If uz.tagExists(uExif.TagID.iSOSpeedLatitudezzz) Then
+        x = uz.TagValue(uExif.TagID.iSOSpeedLatitudezzz, 0)
+        If x > 0 Then strInfo &= "ISO speed latitude zzz:" & tb & Format(x, "#,#") & "\par "
+      End If
+
+      If Right(strInfo, 10) <> "\par \par " Then strInfo &= "\par "
 
       If uz.tagExists(uExif.TagID.subjectdistance) Then
         x = uz.TagValue(uExif.TagID.subjectdistance, 0)
-        If x > 0 Then strInfo = strInfo & "Subject Distance (meters): " & tb & Format(x, "##0.0") & "\par "
+        If x > 0 Then strInfo &= "Subject Distance (meters): " & tb & Format(x, "##0.0") & "\par "
       End If
 
-      If uz.tagExists(uExif.TagID.subjectdistancerange) Then
-        Select Case uz.TagValue(uExif.TagID.subjectdistancerange, 0)
+      If uz.tagExists(uExif.TagID.subjectDistanceRange) Then
+        Select Case uz.TagValue(uExif.TagID.subjectDistanceRange, 0)
           Case 0
             parm = "Unknown"
           Case 1
@@ -561,38 +645,38 @@ Public Module ImageInfo
           Case 3
             parm = "Distant"
           Case Else
-            parm = uz.TagValue(uExif.TagID.subjectdistancerange, 0)
+            parm = uz.TagValue(uExif.TagID.subjectDistanceRange, 0)
         End Select
-        strInfo = strInfo & "Subject Distance Range: " & tb & parm & "\par "
+        strInfo &= "Subject Distance Range: " & tb & parm & "\par "
       End If
 
       If uz.tagExists(uExif.TagID.focallength) Then
         x = uz.TagValue(uExif.TagID.focallength, 0)
-        If x > 0 Then strInfo = strInfo & "Focal Length: " & tb & Format(x, "###,##0") & " mm" & "\par "
+        If x > 0 Then strInfo &= "Focal Length: " & tb & Format(x, "###,##0") & " mm" & "\par "
       End If
 
-      If uz.tagExists(uExif.TagID.focallengthin35mmfilm) Then
-        x = uz.TagValue(uExif.TagID.focallengthin35mmfilm, 0)
-        If x > 0 Then strInfo = strInfo & "Focal Length (35mm): " & tb & Format(x, "###,##0") & " mm" & "\par "
+      If uz.tagExists(uExif.TagID.focalLengthIn35mmFilm) Then
+        x = uz.TagValue(uExif.TagID.focalLengthIn35mmFilm, 0)
+        If x > 0 Then strInfo &= "Focal Length (35mm): " & tb & Format(x, "###,##0") & " mm" & "\par "
       End If
 
-      If uz.tagExists(uExif.TagID.DigitalZoomRatio) Then
-        x = uz.TagValue(uExif.TagID.DigitalZoomRatio, 0)
+      If uz.tagExists(uExif.TagID.digitalZoomRatio) Then
+        x = uz.TagValue(uExif.TagID.digitalZoomRatio, 0)
         If x <> 0 Then
           parm = Format(x, "###,##0.0")
         Else
           parm = "Not Used"
         End If
-        strInfo = strInfo & "Digital Zoom: " & tb & parm & "\par "
+        strInfo &= "Digital Zoom: " & tb & parm & "\par "
       End If
 
       If uz.tagExists(uExif.TagID.brightness) Then
         x = uz.TagValue(uExif.TagID.brightness, 0)
-        strInfo = strInfo & "Brightness: " & tb & Format(x, "##0.0") & "\par "
+        strInfo &= "Brightness: " & tb & Format(x, "##0.0") & "\par "
       End If
 
-      If uz.tagExists(uExif.TagID.Contrast) Then
-        Select Case uz.TagValue(uExif.TagID.Contrast, 0)
+      If uz.tagExists(uExif.TagID.contrast) Then
+        Select Case uz.TagValue(uExif.TagID.contrast, 0)
           Case 0
             parm = "Normal"
           Case 1
@@ -600,13 +684,13 @@ Public Module ImageInfo
           Case 2
             parm = "Hard"
           Case Else
-            parm = uz.TagValue(uExif.TagID.Contrast, 0)
+            parm = uz.TagValue(uExif.TagID.contrast, 0)
         End Select
-        strInfo = strInfo & "Contrast: " & tb & parm & "\par "
+        strInfo &= "Contrast: " & tb & parm & "\par "
       End If
 
-      If uz.tagExists(uExif.TagID.Saturation) Then
-        Select Case uz.TagValue(uExif.TagID.Saturation, 0)
+      If uz.tagExists(uExif.TagID.saturation) Then
+        Select Case uz.TagValue(uExif.TagID.saturation, 0)
           Case 0
             parm = "Normal"
           Case 1
@@ -614,9 +698,9 @@ Public Module ImageInfo
           Case 2
             parm = "High Saturation"
           Case Else
-            parm = uz.TagValue(uExif.TagID.Saturation, 0)
+            parm = uz.TagValue(uExif.TagID.saturation, 0)
         End Select
-        strInfo = strInfo & "Saturation: " & tb & parm & "\par "
+        strInfo &= "Saturation: " & tb & parm & "\par "
       End If
 
       If uz.tagExists(uExif.TagID.sharpness) Then
@@ -630,19 +714,19 @@ Public Module ImageInfo
           Case Else
             parm = uz.TagValue(uExif.TagID.sharpness, 0)
         End Select
-        strInfo = strInfo & "Sharpness: " & tb & parm & "\par "
+        strInfo &= "Sharpness: " & tb & parm & "\par "
       End If
 
-      If uz.tagExists(uExif.TagID.whitebalance) Then
-        Select Case uz.TagValue(uExif.TagID.whitebalance, 0)
+      If uz.tagExists(uExif.TagID.whiteBalance) Then
+        Select Case uz.TagValue(uExif.TagID.whiteBalance, 0)
           Case 0
             parm = "Auto"
           Case 1
             parm = "Manual"
           Case Else
-            parm = uz.TagValue(uExif.TagID.whitebalance, 0)
+            parm = uz.TagValue(uExif.TagID.whiteBalance, 0)
         End Select
-        strInfo = strInfo & "White Balance: " & tb & parm & "\par "
+        strInfo &= "White Balance: " & tb & parm & "\par "
       End If
 
       If uz.tagExists(uExif.TagID.lightsource) Then
@@ -692,11 +776,11 @@ Public Module ImageInfo
           Case Else
             parm = uz.TagValue(uExif.TagID.lightsource, 0)
         End Select
-        strInfo = strInfo & "Light Source: " & tb & parm & "\par " ' Integer ' 31
+        strInfo &= "Light Source: " & tb & parm & "\par " ' Integer ' 31
       End If
 
-      If uz.tagExists(uExif.TagID.scenecapturetype) Then
-        Select Case uz.TagValue(uExif.TagID.scenecapturetype, 0)
+      If uz.tagExists(uExif.TagID.sceneCaptureType) Then
+        Select Case uz.TagValue(uExif.TagID.sceneCaptureType, 0)
           Case 0
             parm = "Standard"
           Case 1
@@ -706,9 +790,9 @@ Public Module ImageInfo
           Case 3
             parm = "Night Scene"
           Case Else
-            parm = uz.TagValue(uExif.TagID.scenecapturetype, 0)
+            parm = uz.TagValue(uExif.TagID.sceneCaptureType, 0)
         End Select
-        strInfo = strInfo & "Scene Capture Type: " & tb & parm & "\par "
+        strInfo &= "Scene Capture Type: " & tb & parm & "\par "
       End If
 
       If uz.tagExists(uExif.TagID.meteringmode) Then
@@ -728,7 +812,7 @@ Public Module ImageInfo
           Case Else
             parm = uz.TagValue(uExif.TagID.meteringmode, 0)
         End Select
-        strInfo = strInfo & "Metering Mode: " & tb & parm & "\par " ' Integer ' 30
+        strInfo &= "Metering Mode: " & tb & parm & "\par " ' Integer ' 30
       End If
 
       If uz.tagExists(uExif.TagID.flash) Then
@@ -746,16 +830,16 @@ Public Module ImageInfo
           Case Else
             parm = CStr(x)
         End Select
-        strInfo = strInfo & "Flash: " & tb & parm & "\par " ' Integer ' 32
+        strInfo &= "Flash: " & tb & parm & "\par " ' Integer ' 32
       End If
 
       If uz.tagExists(uExif.TagID.flashenergy) Then
         x = uz.TagValue(uExif.TagID.flashenergy, 0)
-        strInfo = strInfo & "Flash Energy (BCPS): " & tb & Format(x, "###,##0.0") & "\par "
+        strInfo &= "Flash Energy (BCPS): " & tb & Format(x, "###,##0.0") & "\par "
       End If
 
       If uz.tagExists(uExif.TagID.spectralsensitivity) Then
-        strInfo = strInfo & "Spectral Sensitivity: " & tb & uz.TagValue(uExif.TagID.spectralsensitivity, 0) & "\par " ' String ' 161
+        strInfo &= "Spectral Sensitivity: " & tb & uz.TagValue(uExif.TagID.spectralsensitivity, 0) & "\par " ' String ' 161
       End If
 
       If uz.tagExists(uExif.TagID.focalplaneXresolution) And uz.tagExists(uExif.TagID.focalplaneYresolution) Then
@@ -763,26 +847,26 @@ Public Module ImageInfo
         parm = Format(x, "###,##0")
         x = uz.TagValue(uExif.TagID.focalplaneYresolution, 0)
         parm = parm & " x " & Format(x, "###,##0")
-        If uz.tagExists(uExif.TagID.FocalPlaneResolutionUnit) Then
-          Select Case uz.TagValue(uExif.TagID.FocalPlaneResolutionUnit, 0)
+        If uz.tagExists(uExif.TagID.focalPlaneResolutionUnit) Then
+          Select Case uz.TagValue(uExif.TagID.focalPlaneResolutionUnit, 0)
             Case 2
               parm = parm & " pixels per inch"
             Case 3
               parm = parm & " pixels per centimeter"
             Case Else
-              parm = parm & " units: " & uz.TagValue(uExif.TagID.FocalPlaneResolutionUnit, 0)
+              parm = parm & " units: " & uz.TagValue(uExif.TagID.focalPlaneResolutionUnit, 0)
           End Select
         End If
-        strInfo = strInfo & "Focal Plane Resolution: " & tb & parm & "\par "
+        strInfo &= "Focal Plane Resolution: " & tb & parm & "\par "
       End If
 
       If uz.tagExists(uExif.TagID.subjectlocation) Then
         v = uz.TagValue(uExif.TagID.subjectlocation)
-        If UBound(v) >= 1 Then strInfo = strInfo & "Subject Location: " & tb & v(0) & ", " & v(1) & "\par "
+        If UBound(v) >= 1 Then strInfo &= "Subject Location: " & tb & v(0) & ", " & v(1) & "\par "
       End If
 
-      If uz.tagExists(uExif.TagID.subjectarea) Then
-        v = uz.TagValue(uExif.TagID.subjectarea)
+      If uz.tagExists(uExif.TagID.subjectArea) Then
+        v = uz.TagValue(uExif.TagID.subjectArea)
         parm = ""
         Select Case UBound(v)
           Case 1 ' point
@@ -796,21 +880,21 @@ Public Module ImageInfo
               parm = parm & v(i) & " "
             Next i
         End Select
-        strInfo = strInfo & "Subject Area: " & tb & parm & "\par "
+        strInfo &= "Subject Area: " & tb & parm & "\par "
       End If
 
       If uz.tagExists(uExif.TagID.exposureindex) Then
         x = uz.TagValue(uExif.TagID.exposureindex, 0)
-        strInfo = strInfo & "Exposure Index: " & tb & Format(x, "###,###") & "\par "
+        strInfo &= "Exposure Index: " & tb & Format(x, "###,###") & "\par "
       End If
 
-      If Right(strInfo, 10) <> "\par \par " Then strInfo = strInfo & "\par "
+      If Right(strInfo, 10) <> "\par \par " Then strInfo &= "\par "
 
       If uz.tagExists(uExif.TagID.colorspace) Then
         If uz.TagValue(uExif.TagID.colorspace, 0) = 1 Then
-          strInfo = strInfo & "Color Space: " & tb & "sRGB" & "\par "
+          strInfo &= "Color Space: " & tb & "sRGB" & "\par "
         Else
-          strInfo = strInfo & "Color Space: " & tb & uz.TagValue(uExif.TagID.colorspace, 0) & "\par " ' Integer ' 159
+          strInfo &= "Color Space: " & tb & uz.TagValue(uExif.TagID.colorspace, 0) & "\par " ' Integer ' 159
         End If
       End If
 
@@ -831,48 +915,48 @@ Public Module ImageInfo
           Case Else
             parm = uz.TagValue(uExif.TagID.sensingmethod, 0)
         End Select
-        strInfo = strInfo & "Sensing Method: " & tb & parm & "\par " ' Integer ' 171
+        strInfo &= "Sensing Method: " & tb & parm & "\par " ' Integer ' 171
       End If
 
       If uz.tagExists(uExif.TagID.filesource) Then
         j = uz.TagValue(uExif.TagID.filesource, 0)
         If j = 3 Then parm = "Digital Still Camera" Else parm = CStr(j)
-        strInfo = strInfo & "File Source: " & tb & parm & "\par "
+        strInfo &= "File Source: " & tb & parm & "\par "
       End If
 
       If uz.tagExists(uExif.TagID.scenetype) Then
         j = uz.TagValue(uExif.TagID.scenetype, 0)
         If j = 1 Then parm = "Directly Photographed Image" Else parm = CStr(j)
-        strInfo = strInfo & "Scene Type: " & tb & parm & "\par " ' Variant ' 173
+        strInfo &= "Scene Type: " & tb & parm & "\par " ' Variant ' 173
       End If
 
-      If uz.tagExists(uExif.TagID.CustomRendered) Then
-        Select Case uz.TagValue(uExif.TagID.CustomRendered, 0)
+      If uz.tagExists(uExif.TagID.customRendered) Then
+        Select Case uz.TagValue(uExif.TagID.customRendered, 0)
           Case 0
             parm = "No"
           Case 1
             parm = "Yes"
           Case Else
-            parm = uz.TagValue(uExif.TagID.CustomRendered, 0)
+            parm = uz.TagValue(uExif.TagID.customRendered, 0)
         End Select
-        strInfo = strInfo & "Custom Rendered: " & tb & parm & "\par "
+        strInfo &= "Custom Rendered: " & tb & parm & "\par "
       End If
 
-      If uz.tagExists(uExif.TagID.devicesettingdescription) Then
-        v = uz.TagValue(uExif.TagID.devicesettingdescription)
-        strInfo = strInfo & "Device Setting Description: " & tb
+      If uz.tagExists(uExif.TagID.deviceSettingDescription) Then
+        v = uz.TagValue(uExif.TagID.deviceSettingDescription)
+        strInfo &= "Device Setting Description: " & tb
         For j = 0 To UBound(v)
           If v(j) = 0 Then
-            strInfo = strInfo & "\par "
+            strInfo &= "\par "
           Else
-            strInfo = strInfo & ChrW(v(j))
+            strInfo &= ChrW(v(j))
           End If
         Next j
-        strInfo = strInfo & "\par "
+        strInfo &= "\par "
       End If
 
-      If uz.tagExists(uExif.TagID.gaincontrol) Then
-        Select Case uz.TagValue(uExif.TagID.gaincontrol, 0)
+      If uz.tagExists(uExif.TagID.gainControl) Then
+        Select Case uz.TagValue(uExif.TagID.gainControl, 0)
           Case 0
             parm = "None"
           Case 1
@@ -884,23 +968,23 @@ Public Module ImageInfo
           Case 4
             parm = "High Gain Down"
           Case Else
-            parm = uz.TagValue(uExif.TagID.gaincontrol, 0)
+            parm = uz.TagValue(uExif.TagID.gainControl, 0)
         End Select
-        strInfo = strInfo & "Gain Control:" & tb & parm & "\par "
+        strInfo &= "Gain Control:" & tb & parm & "\par "
       End If
 
       If uz.tagExists(uExif.TagID.spatialfrequencyresponse) Then
-        strInfo = strInfo & "Spatial Frequency Response:"
+        strInfo &= "Spatial Frequency Response:"
         v = uz.TagValue(uExif.TagID.spatialfrequencyresponse)
         infoMatrix(v, parm)
-        strInfo = strInfo & parm
+        strInfo &= parm
       End If
 
       If uz.tagExists(uExif.TagID.oecf) Then
-        strInfo = strInfo & "Opto-Electric Coefficient: " & "\par " ' Variant ' 163
+        strInfo &= "Opto-Electric Coefficient: " & "\par " ' Variant ' 163
         v = uz.TagValue(uExif.TagID.oecf)
         infoMatrix(v, parm)
-        strInfo = strInfo & parm
+        strInfo &= parm
       End If
 
       If uz.tagExists(uExif.TagID.cfapattern) Then
@@ -915,7 +999,7 @@ Public Module ImageInfo
           End If
 
           If UBound(v) <= nCols * nrows + 4 Then
-            strInfo = strInfo & "CFA Pattern: " ' Variant ' 174
+            strInfo &= "CFA Pattern: " ' Variant ' 174
             parm = ""
             k = 4 ' add the data
             For j = 1 To nrows
@@ -927,7 +1011,7 @@ Public Module ImageInfo
               Next i2
               parm = parm & "\par "
             Next j
-            strInfo = strInfo & parm
+            strInfo &= parm
           End If
         End If
       End If
@@ -945,95 +1029,95 @@ Public Module ImageInfo
           End If
         End If
 
-        strInfo = strInfo & "Exif Version: " & tb & parm & "\par "
+        strInfo &= "Exif Version:" & tb & parm & "\par "
       End If
 
-      If uz.tagExists(uExif.TagID.FlashpixVersion) Then
-        strInfo = strInfo & "Supported Flashpix Version: " & tb
-        v = uz.TagValue(uExif.TagID.FlashpixVersion)
+      If uz.tagExists(uExif.TagID.flashpixVersion) Then
+        strInfo &= "Supported Flashpix Version:" & tb
+        v = uz.TagValue(uExif.TagID.flashpixVersion)
         If TypeOf v Is String AndAlso Not IsArray(v) Then
-          strInfo = strInfo & v
+          strInfo &= v
         ElseIf IsArray(v) AndAlso uuBound(v) = 0 AndAlso TypeOf v(0) Is String Then
-          strInfo = strInfo & v(0)
+          strInfo &= v(0)
         Else
-          For j = 0 To UBound(v) : strInfo = strInfo & ChrW(v(j)) : Next j
+          For j = 0 To UBound(v) : strInfo &= ChrW(v(j)) : Next j
         End If
-        strInfo = strInfo & "\par "
+        strInfo &= "\par "
       End If
 
       If uz.tagExists(uExif.TagID.relatedsoundfile) Then
         parm = Trim(uz.TagValue(uExif.TagID.relatedsoundfile, 0))
-        If Len(parm) > 0 Then strInfo = strInfo & "Related Audio File: " & tb & parm & "\par " ' String ' 164
+        If Len(parm) > 0 Then strInfo &= "Related Audio File: " & tb & parm & "\par " ' String ' 164
       End If
 
-      strInfo = strInfo & "Related Audio File: " & tb & parm & "\par " ' String ' 164
+      strInfo &= "Related Audio File: " & tb & parm & "\par " ' String ' 164
     End If
 
     bb = getBmpComment(propID.ThumbnailData, pComments)
     If bb IsNot Nothing AndAlso UBound(bb) > 10 Then parm = "Yes" Else parm = "No"
-    strInfo = strInfo & "Embedded Thumbnail Image: " & tb & parm & "\par "
+    strInfo &= "Embedded Thumbnail Image: " & tb & parm & "\par "
 
     '--------------------------
 
-    If ux.tagExists(uExif.TagID.gpspointer) Then
-      uz = ux.tagIFD(uExif.TagID.gpspointer)
+    If ux.tagExists(uExif.TagID.GPSpointer) Then
+      uz = ux.tagIFD(uExif.TagID.GPSpointer)
       If uz IsNot Nothing AndAlso uz.Tags.Count() > 1 Then ' skip it if there's only the version ID (or nothing)
-        If Right(strInfo, 10) <> "\par \par " Then strInfo = strInfo & "\par "
-        strInfo = strInfo & "{\b GPS Information\b0 }" & "\par "
+        If Right(strInfo, 10) <> "\par \par " Then strInfo &= "\par "
+        strInfo &= "{\b GPS Information\b0 }" & "\par "
 
-        If uz.tagExists(uExif.TagID.gpslatitude) And uz.tagExists(uExif.TagID.gpslongitude) Then
+        If uz.tagExists(uExif.TagID.GPSlatitude) And uz.tagExists(uExif.TagID.GPSlongitude) Then
           ' lat - long coordinates together
-          v = uz.TagValue(uExif.TagID.gpslatitude)
-          strInfo = strInfo & "GPS location: " & tb & v(0) & "°"
-          If v(1) >= 0 And v(1) < 60 Then strInfo = strInfo & v(1) & "'"
-          If v(2) > 0 And v(2) < 60 Then strInfo = strInfo & v(2) & """"
-          strInfo = strInfo & uz.TagValue(uExif.TagID.gpslatituderef, 0)
-          v = uz.TagValue(uExif.TagID.gpslongitude)
-          strInfo = strInfo & ", " & v(0) & "°"
-          If v(1) >= 0 And v(1) < 60 Then strInfo = strInfo & v(1) & "'"
-          If v(2) > 0 And v(2) < 60 Then strInfo = strInfo & v(2) & """"
-          strInfo = strInfo & uz.TagValue(uExif.TagID.gpslongituderef, 0) & "\par "
+          v = uz.TagValue(uExif.TagID.GPSlatitude)
+          strInfo &= "GPS location: " & tb & v(0) & "°"
+          If v(1) >= 0 And v(1) < 60 Then strInfo &= v(1) & "'"
+          If v(2) > 0 And v(2) < 60 Then strInfo &= v(2) & """"
+          strInfo &= uz.TagValue(uExif.TagID.GPSlatituderef, 0)
+          v = uz.TagValue(uExif.TagID.GPSlongitude)
+          strInfo &= ", " & v(0) & "°"
+          If v(1) >= 0 And v(1) < 60 Then strInfo &= v(1) & "'"
+          If v(2) > 0 And v(2) < 60 Then strInfo &= v(2) & """"
+          strInfo &= uz.TagValue(uExif.TagID.GPSlongituderef, 0) & "\par "
         End If
 
-        If uz.tagExists(uExif.TagID.gpsaltituderef) Then
-          k = uz.TagValue(uExif.TagID.gpsaltituderef, 0)
+        If uz.tagExists(uExif.TagID.GPSaltituderef) Then
+          k = uz.TagValue(uExif.TagID.GPSaltituderef, 0)
         Else
           k = 0
         End If
 
-        If uz.tagExists(uExif.TagID.gpsaltitude) Then
-          x = uz.TagValue(uExif.TagID.gpsaltitude, 0)
+        If uz.tagExists(uExif.TagID.GPSaltitude) Then
+          x = uz.TagValue(uExif.TagID.GPSaltitude, 0)
           If k = 1 And x > 0 Then x = -x
-          strInfo = strInfo & "GPS Altitude: " & tb & Format(x / 0.3048, "###,##0") & " feet " & "(" & Format(x, "###,##0") & " meters)" & "\par "
+          strInfo &= "GPS Altitude: " & tb & Format(x / 0.3048, "###,##0") & " feet " & "(" & Format(x, "###,##0") & " meters)" & "\par "
         End If
 
-        If uz.tagExists(uExif.TagID.gpssatellites) Then
-          strInfo = strInfo & "GPS Satellites: " & tb & uz.TagValue(uExif.TagID.gpssatellites, 0) & "\par " ' String
+        If uz.tagExists(uExif.TagID.GPSsatellites) Then
+          strInfo &= "GPS Satellites: " & tb & uz.TagValue(uExif.TagID.GPSsatellites, 0) & "\par " ' String
         End If
 
-        If uz.tagExists(uExif.TagID.gpsstatus) Then
-          strInfo = strInfo & "GPS Status: " & tb & uz.TagValue(uExif.TagID.gpsstatus, 0) & "\par " ' String
+        If uz.tagExists(uExif.TagID.GPSstatus) Then
+          strInfo &= "GPS Status: " & tb & uz.TagValue(uExif.TagID.GPSstatus, 0) & "\par " ' String
         End If
 
 
-        If uz.tagExists(uExif.TagID.gpsmeasuremode) Then
-          strInfo = strInfo & "GPS Measure Mode: " & tb & uz.TagValue(uExif.TagID.gpsmeasuremode, 0) & "\par " ' String
+        If uz.tagExists(uExif.TagID.GPSmeasuremode) Then
+          strInfo &= "GPS Measure Mode: " & tb & uz.TagValue(uExif.TagID.GPSmeasuremode, 0) & "\par " ' String
         End If
 
-        If uz.tagExists(uExif.TagID.gpssatellites) Then
-          strInfo = strInfo & "GPS Satellites: " & tb & uz.TagValue(uExif.TagID.gpssatellites, 0) & "\par " ' String
+        If uz.tagExists(uExif.TagID.GPSsatellites) Then
+          strInfo &= "GPS Satellites: " & tb & uz.TagValue(uExif.TagID.GPSsatellites, 0) & "\par " ' String
         End If
 
-        If uz.tagExists(uExif.TagID.gpsdop) Then
-          x = uz.TagValue(uExif.TagID.gpsdop, 0)
-          strInfo = strInfo & "GPS Data Precision: " & tb & x & "\par "
+        If uz.tagExists(uExif.TagID.GPSdop) Then
+          x = uz.TagValue(uExif.TagID.GPSdop, 0)
+          strInfo &= "GPS Data Precision: " & tb & x & "\par "
         End If
 
-        If uz.tagExists(uExif.TagID.gpsspeed) Then
-          x = uz.TagValue(uExif.TagID.gpsspeed, 0)
+        If uz.tagExists(uExif.TagID.GPSspeed) Then
+          x = uz.TagValue(uExif.TagID.GPSspeed, 0)
           parm = Format(x, "##0.0")
-          If uz.tagExists(uExif.TagID.gpsspeedref) Then
-            Select Case UCase(uz.TagValue(uExif.TagID.gpsspeedref, 0))
+          If uz.tagExists(uExif.TagID.GPSspeedref) Then
+            Select Case UCase(uz.TagValue(uExif.TagID.GPSspeedref, 0))
               Case "K"
                 parm = parm & " kph"
               Case "M"
@@ -1042,59 +1126,59 @@ Public Module ImageInfo
                 parm = parm & " knots"
             End Select
           End If
-          strInfo = strInfo & "GPS Speed: " & tb & parm & "\par "
+          strInfo &= "GPS Speed: " & tb & parm & "\par "
         End If
 
-        If uz.tagExists(uExif.TagID.gpstrack) Then
-          x = uz.TagValue(uExif.TagID.gpstrack, 0)
+        If uz.tagExists(uExif.TagID.GPStrack) Then
+          x = uz.TagValue(uExif.TagID.GPStrack, 0)
           parm = Format(x, "##0.0") & "°"
-          If uz.tagExists(uExif.TagID.gpstrackref) Then
-            If uz.TagValue(uExif.TagID.gpstrackref, 0) = "T" Then parm = parm & " true" Else parm = parm & " magnetic"
+          If uz.tagExists(uExif.TagID.GPStrackref) Then
+            If uz.TagValue(uExif.TagID.GPStrackref, 0) = "T" Then parm = parm & " true" Else parm = parm & " magnetic"
           End If
-          strInfo = strInfo & "GPS Track: " & tb & parm & "\par "
+          strInfo &= "GPS Track: " & tb & parm & "\par "
         End If
 
-        If uz.tagExists(uExif.TagID.gpsimgdirection) Then
-          x = uz.TagValue(uExif.TagID.gpsimgdirection, 0)
+        If uz.tagExists(uExif.TagID.GPSimgdirection) Then
+          x = uz.TagValue(uExif.TagID.GPSimgdirection, 0)
           parm = Format(x, "##0.0") & "°"
-          If uz.tagExists(uExif.TagID.gpsimgdirectionref) Then
-            If uz.TagValue(uExif.TagID.gpsimgdirectionref, 0) = "T" Then parm = parm & " true" Else parm = parm & " magnetic"
+          If uz.tagExists(uExif.TagID.GPSimgdirectionref) Then
+            If uz.TagValue(uExif.TagID.GPSimgdirectionref, 0) = "T" Then parm = parm & " true" Else parm = parm & " magnetic"
           End If
-          strInfo = strInfo & "GPS Image Direction Reference: " & tb & parm & "\par "
+          strInfo &= "GPS Image Direction Reference: " & tb & parm & "\par "
         End If
 
-        If uz.tagExists(uExif.TagID.gpsmapdatum) Then
-          strInfo = strInfo & "GPS Map Datum: " & tb & uz.TagValue(uExif.TagID.gpsmapdatum, 0) & "\par "
+        If uz.tagExists(uExif.TagID.GPSmapdatum) Then
+          strInfo &= "GPS Map Datum: " & tb & uz.TagValue(uExif.TagID.GPSmapdatum, 0) & "\par "
         End If
 
-        If uz.tagExists(uExif.TagID.gpsdestlatitude) Then
-          v = uz.TagValue(uExif.TagID.gpsdestlatitude)
-          strInfo = strInfo & "GPS Destination Latitude: " & tb & uz.TagValue(uExif.TagID.gpsdestlatituderef, 0) & " " & v(0) & "°" & v(1) & "'"
-          If v(2) <> 0 Then strInfo = strInfo & v(2) & """"
-          strInfo = strInfo & "\par "
+        If uz.tagExists(uExif.TagID.GPSdestlatitude) Then
+          v = uz.TagValue(uExif.TagID.GPSdestlatitude)
+          strInfo &= "GPS Destination Latitude: " & tb & uz.TagValue(uExif.TagID.GPSdestlatituderef, 0) & " " & v(0) & "°" & v(1) & "'"
+          If v(2) <> 0 Then strInfo &= v(2) & """"
+          strInfo &= "\par "
         End If
 
-        If uz.tagExists(uExif.TagID.gpsdestlongitude) Then
-          v = uz.TagValue(uExif.TagID.gpsdestlongitude)
-          strInfo = strInfo & "GPS Destination Longitude: " & tb & uz.TagValue(uExif.TagID.gpsdestlongituderef, 0) & " " & v(0) & "°" & v(1) & "'"
-          If v(2) <> 0 Then strInfo = strInfo & v(2) & """"
-          strInfo = strInfo & "\par "
+        If uz.tagExists(uExif.TagID.GPSdestlongitude) Then
+          v = uz.TagValue(uExif.TagID.GPSdestlongitude)
+          strInfo &= "GPS Destination Longitude: " & tb & uz.TagValue(uExif.TagID.GPSdestlongituderef, 0) & " " & v(0) & "°" & v(1) & "'"
+          If v(2) <> 0 Then strInfo &= v(2) & """"
+          strInfo &= "\par "
         End If
 
-        If uz.tagExists(uExif.TagID.gpsdestbearing) Then
-          x = uz.TagValue(uExif.TagID.gpsdestbearing, 0)
+        If uz.tagExists(uExif.TagID.GPSdestbearing) Then
+          x = uz.TagValue(uExif.TagID.GPSdestbearing, 0)
           parm = Format(x, "##0.0") & "°"
-          If uz.tagExists(uExif.TagID.gpsdestbearingref) Then
-            If uz.TagValue(uExif.TagID.gpsdestbearingref, 0) = "T" Then parm = parm & " true" Else parm = parm & " magnetic"
+          If uz.tagExists(uExif.TagID.GPSdestbearingref) Then
+            If uz.TagValue(uExif.TagID.GPSdestbearingref, 0) = "T" Then parm = parm & " true" Else parm = parm & " magnetic"
           End If
-          strInfo = strInfo & "GPS Destination Bearing: " & tb & parm & "\par "
+          strInfo &= "GPS Destination Bearing: " & tb & parm & "\par "
         End If
 
-        If uz.tagExists(uExif.TagID.gpsdestdistance) Then
-          x = uz.TagValue(uExif.TagID.gpsdestdistance, 0)
+        If uz.tagExists(uExif.TagID.GPSdestdistance) Then
+          x = uz.TagValue(uExif.TagID.GPSdestdistance, 0)
           parm = Format(x, "##0.0")
-          If uz.tagExists(uExif.TagID.gpsdestdistanceref) Then
-            Select Case UCase(uz.TagValue(uExif.TagID.gpsdestdistanceref, 0))
+          If uz.tagExists(uExif.TagID.GPSdestdistanceref) Then
+            Select Case UCase(uz.TagValue(uExif.TagID.GPSdestdistanceref, 0))
               Case "K"
                 parm = parm & " km."
               Case "M"
@@ -1103,34 +1187,34 @@ Public Module ImageInfo
                 parm = parm & " nm."
             End Select
           End If
-          strInfo = strInfo & "GPS Destination Distance: " & tb & parm & "\par "
+          strInfo &= "GPS Destination Distance: " & tb & parm & "\par "
         End If
 
-        If uz.tagExists(uExif.TagID.GPSAreaInformation) Then
-          v = uz.TagValue(uExif.TagID.GPSAreaInformation)
+        If uz.tagExists(uExif.TagID.GPSareaInformation) Then
+          v = uz.TagValue(uExif.TagID.GPSareaInformation)
           parm = ""
           For j = 1 To UBound(v) ' skip first byte
             If v(j) >= 9 Then parm = parm & ChrW(v(j))
           Next j
           parm = splitString(parm)
-          If Len(parm) > 0 Then strInfo = strInfo & "GPS Area Information: " & tb & parm & "\par "
+          If Len(parm) > 0 Then strInfo &= "GPS Area Information: " & tb & parm & "\par "
         End If
 
         parm = ""
-        If uz.tagExists(uExif.TagID.gpsDateStamp) Then
-          parm = uz.TagValue(uExif.TagID.gpsDateStamp, 0)
+        If uz.tagExists(uExif.TagID.GPSdateStamp) Then
+          parm = uz.TagValue(uExif.TagID.GPSdateStamp, 0)
           parm = Replace(parm, ":", "/", 1, 2) & " "
         End If
-        If uz.tagExists(uExif.TagID.gpstimestamp) Then
-          v = uz.TagValue(uExif.TagID.gpstimestamp)
+        If uz.tagExists(uExif.TagID.GPStimestamp) Then
+          v = uz.TagValue(uExif.TagID.GPStimestamp)
           parm = parm & Format(v(0), "00") & ":" & Format(v(1), "00") & ":" & Format(v(2), "00")
         End If
         If Len(parm) > 0 Then
-          strInfo = strInfo & "GPS Time Stamp: " & tb & parm & "\par "
+          strInfo &= "GPS Time Stamp: " & tb & parm & "\par "
         End If
 
-        If uz.tagExists(uExif.TagID.GPSDifferential) Then
-          Select Case uz.TagValue(uExif.TagID.GPSDifferential, 0)
+        If uz.tagExists(uExif.TagID.GPSdifferential) Then
+          Select Case uz.TagValue(uExif.TagID.GPSdifferential, 0)
             Case 0
               parm = "No"
             Case 1
@@ -1138,28 +1222,36 @@ Public Module ImageInfo
             Case Else
               parm = ""
           End Select
-          If Len(parm) > 0 Then strInfo = strInfo & "Differential Correction:" & tb & parm & "\par "
+          If Len(parm) > 0 Then strInfo &= "Differential Correction:" & tb & parm & "\par "
         End If
 
-        If uz.tagExists(uExif.TagID.GPSProcessingMethod) Then
-          v = uz.TagValue(uExif.TagID.GPSProcessingMethod)
+        If uz.tagExists(uExif.TagID.GPShPositioningError) Then
+          x = uz.TagValue(uExif.TagID.GPShPositioningError, 0)
+          If x > 0 Then
+            parm = Format(x, "#,##0.00") & " meters"
+            strInfo &= "GPS positioning error:" & tb & parm & "\par "
+          End If
+        End If
+
+        If uz.tagExists(uExif.TagID.GPSprocessingMethod) Then
+          v = uz.TagValue(uExif.TagID.GPSprocessingMethod)
           parm = ""
           For j = 1 To UBound(v) ' skip first byte
             If v(j) >= 9 Then parm = parm & ChrW(v(j))
           Next j
           parm = splitString(parm)
-          If Len(parm) > 0 Then strInfo = strInfo & "GPS Processing Method: " & tb & parm & "\par "
+          If Len(parm) > 0 Then strInfo &= "GPS Processing Method: " & tb & parm & "\par "
         End If
 
-        If uz.tagExists(uExif.TagID.gpsversionid) Then
-          v = uz.TagValue(uExif.TagID.gpsversionid)
+        If uz.tagExists(uExif.TagID.GPSversionid) Then
+          v = uz.TagValue(uExif.TagID.GPSversionid)
           parm = ""
           If UBound(v) >= 3 Then
             If v(0) <> 0 Or v(1) <> 0 Then parm = v(0) & "." & v(1)
             If v(2) <> 0 Or v(3) <> 0 Then parm = parm & "." & v(2)
             If v(3) <> 0 Then parm = parm & "." & v(3)
           End If
-          If uuBound(v) >= 3 Then strInfo = strInfo & "GPS Version: " & tb & parm & "\par "
+          If uuBound(v) >= 3 Then strInfo &= "GPS Version: " & tb & parm & "\par "
         End If
 
       End If  ' gps tags.count > 1
@@ -1169,7 +1261,7 @@ Public Module ImageInfo
     '--------------------------
 
     ' makernote
-    If ShowMakernote And ux.tagExists(uExif.TagID.exifpointer) And ux.tagIFD(uExif.TagID.exifpointer) IsNot Nothing Then
+    If ShowMakernote AndAlso ux.tagExists(uExif.TagID.exifpointer) AndAlso ux.tagIFD(uExif.TagID.exifpointer) IsNot Nothing Then
       uz = ux.tagIFD(uExif.TagID.exifpointer)
       If uz.tagExists(uExif.TagID.makernote) Then
         tg = uz.Tags.Item(sTag(uExif.TagID.makernote))
@@ -1177,18 +1269,18 @@ Public Module ImageInfo
         If tg.Link > 0 Then
           getMakernote(ux, parm, i, False) ' send the exif.makernote string, receive parm, exif.szmake is the make of the camera
         End If
-        If Len(parm) > 0 Then strInfo = strInfo & "\par " & "{\b Maker Note\b0 } " & "\par " & parm
+        If Len(parm) > 0 Then strInfo &= "\par " & "{\b Maker Note\b0 } " & "\par " & parm
       End If
     End If
     '--------------------------
 
     If showXmp AndAlso ux.xmp IsNot Nothing Then
-      strInfo = strInfo & "\par " & "{\b XMP Info\b0 } " & "\par "
-      strInfo = strInfo & formatXmp(ux.xmp)
+      strInfo &= "\par " & "{\b XMP Info\b0 } " & "\par "
+      strInfo &= formatXmp(ux.xmp)
     End If
 
     If ShowJPEGDetails Then
-      strInfo = strInfo & "\par " & "{\b JPEG Details\b0 } " & "\par "
+      strInfo &= "\par " & "{\b JPEG Details\b0 } " & "\par "
 
       If ux.tagExists(uExif.TagID.exifpointer) Then
         uz = ux.tagIFD(uExif.TagID.exifpointer)
@@ -1201,12 +1293,12 @@ Public Module ImageInfo
 
       If ux.tagExists(uExif.TagID.bitspersample) Then
         v = ux.TagValue(uExif.TagID.bitspersample)
-        strInfo = strInfo & "Bits per Sample: " & tb & v(0) & " " & v(1) & " " & v(2) & "\par "
+        strInfo &= "Bits per Sample: " & tb & v(0) & " " & v(1) & " " & v(2) & "\par "
       End If
 
-      If uz.tagExists(uExif.TagID.ComponentsConfiguration) Then
-        strInfo = strInfo & "Components Configuration: " & tb
-        v = uz.TagValue(uExif.TagID.ComponentsConfiguration)
+      If uz.tagExists(uExif.TagID.componentsConfiguration) Then
+        strInfo &= "Components Configuration: " & tb
+        v = uz.TagValue(uExif.TagID.componentsConfiguration)
         parm = ""
         For i = 0 To UBound(v)
           Select Case v(i)
@@ -1226,155 +1318,155 @@ Public Module ImageInfo
               parm = parm & v(i) & " "
           End Select
         Next i
-        strInfo = strInfo & parm & "\par "
+        strInfo &= parm & "\par "
       End If
 
-      If uz.tagExists(uExif.TagID.CompressedBitsPerPixel) Then
-        strInfo = strInfo & "Compressed Bits per Pixel: " & tb & Format(uz.TagValue(uExif.TagID.CompressedBitsPerPixel, 0), "###,##0.0") & "\par "
+      If uz.tagExists(uExif.TagID.compressedBitsPerPixel) Then
+        strInfo &= "Compressed Bits per Pixel: " & tb & Format(uz.TagValue(uExif.TagID.compressedBitsPerPixel, 0), "###,##0.0") & "\par "
       End If
 
-      If ux.tagExists(uExif.TagID.Compression) Then
-        strInfo = strInfo & "Compression Scheme: " & tb & ux.TagValue(uExif.TagID.Compression, 0) & "\par "
+      If ux.tagExists(uExif.TagID.compression) Then
+        strInfo &= "Compression Scheme: " & tb & ux.TagValue(uExif.TagID.compression, 0) & "\par "
       End If
 
-      If uz.tagExists(uExif.TagID.ImageWidth) And uz.tagExists(uExif.TagID.ImageHeight) Then
-        strInfo = strInfo & "EXIF Image Size: " & tb & uz.TagValue(uExif.TagID.ImageWidth, 0) & " x " & uz.TagValue(uExif.TagID.ImageHeight, 0) & "\par "
+      If uz.tagExists(uExif.TagID.imageWidth) And uz.tagExists(uExif.TagID.imageHeight) Then
+        strInfo &= "EXIF Image Size: " & tb & uz.TagValue(uExif.TagID.imageWidth, 0) & " x " & uz.TagValue(uExif.TagID.imageHeight, 0) & "\par "
       End If
 
-      If ux.tagExists(uExif.TagID.JPEGInterchangeFormat) Then
-        strInfo = strInfo & "JPEG Interchange Format: " & tb & ux.TagValue(uExif.TagID.JPEGInterchangeFormat, 0) & "\par "
+      If ux.tagExists(uExif.TagID.jPEGInterchangeFormat) Then
+        strInfo &= "JPEG Interchange Format: " & tb & ux.TagValue(uExif.TagID.jPEGInterchangeFormat, 0) & "\par "
       End If
 
-      If ux.tagExists(uExif.TagID.JPEGInterchangeFormatLength) Then
-        strInfo = strInfo & "JPEG Interchange Format Length: " & tb & ux.TagValue(uExif.TagID.JPEGInterchangeFormatLength, 0) & "\par "
+      If ux.tagExists(uExif.TagID.jPEGInterchangeFormatLength) Then
+        strInfo &= "JPEG Interchange Format Length: " & tb & ux.TagValue(uExif.TagID.jPEGInterchangeFormatLength, 0) & "\par "
       End If
 
-      If ux.tagExists(uExif.TagID.Orientation) Then
-        strInfo = strInfo & "JPEG Orientation: " & tb & ux.TagValue(uExif.TagID.Orientation, 0) & "\par "
+      If ux.tagExists(uExif.TagID.orientation) Then
+        strInfo &= "JPEG Orientation: " & tb & ux.TagValue(uExif.TagID.orientation, 0) & "\par "
       End If
 
-      If ux.tagExists(uExif.TagID.PhotometricInterpretation) Then
-        Select Case ux.TagValue(uExif.TagID.PhotometricInterpretation, 0)
+      If ux.tagExists(uExif.TagID.photometricInterpretation) Then
+        Select Case ux.TagValue(uExif.TagID.photometricInterpretation, 0)
           Case 2
             parm = "RGB"
           Case 6
             parm = "YCbCr"
           Case Else
-            parm = ux.TagValue(uExif.TagID.PhotometricInterpretation, 0)
+            parm = ux.TagValue(uExif.TagID.photometricInterpretation, 0)
         End Select
-        strInfo = strInfo & "JPEG Photometric Interpretation:" & tb & parm & "\par "
+        strInfo &= "JPEG Photometric Interpretation:" & tb & parm & "\par "
       End If
 
-      If uz.tagExists(uExif.TagID.PixelXDimension) And uz.tagExists(uExif.TagID.PixelYDimension) Then
-        strInfo = strInfo & "Valid Image Size: " & tb & uz.TagValue(uExif.TagID.PixelXDimension, 0) & " x " & uz.TagValue(uExif.TagID.PixelYDimension, 0) & "\par "
+      If uz.tagExists(uExif.TagID.pixelXDimension) And uz.tagExists(uExif.TagID.pixelYDimension) Then
+        strInfo &= "Valid Image Size: " & tb & uz.TagValue(uExif.TagID.pixelXDimension, 0) & " x " & uz.TagValue(uExif.TagID.pixelYDimension, 0) & "\par "
       End If
 
-      If ux.tagExists(uExif.TagID.PlanarConfiguration) Then
-        Select Case ux.TagValue(uExif.TagID.PlanarConfiguration, 0)
+      If ux.tagExists(uExif.TagID.planarConfiguration) Then
+        Select Case ux.TagValue(uExif.TagID.planarConfiguration, 0)
           Case 1
             parm = "Chunky"
           Case 2
             parm = "Planar"
           Case Else
-            parm = ux.TagValue(uExif.TagID.PlanarConfiguration, 0)
+            parm = ux.TagValue(uExif.TagID.planarConfiguration, 0)
         End Select
-        strInfo = strInfo & "Planar Configuration:" & tb & parm & "\par "
+        strInfo &= "Planar Configuration:" & tb & parm & "\par "
       End If
 
-      If ux.tagExists(uExif.TagID.PrimaryChromaticities) Then
-        v = ux.TagValue(uExif.TagID.PrimaryChromaticities)
+      If ux.tagExists(uExif.TagID.primaryChromaticities) Then
+        v = ux.TagValue(uExif.TagID.primaryChromaticities)
         parm = ""
         For i = 0 To UBound(v)
           parm = parm & Format(v(i), "##,##0.0# ")
         Next i
-        strInfo = strInfo & "Primary Chromaticities: " & tb & parm & "\par "
+        strInfo &= "Primary Chromaticities: " & tb & parm & "\par "
       End If
 
-      If ux.tagExists(uExif.TagID.ReferenceBlackWhite) Then
-        v = ux.TagValue(uExif.TagID.ReferenceBlackWhite)
+      If ux.tagExists(uExif.TagID.referenceBlackWhite) Then
+        v = ux.TagValue(uExif.TagID.referenceBlackWhite)
         parm = ""
         For i = 0 To UBound(v)
           parm = parm & Format(v(i), "##0.0# ")
         Next i
-        strInfo = strInfo & "Reference Black and White: " & tb & parm & "\par "
+        strInfo &= "Reference Black and White: " & tb & parm & "\par "
       End If
 
-      If ux.tagExists(uExif.TagID.RowsPerStrip) Then
-        strInfo = strInfo & "Rows per Strip: " & tb & Format(ux.TagValue(uExif.TagID.RowsPerStrip, 0), "###,###") & "\par "
+      If ux.tagExists(uExif.TagID.rowsPerStrip) Then
+        strInfo &= "Rows per Strip: " & tb & Format(ux.TagValue(uExif.TagID.rowsPerStrip, 0), "###,###") & "\par "
       End If
 
-      If ux.tagExists(uExif.TagID.SamplesPerPixel) Then
-        strInfo = strInfo & "Samples per Pixel: " & tb & ux.TagValue(uExif.TagID.SamplesPerPixel, 0) & "\par "
+      If ux.tagExists(uExif.TagID.samplesPerPixel) Then
+        strInfo &= "Samples per Pixel: " & tb & ux.TagValue(uExif.TagID.samplesPerPixel, 0) & "\par "
       End If
 
-      If ux.tagExists(uExif.TagID.StripByteCounts) Then
-        strInfo = strInfo & "Strip Byte Counts: " & tb
-        v = ux.TagValue(uExif.TagID.StripByteCounts)
+      If ux.tagExists(uExif.TagID.stripByteCounts) Then
+        strInfo &= "Strip Byte Counts: " & tb
+        v = ux.TagValue(uExif.TagID.stripByteCounts)
         parm = ""
         For i = 0 To UBound(v)
           parm = parm & Format(v(i), "###,###,###") & " "
           If (i + 1) Mod 20 = 0 Then parm = parm & "\par " & tb
         Next i
-        strInfo = strInfo & parm & "\par "
+        strInfo &= parm & "\par "
       End If
 
-      If ux.tagExists(uExif.TagID.StripOffsets) Then
-        strInfo = strInfo & "Strip Offsets: " & tb
-        v = ux.TagValue(uExif.TagID.StripOffsets)
+      If ux.tagExists(uExif.TagID.stripOffsets) Then
+        strInfo &= "Strip Offsets: " & tb
+        v = ux.TagValue(uExif.TagID.stripOffsets)
         parm = ""
         For i = 0 To UBound(v)
           parm = parm & Format(v(i), "###,###,###") & " "
           If (i + 1) Mod 20 = 0 Then parm = parm & "\par " & tb
         Next i
-        strInfo = strInfo & parm & "\par "
+        strInfo &= parm & "\par "
       End If
 
-      If ux.tagExists(uExif.TagID.TransferFunction) Then
-        strInfo = strInfo & "Transfer Function: " & tb
-        v = ux.TagValue(uExif.TagID.TransferFunction)
+      If ux.tagExists(uExif.TagID.transferFunction) Then
+        strInfo &= "Transfer Function: " & tb
+        v = ux.TagValue(uExif.TagID.transferFunction)
         parm = ""
         For i = 0 To UBound(v)
           parm = parm & v(i) & " "
           If (i + 1) Mod 48 = 0 Then parm = parm & "\par " & tb
         Next i
-        strInfo = strInfo & parm & "\par "
+        strInfo &= parm & "\par "
       End If
 
       If ux.tagExists(uExif.TagID.whitePoint) Then
-        strInfo = strInfo & "White Point: " & tb
+        strInfo &= "White Point: " & tb
         v = ux.TagValue(uExif.TagID.whitePoint)
         parm = ""
         For i = 0 To UBound(v)
           parm = parm & v(i) & " "
         Next i
-        strInfo = strInfo & parm & "\par "
+        strInfo &= parm & "\par "
       End If
 
-      If ux.tagExists(uExif.TagID.YCbCrCoefficients) Then
-        strInfo = strInfo & "YCbCr Coefficients: " & tb
-        v = ux.TagValue(uExif.TagID.YCbCrCoefficients)
+      If ux.tagExists(uExif.TagID.yCbCrCoefficients) Then
+        strInfo &= "YCbCr Coefficients: " & tb
+        v = ux.TagValue(uExif.TagID.yCbCrCoefficients)
         parm = ""
         For i = 0 To UBound(v)
           parm = parm & v(i) & " "
         Next i
-        strInfo = strInfo & parm & "\par "
+        strInfo &= parm & "\par "
       End If
 
-      If ux.tagExists(uExif.TagID.YCbCrPositioning) Then
-        Select Case ux.TagValue(uExif.TagID.YCbCrPositioning, 0)
+      If ux.tagExists(uExif.TagID.yCbCrPositioning) Then
+        Select Case ux.TagValue(uExif.TagID.yCbCrPositioning, 0)
           Case 1
             parm = "Centered"
           Case 2
             parm = "Co-sited"
           Case Else
-            parm = ux.TagValue(uExif.TagID.YCbCrPositioning, 0)
+            parm = ux.TagValue(uExif.TagID.yCbCrPositioning, 0)
         End Select
-        strInfo = strInfo & "YCbCr Positioning: " & tb & parm & "\par "
+        strInfo &= "YCbCr Positioning: " & tb & parm & "\par "
       End If
 
-      If ux.tagExists(uExif.TagID.YCbCrSubSampling) Then
-        strInfo = strInfo & "YCbCr SubSampling: " & tb
-        v = ux.TagValue(uExif.TagID.YCbCrSubSampling)
+      If ux.tagExists(uExif.TagID.yCbCrSubSampling) Then
+        strInfo &= "YCbCr SubSampling: " & tb
+        v = ux.TagValue(uExif.TagID.yCbCrSubSampling)
         If v(0) = 2 And v(1) = 1 Then
           parm = "YCbCr4:2:2"
         ElseIf v(0) = 2 And v(1) = 2 Then
@@ -1384,7 +1476,7 @@ Public Module ImageInfo
           For i = 0 To UBound(v)
             parm = parm & v(i) & " "
           Next i
-          strInfo = strInfo & parm & "\par "
+          strInfo &= parm & "\par "
         End If
       End If
 
@@ -1402,7 +1494,7 @@ Public Module ImageInfo
     Dim make As String
     Dim makerTags As Collection
 
-    make = uz.TagValue(uExif.TagID.Make, 0)
+    make = uz.TagValue(uExif.TagID.make, 0)
     note = ""
 
     ' get the makernote tags into makertags
@@ -1668,12 +1760,16 @@ Public Module ImageInfo
 
       Case "olympus"
         v = mTag.Value
-        parm = UTF8bare.GetString(v, 0, 7)
+        parm = UTF8bare.GetString(v, 0, 14)
         If eqstr(Mid(parm, 1, 5), "olymp") Then ' olympus tags
           If AscW(parm.Chars(5)) = 0 Then
             vOffset = 8
             olyNew = False
             mTag.onlyRead = True
+          ElseIf parm.Substring(7, 3) = Chr(0) & "II" Then
+            vOffset = 12
+            olyNew = True
+            relativeLinks = 0
           Else
             vOffset = 12
             olyNew = True ' for the 2010, 2020, etc. ifd links
@@ -1844,7 +1940,7 @@ Public Module ImageInfo
         mTag.IFD = ux
 
         k = mTag.Link
-        If eqstr(utf8bare.getstring(fdata, k, 3), "kdk") Then
+        If eqstr(UTF8bare.GetString(fdata, k, 3), "kdk") Then
           k = k + 8
           If word(fdata, k + 16, intel, False) > 2200 Then intel = Not intel ' some kodak cameras have different numeric format than the rest of the exif tags
 
@@ -2400,6 +2496,10 @@ Public Module ImageInfo
         tagname = "GPS differential correction"
         tagdatatype = 3
         tagdatacount = 1
+      Case &H1F
+        tagname = "Horizontal positioning error"
+        tagdatatype = 5
+        tagdatacount = 1
       Case &H2
         tagname = "Latitude"
         tagdatatype = 5
@@ -2488,6 +2588,30 @@ Public Module ImageInfo
         tagname = "Optoelectric conversion factor"
         tagdatatype = 7
         tagdatacount = 0
+      Case &H8830
+        tagname = "Sensitivity Type"
+        tagdatatype = 3
+        tagdatacount = 1
+      Case &H8831
+        tagname = "Standard Output Sensitivity"
+        tagdatatype = 4
+        tagdatacount = 1
+      Case &H8832
+        tagname = "Recommended Exposure Index"
+        tagdatatype = 4
+        tagdatacount = 1
+      Case &H8833
+        tagname = "ISO Speed"
+        tagdatatype = 4
+        tagdatacount = 1
+      Case &H8834
+        tagname = "ISO Speed Latitude yyy"
+        tagdatatype = 4
+        tagdatacount = 1
+      Case &H8835
+        tagname = "ISO Speed Latitude zzz"
+        tagdatatype = 4
+        tagdatacount = 1
       Case &H9
         tagname = "GPS receiver status"
         tagdatatype = 2
@@ -2720,6 +2844,30 @@ Public Module ImageInfo
         tagname = "Unique image ID"
         tagdatatype = 2
         tagdatacount = 33
+      Case &HA430
+        tagname = "Camera owner name"
+        tagdatatype = 2
+        tagdatacount = 33
+      Case &HA431
+        tagname = "Body serial number"
+        tagdatatype = 2
+        tagdatacount = 33
+      Case &HA432
+        tagname = "Lens specification"
+        tagdatatype = 5
+        tagdatacount = 33
+      Case &HA433
+        tagname = "Lens make"
+        tagdatatype = 2
+        tagdatacount = 33
+      Case &HA434
+        tagname = "Lens model"
+        tagdatatype = 2
+        tagdatacount = 33
+      Case &HA435
+        tagname = "Lens serial number"
+        tagdatatype = 2
+        tagdatacount = 33
       Case &HB
         tagname = "Measurement precision"
         tagdatatype = 5
@@ -2799,7 +2947,7 @@ Public Module ImageInfo
     If makertags.Contains(sTag(0)) Then
       v = makertags.Item(sTag(0)).Value
       If IsArray(v) AndAlso UBound(v) = 3 Then parm = v(0) & v(1) & v(2) & v(3) Else parm = ""
-      if Trim(parm) <> "" Then note = note & "Pentax Version:" & tb & parm & "\par "
+      If Trim(parm) <> "" Then note = note & "Pentax Version:" & tb & parm & "\par "
     End If
 
     If makertags.Contains(sTag(1)) Then
@@ -2810,7 +2958,7 @@ Public Module ImageInfo
     If makertags.Contains(sTag(2)) Then
       v = makertags.Item(sTag(2)).Value
       If IsArray(v) AndAlso UBound(v) >= 1 Then parm = v(0) & " x " & v(1) Else parm = ""
-      if Trim(parm) <> "" Then note = note & "Preview Image Size:" & tb & parm & "\par "
+      If Trim(parm) <> "" Then note = note & "Preview Image Size:" & tb & parm & "\par "
     End If
 
     If makertags.Contains(sTag(5)) Then
@@ -2821,13 +2969,13 @@ Public Module ImageInfo
     If makertags.Contains(sTag(6)) Then
       v = makertags.Item(sTag(6)).Value
       parm = Format(v(2), "00") & "/" & Format(v(3), "00") & "/" & Format(v(1) + v(0) * 256, "0000") ' date
-      if Trim(parm) <> "" Then note = note & "Date:" & tb & parm & "\par "
+      If Trim(parm) <> "" Then note = note & "Date:" & tb & parm & "\par "
     End If
 
     If makertags.Contains(sTag(7)) Then
       v = makertags.Item(sTag(7)).Value
       parm = Format(v(0), "00") & ":" & Format(v(1), "00") & ":" & Format(v(2), "00") ' time
-      if Trim(parm) <> "" Then note = note & "Time:" & tb & parm & "\par "
+      If Trim(parm) <> "" Then note = note & "Time:" & tb & parm & "\par "
     End If
 
     If makertags.Contains(sTag(8)) Then
@@ -3201,27 +3349,27 @@ Public Module ImageInfo
       If makertags.Contains(sTag(37)) Then
         i = makertags.Item(sTag(37)).singleValue
         If i = 0 Then parm = "No" Else parm = "Yes"
-        if Trim(parm) <> "" Then note = note & "Home Daylight Savings Time:" & tb & parm & "\par "
+        If Trim(parm) <> "" Then note = note & "Home Daylight Savings Time:" & tb & parm & "\par "
       End If
 
       If makertags.Contains(sTag(38)) Then
         i = makertags.Item(sTag(38)).singleValue
         If i = 0 Then parm = "No" Else parm = "Yes"
-        if Trim(parm) <> "" Then note = note & "Dest. Daylight Savings Time:" & tb & parm & "\par "
+        If Trim(parm) <> "" Then note = note & "Dest. Daylight Savings Time:" & tb & parm & "\par "
       End If
 
       If makertags.Contains(sTag(39)) Then
         v = makertags.Item(sTag(39)).Value
         parm = ""
         For i = 0 To UBound(v) : parm = parm & 255 - v(i) : Next i
-        if Trim(parm) <> "" Then note = note & "DSP Firmware Version:" & tb & parm & "\par "
+        If Trim(parm) <> "" Then note = note & "DSP Firmware Version:" & tb & parm & "\par "
       End If
 
       If makertags.Contains(sTag(40)) Then
         v = makertags.Item(sTag(40)).Value
         parm = ""
         For i = 0 To UBound(v) : parm = parm & 255 - v(i) : Next i
-        if Trim(parm) <> "" Then note = note & "CPU Firmware Version:" & tb & parm & "\par "
+        If Trim(parm) <> "" Then note = note & "CPU Firmware Version:" & tb & parm & "\par "
       End If
 
       If makertags.Contains(sTag(41)) Then
@@ -3829,12 +3977,12 @@ Public Module ImageInfo
 
     If makerTags.Contains(sTag(1)) Then
       parm = makerTags.Item(sTag(1)).singleValue
-      if Trim(parm) <> "" Then note = note & "Maker Note Type:" & tb & parm & "\par "
+      If Trim(parm) <> "" Then note = note & "Maker Note Type:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(2)) Then
       parm = makerTags.Item(sTag(2)).singleValue
-      if Trim(parm) <> "" Then note = note & "Maker Note Version:" & tb & parm & "\par "
+      If Trim(parm) <> "" Then note = note & "Maker Note Version:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H1001)) Then
@@ -4047,7 +4195,7 @@ Public Module ImageInfo
           Case 130 : parm = "Small Movie"
           Case Else : parm = ""
         End Select
-        if Trim(parm) <> "" Then note = note & "Image Size:" & tb & parm & "\par "
+        If Trim(parm) <> "" Then note = note & "Image Size:" & tb & parm & "\par "
 
         Select Case v(11)
           Case 0 : parm = "Auto"
@@ -4085,7 +4233,7 @@ Public Module ImageInfo
           Case 33 : parm = "ISO 3200"
           Case Else : parm = ""
         End Select
-        if Trim(parm) <> "" Then note = note & "Shooting Mode:" & tb & parm & "\par "
+        If Trim(parm) <> "" Then note = note & "Shooting Mode:" & tb & parm & "\par "
 
         Select Case v(12)
           Case 0 : parm = "None"
@@ -4207,7 +4355,7 @@ Public Module ImageInfo
           If i And 2048 Then parm = parm & "FP sync used "
           If i And 8192 Then parm = parm & "Built-in "
           If i And 16384 Then parm = parm & "External "
-          if Trim(parm) <> "" Then note = note & "Flash:" & tb & Trim(parm) & "\par "
+          If Trim(parm) <> "" Then note = note & "Flash:" & tb & Trim(parm) & "\par "
         End If
 
         If UBound(v) >= 32 Then
@@ -4416,14 +4564,14 @@ Public Module ImageInfo
       parm = makerTags.Item(sTag(6)).singleValue
       If InStr(parm, ChrW(0)) > 0 Then parm = Trim(Mid(parm, 1, InStr(parm, ChrW(0)) - 1))
       'parm = splitString(parm)
-      if Trim(parm) <> "" Then note = note & "Image Type:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note = note & "Image Type:" & tb & Trim(parm) & "\par "
     End If ' tag 6 for Canon
 
     If makerTags.Contains(sTag(7)) Then
       parm = makerTags.Item(sTag(7)).singleValue
       If InStr(parm, ChrW(0)) > 0 Then parm = Trim(Mid(parm, 1, InStr(parm, ChrW(0)) - 1))
       ' parm = splitString(parm)
-      if Trim(parm) <> "" Then
+      If Trim(parm) <> "" Then
         note = note & "Firmware:" & tb & Trim(parm) & "\par "
         canonFirmware = Trim(parm)
       End If
@@ -4438,7 +4586,7 @@ Public Module ImageInfo
     If makerTags.Contains(sTag(9)) Then
       parm = makerTags.Item(sTag(9)).singleValue
       If InStr(parm, ChrW(0)) > 0 Then parm = Mid(parm, 1, InStr(parm, ChrW(0)) - 1)
-      if Trim(parm) <> "" Then note = note & "Owner Name:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note = note & "Owner Name:" & tb & Trim(parm) & "\par "
     End If ' tag 9 for Canon
 
     If makerTags.Contains(sTag(12)) Then
@@ -4777,11 +4925,11 @@ Public Module ImageInfo
             End Select
             If Len(parm) > 0 Then note = note & "Auto Lighting Optimizer:" & tb & parm & "\par "
             note = note & "Lens Type:" & tb & canonDescr(4, b(231)) & "\par "
-            parm = utf8bare.getstring(b, 346, 5)
+            parm = UTF8bare.GetString(b, 346, 5)
             If AscW(parm.Chars(0)) < 32 Then parm = ""
             If InStr(parm, ChrW(0)) > 0 Then parm = Mid(parm, 1, InStr(parm, ChrW(0)) - 1)
             If Len(parm) > 0 Then note = note & "Firmware Version:" & tb & parm & "\par " : k = 0
-            parm = utf8bare.getstring(b, 382, 5)
+            parm = UTF8bare.GetString(b, 382, 5)
             If AscW(parm.Chars(0)) < 32 Then parm = ""
             If InStr(parm, ChrW(0)) > 0 Then parm = Mid(parm, 1, InStr(parm, ChrW(0)) - 1)
             If Len(parm) > 0 Then note = note & "Firmware Version:" & tb & parm & "\par " : k = 36
@@ -4823,7 +4971,7 @@ Public Module ImageInfo
             parm = canonDescr(1, word(b, 111, intel))
             If Len(parm) > 0 Then note = note & "White Balance:" & tb & parm & "\par "
             note = note & "Color Temperature:" & tb & word(b, 115, intel) & "\par "
-            parm = utf8bare.getstring(b, 255, 5)
+            parm = UTF8bare.GetString(b, 255, 5)
             If InStr(parm, ChrW(0)) > 0 Then parm = Mid(parm, 1, InStr(parm, ChrW(0)) - 1)
             If Len(parm) > 0 Then note = note & "Firmware Version:" & tb & parm & "\par "
             x = DWord(b, 407, intel)
@@ -4831,7 +4979,7 @@ Public Module ImageInfo
             x = DWord(b, 419, intel)
             If x > 0 Then note = note & "Directory Index:" & tb & Format(x, "###,###,###") & "\par "
             note = note & "Lens Type:" & tb & canonDescr(4, b(215)) & "\par "
-            parm = utf8bare.getstring(b, 2347, 64)
+            parm = UTF8bare.GetString(b, 2347, 64)
             If InStr(parm, ChrW(0)) > 0 Then parm = Mid(parm, 1, InStr(parm, ChrW(0)) - 1)
             If Len(parm) > 0 Then note = note & "Lens Model:" & tb & parm & "\par "
           End If ' EOS 40D
@@ -4891,11 +5039,11 @@ Public Module ImageInfo
             End Select
             If Len(parm) > 0 Then note = note & "Auto Lighting Optimizer:" & tb & parm & "\par "
             note = note & "Lens Type:" & tb & canonDescr(4, b(235)) & "\par "
-            parm = utf8bare.getstring(b, 346, 5)
+            parm = UTF8bare.GetString(b, 346, 5)
             If AscW(parm.Chars(0)) < 32 Then parm = ""
             If InStr(parm, ChrW(0)) > 0 Then parm = Mid(parm, 1, InStr(parm, ChrW(0)) - 1)
             If Len(parm) > 0 Then note = note & "Firmware Version:" & tb & parm & "\par " : k = 0
-            parm = utf8bare.getstring(b, 350, 5)
+            parm = UTF8bare.GetString(b, 350, 5)
             If AscW(parm.Chars(0)) < 32 Then parm = ""
             If InStr(parm, ChrW(0)) > 0 Then parm = Mid(parm, 1, InStr(parm, ChrW(0)) - 1)
             If Len(parm) > 0 Then note = note & "Firmware Version:" & tb & parm & "\par " : k = 4
@@ -4942,7 +5090,7 @@ Public Module ImageInfo
             If Len(parm) > 0 Then note = note & "White Balance:" & tb & parm & "\par "
             note = note & "Color Temperature:" & tb & word(b, 115, intel) & "\par "
             note = note & "Lens Type:" & tb & canonDescr(4, b(227)) & "\par "
-            parm = utf8bare.getstring(b, 267, 5)
+            parm = UTF8bare.GetString(b, 267, 5)
             If AscW(parm.Chars(0)) < 32 Then parm = ""
             If InStr(parm, ChrW(0)) > 0 Then parm = Mid(parm, 1, InStr(parm, ChrW(0)) - 1)
             If Len(parm) > 0 Then note = note & "Firmware Version:" & tb & parm & "\par " : k = 0
@@ -4950,7 +5098,7 @@ Public Module ImageInfo
             If x > 0 Then note = note & "Directory Index:" & tb & Format(x, "###,###,###") & "\par "
             x = DWord(b, 323, intel)
             If x > 0 Then note = note & "File Index:" & tb & Format(x, "###,###,###") & "\par "
-            parm = utf8bare.getstring(b, 2359, 64)
+            parm = UTF8bare.GetString(b, 2359, 64)
             If InStr(parm, ChrW(0)) > 0 Then parm = Mid(parm, 1, InStr(parm, ChrW(0)) - 1)
             If Len(parm) > 0 Then note = note & "Lens Model:" & tb & parm & "\par "
           End If ' EOS 450D, 1000D
@@ -5014,7 +5162,7 @@ Public Module ImageInfo
             note = note & "Lens Type:" & tb & canonDescr(4, b(k + 239)) & "\par "
             If InStr(parm, ChrW(0)) > 0 Then parm = Mid(parm, 1, InStr(parm, ChrW(0)) - 1)
             If Len(parm) > 0 Then note = note & "Firmware Version:" & tb & parm & "\par " : k = 0
-            parm = utf8bare.getstring(b, k + 392, 35)
+            parm = UTF8bare.GetString(b, k + 392, 35)
             If AscW(parm.Chars(0)) < 32 Then parm = ""
             If InStr(parm, ChrW(0)) > 0 Then parm = Mid(parm, 1, InStr(parm, ChrW(0)) - 1)
             If Len(parm) > 0 Then note = note & "Firmware Version:" & tb & parm & "\par " : k = 0
@@ -5088,7 +5236,7 @@ Public Module ImageInfo
             End Select
             If Len(parm) > 0 Then note = note & "Auto Lighting Optimizer:" & tb & parm & "\par "
             note = note & "Lens Type:" & tb & canonDescr(4, b(247)) & "\par "
-            parm = utf8bare.getstring(b, 400, 35)
+            parm = UTF8bare.GetString(b, 400, 35)
             If AscW(parm.Chars(0)) < 32 Then parm = ""
             If InStr(parm, ChrW(0)) > 0 Then parm = Mid(parm, 1, InStr(parm, ChrW(0)) - 1)
             If Len(parm) > 0 Then note = note & "Firmware Version:" & tb & parm & "\par " : k = 0
@@ -5105,7 +5253,7 @@ Public Module ImageInfo
     If makerTags.Contains(sTag(&H95)) Then
       parm = makerTags.Item(sTag(&H95)).singleValue
       If InStr(parm, ChrW(0)) > 0 Then parm = Mid(parm, 1, InStr(parm, ChrW(0)) - 1)
-      if Trim(parm) <> "" Then note = note & "Lens Model:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note = note & "Lens Model:" & tb & Trim(parm) & "\par "
     End If ' tag 95 for Canon
 
   End Sub ' canonMakernote
@@ -5128,12 +5276,12 @@ Public Module ImageInfo
           parm = parm & v(i)
         End If
       Next i
-      if Trim(parm) <> "" Then note = note & "Makernote Version:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note = note & "Makernote Version:" & tb & Trim(parm) & "\par "
     End If ' tag 1 for nikon
 
     If makerTags.Contains(sTag(15)) Then
       parm = makerTags.Item(sTag(15)).singleValue
-      if Trim(parm) <> "" Then note = note & "ISO Selection:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note = note & "ISO Selection:" & tb & Trim(parm) & "\par "
     End If ' tag 15 for nikon
 
     If makerTags.Contains(sTag(19)) Then
@@ -5160,37 +5308,37 @@ Public Module ImageInfo
 
     If makerTags.Contains(sTag(3)) Then
       parm = makerTags.Item(sTag(3)).singleValue
-      if Trim(parm) <> "" Then note = note & "Color Mode:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note = note & "Color Mode:" & tb & Trim(parm) & "\par "
     End If
 
     If makerTags.Contains(sTag(4)) Then
       parm = makerTags.Item(sTag(4)).singleValue
-      if Trim(parm) <> "" Then note = note & "Quality:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note = note & "Quality:" & tb & Trim(parm) & "\par "
     End If ' tag 4 for nikon
 
     If makerTags.Contains(sTag(5)) Then
       parm = makerTags.Item(sTag(5)).singleValue
-      if Trim(parm) <> "" Then note = note & "White Balance:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note = note & "White Balance:" & tb & Trim(parm) & "\par "
     End If ' tag 5 for nikon
 
     If makerTags.Contains(sTag(6)) Then
       parm = makerTags.Item(sTag(6)).singleValue
-      if Trim(parm) <> "" Then note = note & "Image Sharpening:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note = note & "Image Sharpening:" & tb & Trim(parm) & "\par "
     End If ' tag 6 for nikon
 
     If makerTags.Contains(sTag(7)) Then
       parm = makerTags.Item(sTag(7)).singleValue
-      if Trim(parm) <> "" Then note = note & "Focus Mode:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note = note & "Focus Mode:" & tb & Trim(parm) & "\par "
     End If ' tag 7 for nikon
 
     If makerTags.Contains(sTag(8)) Then
       parm = makerTags.Item(sTag(8)).singleValue
-      if Trim(parm) <> "" Then note = note & "Flash Setting:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note = note & "Flash Setting:" & tb & Trim(parm) & "\par "
     End If ' tag 8 for nikon
 
     If makerTags.Contains(sTag(9)) Then
       parm = makerTags.Item(sTag(9)).singleValue
-      if Trim(parm) <> "" Then note = note & "Flash Type:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note = note & "Flash Type:" & tb & Trim(parm) & "\par "
     End If ' tag 9 for nikon
 
     If makerTags.Contains(sTag(11)) Then
@@ -5216,7 +5364,7 @@ Public Module ImageInfo
       For i = 0 To k
         parm = parm & v(i)
       Next i
-      if Trim(parm) <> "" Then note = note & "Program Shift:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note = note & "Program Shift:" & tb & Trim(parm) & "\par "
     End If ' tag 13 for nikon
 
     If makerTags.Contains(sTag(14)) Then
@@ -5226,7 +5374,7 @@ Public Module ImageInfo
       For i = 0 To k
         parm = parm & v(i)
       Next i
-      if Trim(parm) <> "" Then note = note & "Exposure Difference:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note = note & "Exposure Difference:" & tb & Trim(parm) & "\par "
     End If ' tag 14 for nikon
 
     If makerTags.Contains(sTag(18)) Then
@@ -5236,7 +5384,7 @@ Public Module ImageInfo
       For i = 0 To k
         parm = parm & v(i)
       Next i
-      if Trim(parm) <> "" Then note = note & "Flash Exposure Compensation:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note = note & "Flash Exposure Compensation:" & tb & Trim(parm) & "\par "
     End If ' tag 18 for nikon
 
     If makerTags.Contains(sTag(22)) Then
@@ -5257,7 +5405,7 @@ Public Module ImageInfo
       For i = 0 To k
         parm = parm & v(i)
       Next i
-      if Trim(parm) <> "" Then note = note & "Flash Exposure Bracket:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note = note & "Flash Exposure Bracket:" & tb & Trim(parm) & "\par "
     End If ' tag 23 for nikon
 
     If makerTags.Contains(sTag(24)) Then
@@ -5267,7 +5415,7 @@ Public Module ImageInfo
       For i = 0 To k
         parm = parm & " " & v(i)
       Next i
-      if Trim(parm) <> "" Then note = note & "Flash Exposure Bracket:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note = note & "Flash Exposure Bracket:" & tb & Trim(parm) & "\par "
     End If ' tag 24 for nikon
 
     If makerTags.Contains(sTag(25)) Then
@@ -5277,7 +5425,7 @@ Public Module ImageInfo
 
     If makerTags.Contains(sTag(26)) Then
       parm = makerTags.Item(sTag(26)).singleValue
-      if Trim(parm) <> "" Then note = note & "Image Processing:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note = note & "Image Processing:" & tb & Trim(parm) & "\par "
     End If ' tag 26 for nikon
 
     If makerTags.Contains(sTag(27)) Then
@@ -5420,22 +5568,22 @@ Public Module ImageInfo
         Case 5
           parm = "high"
       End Select
-      if Trim(parm) <> "" Then note = note & "Vignette Control:" & tb & parm & "\par "
+      If Trim(parm) <> "" Then note = note & "Vignette Control:" & tb & parm & "\par "
     End If ' tag 42 for nikon
 
     If makerTags.Contains(sTag(128)) Then
       parm = makerTags.Item(sTag(128)).singleValue
-      if Trim(parm) <> "" Then note = note & "Image Adjustment:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note = note & "Image Adjustment:" & tb & Trim(parm) & "\par "
     End If ' tag 128 for nikon
 
     If makerTags.Contains(sTag(129)) Then
       parm = makerTags.Item(sTag(129)).singleValue
-      if Trim(parm) <> "" Then note = note & "Tone Component:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note = note & "Tone Component:" & tb & Trim(parm) & "\par "
     End If ' tag 129 for nikon
 
     If makerTags.Contains(sTag(130)) Then
       parm = makerTags.Item(sTag(130)).singleValue
-      if Trim(parm) <> "" Then note = note & "Auxiliary Lens:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note = note & "Auxiliary Lens:" & tb & Trim(parm) & "\par "
     End If ' tag 130 for nikon
 
     If makerTags.Contains(sTag(131)) Then
@@ -5445,7 +5593,7 @@ Public Module ImageInfo
       If i And 4 Then parm = parm & "G "
       If i And 2 Then parm = parm & "D "
       If i And 1 Then parm = parm & "MF "
-      if Trim(parm) <> "" Then note = note & "Lens Type:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note = note & "Lens Type:" & tb & Trim(parm) & "\par "
     End If ' tag 131 for nikon
 
     If makerTags.Contains(sTag(132)) Then
@@ -5478,7 +5626,7 @@ Public Module ImageInfo
         Case 9 : parm = "Fired, TTL Mode"
         Case Else : parm = ""
       End Select
-      if Trim(parm) <> "" Then note = note & "Flash Mode:" & tb & parm & "\par "
+      If Trim(parm) <> "" Then note = note & "Flash Mode:" & tb & parm & "\par "
     End If ' tag 135 for nikon
 
     If makerTags.Contains(sTag(136)) Then
@@ -5534,7 +5682,7 @@ Public Module ImageInfo
       If i And 4 Then parm = parm & "PC Control "
       If i And 2 Then parm = parm & "Delay "
       If i And 1 Then parm = parm & "Continuous "
-      if Trim(parm) <> "" Then note = note & "Shooting Mode:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note = note & "Shooting Mode:" & tb & Trim(parm) & "\par "
     End If ' tag 137 for nikon
 
     If makerTags.Contains(sTag(138)) Then
@@ -5548,7 +5696,7 @@ Public Module ImageInfo
         Case 2
           parm = "Manual Release"
       End Select
-      if Trim(parm) <> "" Then note = note & "Autobracket Release:" & tb & parm & "\par "
+      If Trim(parm) <> "" Then note = note & "Autobracket Release:" & tb & parm & "\par "
     End If ' tag 138 for nikon
 
     If makerTags.Contains(sTag(139)) Then
@@ -5559,23 +5707,23 @@ Public Module ImageInfo
         For i = 0 To k
           parm = parm & " " & v(i)
         Next i
-        if Trim(parm) <> "" Then note = note & "Lens F-Stops:" & tb & Trim(parm) & "\par "
+        If Trim(parm) <> "" Then note = note & "Lens F-Stops:" & tb & Trim(parm) & "\par "
       End If
     End If ' tag 139 for nikon
 
     If makerTags.Contains(sTag(141)) Then
       parm = makerTags.Item(sTag(141)).singleValue
-      if Trim(parm) <> "" Then note = note & "Color Hue:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note = note & "Color Hue:" & tb & Trim(parm) & "\par "
     End If ' tag 141 for nikon
 
     If makerTags.Contains(sTag(143)) Then
       parm = makerTags.Item(sTag(143)).singleValue
-      if Trim(parm) <> "" Then note = note & "Scene Mode:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note = note & "Scene Mode:" & tb & Trim(parm) & "\par "
     End If ' tag 143 for nikon
 
     If makerTags.Contains(sTag(144)) Then
       parm = makerTags.Item(sTag(144)).singleValue
-      if Trim(parm) <> "" Then note = note & "Light Source:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note = note & "Light Source:" & tb & Trim(parm) & "\par "
     End If ' tag 144 for nikon
 
     If makerTags.Contains(sTag(146)) Then
@@ -5596,7 +5744,7 @@ Public Module ImageInfo
         Case 4
           parm = "Lossy (type 2)"
       End Select
-      if Trim(parm) <> "" Then note = note & "NEF Compression:" & tb & parm & "\par "
+      If Trim(parm) <> "" Then note = note & "NEF Compression:" & tb & parm & "\par "
     End If ' tag 147 for nikon
 
     If makerTags.Contains(sTag(148)) Then
@@ -5606,7 +5754,7 @@ Public Module ImageInfo
 
     If makerTags.Contains(sTag(149)) Then
       parm = makerTags.Item(sTag(149)).singleValue
-      if Trim(parm) <> "" Then note = note & "Noise Reduction:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note = note & "Noise Reduction:" & tb & Trim(parm) & "\par "
     End If ' tag 149 for nikon
 
     If makerTags.Contains(sTag(154)) Then
@@ -5616,7 +5764,7 @@ Public Module ImageInfo
 
     If makerTags.Contains(sTag(156)) Then
       parm = makerTags.Item(sTag(156)).singleValue
-      if Trim(parm) <> "" Then note = note & "Scene Assist:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note = note & "Scene Assist:" & tb & Trim(parm) & "\par "
     End If ' tag 156 for nikon
 
     If makerTags.Contains(sTag(158)) Then
@@ -5676,13 +5824,13 @@ Public Module ImageInfo
             Case Else
           End Select
         Next i
-        if Trim(parm) <> "" Then note = note & "Retouch History:" & tb & parm & "\par "
+        If Trim(parm) <> "" Then note = note & "Retouch History:" & tb & parm & "\par "
       End If
     End If ' tag 158 for nikon
 
     If makerTags.Contains(sTag(160)) Then
       parm = makerTags.Item(sTag(160)).singleValue
-      if Trim(parm) <> "" Then note = note & "Serial Number:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note = note & "Serial Number:" & tb & Trim(parm) & "\par "
     End If ' tag 160 for nikon
 
     If makerTags.Contains(sTag(162)) Then
@@ -5703,27 +5851,27 @@ Public Module ImageInfo
     If makerTags.Contains(sTag(169)) Then
       v = makerTags.Item(sTag(169)).singleValue
       parm = v
-      if Trim(parm) <> "" Then note = note & "Image Optimization:" & tb & parm & "\par "
+      If Trim(parm) <> "" Then note = note & "Image Optimization:" & tb & parm & "\par "
     End If ' tag 169 for nikon
 
     If makerTags.Contains(sTag(170)) Then
       parm = makerTags.Item(sTag(170)).singleValue
-      if Trim(parm) <> "" Then note = note & "Saturation:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note = note & "Saturation:" & tb & Trim(parm) & "\par "
     End If ' tag 170 for nikon
 
     If makerTags.Contains(sTag(171)) Then
       parm = makerTags.Item(sTag(171)).singleValue
-      if Trim(parm) <> "" Then note = note & "Vari Program:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note = note & "Vari Program:" & tb & Trim(parm) & "\par "
     End If ' tag 171 for nikon
 
     If makerTags.Contains(sTag(172)) Then
       parm = makerTags.Item(sTag(172)).singleValue
-      if Trim(parm) <> "" Then note = note & "Image Stabilization:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note = note & "Image Stabilization:" & tb & Trim(parm) & "\par "
     End If ' tag 172 for nikon
 
     If makerTags.Contains(sTag(173)) Then
       parm = makerTags.Item(sTag(173)).singleValue
-      if Trim(parm) <> "" Then note = note & "Autofocus Response:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note = note & "Autofocus Response:" & tb & Trim(parm) & "\par "
     End If ' tag 173 for nikon
 
     If makerTags.Contains(sTag(177)) Then
@@ -5741,12 +5889,12 @@ Public Module ImageInfo
         Case 6
           parm = "High"
       End Select
-      if Trim(parm) <> "" Then note = note & "High ISO Noise Reduction:" & tb & parm & "\par "
+      If Trim(parm) <> "" Then note = note & "High ISO Noise Reduction:" & tb & parm & "\par "
     End If ' tag 177 for nikon
 
     If makerTags.Contains(sTag(179)) Then
       parm = makerTags.Item(sTag(179)).singleValue
-      if Trim(parm) <> "" Then note = note & "Toning Effect:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note = note & "Toning Effect:" & tb & Trim(parm) & "\par "
     End If ' tag 179 for nikon
 
   End Sub ' nikonMakernote
@@ -6308,8 +6456,12 @@ Public Module ImageInfo
       If Len(parm) > 0 Then note = note & "Scene Mode:" & tb & parm & "\par "
     End If
 
-    If makerTags.Contains(sTag(&H404)) Then ' camera ID, undefined
-      parm = makerTags.Item(sTag(&H404)).singleValue
+    If makerTags.Contains(sTag(&H404)) Then
+      v = makerTags.Item(sTag(&H404)).singleValue
+      parm = ""
+      For i = 1 To Len(v)
+        If AscW(v.chars(i - 1)) >= 32 Then parm = parm & v.chars(i - 1)
+      Next i
       If InStr(parm, ChrW(0)) > 0 Then parm = Trim(Mid(parm, 1, InStr(parm, ChrW(0)) - 1))
       If Len(parm) > 0 Then note = note & "Serial Number:" & tb & parm & "\par "
     End If
@@ -6486,8 +6638,12 @@ Public Module ImageInfo
       note = note & "Color Matrix Number:" & tb & i & "\par "
     End If
 
-    If makerTags.Contains(sTag(&H101A)) Then ' camera ID, undefined
-      parm = makerTags.Item(sTag(&H101A)).singleValue
+    If makerTags.Contains(sTag(&H101A)) Then
+      v = makerTags.Item(sTag(&H101A)).singleValue
+      parm = ""
+      For i = 1 To Len(v)
+        If AscW(v.chars(i - 1)) >= 32 Then parm = parm & v.chars(i - 1)
+      Next i
       If InStr(parm, ChrW(0)) > 0 Then parm = Trim(Mid(parm, 1, InStr(parm, ChrW(0)) - 1))
       If Len(parm) > 0 Then note = note & "Serial Number:" & tb & parm & "\par "
     End If
@@ -6585,7 +6741,10 @@ Public Module ImageInfo
         For i = 1 To Len(v)
           If AscW(v.chars(i - 1)) >= 32 Then parm = parm & v.chars(i - 1)
         Next i
-        If Len(parm) > 1 Then note = note & "Camera Type:" & tb & parm & "\par "
+        If Len(parm) > 1 Then
+          If olympusCamera.ContainsKey(parm) Then parm = olympusCamera(parm)
+          note = note & "Camera Type:" & tb & parm & "\par "
+        End If
       End If
 
       If uz.Tags.Contains(sTag(&H101)) Then
@@ -6595,95 +6754,113 @@ Public Module ImageInfo
         For i = 1 To Len(v)
           If AscW(v.chars(i - 1)) >= 32 Then parm = parm & v.chars(i - 1)
         Next i
+        If InStr(parm, ChrW(0)) > 0 Then parm = Trim(Mid(parm, 1, InStr(parm, ChrW(0)) - 1))
         If Len(parm) > 0 Then note = note & "Serial Number:" & tb & parm & "\par "
       End If
 
-      If uz.Tags.Contains(sTag(&H102)) Then ' camera ID, undefined
+      If uz.Tags.Contains(sTag(&H102)) Then
         v = uz.Tags.Item(sTag(&H102)).singleValue
         If InStr(v, ChrW(0)) > 0 Then v = Trim(Mid(v, 1, InStr(v, ChrW(0)) - 1))
         parm = ""
         For i = 1 To Len(v)
           If AscW(v.chars(i - 1)) >= 32 Then parm = parm & v.chars(i - 1)
         Next i
+        If InStr(parm, ChrW(0)) > 0 Then parm = Trim(Mid(parm, 1, InStr(parm, ChrW(0)) - 1))
         If Len(parm) > 0 Then note = note & "Internal Serial Number:" & tb & parm & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H103)) Then
         x = uz.Tags.Item(sTag(&H103)).singleValue
-        note = note & "Focal Plane Diagonal:" & tb & Format(x, "####,##0.###") & "\par "
+        note = note & "Focal Plane Diagonal:" & tb & Format(x, "####,##0.###") & " mm\par "
       End If
 
       If uz.Tags.Contains(sTag(&H104)) Then
         i = uz.Tags.Item(sTag(&H104)).singleValue
-        If i <> 0 Then note = note & "Body Firmware Version:" & tb & i & "\par "
+        parm = Format(i, "x2")
+        parm = parm.Insert(1, ".")
+        If i <> 0 Then note = note & "Body Firmware Version:" & tb & parm & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H201)) Then
         v = uz.Tags.Item(sTag(&H201)).Value
-        parm = ""
-        For i = 0 To UBound(v) : parm = parm & v(i) & " " : Next i
+        parm = Format(v(0), "x2") & Format(v(2), "x2") & Format(v(3), "x2")
+        If olympusLens.ContainsKey(parm) Then parm = olympusLens(parm) Else parm = ""
         If Len(parm) > 0 Then note = note & "Lens Type:" & tb & parm & "\par "
       End If
 
-      If uz.Tags.Contains(sTag(&H202)) Then ' camera ID, undefined
-        parm = uz.Tags.Item(sTag(&H202)).singleValue
-        If InStr(parm, ChrW(0)) > 0 Then parm = Trim(Mid(parm, 1, InStr(parm, ChrW(0)) - 1))
+      If uz.Tags.Contains(sTag(&H202)) Then
+        v = uz.Tags.Item(sTag(&H202)).singleValue
+        parm = v
         If Len(parm) > 0 Then note = note & "Lens Serial Number:" & tb & parm & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H205)) Then
         i = uz.Tags.Item(sTag(&H205)).singleValue
-        note = note & "Max Aperture at Min. Focal:" & tb & i & "\par "
+        If i > 0 Then
+          parm = Format(Sqrt(2) ^ (i / 256), "#.0")
+          note = note & "Max Aperture at Min. Focal:" & tb & parm & "\par "
+        End If
       End If
 
       If uz.Tags.Contains(sTag(&H206)) Then
         i = uz.Tags.Item(sTag(&H206)).singleValue
-        note = note & "Max Aperture at Max. Focal:" & tb & i & "\par "
+        If i > 0 Then
+          parm = Format(Sqrt(2) ^ (i / 256), "#.0")
+          note = note & "Max Aperture at Max. Focal:" & tb & parm & "\par "
+        End If
       End If
 
       If uz.Tags.Contains(sTag(&H20A)) Then
         i = uz.Tags.Item(sTag(&H20A)).singleValue
-        note = note & "Max Aperture at Current Focal:" & tb & i & "\par "
+        If i > 0 Then
+          parm = Format(Sqrt(2) ^ (i / 256), "#.0")
+          note = note & "Max Aperture at Current Focal:" & tb & parm & "\par "
+        End If
       End If
 
       If uz.Tags.Contains(sTag(&H207)) Then
         i = uz.Tags.Item(sTag(&H207)).singleValue
-        note = note & "Minimum Focal Length:" & tb & i & "\par "
+        note = note & "Minimum Focal Length:" & tb & i & " mm \par "
       End If
 
       If uz.Tags.Contains(sTag(&H208)) Then
         i = uz.Tags.Item(sTag(&H208)).singleValue
-        note = note & "Maximum Focal Length:" & tb & i & "\par "
+        note = note & "Maximum Focal Length:" & tb & i & " mm \par "
       End If
 
       If uz.Tags.Contains(sTag(&H20B)) Then
         i = uz.Tags.Item(sTag(&H20B)).singleValue
-        note = note & "Lens Properties:" & tb & i & "\par "
+        note = note & "Lens Properties:" & tb & Format(i, "x4") & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H301)) Then
         v = uz.Tags.Item(sTag(&H301)).Value
         parm = ""
-        For i = 0 To UBound(v) : parm = parm & v(i) & " " : Next i
-        If Len(parm) > 0 Then note = note & "Extender:" & tb & parm & "\par "
+        If v(0) = 0 Then
+          Select Case v(2)
+            Case 0
+              parm = "none"
+            Case 4
+              parm = "Olympus Zuiko Digital EC-14 1.4x Teleconverter"
+            Case 8
+              parm = "Olympus EX-25 Extension Tube"
+            Case 10
+              parm = "Olympus Zuiko Digital EC-20 2.0x Teleconverter"
+          End Select
+          If Len(parm) > 0 Then note = note & "Extender:" & tb & parm & "\par "
+        End If
       End If
 
-      If uz.Tags.Contains(sTag(&H302)) Then ' camera ID, undefined
-        parm = uz.Tags.Item(sTag(&H302)).singleValue
-        If InStr(parm, ChrW(0)) > 0 Then parm = Trim(Mid(parm, 1, InStr(parm, ChrW(0)) - 1))
+      If uz.Tags.Contains(sTag(&H302)) Then ' Extender Serial Number
+        v = uz.Tags.Item(sTag(&H302)).singleValue
+        parm = v
         If Len(parm) > 0 Then note = note & "Extender Serial Number:" & tb & parm & "\par "
       End If
 
-      If uz.Tags.Contains(sTag(&H303)) Then ' camera ID, undefined
-        v = uz.Tags.Item(sTag(&H303)).singleValue
-        If TypeOf v Is String Then
-          If InStr(v, ChrW(0)) > 0 Then v = Trim(Mid(v, 1, InStr(v, ChrW(0)) - 1))
-          parm = ""
-          For i = 1 To Len(v)
-            If AscW(v.chars(i - 1)) >= 32 Then parm = parm & v.chars(i - 1)
-          Next i
-          If Len(parm) > 0 Then note = note & "Extender Model:" & tb & parm & "\par "
-        End If
+      If uz.Tags.Contains(sTag(&H303)) Then ' Extender Model
+        v = uz.Tags.Item(sTag(&H302)).singleValue
+        parm = v
+        If Len(parm) > 0 Then note = note & "Extender Model:" & tb & parm & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H304)) Then
@@ -6693,11 +6870,11 @@ Public Module ImageInfo
 
       If uz.Tags.Contains(sTag(&H1000)) Then
         i = uz.Tags.Item(sTag(&H1000)).singlevalue
-        parm = ""
         Select Case i
           Case 0 : parm = "None"
           Case 2 : parm = "Simple E System"
           Case 3 : parm = "E System"
+          Case 4 : parm = "E-System (body powered)"
           Case Else : parm = ""
         End Select
         If Len(parm) > 0 Then note = note & "Flash Type:" & tb & parm & "\par "
@@ -6705,7 +6882,6 @@ Public Module ImageInfo
 
       If uz.Tags.Contains(sTag(&H1001)) Then
         i = uz.Tags.Item(sTag(&H1001)).singlevalue
-        parm = ""
         Select Case i
           Case 0 : parm = "None"
           Case 1 : parm = "FL-20"
@@ -6715,6 +6891,10 @@ Public Module ImageInfo
           Case 5 : parm = "FL-36"
           Case 6 : parm = "FL-50R"
           Case 7 : parm = "FL-36R"
+          Case 9 : parm = "FL-14"
+          Case 11 : parm = "FL-600R"
+          Case 13 : parm = "FL-LM3"
+          Case 15 : parm = "FL-900R"
           Case Else : parm = ""
         End Select
         If Len(parm) > 0 Then note = note & "Flash Model:" & tb & parm & "\par "
@@ -6788,6 +6968,17 @@ Public Module ImageInfo
         If Len(parm) > 0 Then note = note & "Metering Mode:" & tb & parm & "\par "
       End If
 
+      If uz.Tags.Contains(sTag(&H203)) Then
+        x = uz.Tags.Item(sTag(&H203)).singlevalue
+        If Len(parm) > 0 Then note = note & "Exposure shift:" & tb & Format(x, "#0.##") & "\par "
+      End If
+
+      If uz.Tags.Contains(sTag(&H204)) Then
+        i = uz.Tags.Item(sTag(&H204)).singleValue
+        If i = 0 Then parm = "Off" Else If i = 1 Then parm = "On" Else parm = ""
+        If Len(parm) > 0 Then note = note & "ND filter:" & tb & parm & "\par "
+      End If
+
       If uz.Tags.Contains(sTag(&H300)) Then
         i = uz.Tags.Item(sTag(&H300)).singlevalue
         parm = ""
@@ -6801,16 +6992,27 @@ Public Module ImageInfo
       End If
 
       If uz.Tags.Contains(sTag(&H301)) Then
-        i = uz.Tags.Item(sTag(&H301)).singlevalue
-        parm = ""
-        Select Case i
+        v = uz.Tags.Item(sTag(&H301)).value
+        Select Case v(0)
           Case 0 : parm = "Single AF"
           Case 1 : parm = "Sequential shooting AF"
           Case 2 : parm = "Continuous AF"
           Case 3 : parm = "Multi AF"
+          Case 4 : parm = "Face detect"
           Case 10 : parm = "MF"
           Case Else : parm = ""
         End Select
+
+        i = v(1)
+        If i And 1 Then parm &= ", S-AF"
+        If i And 4 Then parm &= ", C-AF"
+        If i And 16 Then parm &= ", MF"
+        If i And 32 Then parm &= ", Face detect"
+        If i And 64 Then parm &= ", Imager AF"
+        If i And 128 Then parm &= ", Live View Magnification Frame"
+        If i And 256 Then parm &= ", AF sensor"
+
+        If parm.StartsWith(", ") Then parm = parm.Substring(2)
         If Len(parm) > 0 Then note = note & "Focus Mode:" & tb & parm & "\par "
       End If
 
@@ -6826,6 +7028,13 @@ Public Module ImageInfo
         If Len(parm) > 0 Then note = note & "AF Search:" & tb & parm & "\par "
       End If
 
+      If uz.Tags.Contains(sTag(&H306)) Then
+        i = uz.Tags.Item(sTag(&H306)).singleValue
+        If i = 0 Then parm = "Off" Else If i = 1 Then parm = "On" Else parm = ""
+        If Len(parm) > 0 Then note = note & "AF Fine Tune:" & tb & parm & "\par "
+      End If
+
+
       If uz.Tags.Contains(sTag(&H400)) Then
         i = uz.Tags.Item(sTag(&H400)).singlevalue
         parm = ""
@@ -6836,7 +7045,41 @@ Public Module ImageInfo
         If i And 2 ^ 3 Then parm = parm & ", Slow-sync"
         If i And 2 ^ 4 Then parm = parm & ", Forced On"
         If i And 2 ^ 5 Then parm = parm & ", 2nd Curtain"
+        If parm.StartsWith(", ") Then parm = parm.Substring(2)
         If Len(parm) > 0 Then note = note & "Flash Mode:" & tb & parm & "\par "
+      End If
+
+      If uz.Tags.Contains(sTag(&H403)) Then
+        i = uz.Tags.Item(sTag(&H403)).singlevalue
+        Select Case i
+          Case 0 : parm = "off"
+          Case 1 : parm = "Channel 1, low"
+          Case 2 : parm = "Channel 2, low"
+          Case 3 : parm = "Channel 3, low"
+          Case 4 : parm = "Channel 4, low"
+          Case 9 : parm = "Channel 1, mid"
+          Case 10 : parm = "Channel 2, mid"
+          Case 11 : parm = "Channel 3, mid"
+          Case 12 : parm = "Channel 4, mid"
+          Case 17 : parm = "Channel 1, high"
+          Case 18 : parm = "Channel 2, high"
+          Case 19 : parm = "Channel 3, high"
+          Case 20 : parm = "Channel 4, high"
+          Case Else : parm = ""
+        End Select
+        If Len(parm) > 0 Then note = note & "Flash Remote Control:" & tb & parm & "\par "
+      End If
+
+      If uz.Tags.Contains(sTag(&H404)) Then
+        i = uz.Tags.Item(sTag(&H404)).singlevalue
+        Select Case i
+          Case 0 : parm = "off"
+          Case 3 : parm = "TTL"
+          Case 4 : parm = "Auto"
+          Case 5 : parm = "Manual"
+          Case Else : parm = ""
+        End Select
+        If Len(parm) > 0 Then note = note & "Flash control mode:" & tb & parm & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H500)) Then
@@ -6844,22 +7087,28 @@ Public Module ImageInfo
         parm = ""
         Select Case i
           Case 0 : parm = "Auto"
+          Case 1 : parm = "Auto (Keep Warm Color Off)"
           Case 16 : parm = "7500K (Fine Weather with Shade)"
           Case 17 : parm = "6000K (Cloudy)"
           Case 18 : parm = "5300K (Fine Weather)"
           Case 20 : parm = "3000K (Tungsten light)"
           Case 21 : parm = "3600K (Tungsten light-like)"
+          Case 22 : parm = "Auto Setup"
+          Case 23 : parm = "5500K (Flash) "
           Case 33 : parm = "6600K (Daylight fluorescent)"
           Case 34 : parm = "4500K (Neutral white fluorescent)"
           Case 35 : parm = "4000K (Cool white fluorescent)"
+          Case 36 : parm = "White fluorescent"
           Case 48 : parm = "3600K (Tungsten light-like)"
-          Case 256 : parm = "Custom WB 1"
-          Case 257 : parm = "Custom WB 2"
-          Case 258 : parm = "Custom WB 3"
-          Case 259 : parm = "Custom WB 4"
-          Case 512 : parm = "Custom WB 5400K"
-          Case 513 : parm = "Custom WB 2900K"
-          Case 514 : parm = "Custom WB 8000K"
+          Case 67 : parm = "Underwater"
+          Case 256 : parm = "One touch WB 1"
+          Case 257 : parm = "One touch WB 2"
+          Case 258 : parm = "One touch WB 3"
+          Case 259 : parm = "One touch WB 4"
+          Case 512 : parm = "Custom WB 1"
+          Case 513 : parm = "Custom WB 2"
+          Case 514 : parm = "Custom WB 3"
+          Case 515 : parm = "Custom WB 4"
           Case Else : parm = ""
         End Select
         If Len(parm) > 0 Then note = note & "White Balance:" & tb & parm & "\par "
@@ -6930,55 +7179,7 @@ Public Module ImageInfo
 
       If uz.Tags.Contains(sTag(&H509)) Then
         i = uz.Tags.Item(sTag(&H509)).singlevalue
-        parm = ""
-        Select Case i
-          Case 0 : parm = "Standard"
-          Case 6 : parm = "Auto"
-          Case 7 : parm = "Sport"
-          Case 8 : parm = "Portrait"
-          Case 9 : parm = "Landscape+Portrait"
-          Case 10 : parm = "Landscape"
-          Case 11 : parm = "Night Scene"
-          Case 12 : parm = "Self Portrait"
-          Case 13 : parm = "Panorama"
-          Case 14 : parm = "2 in 1"
-          Case 15 : parm = "Movie"
-          Case 16 : parm = "Landscape+Portrait"
-          Case 17 : parm = "Night+Portrait"
-          Case 18 : parm = "Indoor"
-          Case 19 : parm = "Fireworks"
-          Case 20 : parm = "Sunset"
-          Case 22 : parm = "Macro"
-          Case 23 : parm = "Super Macro"
-          Case 24 : parm = "Food"
-          Case 25 : parm = "Documents"
-          Case 26 : parm = "Museum"
-          Case 27 : parm = "Shoot & Select"
-          Case 28 : parm = "Beach & Snow"
-          Case 29 : parm = "Self Protrait+Timer"
-          Case 30 : parm = "Candle"
-          Case 31 : parm = "Available Light"
-          Case 32 : parm = "Behind Glass"
-          Case 33 : parm = "My Mode"
-          Case 34 : parm = "Pet"
-          Case 35 : parm = "Underwater Wide1"
-          Case 36 : parm = "Underwater Macro"
-          Case 37 : parm = "Shoot & Select1"
-          Case 38 : parm = "Shoot & Select2"
-          Case 39 : parm = "High Key"
-          Case 40 : parm = "Digital Image Stabilization"
-          Case 41 : parm = "Auction"
-          Case 42 : parm = "Beach"
-          Case 43 : parm = "Snow"
-          Case 44 : parm = "Underwater Wide2"
-          Case 45 : parm = "Low Key"
-          Case 46 : parm = "Children"
-          Case 47 : parm = "Vivid"
-          Case 48 : parm = "Nature Macro"
-          Case 49 : parm = "Underwater Snapshot"
-          Case 50 : parm = "Shooting Guide"
-          Case Else : parm = ""
-        End Select
+        If olympusSceneMode.ContainsKey(i) Then parm = olympusSceneMode(i) Else parm = ""
         If Len(parm) > 0 Then note = note & "Scene Mode:" & tb & parm & "\par "
       End If
 
@@ -6989,6 +7190,8 @@ Public Module ImageInfo
         If i And 2 ^ 0 Then parm = parm & "On"
         If i And 2 ^ 1 Then parm = parm & ", Noise Filter"
         If i And 2 ^ 2 Then parm = parm & ", Noise Filter, ISO Boost"
+        If i And 2 ^ 3 Then parm = parm & ", Auto"
+        If parm.StartsWith(", ") Then parm = parm.Substring(2)
         If Len(parm) > 0 Then note = note & "Noise Reduction:" & tb & parm & "\par "
       End If
 
@@ -7009,6 +7212,18 @@ Public Module ImageInfo
         note = note & "Compression Factor:" & tb & Format(x, "####,##0.###") & "\par "
       End If
 
+      If uz.Tags.Contains(sTag(&H50F)) Then
+        v = uz.Tags.Item(sTag(&H50F)).Value
+        If v.length >= 3 Then
+          If v(0) = -1 And v(1) = -1 And v(2) = 1 Then parm = "Low key"
+          If v(0) = 0 And v(1) = -1 And v(2) = 1 Then parm = "Normal"
+          If v(0) = 0 And v(1) = 0 And v(2) = 0 Then parm = "n/a"
+          If v(0) = 1 And v(1) = -1 And v(2) = 1 Then parm = "High key"
+          If v.length = 4 Then parm &= "; " & v(3)
+          If Len(parm) > 0 Then note = note & "Gradation:" & tb & parm & "\par "
+        End If
+      End If
+
       If uz.Tags.Contains(sTag(&H520)) Then
         v = uz.Tags.Item(sTag(&H520)).value
         parm = ""
@@ -7017,37 +7232,44 @@ Public Module ImageInfo
           Case 2 : parm = "Natural"
           Case 3 : parm = "Muted"
           Case 4 : parm = "Portrait"
+          Case 5 : parm = "i-Enhance"
+          Case 6 : parm = "e-Portrait"
+          Case 7 : parm = "Color Creator"
+          Case 9 : parm = "Color Profile 1"
+          Case 10 : parm = "Color Profile 2"
+          Case 11 : parm = "Color Profile 3"
+          Case 12 : parm = "Monochrome Profile 1"
+          Case 13 : parm = "Monochrome Profile 2"
+          Case 14 : parm = "Monochrome Profile 3 "
           Case 256 : parm = "Monotone"
           Case 512 : parm = "Sepia"
           Case Else : parm = ""
         End Select
+        If v.length = 2 Then parm = parm & "; " & v(1)
         If Len(parm) > 0 Then note = note & "Picture Mode:" & tb & parm & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H521)) Then
         v = uz.Tags.Item(sTag(&H521)).Value
+        i = v(1) : If i > 32767 Then i = i - 65536
         If UBound(v) >= 2 Then
-          note = note & "Pic Mode Saturation Setting:" & tb & v(0) & "\par "
-          'note = note & "Pic Mode Saturation Minimum:" & tb & v(1) & "\par "
-          'note = note & "Pic Mode Saturation Maximum:" & tb & v(2) & "\par "
+          note = note & "Picture Mode Saturation:" & tb & v(0) & " (min " & i & ", max " & v(2) & ")\par "
         End If
       End If
 
       If uz.Tags.Contains(sTag(&H523)) Then
         v = uz.Tags.Item(sTag(&H523)).Value
+        i = v(1) : If i > 32767 Then i = i - 65536
         If UBound(v) >= 2 Then
-          note = note & "Pic Mode Contrast Setting:" & tb & v(0) & "\par "
-          'note = note & "Pic Mode Contrast Minimum:" & tb & v(1) & "\par "
-          'note = note & "Pic Mode Contrast Maximum:" & tb & v(2) & "\par "
+          note = note & "Picture Mode Contrast:" & tb & v(0) & " (min " & i & ", max " & v(2) & ")\par "
         End If
       End If
 
       If uz.Tags.Contains(sTag(&H524)) Then
         v = uz.Tags.Item(sTag(&H524)).Value
+        i = v(1) : If i > 32767 Then i = i - 65536
         If UBound(v) >= 2 Then
-          note = note & "Pic Mode Sharpness Setting:" & tb & v(0) & "\par "
-          'note = note & "Pic Mode Sharpness Minimum:" & tb & v(1) & "\par "
-          'note = note & "Pic Mode Sharpness Maximum:" & tb & v(2) & "\par "
+          note = note & "Picture Mode Sharpness:" & tb & v(0) & " (min " & i & ", max " & v(2) & ")\par "
         End If
       End If
 
@@ -7076,7 +7298,106 @@ Public Module ImageInfo
           Case 5 : parm = "Green"
           Case Else : parm = ""
         End Select
-        If Len(parm) > 0 Then note = note & "Picture Mode Tone:" & tb & parm & "\par "
+        If Len(parm) > 0 Then note = note & "Picture mode tone:" & tb & parm & "\par "
+      End If
+
+      If uz.Tags.Contains(sTag(&H527)) Then
+        v = uz.Tags.Item(sTag(&H527)).value
+        parm = ""
+        If v.length >= 3 AndAlso v(1) = -2 AndAlso v(2) = 1 Then
+          If v(0) = -1 Then parm = "Low"
+          If v(0) = -2 Then parm = "Off"
+          If v(0) = 0 Then parm = "Standard"
+          If v(0) = 1 Then parm = "High"
+        End If
+        If Len(parm) > 0 Then note = note & "Noise filter:" & tb & parm & "\par "
+      End If
+
+      If uz.Tags.Contains(sTag(&H529)) Then
+        v = uz.Tags.Item(sTag(&H529)).value
+        i = v(0)
+        If olympusArtFilter.ContainsKey(i) Then
+          parm = olympusArtFilter(i) & "; " & v(1) & "; " & v(2) & "; " & v(3)
+          note = note & "Art filter:" & tb & parm & "\par "
+        End If
+      End If
+
+      If uz.Tags.Contains(sTag(&H52C)) Then
+        v = uz.Tags.Item(sTag(&H52C)).value
+        i = v(0)
+        If olympusMagicFilter.ContainsKey(i) Then
+          parm = olympusMagicFilter(i) & "; " & v(1) & "; " & v(2) & "; " & v(3)
+          note = note & "Magic filter:" & tb & parm & "\par "
+        End If
+      End If
+
+      If uz.Tags.Contains(sTag(&H52D)) Then
+        v = uz.Tags.Item(sTag(&H52D)).Value
+        If v.length >= 3 Then
+          If v(0) = -1 And v(1) = -1 And v(2) = 1 Then parm = "Low"
+          If v(0) = 0 And v(1) = -1 And v(2) = 1 Then parm = "Normal"
+          If v(0) = 1 And v(1) = -1 And v(2) = 1 Then parm = "High"
+          If Len(parm) > 0 Then note = note & "Picture mode effect:" & tb & parm & "\par "
+        End If
+      End If
+
+
+      If uz.Tags.Contains(sTag(&H52F)) Then
+        v = uz.Tags.Item(sTag(&H52F)).value
+        i = v(0)
+        If olympusArtFilterEffect.ContainsKey(i) AndAlso v.length >= 7 Then
+          parm = olympusArtFilterEffect(i) & "; " & v(4) & "; " & v(6)
+          note = note & "Art filter effect:" & tb & parm & "\par "
+        End If
+      End If
+
+      If uz.Tags.Contains(sTag(&H537)) Then
+        v = uz.Tags.Item(sTag(&H537)).value
+        Select Case v(0)
+          Case 0 : parm = "no filter"
+          Case 1 : parm = "Yellow"
+          Case 2 : parm = "Orange"
+          Case 3 : parm = "Red"
+          Case 4 : parm = "Magenta"
+          Case 5 : parm = "Blue"
+          Case 6 : parm = "Cyan"
+          Case 7 : parm = "Green"
+          Case 8 : parm = "Yellow-green"
+          Case Else : parm = ""
+        End Select
+        If Len(parm) > 0 Then note = note & "Monochrome profile settings:" & tb & parm & "\par "
+      End If
+
+      If uz.Tags.Contains(sTag(&H538)) Then
+        v = uz.Tags.Item(sTag(&H538)).value
+        Select Case v(0)
+          Case 0 : parm = "off"
+          Case 1 : parm = "Low"
+          Case 2 : parm = "Medium"
+          Case 3 : parm = "High"
+          Case Else : parm = ""
+        End Select
+        If Len(parm) > 0 Then note = note & "Film grain effect:" & tb & parm & "\par "
+      End If
+
+      If uz.Tags.Contains(sTag(&H53A)) Then
+        i = uz.Tags.Item(sTag(&H53A)).singleValue
+        note = note & "Monochrome vignetting:" & tb & i & "\par "
+      End If
+
+      If uz.Tags.Contains(sTag(&H53B)) Then
+        i = uz.Tags.Item(sTag(&H53B)).singlevalue
+        parm = ""
+        Select Case i
+          Case 0 : parm = "(none)"
+          Case 1 : parm = "Normal"
+          Case 2 : parm = "Sepia"
+          Case 3 : parm = "Blue"
+          Case 4 : parm = "Purple"
+          Case 5 : parm = "Green"
+          Case Else : parm = ""
+        End Select
+        If Len(parm) > 0 Then note = note & "Monochrome Color:" & tb & parm & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H600)) Then
@@ -7099,16 +7420,70 @@ Public Module ImageInfo
           Case 2 : parm = "High"
           Case 3 : parm = "Super High"
           Case 4 : parm = "Raw"
+          Case 4 : parm = "Standard (5)"
           Case Else : parm = ""
         End Select
         If Len(parm) > 0 Then note = note & "Image Quality:" & tb & parm & "\par "
       End If
 
+      If uz.Tags.Contains(sTag(&H604)) Then
+        i = uz.Tags.Item(sTag(&H604)).singlevalue
+        parm = ""
+        Select Case i
+          Case 0 : parm = "(off)"
+          Case 1 : parm = "Mode 1"
+          Case 2 : parm = "Mode 2"
+          Case 3 : parm = "Mode 3"
+          Case 4 : parm = "Mode 4"
+          Case Else : parm = ""
+        End Select
+        If Len(parm) > 0 Then note = note & "Image stabilization:" & tb & parm & "\par "
+      End If
+
+      If uz.Tags.Contains(sTag(&H804)) Then
+        v = uz.Tags.Item(sTag(&H804)).value
+        parm = ""
+        If v.length = 2 Then
+          If v(0) = 0 And v(1) = 0 Then parm = "(none)"
+          If v(0) = 5 And v(1) = 4 Then parm = "HDR1"
+          If v(0) = 6 And v(1) = 4 Then parm = "HDR2"
+          If v(0) = 9 And v(1) = 8 Then parm = "Focus stacked, 8 images"
+          If Len(parm) > 0 Then note = note & "Stacked image:" & tb & parm & "\par "
+        End If
+      End If
+
+      If uz.Tags.Contains(sTag(&H900)) Then
+        x = uz.Tags.Item(sTag(&H900)).singleValue
+        note = note & "Manometer pressure:" & tb & Format(x / 10, "#0") & " kPa\par "
+
+        If x <> 0 AndAlso uz.Tags.Contains(sTag(&H901)) Then
+          v = uz.Tags.Item(sTag(&H901)).Value
+          If v.length > 1 Then note = note & "Manometer reading:" & tb & Format(v(0) / 10, "#0") & " m, " & Format(v(1) / 10, "#0") & " ft \par "
+        End If
+      End If
+
       If uz.Tags.Contains(sTag(&H902)) Then
         i = uz.Tags.Item(sTag(&H902)).singleValue
         If i = 0 Then parm = "Off" Else If i = 1 Then parm = "On" Else parm = ""
-        If Len(parm) > 0 Then note = note & "Extended White Balance:" & tb & parm & "\par "
+        If Len(parm) > 0 Then note = note & "Extended white balance detect:" & tb & parm & "\par "
       End If
+
+      If uz.Tags.Contains(sTag(&H903)) Then
+        x = uz.Tags.Item(sTag(&H903)).singleValue
+        note = note & "Roll angle:" & tb & Format(x / 10, "#0") & "°\par "
+      End If
+
+      If uz.Tags.Contains(sTag(&H904)) Then
+        x = uz.Tags.Item(sTag(&H904)).singleValue
+        note = note & "Pitch angle:" & tb & Format(x / 10, "#0") & "°\par "
+      End If
+
+      If uz.Tags.Contains(sTag(&H908)) Then
+        v = uz.Tags.Item(sTag(&H908)).singleValue
+        parm = v
+        If parm <> "" AndAlso Not parm.StartsWith("0000") Then note = note & "UTC date and time:" & tb & parm & "\par "
+      End If
+
     End If ' olympus tag 2020
 
     If makerTags.Contains(sTag(&H2050)) Then
@@ -7154,14 +7529,17 @@ Public Module ImageInfo
       End If
 
       If uz.Tags.Contains(sTag(&H305)) Then
+        ' "this rational value looks like it is in mm when the denominator is 1 (E-1), "
+        ' "and cm when denominator is 10 (E-300), so if we ignore the denominator we are consistently in mm - PH"
         x = uz.Tags.Item(sTag(&H305)).singleValue
-        If x > 0 Then note = note & "Focus Distance:" & tb & Format(x, "####,##0.###") & "\par "
+        If x > 0 Then note = note & "Focus Distance:" & tb & Format(x, "####,##0.##") & " m\par "
       End If
 
       If uz.Tags.Contains(sTag(&H308)) Then
         v = uz.Tags.Item(sTag(&H308)).value
         If UBound(v) >= 1 Then
-          Select Case v(0)
+          i = v(0)
+          Select Case (i And &H1F)
             Case &H0 : parm = "(none)"
             Case &H1 : parm = "Top-left (horizontal)"
             Case &H2 : parm = "Top-center (horizontal)"
@@ -7188,14 +7566,15 @@ Public Module ImageInfo
             Case Else : parm = ""
           End Select
         Else
-          Select Case v(0)
-            Case 0 : parm = "Left"
-            Case 1 : parm = "Center (horizontal)"
-            Case 2 : parm = "Right"
-            Case 3 : parm = "Center (vertical)"
-            Case 255 : parm = "None"
-            Case Else : parm = ""
-          End Select
+          parm = ""
+          'Select Case v(0)
+          '  Case 0 : parm = "Left"
+          '  Case 1 : parm = "Center (horizontal)"
+          '  Case 2 : parm = "Right"
+          '  Case 3 : parm = "Center (vertical)"
+          '  Case 255 : parm = "None"
+          '  Case Else : parm = ""
+          'End Select
         End If
         If Len(parm) > 0 Then note = note & "Autofocus Point:" & tb & parm & "\par "
       End If
@@ -7222,6 +7601,23 @@ Public Module ImageInfo
         If v(0) = 0 Then parm = "Off" Else If v(0) = 1 Then parm = "On" Else parm = ""
         If Len(parm) > 0 Then note = note & "Internal Flash:" & tb & parm & "\par "
       End If
+
+      If uz.Tags.Contains(sTag(&H1209)) Then
+        v = uz.Tags.Item(sTag(&H1209)).value
+        If v(0) = 0 Then parm = "Off" Else If v(0) = 1 Then parm = "On" Else parm = ""
+        If v.length >= 2 AndAlso v(1) > 0 Then
+          x = 1 / v(1)
+          If x < 1 Then parm &= " (" & Format(x, "#.##") & " strength)" Else parm &= " (full strength)"
+        End If
+        If Len(parm) > 0 Then note = note & "Manual Flash:" & tb & parm & "\par "
+      End If
+
+      If uz.Tags.Contains(sTag(&H120A)) Then
+        v = uz.Tags.Item(sTag(&H120A)).value
+        If v(0) = 0 Then parm = "Off" Else If v(0) = 1 Then parm = "On" Else parm = ""
+        If Len(parm) > 0 Then note = note & "Macro LED:" & tb & parm & "\par "
+      End If
+
 
     End If ' olympus tag 2050
 
@@ -7296,7 +7692,7 @@ Public Module ImageInfo
     If makerTags.Contains(sTag(&H207)) Then ' Firmware version, string
       parm = makerTags.Item(sTag(&H207)).singleValue
       If InStr(parm, ChrW(0)) > 0 Then parm = Trim(Mid(parm, 1, InStr(parm, ChrW(0)) - 1))
-      if Trim(parm) <> "" Then note = note & "Firmware Version:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note = note & "Firmware Version:" & tb & Trim(parm) & "\par "
     End If
 
     If makerTags.Contains(sTag(520)) Then ' [picture info] [camera info], string
@@ -7549,7 +7945,7 @@ Public Module ImageInfo
       Else
         parm = v
       End If
-      if Trim(parm) <> "" Then note = note & "Makernote Version:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note = note & "Makernote Version:" & tb & Trim(parm) & "\par "
     End If
 
     If makerTags.Contains(sTag(4096)) Then
@@ -8474,7 +8870,7 @@ Public Module ImageInfo
       Else
         parm = ChrW(v)
       End If
-      if Trim(parm) <> "" Then
+      If Trim(parm) <> "" Then
         note = note & "Maker Note Version:" & tb & Trim(parm) & "\par "
         makerVersion = Val(Trim(parm))
       End If
@@ -8869,7 +9265,7 @@ Public Module ImageInfo
     End If
 
     If makerTags.Contains(sTag(44)) Then
-      s = uz.TagValue(uExif.TagID.Model, 0)
+      s = uz.TagValue(uExif.TagID.model, 0)
       i = makerTags.Item(sTag(44)).singleValue
       If s IsNot Nothing AndAlso (InStr(s, "DMC-LC") > 0 Or InStr(s, "DMC-LX") > 0 Or InStr(s, "DMC-FZ") > 0) Then
         ' LC1, LX2, FZ7, FZ8, FZ18 And FZ50
@@ -9623,21 +10019,21 @@ Public Module ImageInfo
         parm = makerTags.Item(sTag(81)).singleValue
         i = parm.IndexOf(Chr(0))
         If i >= 0 Then parm = parm.Substring(0, i)
-        if Trim(parm) <> "" Then note = note & "Lens Type:" & tb & Trim(parm) & "\par "
+        If Trim(parm) <> "" Then note = note & "Lens Type:" & tb & Trim(parm) & "\par "
       End If
 
       If makerTags.Contains(sTag(82)) Then
         parm = makerTags.Item(sTag(82)).singleValue
         i = parm.IndexOf(Chr(0))
         If i >= 0 Then parm = parm.Substring(0, i)
-        if Trim(parm) <> "" Then note = note & "Lens Serial Number:" & tb & Trim(parm) & "\par "
+        If Trim(parm) <> "" Then note = note & "Lens Serial Number:" & tb & Trim(parm) & "\par "
       End If
 
       If makerTags.Contains(sTag(83)) Then
         parm = makerTags.Item(sTag(83)).singleValue
         i = parm.IndexOf(Chr(0))
         If i >= 0 Then parm = parm.Substring(0, i)
-        if Trim(parm) <> "" Then note = note & "Accessory Type:" & tb & Trim(parm) & "\par "
+        If Trim(parm) <> "" Then note = note & "Accessory Type:" & tb & Trim(parm) & "\par "
       End If
 
       If makerTags.Contains(sTag(&H8010)) Then
@@ -11122,7 +11518,7 @@ Public Module ImageInfo
     it(7, 0) = -1 : it(7, 1) = 0 : it(7, 2) = -1 : it(7, 3) = -1 : it(7, 4) = -1 : it(7, 5) = 5 : it(7, 6) = -1 : it(7, 7) = -1 : it(7, 8) = -1 : it(7, 9) = -1 '   < not used
     it(8, 0) = 0 : it(8, 1) = 0 : it(8, 2) = 0 : it(8, 3) = 0 : it(8, 4) = 0 : it(8, 5) = 0 : it(8, 6) = 0 : it(8, 7) = 0 : it(8, 8) = 0 : it(8, 9) = 0 '   
 
-    sx = utf8bare.getstring(xmp)
+    sx = UTF8bare.GetString(xmp)
     k = sx.IndexOf("<rdf:Description", StringComparison.OrdinalIgnoreCase)
     If k > 0 Then sx = sx.Substring(k + 17)
     k = sx.IndexOf("<?xpacket end", StringComparison.OrdinalIgnoreCase)
@@ -11191,7 +11587,7 @@ Public Module ImageInfo
 
   End Function
 
-  Function pCommentsToMagick(pComments As list(Of PropertyItem)) As ExifProfile
+  Function pCommentsToMagick(pComments As List(Of PropertyItem)) As ExifProfile
     ' copy exif data from uExif to ExifProfile
     Dim exif As New ExifProfile
     Dim p As PropertyItem
@@ -11242,8 +11638,8 @@ Public Module ImageInfo
       End If
     End If
 
-    If ux.tagExists(uExif.TagID.gpspointer) Then
-      tg = ux.Tags.Item(sTag(uExif.TagID.gpspointer))
+    If ux.tagExists(uExif.TagID.GPSpointer) Then
+      tg = ux.Tags.Item(sTag(uExif.TagID.GPSpointer))
       If tg.IFD IsNot Nothing Then
         For Each tgg As uTag In tg.IFD.Tags
           If exTags.Contains(tgg.tag) Then ex.SetValue(tgg.tag, tgg.Value)
@@ -11255,226 +11651,834 @@ Public Module ImageInfo
 
   End Function
 
-  Public Enum propID ' IDs for GDI propertyitems
-    Artist = &H13B
+  Public Enum propID
+    ' IDs for GDI .propertyitems
+    GpsVersion = &H0
+    GpsLatitudeRef = &H1
+    GpsLatitude = &H2
+    GpsLongitudeRef = &H3
+    GpsLongitude = &H4
+    GpsAltitudeRef = &H5
+    GpsAltitude = &H6
+    GpsTimeStamp = &H7
+    GpsSatellites = &H8
+    GpsStatus = &H9
+    GpsMeasureMode = &HA
+    GpsDop = &HB
+    GpsSpeedRef = &HC
+    GpsSpeed = &HD
+    GpsTrackRef = &HE
+    GpsTrack = &HF
+    GpsImgDirectionRef = &H10
+    GpsImgDirection = &H11
+    GpsMapDatum = &H12
+    GpsDestinationLatitudeRef = &H13
+    GpsDestinationLatitude = &H14
+    GpsDestinationLongitudeRef = &H15
+    GpsDestinationLongitude = &H16
+    GpsDestBearingRef = &H17
+    GpsDestBearing = &H18
+    GpsDestinationDistanceRef = &H19
+    GpsDestinationDistance = &H1A
+    GPSProcessingMethod = &H1B
+    GPSAreaInformation = &H1C
+    GpsDateStamp = &H1D
+    GPSDifferential = &H1E
+    GPSHPositioningError = &H1F
+    NewSubfileType = &HFE
+    SubfileType = &HFF
+    ImageWidth = &H100
+    ImageHeight = &H101
     BitsPerSample = &H102
-    CellHeight = &H109
-    CellWidth = &H108
-    ChrominanceTable = &H5091
-    ColorMap = &H140
-    ColorTransferFunction = &H501A
     Compression = &H103
-    Copyright = &H8298
-    DateTime = &H132
+    PhotometricInterpretation = &H106
+    ThreshHolding = &H107
+    CellWidth = &H108
+    CellHeight = &H109
+    FillOrder = &H10A
     DocumentName = &H10D
-    DotRange = &H150
+    ImageDescription = &H10E
     EquipmentMake = &H10F
     EquipmentModel = &H110
+    StripOffsets = &H111
+    Orientation = &H112
+    SamplesPerPixel = &H115
+    RowsPerStrip = &H116
+    StripBytesCount = &H117
+    MinSampleValue = &H118
+    MaxSampleValue = &H119
+    XResolution = &H11A
+    YResolution = &H11B
+    PlanarConfiguration = &H11C
+    PageName = &H11D
+    XPosition = &H11E
+    YPosition = &H11F
+    FreeOffset = &H120
+    FreeByteCounts = &H121
+    GrayResponseUnit = &H122
+    GrayResponseCurve = &H123
+    T4Option = &H124
+    T6Option = &H125
+    ResolutionUnit = &H128
+    PageNumber = &H129
+    TransferFunction = &H12D
+    SoftwareUsed = &H131
+    DateTime = &H132
+    Artist = &H13B
+    HostComputer = &H13C
+    Predictor = &H13D
+    WhitePoint = &H13E
+    PrimaryChromaticities = &H13F
+    ColorMap = &H140
+    HalftoneHints = &H141
+    TileWidth = &H142
+    TileLength = &H143
+    TileOffset = &H144
+    TileByteCounts = &H145
+    InkSet = &H14C
+    InkNames = &H14D
+    NumberOfInks = &H14E
+    DotRange = &H150
+    TargetPrinter = &H151
+    ExtraSamples = &H152
+    SampleFormat = &H153
+    SMinSampleValue = &H154
+    SMaxSampleValue = &H155
+    TransferRange = &H156
+    JPEGProc = &H200
+    JPEGInterchangeFormat = &H201
+    JPEGInterchangeLength = &H202
+    JPEGRestartInterval = &H203
+    JPEGLosslessPredictors = &H205
+    JPEGPointTransforms = &H206
+    JPEGQTables = &H207
+    JPEGDCTables = &H208
+    JPEGACTables = &H209
+    YCbCrCoefficients = &H211
+    YCbCrSubsampling = &H212
+    YCbCrPositioning = &H213
+    REFBlackWhite = &H214
+    Gamma = &H301
+    ICCProfileDescriptor = &H302
+    SRGBRenderingIntent = &H303
+    ImageTitle = &H320
+    ResolutionXUnit = &H5001
+    ResolutionYUnit = &H5002
+    ResolutionXLengthUnit = &H5003
+    ResolutionYLengthUnit = &H5004
+    PrintFlags = &H5005
+    PrintFlagsVersion = &H5006
+    PrintFlagsCrop = &H5007
+    PrintFlagsBleedWidth = &H5008
+    PrintFlagsBleedWidthScale = &H5009
+    HalftoneLPI = &H500A
+    HalftoneLPIUnit = &H500B
+    HalftoneDegree = &H500C
+    HalftoneShape = &H500D
+    HalftoneMisc = &H500E
+    HalftoneScreen = &H500F
+    JPEGQuality = &H5010
+    GridSize = &H5011
+    ThumbnailFormat = &H5012
+    ThumbnailWidth = &H5013
+    ThumbnailHeight = &H5014
+    ThumbnailColorDepth = &H5015
+    ThumbnailPlanes = &H5016
+    ThumbnailRawBytes = &H5017
+    ThumbnailSize = &H5018
+    ThumbnailCompressedSize = &H5019
+    ColorTransferFunction = &H501A
+    ThumbnailData = &H501B
+    ThumbnailImageWidth = &H5020
+    ThumbnailImageHeight = &H5021
+    ThumbnailBitsPerSample = &H5022
+    ThumbnailCompression = &H5023
+    ThumbnailPhotometricInterp = &H5024
+    ThumbnailImageDescription = &H5025
+    ThumbnailEquipMake = &H5026
+    ThumbnailEquipModel = &H5027
+    ThumbnailStripOffsets = &H5028
+    ThumbnailOrientation = &H5029
+    ThumbnailSamplesPerPixel = &H502A
+    ThumbnailRowsPerStrip = &H502B
+    ThumbnailStripBytesCount = &H502C
+    ThumbnailResolutionX = &H502D
+    ThumbnailResolutionY = &H502E
+    ThumbnailPlanarConfig = &H502F
+    ThumbnailResolutionUnit = &H5030
+    ThumbnailTransferFunction = &H5031
+    ThumbnailSoftwareUsed = &H5032
+    ThumbnailDateTime = &H5033
+    ThumbnailArtist = &H5034
+    ThumbnailWhitePoint = &H5035
+    ThumbnailPrimaryChromaticities = &H5036
+    ThumbnailYCbCrCoefficients = &H5037
+    ThumbnailYCbCrSubsampling = &H5038
+    ThumbnailYCbCrPositioning = &H5039
+    ThumbnailRefBlackWhite = &H503A
+    ThumbnailCopyRight = &H503B
+    LuminanceTable = &H5090
+    ChrominanceTable = &H5091
+    FrameDelay = &H5100
+    LoopCount = &H5101
+    GlobalPalette = &H5102
+    IndexBackground = &H5103
+    IndexTransparent = &H5104
+    PixelUnit = &H5110
+    PixelPerUnitX = &H5111
+    PixelPerUnitY = &H5112
+    PaletteHistogram = &H5113
+    Copyright = &H8298
+    ExposureTime = &H829A
+    FNumber = &H829D
+    ExifPointer = &H8769
+    ICCProfile = &H8773
+    ExposureProgram = &H8822
+    SpectralSensitivity = &H8824
+    GpsIFDPointer = &H8825
+    PhotographicSensitivity = &H8827
+    OECF = &H8828
+    SensitivityType = &H8830
+    StandardOutputSensitivity = &H8831
+    RecommendedExposureIndex = &H8832
+    ISOSpeed = &H8833
+    ISOSpeedLatitudeyyy = &H8834
+    ISOSpeedLatitudezzz = &H8835
+    ExifVersion = &H9000
+    DateTimeOriginal = &H9003
+    DateTimeDigitized = &H9004
+    ComponentConfiguration = &H9101
+    CompressedBPP = &H9102
+    ShutterSpeed = &H9201
     Aperture = &H9202
     Brightness = &H9203
-    CFAPattern = &HA302
-    ColorSpace = &HA001
-    CompressedBPP = &H9102
-    ComponentConfiguration = &H9101
-    DateTimeDigitized = &H9004
-    DateTimeDigitizedSubSeconds = &H9292
-    DateTimeOriginal = &H9003
-    DateTimeOriginalSubseconds = &H9291
-    DateTimeSubseconds = &H9290
     ExposureBias = &H9204
-    ExposureIndex = &HA215
-    ExposureProgram = &H8822
-    ExposureTime = &H829A
-    FileSource = &HA300
-    Flash = &H9209
-    FlashEnergy = &HA20B
-    FNumber = &H829D
-    FocalLength = &H920A
-    FocalResolutionUnit = &HA210
-    FocalXResolution = &HA20E
-    FocalYResolution = &HA20F
-    FPXVersion = &HA000
-    ExifPointer = &H8769
-    InteropPointer = &HA005
-    ISOSpeed = &H8827
-    LightSource = &H9208
-    MakerNote = &H927C
     MaxAperture = &H9205
+    SubjectDistanceRange = &H9206
     MeteringMode = &H9207
-    OECF = &H8828
+    LightSource = &H9208
+    Flash = &H9209
+    FocalLength = &H920A
+    SubjectArea = &H9214
+    MakerNote = &H927C
+    UserComment = &H9286
+    DateTimeSubseconds = &H9290
+    DateTimeOriginalSubseconds = &H9291
+    DateTimeDigitizedSubSeconds = &H9292
+    FPXVersion = &HA000
+    ColorSpace = &HA001
     PixelXDimension = &HA002
     PixelYDimension = &HA003
     RelatedWavFile = &HA004
-    SceneType = &HA301
-    SensingMethod = &HA217
-    ShutterSpeed = &H9201
+    InteropPointer = &HA005
+    FlashEnergy = &HA20B
     SpatialFrequencyResponse = &HA20C
-    SpectralSensitivity = &H8824
-    SubjectDistanceRange = &H9206
+    FocalXResolution = &HA20E
+    FocalYResolution = &HA20F
+    FocalResolutionUnit = &HA210
     SubjectLocation = &HA214
-    UserComment = &H9286
-    ExifVersion = &H9000
-    ExtraSamples = &H152
-    FillOrder = &H10A
-    FrameDelay = &H5100
-    FreeByteCounts = &H121
-    FreeOffset = &H120
-    Gamma = &H301
-    GlobalPalette = &H5102
-    GpsAltitude = &H6
-    GpsAltitudeRef = &H5
-    GpsDateStamp = &H1D
-    GpsDestBearing = &H18
-    GpsDestBearingRef = &H17
-    GpsDestinationDistance = &H1A
-    GpsDestinationDistanceRef = &H19
-    GpsDestinationLatitude = &H14
-    GpsDestinationLatitudeRef = &H13
-    GpsDestinationLongitude = &H16
-    GpsDestinationLongitudeRef = &H15
-    GpsDop = &HB
-    GpsMeasureMode = &HA
-    GpsSatellites = &H8
-    GpsStatus = &H9
-    GpsTimeStamp = &H7
-    GpsIFDPointer = &H8825
-    GpsImgDirection = &H11
-    GpsImgDirectionRef = &H10
-    GpsLatitude = &H2
-    GpsLatitudeRef = &H1
-    GpsLongitude = &H4
-    GpsLongitudeRef = &H3
-    GpsMapDatum = &H12
-    GpsSpeed = &HD
-    GpsSpeedRef = &HC
-    GpsTrack = &HF
-    GpsTrackRef = &HE
-    GpsVersion = &H0
-    GrayResponseCurve = &H123
-    GrayResponseUnit = &H122
-    GridSize = &H5011
-    HalftoneDegree = &H500C
-    HalftoneHints = &H141
-    HalftoneLPI = &H500A
-    HalftoneLPIUnit = &H500B
-    HalftoneMisc = &H500E
-    HalftoneScreen = &H500F
-    HalftoneShape = &H500D
-    HostComputer = &H13C
-    ICCProfile = &H8773
-    ICCProfileDescriptor = &H302
-    ImageDescription = &H10E
-    ImageHeight = &H101
-    ImageTitle = &H320
-    ImageWidth = &H100
-    IndexBackground = &H5103
-    IndexTransparent = &H5104
-    InkNames = &H14D
-    InkSet = &H14C
-    JPEGACTables = &H209
-    JPEGDCTables = &H208
-    JPEGInterchangeFormat = &H201
-    JPEGInterchangeLength = &H202
-    JPEGLosslessPredictors = &H205
-    JPEGPointTransforms = &H206
-    JPEGProc = &H200
-    JPEGQTables = &H207
-    JPEGQuality = &H5010
-    JPEGRestartInterval = &H203
-    LoopCount = &H5101
-    LuminanceTable = &H5090
-    MaxSampleValue = &H119
-    MinSampleValue = &H118
-    NewSubfileType = &HFE
-    NumberOfInks = &H14E
-    Orientation = &H112
-    PageName = &H11D
-    PageNumber = &H129
-    PaletteHistogram = &H5113
-    PhotometricInterpretation = &H106
-    PixelPerUnitX = &H5111
-    PixelPerUnitY = &H5112
-    PixelUnit = &H5110
-    PlanarConfiguration = &H11C
-    Predictor = &H13D
-    PrimaryChromaticities = &H13F
-    PrintFlags = &H5005
-    PrintFlagsBleedWidth = &H5008
-    PrintFlagsBleedWidthScale = &H5009
-    PrintFlagsCrop = &H5007
-    PrintFlagsVersion = &H5006
-    REFBlackWhite = &H214
-    ResolutionUnit = &H128
-    ResolutionXLengthUnit = &H5003
-    ResolutionXUnit = &H5001
-    ResolutionYLengthUnit = &H5004
-    ResolutionYUnit = &H5002
-    RowsPerStrip = &H116
-    SampleFormat = &H153
-    SamplesPerPixel = &H115
-    SMaxSampleValue = &H155
-    SMinSampleValue = &H154
-    SoftwareUsed = &H131
-    SRGBRenderingIntent = &H303
-    StripBytesCount = &H117
-    StripOffsets = &H111
-    SubfileType = &HFF
-    T4Option = &H124
-    T6Option = &H125
-    TargetPrinter = &H151
-    ThreshHolding = &H107
-    ThumbnailArtist = &H5034
-    ThumbnailBitsPerSample = &H5022
-    ThumbnailColorDepth = &H5015
-    ThumbnailCompressedSize = &H5019
-    ThumbnailCompression = &H5023
-    ThumbnailCopyRight = &H503B
-    ThumbnailData = &H501B
-    ThumbnailDateTime = &H5033
-    ThumbnailEquipMake = &H5026
-    ThumbnailEquipModel = &H5027
-    ThumbnailFormat = &H5012
-    ThumbnailHeight = &H5014
-    ThumbnailImageDescription = &H5025
-    ThumbnailImageHeight = &H5021
-    ThumbnailImageWidth = &H5020
-    ThumbnailOrientation = &H5029
-    ThumbnailPhotometricInterp = &H5024
-    ThumbnailPlanarConfig = &H502F
-    ThumbnailPlanes = &H5016
-    ThumbnailPrimaryChromaticities = &H5036
-    ThumbnailRawBytes = &H5017
-    ThumbnailRefBlackWhite = &H503A
-    ThumbnailResolutionUnit = &H5030
-    ThumbnailResolutionX = &H502D
-    ThumbnailResolutionY = &H502E
-    ThumbnailRowsPerStrip = &H502B
-    ThumbnailSamplesPerPixel = &H502A
-    ThumbnailSize = &H5018
-    ThumbnailSoftwareUsed = &H5032
-    ThumbnailStripBytesCount = &H502C
-    ThumbnailStripOffsets = &H5028
-    ThumbnailTransferFunction = &H5031
-    ThumbnailWhitePoint = &H5035
-    ThumbnailWidth = &H5013
-    ThumbnailYCbCrCoefficients = &H5037
-    ThumbnailYCbCrPositioning = &H5039
-    ThumbnailYCbCrSubsampling = &H5038
-    TileByteCounts = &H145
-    TileLength = &H143
-    TileOffset = &H144
-    TileWidth = &H142
-    TransferFunction = &H12D
-    TransferRange = &H156
-    WhitePoint = &H13E
-    XPosition = &H11E
-    XResolution = &H11A
-    YCbCrCoefficients = &H211
-    YCbCrPositioning = &H213
-    YCbCrSubsampling = &H212
-    YPosition = &H11F
-    YResolution = &H11B
+    ExposureIndex = &HA215
+    SensingMethod = &HA217
+    FileSource = &HA300
+    SceneType = &HA301
+    CFAPattern = &HA302
+    CustomRendered = &HA401
+    ExposureMode = &HA402
+    WhiteBalance = &HA403
+    DigitalZoomRatio = &HA404
+    FocalLengthIn35mmFilm = &HA405
+    SceneCaptureType = &HA406
+    GainControl = &HA407
+    Contrast = &HA408
+    Saturation = &HA409
+    Sharpness = &HA40A
+    DeviceSettingDescription = &HA40B
   End Enum
+
+
+  Sub exifInit()
+
+    olympusLens.Add("000000", "None")
+    olympusLens.Add("000100", "Olympus Zuiko Digital ED 50mm F2.0 Macro")
+    olympusLens.Add("000101", "Olympus Zuiko Digital 40-150mm F3.5-4.5")
+    olympusLens.Add("000110", "Olympus M.Zuiko Digital ED 14-42mm F3.5-5.6")
+    olympusLens.Add("000200", "Olympus Zuiko Digital ED 150mm F2.0")
+    olympusLens.Add("000210", "Olympus M.Zuiko Digital 17mm F2.8 Pancake")
+    olympusLens.Add("000300", "Olympus Zuiko Digital ED 300mm F2.8")
+    olympusLens.Add("000310", "Olympus M.Zuiko Digital ED 14-150mm F4.0-5.6 [II]")
+    olympusLens.Add("000410", "Olympus M.Zuiko Digital ED 9-18mm F4.0-5.6")
+    olympusLens.Add("000500", "Olympus Zuiko Digital 14-54mm F2.8-3.5")
+    olympusLens.Add("000501", "Olympus Zuiko Digital Pro ED 90-250mm F2.8")
+    olympusLens.Add("000510", "Olympus M.Zuiko Digital ED 14-42mm F3.5-5.6 L")
+    olympusLens.Add("000600", "Olympus Zuiko Digital ED 50-200mm F2.8-3.5")
+    olympusLens.Add("000601", "Olympus Zuiko Digital ED 8mm F3.5 Fisheye")
+    olympusLens.Add("000610", "Olympus M.Zuiko Digital ED 40-150mm F4.0-5.6")
+    olympusLens.Add("000700", "Olympus Zuiko Digital 11-22mm F2.8-3.5")
+    olympusLens.Add("000701", "Olympus Zuiko Digital 18-180mm F3.5-6.3")
+    olympusLens.Add("000710", "Olympus M.Zuiko Digital ED 12mm F2.0")
+    olympusLens.Add("000801", "Olympus Zuiko Digital 70-300mm F4.0-5.6")
+    olympusLens.Add("000810", "Olympus M.Zuiko Digital ED 75-300mm F4.8-6.7")
+    olympusLens.Add("000910", "Olympus M.Zuiko Digital 14-42mm F3.5-5.6 II")
+    olympusLens.Add("001001", "Kenko Tokina Reflex 300mm F6.3 MF Macro")
+    olympusLens.Add("001010", "Olympus M.Zuiko Digital ED 12-50mm F3.5-6.3 EZ")
+    olympusLens.Add("001110", "Olympus M.Zuiko Digital 45mm F1.8")
+    olympusLens.Add("001210", "Olympus M.Zuiko Digital ED 60mm F2.8 Macro")
+    olympusLens.Add("001310", "Olympus M.Zuiko Digital 14-42mm F3.5-5.6 II R")
+    olympusLens.Add("001410", "Olympus M.Zuiko Digital ED 40-150mm F4.0-5.6 R")
+    olympusLens.Add("001500", "Olympus Zuiko Digital ED 7-14mm F4.0")
+    olympusLens.Add("001510", "Olympus M.Zuiko Digital ED 75mm F1.8")
+    olympusLens.Add("001610", "Olympus M.Zuiko Digital 17mm F1.8")
+    olympusLens.Add("001700", "Olympus Zuiko Digital Pro ED 35-100mm F2.0")
+    olympusLens.Add("001800", "Olympus Zuiko Digital 14-45mm F3.5-5.6")
+    olympusLens.Add("001810", "Olympus M.Zuiko Digital ED 75-300mm F4.8-6.7 II")
+    olympusLens.Add("001910", "Olympus M.Zuiko Digital ED 12-40mm F2.8 Pro")
+    olympusLens.Add("002000", "Olympus Zuiko Digital 35mm F3.5 Macro")
+    olympusLens.Add("002010", "Olympus M.Zuiko Digital ED 40-150mm F2.8 Pro")
+    olympusLens.Add("002110", "Olympus M.Zuiko Digital ED 14-42mm F3.5-5.6 EZ")
+    olympusLens.Add("002200", "Olympus Zuiko Digital 17.5-45mm F3.5-5.6")
+    olympusLens.Add("002210", "Olympus M.Zuiko Digital 25mm F1.8")
+    olympusLens.Add("002300", "Olympus Zuiko Digital ED 14-42mm F3.5-5.6")
+    olympusLens.Add("002310", "Olympus M.Zuiko Digital ED 7-14mm F2.8 Pro")
+    olympusLens.Add("002400", "Olympus Zuiko Digital ED 40-150mm F4.0-5.6")
+    olympusLens.Add("002410", "Olympus M.Zuiko Digital ED 300mm F4.0 IS Pro")
+    olympusLens.Add("002510", "Olympus M.Zuiko Digital ED 8mm F1.8 Fisheye Pro")
+    olympusLens.Add("002610", "Olympus M.Zuiko Digital ED 12-100mm F4.0 IS Pro")
+    olympusLens.Add("002710", "Olympus M.Zuiko Digital ED 30mm F3.5 Macro")
+    olympusLens.Add("002810", "Olympus M.Zuiko Digital ED 25mm F1.2 Pro")
+    olympusLens.Add("002910", "Olympus M.Zuiko Digital ED 17mm F1.2 Pro")
+    olympusLens.Add("003000", "Olympus Zuiko Digital ED 50-200mm F2.8-3.5 SWD")
+    olympusLens.Add("003010", "Olympus M.Zuiko Digital ED 45mm F1.2 Pro")
+    olympusLens.Add("003100", "Olympus Zuiko Digital ED 12-60mm F2.8-4.0 SWD")
+    olympusLens.Add("003200", "Olympus Zuiko Digital ED 14-35mm F2.0 SWD")
+    olympusLens.Add("003300", "Olympus Zuiko Digital 25mm F2.8")
+    olympusLens.Add("003400", "Olympus Zuiko Digital ED 9-18mm F4.0-5.6")
+    olympusLens.Add("003500", "Olympus Zuiko Digital 14-54mm F2.8-3.5 II")
+    olympusLens.Add("010100", "Sigma 18-50mm F3.5-5.6 DC")
+    olympusLens.Add("010110", "Sigma 30mm F2.8 EX DN")
+    olympusLens.Add("010200", "Sigma 55-200mm F4.0-5.6 DC")
+    olympusLens.Add("010210", "Sigma 19mm F2.8 EX DN")
+    olympusLens.Add("010300", "Sigma 18-125mm F3.5-5.6 DC")
+    olympusLens.Add("010310", "Sigma 30mm F2.8 DN | A")
+    olympusLens.Add("010400", "Sigma 18-125mm F3.5-5.6 DC")
+    olympusLens.Add("010410", "Sigma 19mm F2.8 DN | A")
+    olympusLens.Add("010500", "Sigma 30mm F1.4 EX DC HSM")
+    olympusLens.Add("010510", "Sigma 60mm F2.8 DN | A")
+    olympusLens.Add("010600", "Sigma APO 50-500mm F4.0-6.3 EX DG HSM")
+    olympusLens.Add("010610", "Sigma 30mm F1.4 DC DN | C")
+    olympusLens.Add("010700", "Sigma Macro 105mm F2.8 EX DG")
+    olympusLens.Add("010710", "Sigma 16mm F1.4 DC DN | C (017)")
+    olympusLens.Add("010800", "Sigma APO Macro 150mm F2.8 EX DG HSM")
+    olympusLens.Add("010900", "Sigma 18-50mm F2.8 EX DC Macro")
+    olympusLens.Add("011000", "Sigma 24mm F1.8 EX DG Aspherical Macro")
+    olympusLens.Add("011100", "Sigma APO 135-400mm F4.5-5.6 DG")
+    olympusLens.Add("011200", "Sigma APO 300-800mm F5.6 EX DG HSM")
+    olympusLens.Add("011300", "Sigma 30mm F1.4 EX DC HSM")
+    olympusLens.Add("011400", "Sigma APO 50-500mm F4.0-6.3 EX DG HSM")
+    olympusLens.Add("011500", "Sigma 10-20mm F4.0-5.6 EX DC HSM")
+    olympusLens.Add("011600", "Sigma APO 70-200mm F2.8 II EX DG Macro HSM")
+    olympusLens.Add("011700", "Sigma 50mm F1.4 EX DG HSM")
+    olympusLens.Add("020100", "Leica D Vario Elmarit 14-50mm F2.8-3.5 Asph.")
+    olympusLens.Add("020110", "Lumix G Vario 14-45mm F3.5-5.6 Asph. Mega OIS")
+    olympusLens.Add("020200", "Leica D Summilux 25mm F1.4 Asph.")
+    olympusLens.Add("020210", "Lumix G Vario 45-200mm F4.0-5.6 Mega OIS")
+    olympusLens.Add("020300", "Leica D Vario Elmar 14-50mm F3.8-5.6 Asph. Mega OIS")
+    olympusLens.Add("020301", "Leica D Vario Elmar 14-50mm F3.8-5.6 Asph.")
+    olympusLens.Add("020310", "Lumix G Vario HD 14-140mm F4.0-5.8 Asph. Mega OIS")
+    olympusLens.Add("020400", "Leica D Vario Elmar 14-150mm F3.5-5.6")
+    olympusLens.Add("020410", "Lumix G Vario 7-14mm F4.0 Asph.")
+    olympusLens.Add("020510", "Lumix G 20mm F1.7 Asph.")
+    olympusLens.Add("020610", "Leica DG Macro-Elmarit 45mm F2.8 Asph. Mega OIS")
+    olympusLens.Add("020710", "Lumix G Vario 14-42mm F3.5-5.6 Asph. Mega OIS")
+    olympusLens.Add("020810", "Lumix G Fisheye 8mm F3.5")
+    olympusLens.Add("020910", "Lumix G Vario 100-300mm F4.0-5.6 Mega OIS")
+    olympusLens.Add("021010", "Lumix G 14mm F2.5 Asph.")
+    olympusLens.Add("021110", "Lumix G 12.5mm F12 3D")
+    olympusLens.Add("021210", "Leica DG Summilux 25mm F1.4 Asph.")
+    olympusLens.Add("021310", "Lumix G X Vario PZ 45-175mm F4.0-5.6 Asph. Power OIS")
+    olympusLens.Add("021410", "Lumix G X Vario PZ 14-42mm F3.5-5.6 Asph. Power OIS")
+    olympusLens.Add("021510", "Lumix G X Vario 12-35mm F2.8 Asph. Power OIS")
+    olympusLens.Add("021610", "Lumix G Vario 45-150mm F4.0-5.6 Asph. Mega OIS")
+    olympusLens.Add("021710", "Lumix G X Vario 35-100mm F2.8 Power OIS")
+    olympusLens.Add("021810", "Lumix G Vario 14-42mm F3.5-5.6 II Asph. Mega OIS")
+    olympusLens.Add("021910", "Lumix G Vario 14-140mm F3.5-5.6 Asph. Power OIS")
+    olympusLens.Add("022010", "Lumix G Vario 12-32mm F3.5-5.6 Asph. Mega OIS")
+    olympusLens.Add("022110", "Leica DG Nocticron 42.5mm F1.2 Asph. Power OIS")
+    olympusLens.Add("022210", "Leica DG Summilux 15mm F1.7 Asph.")
+    olympusLens.Add("022310", "Lumix G Vario 35-100mm F4.0-5.6 Asph. Mega OIS")
+    olympusLens.Add("022410", "Lumix G Macro 30mm F2.8 Asph. Mega OIS")
+    olympusLens.Add("022510", "Lumix G 42.5mm F1.7 Asph. Power OIS")
+    olympusLens.Add("022610", "Lumix G 25mm F1.7 Asph.")
+    olympusLens.Add("022710", "Leica DG Vario-Elmar 100-400mm F4.0-6.3 Asph. Power OIS")
+    olympusLens.Add("022810", "Lumix G Vario 12-60mm F3.5-5.6 Asph. Power OIS")
+    olympusLens.Add("030100", "Leica D Vario Elmarit 14-50mm F2.8-3.5 Asph.")
+    olympusLens.Add("030200", "Leica D Summilux 25mm F1.4 Asph.")
+    olympusLens.Add("050110", "Tamron 14-150mm F3.5-5.8 Di III")
+
+    olympusCamera.Add("D4028", "X-2,C-50Z")
+    olympusCamera.Add("D4029", "E-20,E-20N,E-20P")
+    olympusCamera.Add("D4034", "C720UZ")
+    olympusCamera.Add("D4040", "E-1")
+    olympusCamera.Add("D4041", "E-300")
+    olympusCamera.Add("D4083", "C2Z,D520Z,C220Z")
+    olympusCamera.Add("D4106", "u20D,S400D,u400D")
+    olympusCamera.Add("D4120", "X-1")
+    olympusCamera.Add("D4122", "u10D,S300D,u300D")
+    olympusCamera.Add("D4125", "AZ-1")
+    olympusCamera.Add("D4141", "C150,D390")
+    olympusCamera.Add("D4193", "C-5000Z")
+    olympusCamera.Add("D4194", "X-3,C-60Z")
+    olympusCamera.Add("D4199", "u30D,S410D,u410D")
+    olympusCamera.Add("D4205", "X450,D535Z,C370Z")
+    olympusCamera.Add("D4210", "C160,D395")
+    olympusCamera.Add("D4211", "C725UZ")
+    olympusCamera.Add("D4213", "FerrariMODEL2003")
+    olympusCamera.Add("D4216", "u15D")
+    olympusCamera.Add("D4217", "u25D")
+    olympusCamera.Add("D4220", "u-miniD,Stylus V")
+    olympusCamera.Add("D4221", "u40D,S500,uD500")
+    olympusCamera.Add("D4231", "FerrariMODEL2004")
+    olympusCamera.Add("D4240", "X500,D590Z,C470Z")
+    olympusCamera.Add("D4244", "uD800,S800")
+    olympusCamera.Add("D4256", "u720SW,S720SW")
+    olympusCamera.Add("D4261", "X600,D630,FE5500")
+    olympusCamera.Add("D4262", "uD600,S600")
+    olympusCamera.Add("D4301", "u810/S810")
+    olympusCamera.Add("D4302", "u710,S710")
+    olympusCamera.Add("D4303", "u700,S700")
+    olympusCamera.Add("D4304", "FE100,X710")
+    olympusCamera.Add("D4305", "FE110,X705")
+    olympusCamera.Add("D4310", "FE-130,X-720")
+    olympusCamera.Add("D4311", "FE-140,X-725")
+    olympusCamera.Add("D4312", "FE150,X730")
+    olympusCamera.Add("D4313", "FE160,X735")
+    olympusCamera.Add("D4314", "u740,S740")
+    olympusCamera.Add("D4315", "u750,S750")
+    olympusCamera.Add("D4316", "u730/S730")
+    olympusCamera.Add("D4317", "FE115,X715")
+    olympusCamera.Add("D4321", "SP550UZ")
+    olympusCamera.Add("D4322", "SP510UZ")
+    olympusCamera.Add("D4324", "FE170,X760")
+    olympusCamera.Add("D4326", "FE200")
+    olympusCamera.Add("D4327", "FE190/X750")
+    olympusCamera.Add("D4328", "u760,S760")
+    olympusCamera.Add("D4330", "FE180/X745")
+    olympusCamera.Add("D4331", "u1000/S1000")
+    olympusCamera.Add("D4332", "u770SW,S770SW")
+    olympusCamera.Add("D4333", "FE240/X795")
+    olympusCamera.Add("D4334", "FE210,X775")
+    olympusCamera.Add("D4336", "FE230/X790")
+    olympusCamera.Add("D4337", "FE220,X785")
+    olympusCamera.Add("D4338", "u725SW,S725SW")
+    olympusCamera.Add("D4339", "FE250/X800")
+    olympusCamera.Add("D4341", "u780,S780")
+    olympusCamera.Add("D4343", "u790SW,S790SW")
+    olympusCamera.Add("D4344", "u1020,S1020")
+    olympusCamera.Add("D4346", "FE15,X10")
+    olympusCamera.Add("D4348", "FE280,X820,C520")
+    olympusCamera.Add("D4349", "FE300,X830")
+    olympusCamera.Add("D4350", "u820,S820")
+    olympusCamera.Add("D4351", "u1200,S1200")
+    olympusCamera.Add("D4352", "FE270,X815,C510")
+    olympusCamera.Add("D4353", "u795SW,S795SW")
+    olympusCamera.Add("D4354", "u1030SW,S1030SW")
+    olympusCamera.Add("D4355", "SP560UZ")
+    olympusCamera.Add("D4356", "u1010,S1010")
+    olympusCamera.Add("D4357", "u830,S830")
+    olympusCamera.Add("D4359", "u840,S840")
+    olympusCamera.Add("D4360", "FE350WIDE,X865")
+    olympusCamera.Add("D4361", "u850SW,S850SW")
+    olympusCamera.Add("D4362", "FE340,X855,C560")
+    olympusCamera.Add("D4363", "FE320,X835,C540")
+    olympusCamera.Add("D4364", "SP570UZ")
+    olympusCamera.Add("D4366", "FE330,X845,C550")
+    olympusCamera.Add("D4368", "FE310,X840,C530")
+    olympusCamera.Add("D4370", "u1050SW,S1050SW")
+    olympusCamera.Add("D4371", "u1060,S1060")
+    olympusCamera.Add("D4372", "FE370,X880,C575")
+    olympusCamera.Add("D4374", "SP565UZ")
+    olympusCamera.Add("D4377", "u1040,S1040")
+    olympusCamera.Add("D4378", "FE360,X875,C570")
+    olympusCamera.Add("D4379", "FE20,X15,C25")
+    olympusCamera.Add("D4380", "uT6000,ST6000")
+    olympusCamera.Add("D4381", "uT8000,ST8000")
+    olympusCamera.Add("D4382", "u9000,S9000")
+    olympusCamera.Add("D4384", "SP590UZ")
+    olympusCamera.Add("D4385", "FE3010,X895")
+    olympusCamera.Add("D4386", "FE3000,X890")
+    olympusCamera.Add("D4387", "FE35,X30")
+    olympusCamera.Add("D4388", "u550WP,S550WP")
+    olympusCamera.Add("D4390", "FE5000,X905")
+    olympusCamera.Add("D4391", "u5000")
+    olympusCamera.Add("D4392", "u7000,S7000")
+    olympusCamera.Add("D4396", "FE5010,X915")
+    olympusCamera.Add("D4397", "FE25,X20")
+    olympusCamera.Add("D4398", "FE45,X40")
+    olympusCamera.Add("D4401", "XZ-1")
+    olympusCamera.Add("D4402", "uT6010,ST6010")
+    olympusCamera.Add("D4406", "u7010,S7010 / u7020,S7020")
+    olympusCamera.Add("D4407", "FE4010,X930")
+    olympusCamera.Add("D4408", "X560WP")
+    olympusCamera.Add("D4409", "FE26,X21")
+    olympusCamera.Add("D4410", "FE4000,X920,X925")
+    olympusCamera.Add("D4411", "FE46,X41,X42")
+    olympusCamera.Add("D4412", "FE5020,X935")
+    olympusCamera.Add("D4413", "uTough-3000")
+    olympusCamera.Add("D4414", "StylusTough-6020")
+    olympusCamera.Add("D4415", "StylusTough-8010")
+    olympusCamera.Add("D4417", "u5010,S5010")
+    olympusCamera.Add("D4418", "u7040,S7040")
+    olympusCamera.Add("D4419", "u9010,S9010")
+    olympusCamera.Add("D4423", "FE4040")
+    olympusCamera.Add("D4424", "FE47,X43")
+    olympusCamera.Add("D4426", "FE4030,X950")
+    olympusCamera.Add("D4428", "FE5030,X965,X960")
+    olympusCamera.Add("D4430", "u7030,S7030")
+    olympusCamera.Add("D4432", "SP600UZ")
+    olympusCamera.Add("D4434", "SP800UZ")
+    olympusCamera.Add("D4439", "FE4020,X940")
+    olympusCamera.Add("D4442", "FE5035")
+    olympusCamera.Add("D4448", "FE4050,X970")
+    olympusCamera.Add("D4450", "FE5050,X985")
+    olympusCamera.Add("D4454", "u-7050")
+    olympusCamera.Add("D4464", "T10,X27")
+    olympusCamera.Add("D4470", "FE5040,X980")
+    olympusCamera.Add("D4472", "TG-310")
+    olympusCamera.Add("D4474", "TG-610")
+    olympusCamera.Add("D4476", "TG-810")
+    olympusCamera.Add("D4478", "VG145,VG140,D715")
+    olympusCamera.Add("D4479", "VG130,D710")
+    olympusCamera.Add("D4480", "VG120,D705")
+    olympusCamera.Add("D4482", "VR310,D720")
+    olympusCamera.Add("D4484", "VR320,D725")
+    olympusCamera.Add("D4486", "VR330,D730")
+    olympusCamera.Add("D4488", "VG110,D700")
+    olympusCamera.Add("D4490", "SP-610UZ")
+    olympusCamera.Add("D4492", "SZ-10")
+    olympusCamera.Add("D4494", "SZ-20")
+    olympusCamera.Add("D4496", "SZ-30MR")
+    olympusCamera.Add("D4498", "SP-810UZ")
+    olympusCamera.Add("D4500", "SZ-11")
+    olympusCamera.Add("D4504", "TG-615")
+    olympusCamera.Add("D4508", "TG-620")
+    olympusCamera.Add("D4510", "TG-820")
+    olympusCamera.Add("D4512", "TG-1")
+    olympusCamera.Add("D4516", "SH-21")
+    olympusCamera.Add("D4519", "SZ-14")
+    olympusCamera.Add("D4520", "SZ-31 MR")
+    olympusCamera.Add("D4521", "SH-25 MR")
+    olympusCamera.Add("D4523", "SP-720 UZ")
+    olympusCamera.Add("D4529", "VG170")
+    olympusCamera.Add("D4531", "XZ-2")
+    olympusCamera.Add("D4535", "SP-620 UZ")
+    olympusCamera.Add("D4536", "TG-320")
+    olympusCamera.Add("D4537", "VR340,D750")
+    olympusCamera.Add("D4538", "VG160,X990,D745")
+    olympusCamera.Add("D4541", "SZ-12")
+    olympusCamera.Add("D4545", "VH410")
+    olympusCamera.Add("D4546", "XZ-10")
+    olympusCamera.Add("D4547", "TG-2")
+    olympusCamera.Add("D4548", "TG-830")
+    olympusCamera.Add("D4549", "TG-630")
+    olympusCamera.Add("D4550", "SH-50")
+    olympusCamera.Add("D4553", "SZ-16,DZ-105")
+    olympusCamera.Add("D4562", "SP-820 UZ")
+    olympusCamera.Add("D4566", "SZ-15")
+    olympusCamera.Add("D4572", "STYLUS1")
+    olympusCamera.Add("D4574", "TG-3")
+    olympusCamera.Add("D4575", "TG-850")
+    olympusCamera.Add("D4579", "SP-100EE")
+    olympusCamera.Add("D4580", "SH-60")
+    olympusCamera.Add("D4581", "SH-1")
+    olympusCamera.Add("D4582", "TG-835")
+    olympusCamera.Add("D4585", "SH-2 / SH-3")
+    olympusCamera.Add("D4586", "TG-4")
+    olympusCamera.Add("D4587", "TG-860")
+    olympusCamera.Add("D4591", "TG-870")
+    olympusCamera.Add("D4593", "TG-5")
+    olympusCamera.Add("D4809", "C2500L")
+    olympusCamera.Add("D4842", "E-10")
+    olympusCamera.Add("D4856", "C-1")
+    olympusCamera.Add("D4857", "C-1Z,D-150Z")
+    olympusCamera.Add("DCHC", "D500L")
+    olympusCamera.Add("DCHT", "D600L / D620L")
+    olympusCamera.Add("K0055", "AIR-A01")
+    olympusCamera.Add("S0003", "E-330")
+    olympusCamera.Add("S0004", "E-500")
+    olympusCamera.Add("S0009", "E-400")
+    olympusCamera.Add("S0010", "E-510  ")
+    olympusCamera.Add("S0011", "E-3")
+    olympusCamera.Add("S0013", "E-410")
+    olympusCamera.Add("S0016", "E-420")
+    olympusCamera.Add("S0017", "E-30")
+    olympusCamera.Add("S0018", "E-520")
+    olympusCamera.Add("S0019", "E-P1")
+    olympusCamera.Add("S0023", "E-620")
+    olympusCamera.Add("S0026", "E-P2")
+    olympusCamera.Add("S0027", "E-PL1")
+    olympusCamera.Add("S0029", "E-450")
+    olympusCamera.Add("S0030", "E-600")
+    olympusCamera.Add("S0032", "E-P3")
+    olympusCamera.Add("S0033", "E-5")
+    olympusCamera.Add("S0034", "E-PL2")
+    olympusCamera.Add("S0036", "E-M5")
+    olympusCamera.Add("S0038", "E-PL3")
+    olympusCamera.Add("S0039", "E-PM1")
+    olympusCamera.Add("S0040", "E-PL1s")
+    olympusCamera.Add("S0042", "E-PL5")
+    olympusCamera.Add("S0043", "E-PM2")
+    olympusCamera.Add("S0044", "E-P5")
+    olympusCamera.Add("S0045", "E-PL6")
+    olympusCamera.Add("S0046", "E-PL7")
+    olympusCamera.Add("S0047", "E-M1")
+    olympusCamera.Add("S0051", "E-M10")
+    olympusCamera.Add("S0052", "E-M5 Mark II")
+    olympusCamera.Add("S0059", "E-M10 Mark II")
+    olympusCamera.Add("S0061", "PEN-F")
+    olympusCamera.Add("S0065", "E-PL8")
+    olympusCamera.Add("S0067", "E-M1 Mark II")
+    olympusCamera.Add("S0068", "E-M10 Mark III")
+    olympusCamera.Add("S0076", "E-PL9")
+    olympusCamera.Add("SR45", "D220")
+    olympusCamera.Add("SR55", "D320L")
+    olympusCamera.Add("SR83", "D340L")
+    olympusCamera.Add("SR85", "C830L,D340R")
+    olympusCamera.Add("SR852", "C860L,D360L")
+    olympusCamera.Add("SR872", "C900Z,D400Z")
+    olympusCamera.Add("SR874", "C960Z,D460Z")
+    olympusCamera.Add("SR951", "C2000Z")
+    olympusCamera.Add("SR952", "C21")
+    olympusCamera.Add("SR953", "C21T.commu")
+    olympusCamera.Add("SR954", "C2020Z")
+    olympusCamera.Add("SR955", "C990Z,D490Z")
+    olympusCamera.Add("SR956", "C211Z")
+    olympusCamera.Add("SR959", "C990ZS,D490Z")
+    olympusCamera.Add("SR95A", "C2100UZ")
+    olympusCamera.Add("SR971", "C100,D370")
+    olympusCamera.Add("SR973", "C2,D230")
+    olympusCamera.Add("SX151", "E100RS")
+    olympusCamera.Add("SX351", "C3000Z / C3030Z")
+    olympusCamera.Add("SX354", "C3040Z")
+    olympusCamera.Add("SX355", "C2040Z")
+    olympusCamera.Add("SX357", "C700UZ")
+    olympusCamera.Add("SX358", "C200Z,D510Z")
+    olympusCamera.Add("SX374", "C3100Z,C3020Z")
+    olympusCamera.Add("SX552", "C4040Z")
+    olympusCamera.Add("SX553", "C40Z,D40Z")
+    olympusCamera.Add("SX556", "C730UZ")
+    olympusCamera.Add("SX558", "C5050Z")
+    olympusCamera.Add("SX571", "C120,D380")
+    olympusCamera.Add("SX574", "C300Z,D550Z")
+    olympusCamera.Add("SX575", "C4100Z,C4000Z")
+    olympusCamera.Add("SX751", "X200,D560Z,C350Z")
+    olympusCamera.Add("SX752", "X300,D565Z,C450Z")
+    olympusCamera.Add("SX753", "C750UZ")
+    olympusCamera.Add("SX754", "C740UZ")
+    olympusCamera.Add("SX755", "C755UZ")
+    olympusCamera.Add("SX756", "C5060WZ")
+    olympusCamera.Add("SX757", "C8080WZ")
+    olympusCamera.Add("SX758", "X350,D575Z,C360Z")
+    olympusCamera.Add("SX759", "X400,D580Z,C460Z")
+    olympusCamera.Add("SX75A", "AZ-2ZOOM")
+    olympusCamera.Add("SX75B", "D595Z,C500Z")
+    olympusCamera.Add("SX75C", "X550,D545Z,C480Z")
+    olympusCamera.Add("SX75D", "IR-300")
+    olympusCamera.Add("SX75F", "C55Z,C5500Z")
+    olympusCamera.Add("SX75G", "C170,D425")
+    olympusCamera.Add("SX75J", "C180,D435")
+    olympusCamera.Add("SX771", "C760UZ")
+    olympusCamera.Add("SX772", "C770UZ")
+    olympusCamera.Add("SX773", "C745UZ")
+    olympusCamera.Add("SX774", "X250,D560Z,C350Z")
+    olympusCamera.Add("SX775", "X100,D540Z,C310Z")
+    olympusCamera.Add("SX776", "C460ZdelSol")
+    olympusCamera.Add("SX777", "C765UZ")
+    olympusCamera.Add("SX77A", "D555Z,C315Z")
+    olympusCamera.Add("SX851", "C7070WZ")
+    olympusCamera.Add("SX852", "C70Z,C7000Z")
+    olympusCamera.Add("SX853", "SP500UZ")
+    olympusCamera.Add("SX854", "SP310")
+    olympusCamera.Add("SX855", "SP350")
+    olympusCamera.Add("SX873", "SP320")
+    olympusCamera.Add("SX875", "FE180/X745")
+    olympusCamera.Add("SX876", "FE190/X750")
+
+    olympusSceneMode.Add(0, "Standard")
+    olympusSceneMode.Add(6, "Auto")
+    olympusSceneMode.Add(7, "Sport")
+    olympusSceneMode.Add(8, "Portrait")
+    olympusSceneMode.Add(9, "Landscape+Portrait")
+    olympusSceneMode.Add(10, "Landscape")
+    olympusSceneMode.Add(11, "Night Scene")
+    olympusSceneMode.Add(12, "Self Portrait")
+    olympusSceneMode.Add(13, "Panorama")
+    olympusSceneMode.Add(14, "2 in 1")
+    olympusSceneMode.Add(15, "Movie")
+    olympusSceneMode.Add(16, "Landscape+Portrait")
+    olympusSceneMode.Add(17, "Night+Portrait")
+    olympusSceneMode.Add(18, "Indoor")
+    olympusSceneMode.Add(19, "Fireworks")
+    olympusSceneMode.Add(20, "Sunset")
+    olympusSceneMode.Add(21, "Beauty Skin")
+    olympusSceneMode.Add(22, "Macro")
+    olympusSceneMode.Add(23, "Super Macro")
+    olympusSceneMode.Add(24, "Food")
+    olympusSceneMode.Add(25, "Documents")
+    olympusSceneMode.Add(26, "Museum")
+    olympusSceneMode.Add(27, "Shoot & Select")
+    olympusSceneMode.Add(28, "Beach & Snow")
+    olympusSceneMode.Add(29, "Self Protrait+Timer")
+    olympusSceneMode.Add(30, "Candle")
+    olympusSceneMode.Add(31, "Available Light")
+    olympusSceneMode.Add(32, "Behind Glass")
+    olympusSceneMode.Add(33, "My Mode")
+    olympusSceneMode.Add(34, "Pet")
+    olympusSceneMode.Add(35, "Underwater Wide1")
+    olympusSceneMode.Add(36, "Underwater Macro")
+    olympusSceneMode.Add(37, "Shoot & Select1")
+    olympusSceneMode.Add(38, "Shoot & Select2")
+    olympusSceneMode.Add(39, "High Key")
+    olympusSceneMode.Add(40, "Digital Image Stabilization")
+    olympusSceneMode.Add(41, "Auction")
+    olympusSceneMode.Add(42, "Beach")
+    olympusSceneMode.Add(43, "Snow")
+    olympusSceneMode.Add(44, "Underwater Wide2")
+    olympusSceneMode.Add(45, "Low Key")
+    olympusSceneMode.Add(46, "Children")
+    olympusSceneMode.Add(47, "Vivid")
+    olympusSceneMode.Add(48, "Nature Macro")
+    olympusSceneMode.Add(49, "Underwater Snapshot")
+    olympusSceneMode.Add(50, "Shooting Guide")
+    olympusSceneMode.Add(54, "Face Portrait")
+    olympusSceneMode.Add(57, "Bulb")
+    olympusSceneMode.Add(59, "Smile Shot")
+    olympusSceneMode.Add(60, "Quick Shutter")
+    olympusSceneMode.Add(63, "Slow Shutter")
+    olympusSceneMode.Add(64, "Bird Watching")
+    olympusSceneMode.Add(65, "Multiple Exposure")
+    olympusSceneMode.Add(66, "e-Portrait")
+    olympusSceneMode.Add(67, "Soft Background Shot")
+    olympusSceneMode.Add(142, "Hand-held Starlight")
+    olympusSceneMode.Add(154, "HDR")
+
+    olympusArtFilter.Add(0, "Off")
+    olympusArtFilter.Add(1, "Soft Focus")
+    olympusArtFilter.Add(2, "Pop Art")
+    olympusArtFilter.Add(3, "Pale & Light Color")
+    olympusArtFilter.Add(4, "Light Tone")
+    olympusArtFilter.Add(5, "Pin Hole")
+    olympusArtFilter.Add(6, "Grainy Film")
+    olympusArtFilter.Add(9, "Diorama")
+    olympusArtFilter.Add(10, "Cross Process")
+    olympusArtFilter.Add(12, "Fish Eye")
+    olympusArtFilter.Add(13, "Drawing")
+    olympusArtFilter.Add(14, "Gentle Sepia")
+    olympusArtFilter.Add(15, "Pale & Light Color II")
+    olympusArtFilter.Add(16, "Pop Art II")
+    olympusArtFilter.Add(17, "Pin Hole II")
+    olympusArtFilter.Add(18, "Pin Hole III")
+    olympusArtFilter.Add(19, "Grainy Film II")
+    olympusArtFilter.Add(20, "Dramatic Tone")
+    olympusArtFilter.Add(21, "Punk")
+    olympusArtFilter.Add(22, "Soft Focus 2")
+    olympusArtFilter.Add(23, "Sparkle")
+    olympusArtFilter.Add(24, "Watercolor")
+    olympusArtFilter.Add(25, "Key Line")
+    olympusArtFilter.Add(26, "Key Line II")
+    olympusArtFilter.Add(27, "Miniature")
+    olympusArtFilter.Add(28, "Reflection")
+    olympusArtFilter.Add(29, "Fragmented")
+    olympusArtFilter.Add(31, "Cross Process II")
+    olympusArtFilter.Add(32, "Dramatic Tone II")
+    olympusArtFilter.Add(33, "Watercolor I")
+    olympusArtFilter.Add(34, "Watercolor II")
+    olympusArtFilter.Add(35, "Diorama II")
+    olympusArtFilter.Add(36, "Vintage")
+    olympusArtFilter.Add(37, "Vintage II")
+    olympusArtFilter.Add(38, "Vintage III")
+    olympusArtFilter.Add(39, "Partial Color")
+    olympusArtFilter.Add(40, "Partial Color II")
+    olympusArtFilter.Add(41, "Partial Color III")
+
+    olympusMagicFilter.Add(0, "Off")
+    olympusMagicFilter.Add(1, "Soft Focus")
+    olympusMagicFilter.Add(2, "Pop Art")
+    olympusMagicFilter.Add(3, "Pale & Light Color")
+    olympusMagicFilter.Add(4, "Light Tone")
+    olympusMagicFilter.Add(5, "Pin Hole")
+    olympusMagicFilter.Add(6, "Grainy Film")
+    olympusMagicFilter.Add(9, "Diorama")
+    olympusMagicFilter.Add(10, "Cross Process")
+    olympusMagicFilter.Add(12, "Fish Eye")
+    olympusMagicFilter.Add(13, "Drawing")
+    olympusMagicFilter.Add(14, "Gentle Sepia")
+    olympusMagicFilter.Add(15, "Pale & Light Color II")
+    olympusMagicFilter.Add(16, "Pop Art II")
+    olympusMagicFilter.Add(17, "Pin Hole II")
+    olympusMagicFilter.Add(18, "Pin Hole III")
+    olympusMagicFilter.Add(19, "Grainy Film II")
+    olympusMagicFilter.Add(20, "Dramatic Tone")
+    olympusMagicFilter.Add(21, "Punk")
+    olympusMagicFilter.Add(22, "Soft Focus 2")
+    olympusMagicFilter.Add(23, "Sparkle")
+    olympusMagicFilter.Add(24, "Watercolor")
+    olympusMagicFilter.Add(25, "Key Line")
+    olympusMagicFilter.Add(26, "Key Line II")
+    olympusMagicFilter.Add(27, "Miniature")
+    olympusMagicFilter.Add(28, "Reflection")
+    olympusMagicFilter.Add(29, "Fragmented")
+    olympusMagicFilter.Add(31, "Cross Process II")
+    olympusMagicFilter.Add(32, "Dramatic Tone II")
+    olympusMagicFilter.Add(33, "Watercolor I")
+    olympusMagicFilter.Add(34, "Watercolor II")
+    olympusMagicFilter.Add(35, "Diorama II")
+    olympusMagicFilter.Add(36, "Vintage")
+    olympusMagicFilter.Add(37, "Vintage II")
+    olympusMagicFilter.Add(38, "Vintage III")
+    olympusMagicFilter.Add(39, "Partial Color")
+    olympusMagicFilter.Add(40, "Partial Color II")
+    olympusMagicFilter.Add(41, "Partial Color III")
+
+    olympusArtFilterEffect.Add(&H0, "Off")
+    olympusArtFilterEffect.Add(&H1, "Soft Focus")
+    olympusArtFilterEffect.Add(&H2, "Pop Art")
+    olympusArtFilterEffect.Add(&H3, "Pale & Light Color")
+    olympusArtFilterEffect.Add(&H4, "Light Tone")
+    olympusArtFilterEffect.Add(&H5, "Pin Hole")
+    olympusArtFilterEffect.Add(&H6, "Grainy Film")
+    olympusArtFilterEffect.Add(&H9, "Diorama")
+    olympusArtFilterEffect.Add(&HA, "Cross Process")
+    olympusArtFilterEffect.Add(&HC, "Fish Eye")
+    olympusArtFilterEffect.Add(&HD, "Drawing")
+    olympusArtFilterEffect.Add(&HE, "Gentle Sepia")
+    olympusArtFilterEffect.Add(&HF, "Pale & Light Color II")
+    olympusArtFilterEffect.Add(&H10, "Pop Art II")
+    olympusArtFilterEffect.Add(&H11, "Pin Hole II")
+    olympusArtFilterEffect.Add(&H12, "Pin Hole III")
+    olympusArtFilterEffect.Add(&H13, "Grainy Film II")
+    olympusArtFilterEffect.Add(&H14, "Dramatic Tone")
+    olympusArtFilterEffect.Add(&H15, "Punk")
+    olympusArtFilterEffect.Add(&H16, "Soft Focus 2")
+    olympusArtFilterEffect.Add(&H17, "Sparkle")
+    olympusArtFilterEffect.Add(&H18, "Watercolor")
+    olympusArtFilterEffect.Add(&H19, "Key Line")
+    olympusArtFilterEffect.Add(&H1A, "Key Line II")
+    olympusArtFilterEffect.Add(&H1B, "Miniature")
+    olympusArtFilterEffect.Add(&H1C, "Reflection")
+    olympusArtFilterEffect.Add(&H1D, "Fragmented")
+    olympusArtFilterEffect.Add(&H1F, "Cross Process II")
+    olympusArtFilterEffect.Add(&H20, "Dramatic Tone II")
+    olympusArtFilterEffect.Add(&H21, "Watercolor I")
+    olympusArtFilterEffect.Add(&H22, "Watercolor II")
+    olympusArtFilterEffect.Add(&H23, "Diorama II")
+    olympusArtFilterEffect.Add(&H24, "Vintage")
+    olympusArtFilterEffect.Add(&H25, "Vintage II")
+    olympusArtFilterEffect.Add(&H26, "Vintage III")
+    olympusArtFilterEffect.Add(&H27, "Partial Color")
+    olympusArtFilterEffect.Add(&H28, "Partial Color II")
+    olympusArtFilterEffect.Add(&H29, "Partial Color III")
+
+  End Sub
+
 
 End Module
 
