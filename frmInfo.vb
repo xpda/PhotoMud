@@ -58,7 +58,7 @@ Public Class frmInfo
     rtext1.SelectionFont = New Font(rtext1.SelectionFont, FontStyle.Regular)
     rtext1.Rtf = ""
     rtext1.Refresh()
-    ucomments = readComments(picPath)
+    ucomments = readComments(picPath, True, True)
     fitFile(picPath, pView)
     showInfo(picPath)
     Text1.Text = Path.GetFileName(picPath)
@@ -144,25 +144,25 @@ Public Class frmInfo
       cmdPrevious.Visible = True
       cmdNext.Visible = True
       If qImage IsNot Nothing Then
-        ucomments = readComments(picPath)
+        ucomments = readComments(picPath, True, True)
         pView.setBitmap(qImage)
         pView.Zoom(0)
       Else
         fitFile(picPath, pView)
-        ucomments = readComments(picPath)
+        ucomments = readComments(picPath, True, True)
       End If
 
     ElseIf callingForm.Name = "frmFullscreen" Then
       cmdPrevious.Visible = False
       cmdNext.Visible = False
-      ucomments = readComments(picPath)
+      ucomments = readComments(picPath, True, True)
       pView.setBitmap(qImage)
       pView.Zoom(0)
 
     Else ' frmmain
       cmdPrevious.Visible = False
       cmdNext.Visible = False
-      ucomments = readComments(frmMain.mView.picName)
+      ucomments = readComments(frmMain.mView.picName, True, True)
       pView.setBitmap(frmMain.mView.Bitmap)
       pView.Zoom(0)
     End If
@@ -241,7 +241,7 @@ Public Class frmInfo
 
     'Clock.Reset() : Clock.Start()
     picInfo = getPicinfo(picpath, True)
-    ucomments = readComments(picpath)
+    ucomments = readComments(picpath, True, True)
     pComments = readPropertyItems(picpath) ' for thumbnail detection
     formatExifComments(chkMakernote.Checked, chkJpgTags.Checked, chkXmpInfo.Checked, _
       chkDump.Checked, s, ucomments, picInfo, pcomments) ' s has the answer

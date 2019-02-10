@@ -274,6 +274,8 @@ Public Class uExif
               Exit Do ' no good
             End If
 
+            'File.WriteAllBytes("c:\tmp.txt", ufData)
+
             Tags = New Collection
             k = getDWord(ufData, 4, intel) ' first ifd
 

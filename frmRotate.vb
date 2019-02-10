@@ -89,7 +89,7 @@ Public Class frmRotate
     ' get the camera roll angle for auto align
     picInfo = getPicinfo(currentpicPath, True)
     If picInfo.ErrMessage <> "" Then
-      uComments = readComments(currentpicPath)
+      uComments = readComments(currentpicPath, True, True)
       pComments = readPropertyItems(currentpicPath)
       formatExifComments(True, False, False, False, s, uComments, picInfo, pComments) ' s has the answer
       i = InStr(s, "Camera Roll Angle:")

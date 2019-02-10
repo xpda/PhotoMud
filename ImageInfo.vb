@@ -22,8 +22,7 @@ Public Module ImageInfo
 
   Public ux As uExif ' main tag. This is nothing if lead tags are used.
 
-  Function readComments(ByRef filename As String, Optional ByVal processIFDs As Boolean = True, _
-    Optional ByVal processMakerNote As Boolean = True) As uExif
+  Function readComments(filename As String, processIFDs As Boolean, processMakerNote As Boolean) As uExif
 
     ' get information from the image, both exif and regular. The result go into picinfo and readcomments.
 
@@ -83,6 +82,16 @@ Public Module ImageInfo
             gpsTags = tg.IFD.Tags
             tagVerify(gpsTags)
           End If
+        End If
+      End If
+
+      If ux.tagExists(uExif.TagID.description) Then
+        tg = ux.Tags(sTag(uExif.TagID.description))
+        s = tg.singleValue
+        If eqstr(s, "Minolta DSC") Or
+           eqstr(s, "OLYMPUS DIGITAL CAMERA") Or
+           eqstr(s, "LEAD Technologies Inc. V1.01") Then ' get rid of advertising
+          tg.Value = ""
         End If
       End If
 
@@ -958,7 +967,7 @@ Public Module ImageInfo
       If uz.tagExists(uExif.TagID.gainControl) Then
         Select Case uz.TagValue(uExif.TagID.gainControl, 0)
           Case 0
-            parm = "None"
+            parm = "(none)"
           Case 1
             parm = "Low Gain Up"
           Case 2
@@ -1511,7 +1520,7 @@ Public Module ImageInfo
     End If
 
     note = ""
-    If makerTags Is Nothing Then Exit Sub
+    If makerTags Is Nothing OrElse makerTags.Count = 0 Then Exit Sub
 
     If DumpAll Then
       note = dumpTags(makerTags)
@@ -1573,7 +1582,7 @@ Public Module ImageInfo
     ' nikon and fuji use links relative to the makernote data, the others use absolute file links
 
     Dim i, j As Integer
-
+    iintel = 2
     ux = New uExif
     mTag.IFD = ux
     'k = mTag.Link + voffset
@@ -1768,6 +1777,7 @@ Public Module ImageInfo
             mTag.onlyRead = True
           ElseIf parm.Substring(7, 3) = Chr(0) & "II" Then
             vOffset = 12
+            iintel = 2
             olyNew = True
             relativeLinks = 0
           Else
@@ -3134,7 +3144,7 @@ Public Module ImageInfo
         If i And 128 Then parm = parm & " bottom-left"
         If i And 256 Then parm = parm & " bottom-center"
         If i And 512 Then parm = parm & " bottom-right"
-        If i = 65535 Then parm = "None"
+        If i = 65535 Then parm = "(none)"
         If Len(parm) > 0 Then note = note & "AF Points in Focus:" & tb & parm & "\par "
       End If
 
@@ -3272,7 +3282,7 @@ Public Module ImageInfo
           Case 4 : parm = "Medium High"
           Case 5 : parm = "Very Low"
           Case 6 : parm = "Very High"
-          Case 65535 : parm = "None"
+          Case 65535 : parm = "(none)"
           Case Else : parm = ""
         End Select
         If Len(parm) > 0 Then note = note & "Saturation:" & tb & parm & "\par "
@@ -4080,7 +4090,7 @@ Public Module ImageInfo
           Case 2
             parm = "Low"
           Case 3
-            parm = "None (B&W)"
+            parm = "(none) (B&W)"
           Case Else
             parm = ""
         End Select
@@ -4236,7 +4246,7 @@ Public Module ImageInfo
         If Trim(parm) <> "" Then note = note & "Shooting Mode:" & tb & parm & "\par "
 
         Select Case v(12)
-          Case 0 : parm = "None"
+          Case 0 : parm = "(none)"
           Case 1 : parm = "2x"
           Case 2 : parm = "4x"
           Case Else : parm = ""
@@ -4309,7 +4319,7 @@ Public Module ImageInfo
         If UBound(v) >= 19 Then
           Select Case v(19)
             Case &H2005 : parm = "Manual AF point selection"
-            Case &H3000 : parm = "None (MF)"
+            Case &H3000 : parm = "(none - MF)"
             Case &H3001 : parm = "Auto AF point selection"
             Case &H3002 : parm = "Right"
             Case &H3003 : parm = "Center"
@@ -4470,7 +4480,7 @@ Public Module ImageInfo
         Case 0 : parm = "Off"
         Case 1 : parm = "Night Scene"
         Case 2 : parm = "On"
-        Case 3 : parm = "None"
+        Case 3 : parm = "(none)"
         Case Else
           parm = ""
       End Select
@@ -4482,7 +4492,7 @@ Public Module ImageInfo
 
       If UBound(v) >= 14 Then
         Select Case v(14)
-          Case &H3000 : parm = "None (MF)"
+          Case &H3000 : parm = "(none - MF)"
           Case &H3001 : parm = "Right"
           Case &H3002 : parm = "Center"
           Case &H3003 : parm = "Center+Right"
@@ -4835,7 +4845,7 @@ Public Module ImageInfo
             For i = 256 To 258 : parm = parm & b(i) & " " : Next i
             note = note & "Sharpness Settings:" & tb & Trim(parm) & "\par "
             Select Case b(255)
-              Case 0 : parm = "None"
+              Case 0 : parm = "(none)"
               Case 1 : parm = "Yellow"
               Case 2 : parm = "Orange"
               Case 3 : parm = "Red"
@@ -4848,7 +4858,7 @@ Public Module ImageInfo
             For i = 265 To 267 : parm = parm & b(i) & " " : Next i
             note = note & "Color Tone Settings:" & tb & Trim(parm) & "\par "
             Select Case b(264)
-              Case 0 : parm = "None"
+              Case 0 : parm = "(none)"
               Case 1 : parm = "Sepia"
               Case 2 : parm = "Blue"
               Case 3 : parm = "Purple"
@@ -5690,7 +5700,7 @@ Public Module ImageInfo
       parm = ""
       Select Case v
         Case 0
-          parm = "None"
+          parm = "(none)"
         Case 1
           parm = "Auto Release"
         Case 2
@@ -6147,7 +6157,7 @@ Public Module ImageInfo
       i = DWord(v, 34 * 4, False) '  Subject Program
       Select Case i
         Case 0
-          parm = "None"
+          parm = "(none)"
         Case 1
           parm = "Portrait"
         Case 2
@@ -6501,7 +6511,7 @@ Public Module ImageInfo
     If makerTags.Contains(sTag(&H1005)) Then
       i = makerTags.Item(sTag(&H1005)).singleValue
       Select Case i
-        Case 0 : parm = "None"
+        Case 0 : parm = "(none)"
         Case 1 : parm = "Internal"
         Case 4 : parm = "External"
         Case 5 : parm = "Internal + External"
@@ -6839,7 +6849,7 @@ Public Module ImageInfo
         If v(0) = 0 Then
           Select Case v(2)
             Case 0
-              parm = "none"
+              parm = "(none)"
             Case 4
               parm = "Olympus Zuiko Digital EC-14 1.4x Teleconverter"
             Case 8
@@ -6871,7 +6881,7 @@ Public Module ImageInfo
       If uz.Tags.Contains(sTag(&H1000)) Then
         i = uz.Tags.Item(sTag(&H1000)).singlevalue
         Select Case i
-          Case 0 : parm = "None"
+          Case 0 : parm = "(none)"
           Case 2 : parm = "Simple E System"
           Case 3 : parm = "E System"
           Case 4 : parm = "E-System (body powered)"
@@ -6883,7 +6893,7 @@ Public Module ImageInfo
       If uz.Tags.Contains(sTag(&H1001)) Then
         i = uz.Tags.Item(sTag(&H1001)).singlevalue
         Select Case i
-          Case 0 : parm = "None"
+          Case 0 : parm = "(none)"
           Case 1 : parm = "FL-20"
           Case 2 : parm = "FL-50"
           Case 3 : parm = "RF-11"
@@ -7382,7 +7392,8 @@ Public Module ImageInfo
 
       If uz.Tags.Contains(sTag(&H53A)) Then
         i = uz.Tags.Item(sTag(&H53A)).singleValue
-        note = note & "Monochrome vignetting:" & tb & i & "\par "
+        If i > 0 Then parm = i Else parm = "(none)"
+        note = note & "Monochrome vignetting:" & tb & parm & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H53B)) Then
@@ -7397,7 +7408,7 @@ Public Module ImageInfo
           Case 5 : parm = "Green"
           Case Else : parm = ""
         End Select
-        If Len(parm) > 0 Then note = note & "Monochrome Color:" & tb & parm & "\par "
+        If Len(parm) > 0 Then note = note & "Monochrome color:" & tb & parm & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H600)) Then
@@ -7532,6 +7543,7 @@ Public Module ImageInfo
         ' "this rational value looks like it is in mm when the denominator is 1 (E-1), "
         ' "and cm when denominator is 10 (E-300), so if we ignore the denominator we are consistently in mm - PH"
         x = uz.Tags.Item(sTag(&H305)).singleValue
+        x = x / 100 ' sometimes this should be / 10
         If x > 0 Then note = note & "Focus Distance:" & tb & Format(x, "####,##0.##") & " m\par "
       End If
 
@@ -7572,7 +7584,7 @@ Public Module ImageInfo
           '  Case 1 : parm = "Center (horizontal)"
           '  Case 2 : parm = "Right"
           '  Case 3 : parm = "Center (vertical)"
-          '  Case 255 : parm = "None"
+          '  Case 255 : parm = "(none)"
           '  Case Else : parm = ""
           'End Select
         End If
@@ -7713,7 +7725,7 @@ Public Module ImageInfo
     If makerTags.Contains(sTag(&H20E)) Then ' [picture info] [camera info], string
       i = makerTags.Item(sTag(&H20E)).singleValue
       Select Case i
-        Case 0 : parm = "None"
+        Case 0 : parm = "(none)"
         Case 1 : parm = "Standard"
         Case 2 : parm = "Best"
         Case 3 : parm = "Adjust Exposure"
@@ -8021,7 +8033,7 @@ Public Module ImageInfo
         Case 512
           parm = "Low"
         Case 768
-          parm = "None (B&W)"
+          parm = "(none - B&W)"
         Case &H8000
           parm = "Film Simulation"
         Case Else
@@ -10351,7 +10363,7 @@ Public Module ImageInfo
       i = makerTags.Item(sTag(&H105)).singleValue
       Select Case i
         Case 0
-          parm = "None"
+          parm = "(none)"
         Case &H48
           parm = "Minolta AF 2x APO (D) "
         Case &H50
@@ -11290,7 +11302,7 @@ Public Module ImageInfo
 
     ElseIf Mode = 2 Then ' picture style
       Select Case Value
-        Case &H0 : canonDescr = "None "
+        Case &H0 : canonDescr = "(none) "
         Case &H1 : canonDescr = "Standard "
         Case &H2 : canonDescr = "Portrait "
         Case &H3 : canonDescr = "High Saturation "
@@ -11898,7 +11910,7 @@ Public Module ImageInfo
 
   Sub exifInit()
 
-    olympusLens.Add("000000", "None")
+    olympusLens.Add("000000", "(none)")
     olympusLens.Add("000100", "Olympus Zuiko Digital ED 50mm F2.0 Macro")
     olympusLens.Add("000101", "Olympus Zuiko Digital 40-150mm F3.5-4.5")
     olympusLens.Add("000110", "Olympus M.Zuiko Digital ED 14-42mm F3.5-5.6")

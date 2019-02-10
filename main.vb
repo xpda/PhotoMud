@@ -1766,27 +1766,27 @@ Public Module main
           Case Else
             img.Ping(fName)
         End Select
+
+        picInfo.FormatID = img.Format
+        picInfo.FormatDescription = img.FormatInfo.Description
+        picInfo.Width = img.Width
+        picInfo.Height = img.Height
+        picInfo.fileSize = img.FileSize
+        picInfo.colorSpace = img.ColorSpace
+        picInfo.colorDepth = img.Depth
+        picInfo.hasPages = img.FormatInfo.IsMultiFrame
+        picInfo.hasAlpha = img.HasAlpha
+        picInfo.Compression = img.CompressionMethod
+        picInfo.Orientation = img.Orientation
+        picInfo.ResolutionX = img.Density.X
+        picInfo.ResolutionY = img.Density.Y
+        picInfo.fileSize = img.FileSize
+        picInfo.isNull = False
       Catch ex As Exception
         picInfo.isNull = True
         picInfo.ErrMessage = ex.Message
         Return picInfo
       End Try
-
-      picInfo.FormatID = img.Format
-      picInfo.FormatDescription = img.FormatInfo.Description
-      picInfo.Width = img.Width
-      picInfo.Height = img.Height
-      picInfo.fileSize = img.FileSize
-      picInfo.colorSpace = img.ColorSpace
-      picInfo.colorDepth = img.Depth
-      picInfo.hasPages = img.FormatInfo.IsMultiFrame
-      picInfo.hasAlpha = img.HasAlpha
-      picInfo.Compression = img.CompressionMethod
-      picInfo.Orientation = img.Orientation
-      picInfo.ResolutionX = img.Density.X
-      picInfo.ResolutionY = img.Density.Y
-      picInfo.fileSize = img.FileSize
-      picInfo.isNull = False
 
     End Using
 
@@ -5213,7 +5213,6 @@ Public Module main
     Catch ex As Exception
       MsgBox(ex.Message)
     End Try
-
   End Sub
 
   Sub updateThumbnail(prop As PropertyItem, bmp As Bitmap)

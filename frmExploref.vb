@@ -2056,7 +2056,7 @@ Public Class frmExploref
         s = "File: " & Path.GetFileName(currentpicPath) & ",  " & rview.Bitmap.Width & " x " & rview.Bitmap.Height & ".     "
       Else
         If currentpicPath <> "" Then picinfo = getPicinfo(currentpicPath, True)
-        If Not picinfo.isNull AndAlso (picinfo.Width > 0 And picinfo.Height > 0) Then
+        If picinfo IsNot Nothing AndAlso Not picinfo.isNull AndAlso (picinfo.Width > 0 And picinfo.Height > 0) Then
           s = "File: " & Path.GetFileName(currentpicPath) & ",  " & picinfo.Width & " x " & picinfo.Height & ".     "
         End If
       End If

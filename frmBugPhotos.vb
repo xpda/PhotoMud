@@ -466,7 +466,7 @@ Public Class frmBugPhotos
       i1 = InStr(i, s, "\")
       s1 = Mid(s, i, i1 - i)
     End If
-    If s1 = "Manual" Then txPixelsPerMM.Enabled = True Else txPixelsPerMM.Enabled = False
+    If s1 = "Manual" Or s1 = "MF, MF" Then txPixelsPerMM.Enabled = True Else txPixelsPerMM.Enabled = False
 
     lens = ""
     i = InStr(s, "Lens Type:")
@@ -486,17 +486,24 @@ Public Class frmBugPhotos
 
     ' set the pixels per mm according to the camera and lens
     ' gx1: 268.4 macro, 56.5 for zoom, gh4: 274.5 macro, 57.8 zoom
-    If InStr(lens, "MACRO-ELMARIT 45/F2.8") > 0 Then
-      If InStr(s, "DMC-GX1") > 0 Then
+    If lens.Contains("MACRO-ELMARIT 45/F2.8") Or lens.Contains("Leica DG Macro-Elmarit 45mm F2.8 Asph. Mega OIS") Then
+      If s.Contains("DMC-GX1") Then
         txPixelsPerMM.Text = "268.4"
-      ElseIf InStr(s, "DMC-GH4") > 0 Then
+      ElseIf s.Contains("DMC-GH4") Then
         txPixelsPerMM.Text = "275.4"
+      ElseIf s.Contains("E-M1MarkII") Or s.Contains("E-M1 Mark II") Then
+        txPixelsPerMM.Text = "303"
       End If
 
-    ElseIf InStr(lens, "VARIO 100-300/F4.0-5.6") > 0 Then
-      If InStr(s, "DMC-GX1") > 0 Then
+    ElseIf lens.Contains("Olympus M.Zuiko Digital ED 30mm F3.5 Macro") Then
+      If s.Contains("E-M1MarkII") Or s.Contains("E-M1 Mark II") Then
+        txPixelsPerMM.Text = "409"
+      End If
+
+    ElseIf lens.Contains("VARIO 100-300/F4.0-5.6") Then
+      If s.Contains("DMC-GX1") Then
         txPixelsPerMM.Text = "56.5"
-      ElseIf InStr(s, "DMC-GH4") > 0 Then
+      ElseIf s.Contains("DMC-GH4") Then
         txPixelsPerMM.Text = "57.8"
       End If
     End If
@@ -561,7 +568,11 @@ Public Class frmBugPhotos
         taxonid = matches(0).taxid
       End If
 
-      If udescription <> "" Then
+      If udescription <> "" AndAlso
+        (Not eqstr(udescription, "Minolta DSC") AndAlso
+        Not eqstr(udescription, "OLYMPUS DIGITAL CAMERA") AndAlso
+        Not eqstr(udescription, "LEAD Technologies Inc. V1.01")) Then
+
         s = udescription
         s = s.Replace(Crlf, " ")
         s = s.Replace(Chr(10), " ")
