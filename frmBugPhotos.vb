@@ -506,6 +506,9 @@ Public Class frmBugPhotos
       ElseIf s.Contains("DMC-GH4") Then
         txPixelsPerMM.Text = "57.8"
       End If
+
+    ElseIf s.Contains("DSC-RX10M4") Then
+      txPixelsPerMM.Text = "79.4"
     End If
 
     dataChanged = False
