@@ -252,7 +252,7 @@ Public Class frmInfo
     s = s.Replace(crlf, "\par       ")
     s = s.Replace(ChrW(10), "\par       ")
     s = s & "\par "
-    rtext1.Rtf = "{\rtf1\ansi{\pard\plain\f2\fs20\tx2800" & s & "}}"
+    rtext1.Rtf = "{\rtf1\ansi{\pard\plain\f2\fs20\tx3500" & s & "}}"
 
     rtext1.SelectionStart = 1
 

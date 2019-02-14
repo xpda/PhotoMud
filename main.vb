@@ -148,13 +148,6 @@ Public Module main
     End Sub
   End Structure
 
-  Public olympusLens As New Dictionary(Of String, String)(System.StringComparer.OrdinalIgnoreCase)
-  Public olympusCamera As New Dictionary(Of String, String)(System.StringComparer.OrdinalIgnoreCase)
-  Public olympusMagicFilter As New Dictionary(Of Integer, String)
-  Public olympusSceneMode As New Dictionary(Of Integer, String)
-  Public olympusArtFilter As New Dictionary(Of Integer, String)
-  Public olympusArtFilterEffect As New Dictionary(Of Integer, String)
-
   Public frmMain As frmMainf
   Public frmExplore As frmExploref
 

@@ -11,6 +11,16 @@ Imports ImageMagick
 
 Public Module ImageInfo
 
+  Public sonyColorMode As New Dictionary(Of Integer, String)
+  Public olympusLens As New Dictionary(Of String, String)(System.StringComparer.OrdinalIgnoreCase)
+  Public olympusCamera As New Dictionary(Of String, String)(System.StringComparer.OrdinalIgnoreCase)
+  Public olympusMagicFilter As New Dictionary(Of Integer, String)
+  Public olympusSceneMode As New Dictionary(Of Integer, String)
+  Public olympusArtFilter As New Dictionary(Of Integer, String)
+  Public olympusArtFilterEffect As New Dictionary(Of Integer, String)
+  Public sonyPictureEffect As New Dictionary(Of Integer, String)
+  Public sonyModelID As New Dictionary(Of Integer, String)
+
   Dim pformatcode As Object
 
   Dim uz As uExif
@@ -582,9 +592,10 @@ Public Module ImageInfo
         v = uz.TagValue(uExif.TagID.PhotographicSensitivity)
         s1 = "" : parm = ""
         For i = 0 To UBound(v)
-          s1 = parm & v(i) & " "
+          s1 = s1 & v(i) & " "
         Next i
         If s1 <> "0" And s1 <> "" Then
+          If IsNumeric(s1) Then s1 = Format(Val(s1), "#,0.##")
           If uz.tagExists(uExif.TagID.sensitivityType) Then
             x = uz.TagValue(uExif.TagID.sensitivityType, 0)
             If IsNumeric(x) Then i = x Else i = 0
@@ -592,7 +603,7 @@ Public Module ImageInfo
               Case 1
                 parm = "Standard output sensitivity:"
               Case 2
-                parm = "Recommended exposure index:"
+                parm = "Recommended exposure index (1):"
               Case 3
                 parm = "ISO speed:"
               Case 4
@@ -623,7 +634,7 @@ Public Module ImageInfo
 
       If uz.tagExists(uExif.TagID.recommendedExposureIndex) Then
         x = uz.TagValue(uExif.TagID.recommendedExposureIndex, 0)
-        If x > 0 Then strInfo &= "Recommended exposure index:" & tb & Format(x, "#,#") & "\par "
+        If x > 0 Then strInfo &= "Recommended exposure index (2):" & tb & Format(x, "#,#") & "\par "
       End If
 
       If uz.tagExists(uExif.TagID.iSOSpeedLatitudeyyy) Then
@@ -1615,6 +1626,9 @@ Public Module ImageInfo
     Dim olyNew As Boolean
     Dim uz As uExif ' temp
 
+
+
+
     ' IFD Format
     ' 2 - ntags - number of direction Entries
     ' for each tag:
@@ -1648,6 +1662,8 @@ Public Module ImageInfo
     '  46  48  48  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  68  0  9  0  92  1  1  128  1  128  1  128
     '  1  128  1  128  1  128  1  128  1  128  69  0  0  0  0  0  104  0  0  0  0  0  10  0  224  255  208  255  10  0  133  2  156  253  93  0  80  0  240  3  0  0  0  0  0  0  0  0  0  0
     '  84  0  0  0  235  255
+
+    'File.WriteAllBytes("c:\tmp1.txt", fdata)
 
     If iintel = 0 Then
       intel = False
@@ -2175,7 +2191,8 @@ Public Module ImageInfo
       Case "sony"
         vOffset = 12
         ''vOffset = 40
-        relativeLinks = 0
+        i = getWord(fdata, 0, False)
+        If i = &H4949 Then relativeLinks = 0 Else relativeLinks = 3 ' 3 if saved by Windows
         iintel = 2
         readMakernoteIFD(ux, mTag, fdata, mTag.Link + vOffset, iintel, intel, relativeLinks)
 
@@ -7050,11 +7067,11 @@ Public Module ImageInfo
         parm = ""
         If i = 0 Then parm = "Off"
         If i And 2 ^ 0 Then parm = parm & "On"
-        If i And 2 ^ 1 Then parm = parm & ", Fill-in"
-        If i And 2 ^ 2 Then parm = parm & ", Red-eye"
-        If i And 2 ^ 3 Then parm = parm & ", Slow-sync"
-        If i And 2 ^ 4 Then parm = parm & ", Forced On"
-        If i And 2 ^ 5 Then parm = parm & ", 2nd Curtain"
+        If i And 2 ^ 1 Then parm = parm & ", fill-in"
+        If i And 2 ^ 2 Then parm = parm & ", red-eye"
+        If i And 2 ^ 3 Then parm = parm & ", slow-sync"
+        If i And 2 ^ 4 Then parm = parm & ", forced On"
+        If i And 2 ^ 5 Then parm = parm & ", 2nd curtain"
         If parm.StartsWith(", ") Then parm = parm.Substring(2)
         If Len(parm) > 0 Then note = note & "Flash Mode:" & tb & parm & "\par "
       End If
@@ -7062,7 +7079,7 @@ Public Module ImageInfo
       If uz.Tags.Contains(sTag(&H403)) Then
         i = uz.Tags.Item(sTag(&H403)).singlevalue
         Select Case i
-          Case 0 : parm = "off"
+          Case 0 : parm = "Off"
           Case 1 : parm = "Channel 1, low"
           Case 2 : parm = "Channel 2, low"
           Case 3 : parm = "Channel 3, low"
@@ -7077,7 +7094,7 @@ Public Module ImageInfo
           Case 20 : parm = "Channel 4, high"
           Case Else : parm = ""
         End Select
-        If Len(parm) > 0 Then note = note & "Flash Remote Control:" & tb & parm & "\par "
+        If Len(parm) > 0 Then note = note & "Flash remote control:" & tb & parm & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H404)) Then
@@ -7351,7 +7368,6 @@ Public Module ImageInfo
         End If
       End If
 
-
       If uz.Tags.Contains(sTag(&H52F)) Then
         v = uz.Tags.Item(sTag(&H52F)).value
         i = v(0)
@@ -7481,12 +7497,16 @@ Public Module ImageInfo
 
       If uz.Tags.Contains(sTag(&H903)) Then
         x = uz.Tags.Item(sTag(&H903)).singleValue
-        note = note & "Roll angle:" & tb & Format(x / 10, "#0") & "°\par "
+        v = uz.Tags.Item(sTag(&H903)).Value
+        If x > 32767 Then x -= 65536
+        note = note & "Roll angle:" & tb & Format(x, "#0") & "°\par "
       End If
 
       If uz.Tags.Contains(sTag(&H904)) Then
         x = uz.Tags.Item(sTag(&H904)).singleValue
-        note = note & "Pitch angle:" & tb & Format(x / 10, "#0") & "°\par "
+        If x > 32767 Then x -= 65536
+        x = -x ' positive pitch is up
+        note = note & "Pitch angle:" & tb & Format(x, "#0") & "°\par "
       End If
 
       If uz.Tags.Contains(sTag(&H908)) Then
@@ -10313,6 +10333,7 @@ Public Module ImageInfo
     Dim i, j, k As Integer
     Dim iu As Long
     Dim parm As String = ""
+    Dim s As String
     Dim x As Double
     Dim bb() As Byte
     Dim v As Object
@@ -10321,10 +10342,10 @@ Public Module ImageInfo
 
     ' get decode array
     For i1 As Integer = 0 To 248
-      encode(i1) = (i1 ^ 3) Mod 249
-      decode((i1 ^ 3) Mod 249) = i1
+      decode(i1) = (i1 ^ 3) Mod 249
+      'encode((i1 ^ 3) Mod 249) = i1
     Next i1
-    For i1 As Integer = 249 To 255 : decode(i1) = i1 : Next i1
+    For i1 As Integer = 249 To 255 : encode(i1) = i1 : decode(i1) = i1 : Next i1
 
     If makerTags.Contains(sTag(&H102)) Then
       i = makerTags.Item(sTag(&H102)).singleValue
@@ -10554,83 +10575,9 @@ Public Module ImageInfo
 
     If makerTags.Contains(sTag(&H200E)) Then
       iu = makerTags.Item(sTag(&H200E)).singleValue
-      Select Case iu
-        Case 0
-          parm = "Off"
-        Case 1
-          parm = "Toy Camera"
-        Case 2
-          parm = "Pop Color"
-        Case 3
-          parm = "Posterization"
-        Case 4
-          parm = "Posterization B/W"
-        Case 5
-          parm = "Retro Photo"
-        Case 6
-          parm = "Soft High Key"
-        Case 7
-          parm = "Partial Color (red)"
-        Case 8
-          parm = "Partial Color (green)"
-        Case 9
-          parm = "Partial Color (blue)"
-        Case 10
-          parm = "Partial Color (yellow)"
-        Case 13
-          parm = "High Contrast Monochrome"
-        Case 16
-          parm = "Toy Camera (normal)"
-        Case 17
-          parm = "Toy Camera (cool)"
-        Case 18
-          parm = "Toy Camera (warm)"
-        Case 19
-          parm = "Toy Camera (green)"
-        Case 20
-          parm = "Toy Camera (magenta)"
-        Case 32
-          parm = "Soft Focus (low)"
-        Case 33
-          parm = "Soft Focus"
-        Case 34
-          parm = "Soft Focus (high)"
-        Case 48
-          parm = "Miniature (auto)"
-        Case 49
-          parm = "Miniature (top)"
-        Case 50
-          parm = "Miniature (middle horizontal)"
-        Case 51
-          parm = "Miniature (bottom)"
-        Case 52
-          parm = "Miniature (left)"
-        Case 53
-          parm = "Miniature (middle vertical)"
-        Case 54
-          parm = "Miniature (right)"
-        Case 64
-          parm = "HDR Painting (low)"
-        Case 65
-          parm = "HDR Painting"
-        Case 66
-          parm = "HDR Painting (high)"
-        Case 80
-          parm = "Rich-tone Monochrome"
-        Case 97
-          parm = "Water Color"
-        Case 98
-          parm = "Water Color 2"
-        Case 112
-          parm = "Illustration (low)"
-        Case 113
-          parm = "Illustration"
-        Case 114
-          parm = "Illustration (high)"
-        Case Else
-          parm = ""
-      End Select
-      If Len(parm) > 0 Then note = note & "Picture Effect:" & tb & parm & "\par "
+      If sonyPictureEffect.ContainsKey(iu) Then
+        note = note & "Picture effect:" & tb & sonyPictureEffect(i) & "\par "
+      End If
     End If
 
     If makerTags.Contains(sTag(&H200F)) Then
@@ -10649,6 +10596,20 @@ Public Module ImageInfo
       End Select
       If Len(parm) > 0 Then note = note & "Soft Skin Effect:" & tb & parm & "\par "
     End If
+
+
+    'If makerTags.Contains(sTag(&H2010)) Then ' doesn't work with rx10/iv?
+    'v = makerTags.Item(sTag(&H2010)).value
+    'bb = v
+    'For i1 As Integer = 0 To UBound(bb)
+    ' i = bb(i1)
+    ' bb(i1) = encode(bb(i1))
+    ' Next i1
+    ' File.WriteAllBytes("c:\tmp.txt", bb)
+    ' uz = New uExif
+    ' uz.getIFDirectory(bb, k, True, True)
+    ' tg.IFD = uz
+    ' End If
 
     If makerTags.Contains(sTag(&H2011)) Then
       iu = makerTags.Item(sTag(&H2011)).singleValue
@@ -10676,11 +10637,32 @@ Public Module ImageInfo
       If Len(parm) > 0 Then note = note & "Lateral Chromatic Aberration:" & tb & parm & "\par "
     End If
 
+    If makerTags.Contains(sTag(&H2013)) Then
+      iu = makerTags.Item(sTag(&H2013)).singleValue
+      Select Case iu
+        Case 0
+          parm = "Off"
+        Case 2
+          parm = "Auto"
+        Case Else
+          parm = ""
+      End Select
+      If Len(parm) > 0 Then note = note & "Distortion Correction Setting:" & tb & parm & "\par "
+    End If
+
     If makerTags.Contains(sTag(&H2014)) Then
       v = makerTags.Item(sTag(&H2014)).value
       If IsArray(v) AndAlso UBound(v) >= 1 Then
         note = note & "White Balance Amber Shift:" & tb & Format(v(0), "##,##0") & "\par "
         note = note & "White Balance Magenta Shift:" & tb & Format(v(1), "##,##0") & "\par "
+      End If
+    End If
+
+    If makerTags.Contains(sTag(&H2026)) Then
+      v = makerTags.Item(sTag(&H2026)).value
+      If IsArray(v) AndAlso UBound(v) >= 1 Then
+        note = note & "White Balance Amber Precice Shift:" & tb & Format(v(0), "##,##0") & "\par "
+        note = note & "White Balance Magenta Precise Shift:" & tb & Format(v(1), "##,##0") & "\par "
       End If
     End If
 
@@ -10706,32 +10688,46 @@ Public Module ImageInfo
           parm = "Flash Fired"
         Case 2
           parm = "External Flash Fired"
+        Case 3
+          parm = "Wireless Controlled Flash"
         Case Else
           parm = ""
       End Select
       If Len(parm) > 0 Then note = note & "Flash Action:" & tb & parm & "\par "
     End If
 
+    If makerTags.Contains(sTag(&H201A)) Then
+      iu = makerTags.Item(sTag(&H201A)).singleValue
+      Select Case iu
+        Case 0
+          parm = "Off"
+        Case 1
+          parm = "On"
+        Case Else
+          parm = ""
+      End Select
+      If Len(parm) > 0 Then note = note & "Electronic Front Curtain Shutter:" & tb & parm & "\par "
+    End If
+
     If makerTags.Contains(sTag(&H201B)) Then
-      ' this is always zero on the RX10 m3
-      'iu = makerTags.Item(sTag(&H201B)).singleValue
-      'Select Case iu
-      '  Case 0
-      'parm = "Manual"
-      '  Case 2
-      'parm = "AF-S"
-      '  Case 3
-      'parm = "AF-C"
-      '  Case 4
-      'parm = "AF-A"
-      '  Case 6
-      'parm = "DMF"
-      '  Case 7
-      'parm = "AF-D"
-      '  Case Else
-      'parm = iu
-      'End Select
-      'If Len(parm) > 0 Then note = note & "Focus Mode:" & tb & parm & "\par "
+      iu = makerTags.Item(sTag(&H201B)).singleValue
+      Select Case iu
+        Case 0
+          parm = "Manual"
+        Case 2
+          parm = "AF-S"
+        Case 3
+          parm = "AF-C"
+        Case 4
+          parm = "AF-A"
+        Case 6
+          parm = "DMF"
+        Case 7
+          parm = "AF-D"
+        Case Else
+          parm = iu
+      End Select
+      If Len(parm) > 0 Then note = note & "Focus Mode:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H201C)) Then
@@ -10744,7 +10740,11 @@ Public Module ImageInfo
         Case 3
           parm = "Flexible Spot"
         Case 4
-          parm = "Flexible Spot(LA - EA4)"
+          parm = "Flexible Spot (or local)"
+        Case 8, 11
+          parm = "Zone"
+        Case 9
+          parm = "Center (or spot)"
         Case 11
           parm = "Zone"
         Case 12
@@ -10766,50 +10766,59 @@ Public Module ImageInfo
 
     If makerTags.Contains(sTag(&H201E)) Then
       iu = makerTags.Item(sTag(&H201E)).singleValue
-      Select Case iu
-        Case 1
-          parm = "Center"
-        Case 2
-          parm = "Top"
-        Case 3
-          parm = "Right"
-        Case 4
-          parm = "Left"
-        Case 5
-          parm = "Bottom"
-        Case 6
-          parm = "Bottom Right"
-        Case 7
-          parm = "Bottom Left"
-        Case 8
-          parm = "Top Left"
-        Case 9
-          parm = "Top Right"
-        Case Else
-          parm = ""
-      End Select
-      If Len(parm) > 0 Then note = note & "Focus Mode:" & tb & parm & "\par "
+      If Len(parm) > 0 Then note = note & "Autofocus Point Select:" & tb & iu & "\par "
     End If
 
-    'If makerTags.Contains(sTag(&H2020)) Then
-    'v = makerTags.Item(sTag(&H2020)).value
-    'If IsArray(v) Then
-    ' k = 0
-    ' For Each i In v
-    ' If i > 0 Then
-    ' k = 1
-    ' Exit For
-    ' End If
-    ' Next i
-    '
-    '    If k >= 1 Then
-    ' For Each i In v
-    ' parm &= Hex$(i) & " "
-    ' Next i
-    ' note = note & "Auto Focus Points Used:" & tb & parm & "\par "
-    ' End If
-    ' End If
-    ' End If
+    If makerTags.Contains(sTag(&H2020)) Then
+      v = makerTags.Item(sTag(&H2020)).value
+      If IsArray(v) Then
+        k = 0
+        For Each i In v
+          If i > 0 Then
+            k = 1
+            Exit For
+          End If
+        Next i
+
+        If k >= 1 Then
+          For Each i In v
+            parm &= Hex$(i) & " "
+          Next i
+          note = note & "Auto Focus Points Used:" & tb & parm & "\par "
+        End If
+      End If
+    End If
+
+    If makerTags.Contains(sTag(&H2021)) Then
+      iu = makerTags.Item(sTag(&H2021)).singleValue
+      Select Case iu
+        Case 0
+          parm = "Off"
+        Case 1
+          parm = "Face tracking"
+        Case 2
+          parm = "Lock on Autofocus"
+        Case Else
+          parm = iu
+      End Select
+      If Len(parm) > 0 Then note = note & "Auto Focus Area Mode:" & tb & parm & "\par "
+    End If
+
+    If makerTags.Contains(sTag(&H2023)) Then
+      iu = makerTags.Item(sTag(&H2023)).singleValue
+      Select Case iu
+        Case 0
+          parm = "Normal"
+        Case 1
+          parm = "High"
+        Case Else
+          parm = iu
+      End Select
+      If Len(parm) > 0 Then note = note & "Multiframe NR Effect:" & tb & parm & "\par "
+    End If
+
+
+
 
     If makerTags.Contains(sTag(&H2027)) Then
       v = makerTags.Item(sTag(&H2027)).value
@@ -10832,7 +10841,31 @@ Public Module ImageInfo
       End If
     End If
 
-    ''If makerTags.Contains(sTag(&H202A)) Then
+    If makerTags.Contains(sTag(&H2028)) Then
+      v = makerTags.Item(sTag(&H2028)).value
+      If v.length = 2 Then s = Str(v(0)) & Str(v(1)) Else s = ""
+      Select Case s
+        Case "00"
+          parm = ""
+        Case "10"
+          parm = "off"
+        Case "11"
+          parm = "standard"
+        Case "12"
+          parm = "high"
+        Case Else
+          parm = ""
+      End Select
+      If Len(parm) > 0 Then note = note & "Variable Low Pass Filter:" & tb & parm & "\par "
+    End If
+
+    If makerTags.Contains(sTag(&H2028)) Then
+      iu = makerTags.Item(sTag(&H2028)).singlevalue
+      If iu = 0 Then parm = "compressed" Else If iu = 1 Then parm = "compressed" Else parm = ""
+      If Len(parm) > 0 Then note = note & "Raw File Type:" & tb & parm & "\par "
+    End If
+
+    'If makerTags.Contains(sTag(&H202A)) Then
     'v = makerTags.Item(sTag(&H202A)).value
     'If IsArray(v) AndAlso UBound(v) >= 62 Then
     '
@@ -10866,7 +10899,22 @@ Public Module ImageInfo
     ' note = note & "Focus Plane AF Point Location:" & tb & parm & "\par "
     ' End If
     ' End If
-    ' End If
+    'End If
+
+    If makerTags.Contains(sTag(&H202B)) Then
+      iu = makerTags.Item(sTag(&H202B)).singleValue
+      Select Case iu
+        Case 0
+          parm = "Standard"
+        Case 1
+          parm = "Ambience"
+        Case 2
+          parm = "White"
+        Case Else
+          parm = ""
+      End Select
+      If Len(parm) > 0 Then note = note & "Priority Set in AWB:" & tb & parm & "\par "
+    End If
 
     If makerTags.Contains(sTag(&H202C)) Then
       iu = makerTags.Item(sTag(&H202C)).singleValue
@@ -10876,6 +10924,8 @@ Public Module ImageInfo
         Case &H200
           parm = "Center-weighted average"
         Case &H301
+          parm = "Spot (standard)"
+        Case &H302
           parm = "Spot (large)"
         Case &H400
           parm = "Average"
@@ -10885,6 +10935,44 @@ Public Module ImageInfo
           parm = ""
       End Select
       If Len(parm) > 0 Then note = note & "Metering Mode 2:" & tb & parm & "\par "
+    End If
+
+    If makerTags.Contains(sTag(&H202D)) Then
+      x = makerTags.Item(sTag(&H202D)).singlevalue
+      parm = Format(x, "#0.##")
+      If Len(parm) > 0 Then note = note & "Exposure Standard Adjustment:" & tb & parm & "\par "
+    End If
+
+    If makerTags.Contains(sTag(&H202E)) Then
+      v = makerTags.Item(sTag(&H202E)).value
+      If v.length = 2 Then s = Str(v(0)) & Str(v(1)) Else s = ""
+      Select Case s
+        Case "00"
+          parm = ""
+        Case "01"
+          parm = "standard jpg"
+        Case "02"
+          parm = "fine jpg"
+        Case "03"
+          parm = "extra fine jpg"
+        Case "10"
+          parm = "raw"
+        Case "11"
+          parm = "raw = standard jpg"
+        Case "12"
+          parm = "raw + fine jpg"
+        Case "13"
+          parm = "raw + extra fine jpg"
+        Case Else
+          parm = ""
+      End Select
+      If Len(parm) > 0 Then note = note & "Quality:" & tb & parm & "\par "
+    End If
+
+    If makerTags.Contains(sTag(&H2031)) Then
+      v = makerTags.Item(sTag(&H2031)).singlevalue
+      parm = v
+      If Len(parm) > 0 Then note = note & "Serial number:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H3000)) Then
@@ -10902,7 +10990,9 @@ Public Module ImageInfo
         If k >= 1 And UBound(v) >= 90 Then
           parm = UTF8bare.GetString(v, 6, 19)
           parm = parm.Trim(whiteSpace)
-          If Len(parm) > 0 Then note = note & "Sony Date and Time:" & tb & parm & "\par "
+          If Len(parm) > 0 AndAlso parm.Contains(":") And parm.Contains("20") Then
+            note = note & "Sony Date and Time:" & tb & parm & "\par "
+          End If
 
           j = getWord(v, 26, True)
           k = getWord(v, 28, True)
@@ -10916,27 +11006,43 @@ Public Module ImageInfo
           parm = parm.Trim(whiteSpace)
           If Len(parm) > 0 Then note = note & "Meta Version:" & tb & parm & "\par "
 
-
         End If
       End If
     End If
 
+    'If makerTags.Contains(sTag(&H9050)) Then ' doesn't work for rx10m4? couldn't get any of the encrypted tags.
+    'v = makerTags.Item(sTag(&H9050)).value
+    'bb = v
+    'For i1 As Integer = 0 To UBound(bb)
+    ' 'bb(i1) = decode(bb(i1))
+    ' Next i1
+    ' File.WriteAllBytes("c:\tmp.txt", bb)
+    ' End If
 
+    If makerTags.Contains(sTag(&HB000)) Then
+      v = makerTags.Item(sTag(&HB000)).Value
+      If v.length = 4 Then
+        If v(0) = 0 And v(1) = 0 And v(2) = 0 And v(3) = 2 Then parm = "JPG"
+        If v(0) = 1 And v(1) = 0 And v(2) = 0 And v(3) = 0 Then parm = "SR2"
+        If v(0) = 2 And v(1) = 0 And v(2) = 0 And v(3) = 0 Then parm = "ARW 1.0"
+        If v(0) = 3 And v(1) = 0 And v(2) = 0 And v(3) = 0 Then parm = "ARW 2.0"
+        If v(0) = 3 And v(1) = 1 And v(2) = 0 And v(3) = 0 Then parm = "ARW 2.1"
+        If v(0) = 3 And v(1) = 2 And v(2) = 0 And v(3) = 0 Then parm = "ARW 2.2"
+        If v(0) = 3 And v(1) = 3 And v(2) = 0 And v(3) = 0 Then parm = "ARW 2.3"
+        If v(0) = 3 And v(1) = 3 And v(2) = 1 And v(3) = 0 Then parm = "ARW 2.3.1"
+        If v(0) = 3 And v(1) = 3 And v(2) = 2 And v(3) = 0 Then parm = "ARW 2.3.2"
+        If v(0) = 3 And v(1) = 3 And v(2) = 3 And v(3) = 0 Then parm = "ARW 2.3.3"
+        If v(0) = 3 And v(1) = 3 And v(2) = 5 And v(3) = 0 Then parm = "ARW 2.3.5"
+        note = note & "File format:" & tb & parm & "\par "
+      End If
+    End If
 
-    If ux.Tags.Contains(sTag(&H9402)) Then
-      tg = ux.Tags.Item(sTag(&H9402))
-      bb = tg.Value
-
-      For i = 0 To UBound(bb)
-        bb(i) = decode(bb(i))
-      Next i
-
-
-      uz = New uExif
-      uz.getIFDirectory(bb, k, True, True)
-      tg.IFD = uz
-
-    End If ' tag 2010
+    If makerTags.Contains(sTag(&HB001)) Then
+      iu = makerTags.Item(sTag(&HB001)).singleValue
+      If sonyModelID.ContainsKey(iu) Then
+        note = note & "Sony model ID:" & tb & sonyModelID(iu) & "\par "
+      End If
+    End If
 
     If makerTags.Contains(sTag(&HB020)) Then
       parm = makerTags.Item(sTag(&HB020)).singleValue
@@ -11052,47 +11158,41 @@ Public Module ImageInfo
       If Len(parm) > 0 Then note = note & "Image Stabilization:" & tb & parm & "\par "
     End If
 
-    If makerTags.Contains(sTag(&HB027)) Then
-      x = makerTags.Item(sTag(&HB027)).singleValue
-      parm = Format(x, "##,##0.#")
-      note = note & "Lens Type:" & tb & parm & "\par "
-    End If
+    'If makerTags.Contains(sTag(&HB027)) Then
+    'x = makerTags.Item(sTag(&HB027)).singleValue
+    'parm = Format(x, "##,##0.#")
+    'note = note & "Lens Type:" & tb & parm & "\par "
+    'End If
 
     If makerTags.Contains(sTag(&HB029)) Then
-      i = makerTags.Item(sTag(&HB029)).singleValue
-      Select Case i
-        Case 0
-          parm = "Standard "
-        Case 1
-          parm = "Vivid "
-        Case 2
-          parm = "Portrait "
-        Case 3
-          parm = "Landscape "
-        Case 4
-          parm = "Sunset"
-        Case 5
-          parm = "Night Portrait"
-        Case 6
-          parm = "B&W"
-        Case 7
-          parm = "Adobe RGB"
-        Case 12, 100
-          parm = "Neutral"
-        Case 101
-          parm = "Clear"
-        Case 102
-          parm = "Deep"
-        Case 103
-          parm = "Light"
-        Case 104
-          parm = "Night View"
-        Case 105
-          parm = "Autumn Leaves"
-        Case Else
-          parm = ""
-      End Select
-      If Len(parm) > 0 Then note = note & "Color Mode:" & tb & parm & "\par "
+      iu = makerTags.Item(sTag(&HB029)).singleValue
+      If sonyColorMode.ContainsKey(iu) Then
+        note = note & "Color mode:" & tb & sonyColorMode(iu) & "\par "
+      End If
+    End If
+
+
+    If makerTags.Contains(sTag(&HB02A)) Then
+      v = makerTags.Item(sTag(&HB02A)).Value
+      parm = ""
+      If v.length = 8 And IsNumeric(v(0)) Then
+        parm = Format(v(1) * 256 + v(2), "x1") & " - " & Format(v(3) * 256 + v(4), "x1") & " mm, f" & Format(Val(Hex$(v(5))) / 10, "#0.0") & " - f" & Format(Val(Hex$(v(6))) / 10, "#0.0")
+      End If
+      If parm <> "" Then note &= "Lens Specification:" & tb & parm & "\par "
+    End If
+
+    If makerTags.Contains(sTag(&HB02B)) Then
+      v = makerTags.Item(sTag(&HB02B)).Value
+      If v.length = 2 Then
+        note = note & "Full image size:" & tb & v(0) & " x " & v(1) & "\par "
+      End If
+    End If
+
+    If makerTags.Contains(sTag(&HB02C)) Then
+      v = makerTags.Item(sTag(&HB02C)).Value
+      If v.length = 2 Then
+        note = note & "Preview image size:" & tb & v(0) & " x " & v(1) & "\par "
+      End If
     End If
 
     If makerTags.Contains(sTag(&HB040)) Then
@@ -11109,8 +11209,8 @@ Public Module ImageInfo
     End If
 
     If makerTags.Contains(sTag(&HB041)) Then
-      i = makerTags.Item(sTag(&HB041)).singleValue
-      Select Case i
+      iu = makerTags.Item(sTag(&HB041)).singleValue
+      Select Case iu
         Case 0
           parm = "Auto "
         Case 5
@@ -11131,17 +11231,105 @@ Public Module ImageInfo
       If Len(parm) > 0 Then note = note & "Exposure Mode:" & tb & parm & "\par "
     End If
 
+    If makerTags.Contains(sTag(&HB042)) Then
+      iu = makerTags.Item(sTag(&HB042)).singleValue
+      Select Case iu
+        Case 1
+          parm = "AF-S"
+        Case 2
+          parm = "AF-C"
+        Case 4
+          parm = "Permanent AF"
+        Case Else
+          parm = ""
+      End Select
+      If Len(parm) > 0 Then note = note & "Focus Mode:" & tb & parm & "\par "
+    End If
+
+    If makerTags.Contains(sTag(&HB043)) Then
+      iu = makerTags.Item(sTag(&HB043)).singleValue
+      Select Case iu
+        Case 0
+          parm = "Multi"
+        Case 1
+          parm = "Center"
+        Case 2
+          parm = "Spot"
+        Case 3
+          parm = "Flexible Spot"
+        Case 10
+          parm = "Selective"
+        Case 14
+          parm = "Tracking"
+        Case 15
+          parm = "Face Tracking"
+        Case 255
+          parm = "Manual"
+        Case Else
+          parm = ""
+      End Select
+      If Len(parm) > 0 Then note = note & "AF Area Mode:" & tb & parm & "\par "
+    End If
+
+    If makerTags.Contains(sTag(&HB044)) Then
+      iu = makerTags.Item(sTag(&HB044)).singleValue
+      Select Case iu
+        Case 0
+          parm = "Off"
+        Case 1
+          parm = "Auto"
+        Case Else
+          parm = ""
+      End Select
+      If Len(parm) > 0 Then note = note & "Focus Mode:" & tb & parm & "\par "
+    End If
+
     If makerTags.Contains(sTag(&HB047)) Then
-      i = makerTags.Item(sTag(&HB047)).singleValue
-      Select Case i
+      iu = makerTags.Item(sTag(&HB047)).singleValue
+      Select Case iu
         Case 0
           parm = "Normal"
         Case 1
           parm = "Fine"
+        Case 1
+          parm = "Extra Fine"
         Case Else
           parm = ""
       End Select
-      If Len(parm) > 0 Then note = note & "Quality:" & tb & parm & "\par "
+      If Len(parm) > 0 Then note = note & "JPG Quality:" & tb & parm & "\par "
+    End If
+
+    If makerTags.Contains(sTag(&HB048)) Then
+      i = makerTags.Item(sTag(&HB048)).singleValue
+      If i = -32768 Then
+        parm = "low"
+      ElseIf i = 32767 Then
+        parm = "high"
+      Else
+        parm = Str(i \ 3).Trim
+        If i Mod 3 <> 0 Then parm &= " " & Str(Abs(i Mod 3)) & "/3" Else If i <> 0 Then parm &= ".0"
+        If i > 0 Then parm = "+" & parm
+      End If
+      If Len(parm) > 0 Then note = note & "Flash Level:" & tb & parm.Trim & "\par "
+    End If
+
+    If makerTags.Contains(sTag(&HB049)) Then
+      iu = makerTags.Item(sTag(&HB049)).singleValue
+      Select Case iu
+        Case 0
+          parm = "Normal"
+        Case 2
+          parm = "Continuous"
+        Case 5
+          parm = "Exposure Bracketing"
+        Case 6
+          parm = "White Balance Bracketing"
+        Case 8
+          parm = "DRO Bracketing"
+        Case Else
+          parm = ""
+      End Select
+      If Len(parm) > 0 Then note = note & "Release Mode:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&HB04B)) Then
@@ -12488,6 +12676,142 @@ Public Module ImageInfo
     olympusArtFilterEffect.Add(&H27, "Partial Color")
     olympusArtFilterEffect.Add(&H28, "Partial Color II")
     olympusArtFilterEffect.Add(&H29, "Partial Color III")
+
+    sonyPictureEffect.Add(0, "Off")
+    sonyPictureEffect.Add(1, "Toy Camera")
+    sonyPictureEffect.Add(2, "Pop Color")
+    sonyPictureEffect.Add(3, "Posterization")
+    sonyPictureEffect.Add(4, "Posterization B/W")
+    sonyPictureEffect.Add(5, "Retro Photo")
+    sonyPictureEffect.Add(6, "Soft High Key")
+    sonyPictureEffect.Add(7, "Partial Color (red)")
+    sonyPictureEffect.Add(8, "Partial Color (green)")
+    sonyPictureEffect.Add(9, "Partial Color (blue)")
+    sonyPictureEffect.Add(10, "Partial Color (yellow)")
+    sonyPictureEffect.Add(13, "High Contrast Monochrome")
+    sonyPictureEffect.Add(16, "Toy Camera (normal)")
+    sonyPictureEffect.Add(17, "Toy Camera (cool)")
+    sonyPictureEffect.Add(18, "Toy Camera (warm)")
+    sonyPictureEffect.Add(19, "Toy Camera (green)")
+    sonyPictureEffect.Add(20, "Toy Camera (magenta)")
+    sonyPictureEffect.Add(32, "Soft Focus (low)")
+    sonyPictureEffect.Add(33, "Soft Focus")
+    sonyPictureEffect.Add(34, "Soft Focus (high)")
+    sonyPictureEffect.Add(48, "Miniature (auto)")
+    sonyPictureEffect.Add(49, "Miniature (top)")
+    sonyPictureEffect.Add(50, "Miniature (middle horizontal)")
+    sonyPictureEffect.Add(51, "Miniature (bottom)")
+    sonyPictureEffect.Add(52, "Miniature (left)")
+    sonyPictureEffect.Add(53, "Miniature (middle vertical)")
+    sonyPictureEffect.Add(54, "Miniature (right)")
+    sonyPictureEffect.Add(64, "HDR Painting (low)")
+    sonyPictureEffect.Add(65, "HDR Painting")
+    sonyPictureEffect.Add(66, "HDR Painting (high)")
+    sonyPictureEffect.Add(80, "Rich-tone Monochrome")
+    sonyPictureEffect.Add(97, "Water Color")
+    sonyPictureEffect.Add(98, "Water Color 2")
+    sonyPictureEffect.Add(112, "Illustration (low)")
+    sonyPictureEffect.Add(113, "Illustration")
+    sonyPictureEffect.Add(114, "Illustration (high)")
+
+    sonyColorMode.Add(0, "Standard")
+    sonyColorMode.Add(1, "Vivid")
+    sonyColorMode.Add(2, "Portrait")
+    sonyColorMode.Add(3, "Landscape")
+    sonyColorMode.Add(4, "Sunset")
+    sonyColorMode.Add(5, "Night View/Portrait")
+    sonyColorMode.Add(6, "B&W")
+    sonyColorMode.Add(7, "Adobe RGB")
+    sonyColorMode.Add(12, "Neutral")
+    sonyColorMode.Add(13, "Clear")
+    sonyColorMode.Add(14, "Deep")
+    sonyColorMode.Add(15, "Light")
+    sonyColorMode.Add(16, "Autumn Leaves")
+    sonyColorMode.Add(17, "Sepia")
+    sonyColorMode.Add(100, "Neutral")
+    sonyColorMode.Add(101, "Clear")
+    sonyColorMode.Add(102, "Deep")
+    sonyColorMode.Add(103, "Light")
+    sonyColorMode.Add(104, "Night View")
+    sonyColorMode.Add(105, "Autumn Leaves")
+
+    sonyModelID.Add(2, "DSC-R1")
+    sonyModelID.Add(256, "DSLR-A100")
+    sonyModelID.Add(257, "DSLR-A900")
+    sonyModelID.Add(258, "DSLR-A700")
+    sonyModelID.Add(259, "DSLR-A200")
+    sonyModelID.Add(260, "DSLR-A350")
+    sonyModelID.Add(261, "DSLR-A300")
+    sonyModelID.Add(262, "DSLR-A900 (APS-C mode)")
+    sonyModelID.Add(263, "DSLR-A380/A390")
+    sonyModelID.Add(264, "DSLR-A330")
+    sonyModelID.Add(265, "DSLR-A230")
+    sonyModelID.Add(266, "DSLR-A290")
+    sonyModelID.Add(269, "DSLR-A850")
+    sonyModelID.Add(270, "DSLR-A850 (APS-C mode)")
+    sonyModelID.Add(273, "DSLR-A550")
+    sonyModelID.Add(274, "DSLR-A500")
+    sonyModelID.Add(275, "DSLR-A450")
+    sonyModelID.Add(278, "NEX-5")
+    sonyModelID.Add(279, "NEX-3")
+    sonyModelID.Add(280, "SLT-A33")
+    sonyModelID.Add(281, "SLT-A55 / SLT-A55V")
+    sonyModelID.Add(282, "DSLR-A560")
+    sonyModelID.Add(283, "DSLR-A580")
+    sonyModelID.Add(284, "NEX-C3")
+    sonyModelID.Add(285, "SLT-A35")
+    sonyModelID.Add(286, "SLT-A65 / SLT-A65V")
+    sonyModelID.Add(287, "SLT-A77 / SLT-A77V")
+    sonyModelID.Add(288, "NEX-5N")
+    sonyModelID.Add(289, "NEX-7")
+    sonyModelID.Add(290, "NEX-VG20E")
+    sonyModelID.Add(291, "SLT-A37")
+    sonyModelID.Add(292, "SLT-A57")
+    sonyModelID.Add(293, "NEX-F3")
+    sonyModelID.Add(294, "SLT-A99 / SLT-A99V")
+    sonyModelID.Add(295, "NEX-6")
+    sonyModelID.Add(296, "NEX-5R")
+    sonyModelID.Add(297, "DSC-RX100")
+    sonyModelID.Add(298, "DSC-RX1")
+    sonyModelID.Add(299, "NEX-VG900")
+    sonyModelID.Add(300, "NEX-VG30E")
+    sonyModelID.Add(302, "ILCE-3000 / ILCE-3500")
+    sonyModelID.Add(303, "SLT-A58")
+    sonyModelID.Add(305, "NEX-3N")
+    sonyModelID.Add(306, "ILCE-7")
+    sonyModelID.Add(307, "NEX-5T")
+    sonyModelID.Add(308, "DSC-RX100M2")
+    sonyModelID.Add(309, "DSC-RX10")
+    sonyModelID.Add(310, "DSC-RX1R")
+    sonyModelID.Add(311, "ILCE-7R")
+    sonyModelID.Add(312, "ILCE-6000")
+    sonyModelID.Add(313, "ILCE-5000")
+    sonyModelID.Add(317, "DSC-RX100M3")
+    sonyModelID.Add(318, "ILCE-7S")
+    sonyModelID.Add(319, "ILCA-77M2")
+    sonyModelID.Add(339, "ILCE-5100")
+    sonyModelID.Add(340, "ILCE-7M2")
+    sonyModelID.Add(341, "DSC-RX100M4")
+    sonyModelID.Add(342, "DSC-RX10M2")
+    sonyModelID.Add(344, "DSC-RX1RM2")
+    sonyModelID.Add(346, "ILCE-QX1")
+    sonyModelID.Add(347, "ILCE-7RM2")
+    sonyModelID.Add(350, "ILCE-7SM2")
+    sonyModelID.Add(353, "ILCA-68")
+    sonyModelID.Add(354, "ILCA-99M2")
+    sonyModelID.Add(355, "DSC-RX10M3")
+    sonyModelID.Add(356, "DSC-RX100M5")
+    sonyModelID.Add(357, "ILCE-6300")
+    sonyModelID.Add(358, "ILCE-9")
+    sonyModelID.Add(360, "ILCE-6500")
+    sonyModelID.Add(362, "ILCE-7RM3")
+    sonyModelID.Add(363, "ILCE-7M3")
+    sonyModelID.Add(364, "DSC-RX0")
+    sonyModelID.Add(365, "DSC-RX10M4")
+    sonyModelID.Add(366, "DSC-RX100M6")
+    sonyModelID.Add(367, "DSC-HX99")
+    sonyModelID.Add(369, "DSC-RX100M5A")
+    sonyModelID.Add(371, "ILCE-6400")
 
   End Sub
 

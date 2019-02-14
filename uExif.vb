@@ -388,7 +388,7 @@ Public Class uExif
 
   Sub getIFDirectory(ByRef ufdata() As Byte, ByVal ifdPointer As Integer, ByVal intel As Boolean, ByVal relativeLinks As Short)
 
-    ' relativelinks: 0 = absolute, 1 = relative, 2 = disable links
+    ' relativelinks: 0 = absolute, 1 = relative, 2 = disable links, 3 = absolute to beginning of ufdata
 
     ' ufdata comes from this instance only if called from readexif.
     ' This is also called recursively and from imageinfo.bas for makernotes
@@ -416,7 +416,7 @@ Public Class uExif
       IFD.Value = getDWord(ufdata, i * 12 + ifdPointer + 10, intel)
       'If IFD.count > 65535 Then Exit For
 
-      If noLinks And relativeLinks = 1 Then ' set the link offset assuming the first data is immediately after the last tag
+      If noLinks And (relativeLinks = 1 Or relativeLinks = 3) Then ' set the link offset assuming the first data is immediately after the last tag
         Select Case IFD.dataType
           Case 1, 2, 6, 7
             n = IFD.count
@@ -430,6 +430,7 @@ Public Class uExif
         If n > 4 Then ' 1st link - get fileoffset
           k = IFD.Value
           linkOffset = k - (Nifd * 12 + 2 + 4) - ifdPointer
+          If relativeLinks = 3 Then linkOffset += 4
           noLinks = False
         End If
       End If
@@ -439,7 +440,7 @@ Public Class uExif
       tg.tag = IFD.tag
 
       tg.dataType = IFD.dataType
-      tg.Value = GetTagValue(ufdata, IFD, intel, linkOffset)  ''''
+      tg.Value = GetTagValue(ufdata, IFD, intel, linkOffset)
 
       If Not tagExists(IFD.tag) Then Tags.Add(tg, tg.key) ' key is a four character hex value for tag - Right("0000" & Hex(tag), 4)
       ' If IFD.tag = TagID.exifpointer Or IFD.tag = TagID.gpspointer Then ' Or IFD.tag = TagID.interoppointer Then
