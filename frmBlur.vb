@@ -92,7 +92,7 @@ Public Class frmBlur
 
     aView.ZoomViews(0.5)
 
-    pcenter = New PointF(aView.pView0.Bitmap.Width / 2, aView.pView0.Bitmap.Height / 2)
+    pcenter = New PointF(CSng(aView.pView0.Bitmap.Width / 2), CSng(aView.pView0.Bitmap.Height / 2))
 
     Loading = False
     Sliding = False
@@ -102,7 +102,9 @@ Public Class frmBlur
   Private Sub Option_Changed(ByVal Sender As Object, ByVal e As EventArgs) _
     Handles Option0.CheckedChanged, Option1.CheckedChanged, Option2.CheckedChanged, Option3.CheckedChanged, Option4.CheckedChanged
 
-    If Sender.checked Then
+    Dim opt As RadioButton = Sender
+
+    If opt.Checked Then
       Sliding = True
 
       If Option0.Checked Then

@@ -100,7 +100,7 @@ Public Class frmContrastStretch
 
     aView.ZoomViews(0.5)
 
-    pcenter = New PointF(aView.pView0.Bitmap.Width / 2, aView.pView0.Bitmap.Height / 2)
+    pcenter = New PointF(CSng(aView.pView0.Bitmap.Width / 2), CSng(aView.pView0.Bitmap.Height / 2))
 
     Loading = False
     Sliding = False
@@ -198,7 +198,7 @@ Public Class frmContrastStretch
     Dim bb() As Byte
     bb = getBmpBytes(aView.pView1.Bitmap) ' values are b, g, r, A
     For i As Integer = 2 To UBound(bb) Step 4
-      bb(i) = Min(CInt(bb(i)) * 3, 255)
+      bb(i) = CByte(Min(CInt(bb(i)) * 3, 255))
     Next i
     setBmpBytes(aView.pView1.Bitmap, bb)
 

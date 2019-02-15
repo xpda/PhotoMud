@@ -60,15 +60,14 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>.\bin\</OutputPath>
-    <DocumentationFile>
-    </DocumentationFile>
+    <DocumentationFile>Photo Mud.xml</DocumentationFile>
     <DebugSymbols>true</DebugSymbols>
-    <DefineDebug>false</DefineDebug>
-    <DefineTrace>false</DefineTrace>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
     <DefineConstants>
     </DefineConstants>
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <NoWarn>41999,42016,42017,42018,42019,42032,42036,42353,42354,42355</NoWarn>
+    <NoWarn>41999,42016,42017,42018,42019,42032,42036</NoWarn>
     <DebugType>Full</DebugType>
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <WarningsAsErrors>42020,42021,42022</WarningsAsErrors>
@@ -78,15 +77,14 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <OutputPath>bin\</OutputPath>
-    <DocumentationFile>
-    </DocumentationFile>
+    <DocumentationFile>Photo Mud.xml</DocumentationFile>
     <DebugSymbols>false</DebugSymbols>
     <DefineDebug>False</DefineDebug>
     <DefineTrace>false</DefineTrace>
     <DefineConstants>
     </DefineConstants>
     <PlatformTarget>x86</PlatformTarget>
-    <NoWarn>41999,42016,42017,42018,42019,42032,42036,42353,42354,42355</NoWarn>
+    <NoWarn>41999,42016,42017,42018,42019,42032,42036</NoWarn>
     <DebugType>None</DebugType>
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <Optimize>true</Optimize>
@@ -97,25 +95,23 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\x64\</OutputPath>
-    <NoWarn>41999,42016,42017,42018,42019,42032,42036,42353,42354,42355</NoWarn>
+    <NoWarn>41999,42016,42017,42018,42019,42032,42036</NoWarn>
     <DebugType>Full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
     <WarningsAsErrors>42020,42021,42022</WarningsAsErrors>
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <Prefer32Bit>false</Prefer32Bit>
-    <DocumentationFile>
-    </DocumentationFile>
+    <DocumentationFile>Photo Mud.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
     <OutputPath>bin\x64\</OutputPath>
     <Optimize>true</Optimize>
-    <NoWarn>41999,42016,42017,42018,42019,42032,42036,42353,42354,42355</NoWarn>
+    <NoWarn>41999,42016,42017,42018,42019,42032,42036</NoWarn>
     <PlatformTarget>x64</PlatformTarget>
     <WarningsAsErrors>42020,42021,42022</WarningsAsErrors>
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <Prefer32Bit>false</Prefer32Bit>
-    <DocumentationFile>
-    </DocumentationFile>
+    <DocumentationFile>Photo Mud.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
     <OptionInfer>Off</OptionInfer>

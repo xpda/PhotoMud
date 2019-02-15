@@ -122,7 +122,7 @@ Module treeviewSubs
     Dim s As String
     Dim success As Boolean
 
-    If Trim(fPath) = "" Then Exit Function
+    If Trim(fPath) = "" Then Return False
     TreeViewSelectPath = True
     If (Len(fPath) > 1) AndAlso (Len(fPath) > 3 Or fPath.Chars(1) <> ":") Then fPath = fPath.TrimEnd("\")
 

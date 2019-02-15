@@ -123,7 +123,9 @@ Public Class frmBorder
   Private Sub opt_CheckedChanged(ByVal Sender As Object, ByVal e As EventArgs) _
     Handles opt2D.CheckedChanged, opt3D.CheckedChanged, optRaise.CheckedChanged, optButton.CheckedChanged
 
-    If Sender.checked Then
+    Dim opt As RadioButton = Sender
+
+    If opt.Checked Then
 
       If opt3D.Checked Then
         trkInner.Visible = True
@@ -218,8 +220,8 @@ Public Class frmBorder
 
     Else
       img = New MagickImage(qImage0) ' reduced size source
-      InnerWidth = InnerWidth * xreduced
-      OuterWidth = OuterWidth * xreduced
+      InnerWidth = CInt(InnerWidth * xreduced)
+      OuterWidth = CInt(OuterWidth * xreduced)
     End If
 
     If opt2D.Checked Then
@@ -240,7 +242,7 @@ Public Class frmBorder
     ElseIf optButton.Checked Then
       ' buttonize
       Using img2 As MagickImage = New MagickImage(Color.Gray, img.Width, img.Height)
-        img2.Colorize(Color.Gray, OuterWidth)
+        img2.Colorize(Color.Gray, New Percentage(OuterWidth))
         img2.Raise(OuterWidth)
         img2.Normalize()
         img2.Blur(0, OuterWidth, Channels.RGB)

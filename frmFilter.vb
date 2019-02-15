@@ -61,8 +61,7 @@ Public Class frmFilter
 
     Dim path As String
     Dim fName As String
-    Dim i As Integer
-    Dim j As Integer
+    Dim i, j, k As Integer
     Dim ipos As Integer
     Dim jLine As String
     Dim result As DialogResult
@@ -102,8 +101,9 @@ Public Class frmFilter
     Next i
 
     ss = File.ReadAllLines(fName)
-    If IsNumeric(ss(0)) AndAlso ss(0) > 0 AndAlso ss(0) <= maxFilterSize Then
-      mx = New ConvolveMatrix(ss(0))
+    If IsNumeric(ss(0)) Then k = CInt(ss(0)) Else k = 0
+    If k > 0 AndAlso k <= maxFilterSize Then
+      mx = New ConvolveMatrix(k)
     Else
       mx = Nothing
       Exit Sub
@@ -145,8 +145,7 @@ Public Class frmFilter
 
     Dim path As String
     Dim fName As String
-    Dim i As Double
-    Dim j As Double
+    Dim i, j As Integer
     Dim result As DialogResult
     Dim sf As String
 
@@ -375,9 +374,11 @@ Public Class frmFilter
   Private Sub Option_CheckedChanged(ByVal Sender As Object, ByVal e As EventArgs) _
     Handles optSize3x3.CheckedChanged, optSize5x5.CheckedChanged, optSize7x7.CheckedChanged
 
+    Dim opt As RadioButton = Sender
+
     If Loading Then Exit Sub
 
-    If Sender.checked Then
+    If opt.Checked Then
       If optSize3x3.Checked Then
         changeFilterSize(3)
       ElseIf optSize5x5.Checked Then
@@ -396,7 +397,7 @@ Public Class frmFilter
     Dim j As Integer
     Dim k As Integer
     Dim oldSize As Integer
-    Dim tmpFilt(maxFilterSize - 1, maxFilterSize - 1) As Integer
+    Dim tmpFilt(maxFilterSize - 1, maxFilterSize - 1) As Double
 
     If newsize = mx.Order Then Exit Sub
 
@@ -440,8 +441,7 @@ Public Class frmFilter
   Private Sub txFilt_Enter(ByVal Sender As Object, ByVal e As EventArgs)
 
     Dim index As Integer
-    Dim t As TextBox
-    t = Sender
+    Dim t As TextBox = Sender
 
     index = findIndex(txFilt, t)
 
@@ -459,14 +459,14 @@ Public Class frmFilter
     filterMin = (maxFilterSize - mx.Order) \ 2
 
     Select Case e.KeyCode
-      Case 37 ' left
-        If index Mod maxFilterSize > filterMin Then txFilt(index - 1).select()
-      Case 38 ' up
-        If index > (filterMin + 1) * maxFilterSize Then txFilt(index - maxFilterSize).select()
-      Case 39 ' right
-        If index Mod maxFilterSize < mx.Order + filterMin - 1 Then txFilt(index + 1).select()
-      Case 40 ' down
-        If index < (mx.Order + filterMin - 1) * maxFilterSize Then txFilt(index + maxFilterSize).select()
+      Case Keys.Left
+        If index Mod maxFilterSize > filterMin Then txFilt(index - 1).Select()
+      Case Keys.Up
+        If index > (filterMin + 1) * maxFilterSize Then txFilt(index - maxFilterSize).Select()
+      Case Keys.Right
+        If index Mod maxFilterSize < mx.Order + filterMin - 1 Then txFilt(index + 1).Select()
+      Case Keys.Down
+        If index < (mx.Order + filterMin - 1) * maxFilterSize Then txFilt(index + maxFilterSize).Select()
     End Select
 
   End Sub

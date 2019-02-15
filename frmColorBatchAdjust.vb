@@ -11,8 +11,8 @@ Public Class frmColorBatchAdjust
 
   Dim Loading As Boolean = True
   Dim Sliding As Boolean
-  Dim downx As Single
-  Dim downy As Single
+  Dim downx As Double
+  Dim downy As Double
   Dim iPicnum As Integer
 
   Dim WithEvents Timer1 As New Timer

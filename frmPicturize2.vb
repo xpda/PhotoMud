@@ -28,8 +28,8 @@ Public Class frmPicturize2
 
     MainSize(0) = frmMain.mView.Bitmap.Width
     MainSize(1) = frmMain.mView.Bitmap.Height
-    If pczNPic(0) <= 0 Then pczNPic(0) = Round(2 * MainSize(0) / pczCellRes(0))
-    If pczNPic(1) <= 0 Then pczNPic(1) = Round(2 * MainSize(1) / pczCellRes(1))
+    If pczNPic(0) <= 0 Then pczNPic(0) = CInt(Round(2 * MainSize(0) / pczCellRes(0)))
+    If pczNPic(1) <= 0 Then pczNPic(1) = CInt(Round(2 * MainSize(1) / pczCellRes(1)))
     txnPicH.Text = CStr(pczNPic(0))
     txnPicV.Text = CStr(pczNPic(1))
 
@@ -40,8 +40,7 @@ Public Class frmPicturize2
   Private Sub txBox_Enter(ByVal Sender As Object, ByVal e As EventArgs) _
     Handles txnPicH.Enter, txnPicV.Enter, txCellsizeH.Enter, txCellsizeV.Enter
 
-    Dim txBox As TextBox
-    txBox = Sender
+    Dim txBox As TextBox = Sender
 
     txBox.SelectionStart = 0
     txBox.SelectionLength = Len(txBox.Text)
@@ -175,7 +174,7 @@ Public Class frmPicturize2
     pczNPic(0) = CInt(txnPicH.Text)
     pczNPic(1) = CInt(txnPicV.Text)
     pczCellDiv(0) = 6 ' removed option 7/10/15
-    pczCellDiv(1) = Round(pczCellDiv(0) * pczCellAspect)
+    pczCellDiv(1) = CInt(Round(pczCellDiv(0) * pczCellAspect))
     If pczCellDiv(1) <= 0 Then pczCellDiv(1) = 1
     pczColorAdjust = chkColorAdjust.Checked
     pczUsePicsOnce = chkUsePicsOnce.Checked

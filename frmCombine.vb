@@ -11,13 +11,13 @@ Public Class frmCombine
   Inherits Form
 
   Dim strMethod(11) As String
-  Dim Operation(11) As Integer
+  Dim Operation(11) As mergeOp
   Dim Loading As Boolean = True
   Dim Sliding As Boolean = False
-  Dim xoff As Single
-  Dim yoff As Single
-  Dim dragx As Single
-  Dim dragy As Single
+  Dim xoff As Double
+  Dim yoff As Double
+  Dim dragx As Double
+  Dim dragy As Double
   Dim gPath2 As GraphicsPath
   Dim gPath3 As GraphicsPath
 
@@ -51,8 +51,8 @@ Public Class frmCombine
   Sub ScaleBitmap()
 
     Dim bmpSize As Size
-    Dim widthallowed As Double
-    Dim heightallowed As Double
+    Dim widthallowed As Integer
+    Dim heightallowed As Integer
 
     Me.Cursor = Cursors.WaitCursor
 
@@ -63,10 +63,10 @@ Public Class frmCombine
       updateImage(pView3, gPath3, trkIntensity3, chkGray3)
       If ((widthallowed * pView3.Bitmap.Height) / pView3.Bitmap.Width) < heightallowed Then
         bmpSize.width = widthallowed
-        bmpSize.height = (bmpSize.width * pView3.Bitmap.Height) / pView3.Bitmap.Width
+        bmpSize.Height = CInt((bmpSize.Width * pView3.Bitmap.Height) / pView3.Bitmap.Width)
       Else
         bmpSize.height = heightallowed
-        bmpSize.width = (bmpSize.height * pView3.Bitmap.Width) / pView3.Bitmap.Height
+        bmpSize.Width = CInt((bmpSize.Height * pView3.Bitmap.Width) / pView3.Bitmap.Height)
       End If
     Else
       bmpSize.width = widthallowed
@@ -252,7 +252,7 @@ Public Class frmCombine
     Me.Cursor = Cursors.WaitCursor
     pView1.setBitmap(pView2.Bitmap)
 
-    destRect = New Rectangle(xoff, yoff, pView1.Bitmap.Width, pView1.Bitmap.Height)
+    destRect = New Rectangle(CInt(xoff), CInt(yoff), pView1.Bitmap.Width, pView1.Bitmap.Height)
     bmpMerge(pView3.Bitmap, pView1.Bitmap, Operation(Combo1.SelectedIndex), destRect)
 
     pView1.Zoom(0)
@@ -283,14 +283,14 @@ Public Class frmCombine
     Sliding = True
     If Sender Is trkIntensity2 Then
       updateImage(pView2, gPath2, trkIntensity2, chkGray2)
-      nmIntensity2.Value = trkIntensity2.Value / 10
+      nmIntensity2.Value = CInt(trkIntensity2.Value / 10)
       pView2.Zoom(0)
     Else
       If chkFit.Checked Then
         ScaleBitmap()
       Else
         updateImage(pView3, gPath3, trkIntensity3, chkGray3)
-        nmIntensity3.Value = trkIntensity3.Value / 10
+        nmIntensity3.Value = CInt(trkIntensity3.Value / 10)
         pView3.Zoom(0)
       End If
     End If

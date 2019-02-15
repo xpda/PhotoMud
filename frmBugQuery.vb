@@ -123,7 +123,7 @@ Public Class frmBugQuery
         adapt.SelectCommand = cmd
         adapt.Fill(dset)
         For Each drow In dset.Tables(0).Rows
-          s1 = drow("taxon")
+          s1 = CStr(drow("taxon"))
           If s = "" OrElse eqstr(s, s1) Then ' taxonkey matches
             If Not IsDBNull(drow("filename")) Then queryNames.Add(folderPath & drow("filename"))
           End If

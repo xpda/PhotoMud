@@ -85,7 +85,7 @@ Public Class frmMainf
   ' for text
   Dim textMultiline As Boolean
   Dim textBackFill As Boolean
-  Dim textAngle As Single
+  Dim textAngle As Double
   Dim textColor As Color
   Dim textBackColor As Color
   Dim fontSize As Integer
@@ -2039,7 +2039,7 @@ Public Class frmMainf
 
     Dim i As Integer
     Dim rColor As Color
-    Dim x1, y1 As Single
+    Dim x1, y1 As Double
     Dim p As Point
     Dim pf As Point
     Dim rCurrent As Rectangle ' rectangle from first point to here

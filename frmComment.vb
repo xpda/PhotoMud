@@ -113,9 +113,9 @@ Public Class frmComment
 
     s1 = LCase(Path.GetExtension(picpath))
 
-    sComment(0) = getBmpComment(propID.ImageDescription, pComments)
-    sComment(1) = getBmpComment(propID.DateTime, pComments)
-    sComment(2) = getBmpComment(propID.DateTimeOriginal, pComments)
+    sComment(0) = CStr(getBmpComment(propID.ImageDescription, pComments))
+    sComment(1) = CStr(getBmpComment(propID.DateTime, pComments))
+    sComment(2) = CStr(getBmpComment(propID.DateTimeOriginal, pComments))
     getGPSLocation(pComments, sComment(3), s1, xLat, xLon, iAltitude)
 
     For i = 1 To 2
@@ -194,9 +194,9 @@ Public Class frmComment
     lbPicPath.Text = Path.GetFileName(filenames(iPic))
     picpath = filenames(iPic)
 
-    sComment(0) = getBmpComment(propID.ImageDescription, pComments)
-    sComment(1) = getBmpComment(propID.DateTime, pComments)
-    sComment(2) = getBmpComment(propID.DateTimeOriginal, pComments)
+    sComment(0) = CStr(getBmpComment(propID.ImageDescription, pComments))
+    sComment(1) = CStr(getBmpComment(propID.DateTime, pComments))
+    sComment(2) = CStr(getBmpComment(propID.DateTimeOriginal, pComments))
     getGPSLocation(pComments, sComment(3), s, xLat, xLon, ialtitude)
 
     For i = 1 To 2

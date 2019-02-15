@@ -125,8 +125,8 @@ Public Class frmBugPhotos
     ' don't save unless the file is there
     If Not File.Exists(getTargetPath) Then
       MsgBox("The image has not been saved.")
+      Me.Cursor = Cursors.Default
       Return 0
-      Exit Function
     End If
 
     Try
@@ -168,15 +168,15 @@ Public Class frmBugPhotos
 
         Else ' abort
           MsgBox("There is more than one " & txTaxon.Text & " in the Database.", MsgBoxStyle.OkOnly)
-          Me.Cursor = Cursors.Default
           cmdTaxon_Click(Nothing, Nothing)
+          Me.Cursor = Cursors.Default
           Return 0
         End If
 
       Else ' matches.count <= 0 
         MsgBox(txTaxon.Text & " is Not in the Database.", MsgBoxStyle.OkOnly)
-        Me.Cursor = Cursors.Default
         cmdTaxon_Click(Nothing, Nothing)
+        Me.Cursor = Cursors.Default
         Return 0
       End If
 
@@ -281,6 +281,7 @@ Public Class frmBugPhotos
     dataChanged = False
     imagesetChanged = False
     Me.Cursor = Cursors.Default
+    Return 1 ' saved
 
   End Function
 

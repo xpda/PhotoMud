@@ -66,7 +66,7 @@ Public Class pViewer
   Property DrawDashed As Boolean = False
   Property DrawForeColor As Color = Color.Navy
   Property DrawBackColor As Color = Color.White
-  Property DrawLineWidth As Single = 1
+  Property DrawLineWidth As Double = 1
   Property DrawShape As shape = shape.Line
   Property DrawString As String = ""
   Property DrawAngle As Double = 0 ' angle for text, etc.
@@ -1014,7 +1014,7 @@ Public Class pViewer
 
   End Sub
 
-  Private Sub uDrawDashedPath(colors() As Color, dashLength As Single, gPath As GraphicsPath, gf As Graphics, _
+  Private Sub uDrawDashedPath(colors() As Color, dashLength As Double, gPath As GraphicsPath, gf As Graphics, _
     Optional usePolygon As Boolean = False)
     ' draws a dashed line with all the colors filled in
 
@@ -1071,13 +1071,13 @@ Public Class pViewer
   End Sub
 
   Sub DrawLine(pp As List(Of Point), LineColor As Color, _
-    Optional LineWidth As Single = 1, Optional Quality As SmoothingMode = Drawing2D.SmoothingMode.HighQuality,
+    Optional LineWidth As Double = 1, Optional Quality As SmoothingMode = Drawing2D.SmoothingMode.HighQuality,
     Optional endCap As LineCap = LineCap.Flat)
     DrawLine(pp.ToArray, LineColor, LineWidth, Quality)
   End Sub
 
   Sub DrawLine(pp() As Point, LineColor As Color, _
-    Optional LineWidth As Single = 1, Optional Quality As SmoothingMode = Drawing2D.SmoothingMode.HighQuality,
+    Optional LineWidth As Double = 1, Optional Quality As SmoothingMode = Drawing2D.SmoothingMode.HighQuality,
     Optional endCap As LineCap = LineCap.Flat)
     ' Public sub to draw line to bitmap
     Using _
@@ -1091,7 +1091,7 @@ Public Class pViewer
   End Sub
 
   Sub uDrawLine(g As Graphics, pp() As Point, LineColor As Color, _
-    Optional LineWidth As Single = 1, Optional Quality As SmoothingMode = Drawing2D.SmoothingMode.HighQuality)
+    Optional LineWidth As Double = 1, Optional Quality As SmoothingMode = Drawing2D.SmoothingMode.HighQuality)
     ' private, draw a line on g
     Using gpen As Pen = New Pen(Color.White)
       gpen.Color = LineColor

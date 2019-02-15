@@ -277,7 +277,7 @@ Public Class uExif
             'File.WriteAllBytes("c:\tmp.txt", ufData)
 
             Tags = New Collection
-            k = getDWord(ufData, 4, intel) ' first ifd
+            k = getDWordSigned(ufData, 4, intel) ' first ifd
 
             getIFDirectory(ufData, k, intel, 0) ' k is link to   next ifd, absolute links
             readExif = Tags.Count
@@ -303,7 +303,6 @@ Public Class uExif
             k = k + 11
             getIPTC(b, k)
           End If
-
         End If
 
         fpos = fpos + app1Size + 2
@@ -318,6 +317,7 @@ Public Class uExif
   End Function
 
   Sub getIPTC(ByRef b As Byte(), ByRef ipos As Integer)
+    ' increments ipos
 
     Dim k As Integer
     Dim ii(0) As Integer
@@ -376,7 +376,7 @@ Public Class uExif
     End If
 
     Tags = New Collection
-    k = getDWord(ufData, 4, intel) ' first ifd
+    k = getDWordSigned(ufData, 4, intel) ' first ifd
     If k >= 8 And k < 500 Then
       getIFDirectory(ufData, k, intel, 0) ' k is link to   next ifd, absolute links
     End If
@@ -393,9 +393,9 @@ Public Class uExif
     ' ufdata comes from this instance only if called from readexif.
     ' This is also called recursively and from imageinfo.bas for makernotes
 
-    Dim Nifd As UInteger
+    Dim Nifd As Integer
     Dim IFD As ifdEntry
-    Dim i, k As Integer
+    Dim k As Integer
     Dim ii1 As Long
     Dim tg As uTag
     Dim noLinks As Boolean
@@ -409,10 +409,10 @@ Public Class uExif
     Nifd = getWord(ufdata, ifdPointer, intel)
     If Nifd > 1000 Or Nifd * 12 + ifdPointer + 5 > UBound(ufdata) Then Exit Sub ' must be an error
 
-    For i = 0 To Nifd - 1
+    For i As Integer = 0 To Nifd - 1
       IFD.tag = getWord(ufdata, i * 12 + ifdPointer + 2, intel)
       IFD.dataType = getWord(ufdata, i * 12 + ifdPointer + 4, intel)
-      IFD.count = getDWord(ufdata, i * 12 + ifdPointer + 6, intel)
+      IFD.count = getDWordSigned(ufdata, i * 12 + ifdPointer + 6, intel)
       IFD.Value = getDWord(ufdata, i * 12 + ifdPointer + 10, intel)
       'If IFD.count > 65535 Then Exit For
 
@@ -428,7 +428,7 @@ Public Class uExif
             n = IFD.count * 8
         End Select
         If n > 4 Then ' 1st link - get fileoffset
-          k = IFD.Value
+          k = CInt(IFD.Value)
           linkOffset = k - (Nifd * 12 + 2 + 4) - ifdPointer
           If relativeLinks = 3 Then linkOffset += 4
           noLinks = False
@@ -444,10 +444,10 @@ Public Class uExif
 
       If Not tagExists(IFD.tag) Then Tags.Add(tg, tg.key) ' key is a four character hex value for tag - Right("0000" & Hex(tag), 4)
       ' If IFD.tag = TagID.exifpointer Or IFD.tag = TagID.gpspointer Then ' Or IFD.tag = TagID.interoppointer Then
-      If IFD.tag = TagID.exifpointer Or IFD.tag = TagID.gpspointer Then ' Or IFD.tag = TagID.interoppointer Then
+      If IFD.tag = TagID.exifpointer Or IFD.tag = TagID.GPSpointer Then ' Or IFD.tag = TagID.interoppointer Then
         If relativeLinks <> 0 Or IFD.Value > ifdPointer Then
           tg.IFD = New uExif
-          tg.IFD.getIFDirectory(ufdata, IFD.Value, intel, relativeLinks) ' recursive
+          tg.IFD.getIFDirectory(ufdata, CInt(IFD.Value), intel, relativeLinks) ' recursive
         End If
       End If
     Next i
@@ -460,7 +460,9 @@ Public Class uExif
 
   End Sub
 
-  Private Function readDWord(ByRef intel As Boolean, Optional ByRef iPos As Integer = -1, Optional ByRef dSigned As Boolean = False) As Integer
+  Private Function readDWord(ByRef intel As Boolean, Optional ByRef iPos As Integer = -1, Optional ByRef dSigned As Boolean = False) As Long
+
+    ' reads a 4-byte integer into an 8=byte integer
 
     Dim b(3) As Byte
 
@@ -474,6 +476,7 @@ Public Class uExif
         End Try
       Else
         Try
+          binRead.Read()
           readDWord = binRead.ReadUInt32()
         Catch
           readDWord = 0
@@ -564,7 +567,7 @@ Public Class uExif
     Dim v As Object = Nothing
     Dim i As Integer
     Dim ii1, ii2 As Long
-    Dim n As Long
+    Dim n As Integer
     Dim b() As Byte
     Dim bi As Byte
     Dim vs() As String
@@ -610,7 +613,7 @@ Public Class uExif
         Return v
       End If
       For i = 0 To n - 1
-        b(i) = ufdata(i + IFD.Value - linkOffset)
+        b(i) = ufdata(i + CInt(IFD.Value) - linkOffset)
       Next i
     End If
 
@@ -655,7 +658,7 @@ Public Class uExif
             ii2 = getDWordSigned(b, i * 8 + 4, intel)
           Else
             ii1 = getDWord(b, i * 8, intel)
-            If ii1 > 2 ^ 31 + 2 ^ 30 Then ii1 = ii1 - 2 ^ 32 '  this is probably because someone (like GPSStamp) got the signs wrong. It's technically incorrect.
+            If ii1 > 2 ^ 31 + 2 ^ 30 Then ii1 = ii1 - CLng(2 ^ 32) '  this is probably because someone (like GPSStamp) got the signs wrong. It's technically incorrect.
             ii2 = getDWord(b, i * 8 + 4, intel)
           End If
           If ii2 <> 0 Then vx(i) = ii1 / ii2 Else vx(i) = 0
@@ -665,14 +668,14 @@ Public Class uExif
       Case 11 ' float (single) ' read again from file
         ReDim vx(IFD.count - 1)
         For i = 0 To IFD.count - 1
-          vx(i) = BitConverter.ToSingle(ufdata, IFD.Value + i * 4)
+          vx(i) = BitConverter.ToSingle(ufdata, CInt(IFD.Value) + i * 4)
         Next i
         v = vx.Clone
 
       Case 12 ' float (single), double ' read again from file
         ReDim vx(IFD.count - 1)
         For i = 0 To IFD.count - 1
-          vx(i) = BitConverter.ToDouble(ufdata, IFD.Value + i * 8)
+          vx(i) = BitConverter.ToDouble(ufdata, CInt(IFD.Value) + i * 8)
         Next i
         v = vx.Clone
 
@@ -735,33 +738,31 @@ Public Class uExif
       'k = k + b(i)
       k = b(i + 1)
       k = (k << 8) + b(i)
-      Return k
+      Return CShort(k)
     Else
       'k = k + b(i) * 256
       'k = k + b(i + 1)
       k = b(i) * 256
       k = k + b(i + 1)
-      Return k
+      Return CShort(k)
     End If
 
     'If k >= 32768 Then k = k - 65536
 
   End Function
-  Private Function getWord(ByRef b() As Byte, ByRef i As Integer, ByRef intel As Boolean) As UShort
+  Private Function getWord(ByRef b() As Byte, ipointer As Integer, intel As Boolean) As UShort
 
     Dim k As Integer
 
     If intel Then
-      k = b(i + 1)
-      k = (k << 8) + b(i)
-      Return k
+      k = b(ipointer + 1)
+      k = (k << 8) + b(ipointer)
+      Return CUShort(k)
     Else
-      k = b(i)
-      k = (k << 8) + b(i + 1)
-      Return k
+      k = b(ipointer)
+      k = (k << 8) + b(ipointer + 1)
+      Return CUShort(k)
     End If
-
-    getWord = k
 
   End Function
 

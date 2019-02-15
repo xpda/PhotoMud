@@ -322,7 +322,7 @@ Public Class frmDupSearch
   Sub scanPics(ByRef fPath As String, ByRef subFolders As Boolean)
 
     Dim k, i As Integer
-    Dim hSize As Single
+    Dim hSize As Double
     Dim rgbVal(2) As Integer
     Dim iFile As Integer
     Dim nPix As Integer

@@ -13,7 +13,7 @@ Public Class frmResize
   Dim pctChanged(1) As Boolean
   Dim Loading As Boolean = True
 
-  Dim tMaxRes As Single ' in case maxres is smaller than the image
+  Dim tMaxRes As Double ' in case maxres is smaller than the image
 
   Private Sub chkAspect_CheckedChanged(ByVal Sender As Object, ByVal e As EventArgs) Handles chkAspect.CheckedChanged
     If Loading Then Exit Sub
@@ -52,8 +52,8 @@ Public Class frmResize
     txRes_Leave(txHres, New EventArgs())
     txRes_Leave(txVres, New EventArgs())
 
-    newSize.Width = CDbl(txSizeW.Text)
-    newSize.Height = CDbl(txSizeH.Text)
+    newSize.Width = CInt(txSizeW.Text)
+    newSize.Height = CInt(txSizeH.Text)
 
     Me.Cursor = Cursors.WaitCursor
     ' scale borderwidth
@@ -61,7 +61,10 @@ Public Class frmResize
       frmMain.mView.ResizeBitmap(newSize)
       frmMain.mView.Zoom(0)
     End If
-    frmMain.mView.Bitmap.SetResolution(txHres.Text, txVres.Text)
+
+    If IsNumeric(txHres.Text) AndAlso IsNumeric(txHres.Text) Then
+      frmMain.mView.Bitmap.SetResolution(CSng(txHres.Text), CSng(txVres.Text))
+    End If
 
     Me.Cursor = Cursors.Default
     Me.DialogResult = DialogResult.OK
@@ -79,8 +82,8 @@ Public Class frmResize
     originalSize(0) = frmMain.mView.Bitmap.Width
     originalSize(1) = frmMain.mView.Bitmap.Height
 
-    txSizeW.Text = originalSize(0)
-    txSizeH.Text = originalSize(1)
+    txSizeW.Text = CStr(originalSize(0))
+    txSizeH.Text = CStr(originalSize(1))
     txPctW.Text = "100"
     txPctH.Text = "100"
     chkAspect.Checked = True
@@ -88,8 +91,8 @@ Public Class frmResize
     tMaxRes = Max(MaxRes, originalSize(0))
     tMaxRes = Max(tMaxRes, originalSize(1))
 
-    txHres.Text = frmMain.mView.Bitmap.HorizontalResolution
-    txVres.Text = frmMain.mView.Bitmap.VerticalResolution
+    txHres.Text = CStr(frmMain.mView.Bitmap.HorizontalResolution)
+    txVres.Text = CStr(frmMain.mView.Bitmap.VerticalResolution)
     Loading = False
 
   End Sub
@@ -163,7 +166,7 @@ Public Class frmResize
 
     gSize(index) = x
     Pct(index) = 100 * x / originalSize(index)
-    If index = 0 Then txPctW.Text = Round(Pct(index) * 10) / 10 Else txPctH.Text = Round(Pct(index) * 10) / 10
+    If index = 0 Then txPctW.Text = CStr(Round(Pct(index) * 10) / 10) Else txPctH.Text = CStr(Round(Pct(index) * 10) / 10)
     pctChanged(index) = False
     gSizeChanged(index) = False
 
@@ -171,7 +174,7 @@ Public Class frmResize
       If index = 1 Then other = 0 Else other = 1
       gSize(other) = originalSize(other) * x / originalSize(index)
       Pct(other) = Pct(index)
-      If other = 0 Then txSizeW.Text = Round(gSize(other)) Else txSizeH.Text = Round(gSize(other))
+      If other = 0 Then txSizeW.Text = CStr(Round(gSize(other))) Else txSizeH.Text = CStr(Round(gSize(other)))
       If other = 0 Then txPctW.Text = txPctH.Text Else txPctH.Text = txPctW.Text
       gSizeChanged(other) = False
       pctChanged(other) = False
@@ -204,7 +207,7 @@ Public Class frmResize
 
     Pct(Index) = x
     gSize(Index) = originalSize(Index) * x / 100
-    If Index = 0 Then txSizeW.Text = Round(gSize(Index)) Else txSizeH.Text = Round(gSize(Index))
+    If Index = 0 Then txSizeW.Text = CStr(Round(gSize(Index))) Else txSizeH.Text = CStr(Round(gSize(Index)))
     pctChanged(Index) = False
     gSizeChanged(Index) = False
 
@@ -212,7 +215,7 @@ Public Class frmResize
       If Index = 1 Then other = 0 Else other = 1
       gSize(other) = originalSize(other) * gSize(Index) / originalSize(Index)
       Pct(other) = Pct(Index)
-      If Index = 1 Then txSizeW.Text = Round(gSize(other)) Else txSizeH.Text = Round(gSize(other))
+      If Index = 1 Then txSizeW.Text = CStr(Round(gSize(other))) Else txSizeH.Text = CStr(Round(gSize(other)))
       If Index = 1 Then txPctW.Text = txBox.Text Else txPctH.Text = txBox.Text
       gSizeChanged(other) = False
       pctChanged(other) = False

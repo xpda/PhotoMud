@@ -15,8 +15,8 @@ Public Class frmHisto
   Dim picMoving As Boolean
 
   Dim histXscale, histYscale As Double
-  Dim newMap(255) As Integer
-  Dim pDown As Single
+  Dim newMap(255) As Byte
+  Dim pDown As Integer
 
   Dim gpath As GraphicsPath = Nothing
 
@@ -81,8 +81,6 @@ Public Class frmHisto
 
   Private Sub frmHisto_Load(ByVal Sender As Object, ByVal e As EventArgs) Handles MyBase.Load
 
-    Dim i As Integer
-
     helpProvider1.SetHelpNavigator(Me, HelpNavigator.Topic)
     helpProvider1.SetHelpKeyword(Me, Me.Name & ".html")
 
@@ -96,16 +94,16 @@ Public Class frmHisto
     picRight0.Cursor = Cursors.Hand
     picRight1.Cursor = Cursors.Hand
 
-    picUp0.Left = ((pView2.Left) - (picUp0.Width) / 2)
-    picUp1.Left = ((pView2.Left) + (pView2.Width) - (picUp0.Width) / 2)
-    picRight1.Top = ((pView2.Top) - (picRight1.Height) / 2)
-    picRight0.Top = ((pView2.Top) + (pView2.Height) - (picRight0.Height) / 2)
+    picUp0.Left = CInt(((pView2.Left) - (picUp0.Width) / 2))
+    picUp1.Left = CInt(((pView2.Left) + (pView2.Width) - (picUp0.Width) / 2))
+    picRight1.Top = CInt(((pView2.Top) - (picRight1.Height) / 2))
+    picRight0.Top = CInt(((pView2.Top) + (pView2.Height) - (picRight0.Height) / 2))
 
     optColorAll.Checked = True
     Channel = "master"
     resetSlides()
 
-    For i = 0 To 255 : newMap(i) = i : Next i
+    For i As Byte = 0 To 255 : newMap(i) = i : Next i
 
     If frmMain.mView.FloaterPath IsNot Nothing Then gpath = frmMain.mView.FloaterPath.Clone
 
@@ -141,11 +139,7 @@ Public Class frmHisto
     n = 3
   End Sub
 
-
-
   Private Sub cmdReset_Click(ByVal Sender As Object, ByVal e As EventArgs) Handles cmdReset.Click
-
-    Dim i As Integer
 
     Me.Cursor = Cursors.WaitCursor
 
@@ -153,7 +147,7 @@ Public Class frmHisto
     aview.pView1.setBitmap(aview.pView1.Bitmap)
     aview.Repaint()
 
-    For i = 0 To 255 : newMap(i) = i : Next i
+    For i As Byte = 0 To 255 : newMap(i) = i : Next i
 
     mapReDraw(False)
 
@@ -162,8 +156,6 @@ Public Class frmHisto
   End Sub
 
   Private Sub chkFreeForm_CheckedChanged(ByVal Sender As Object, ByVal e As EventArgs) Handles chkFreeForm.CheckedChanged
-
-    Dim i As Integer
 
     If Loading Then Exit Sub
 
@@ -180,7 +172,7 @@ Public Class frmHisto
       resetSlides()
     End If
 
-    For i = 0 To 255 : newMap(i) = i : Next
+    For i As Byte = 0 To 255 : newMap(i) = i : Next
     resetFreeform()
     If Not Loading Then showHisto(pView2, histSource, histXscale, histYscale)
 
@@ -189,7 +181,9 @@ Public Class frmHisto
   Private Sub optColor_CheckedChanged(ByVal Sender As Object, ByVal e As EventArgs) _
     Handles optColorAll.CheckedChanged, optColorRed.CheckedChanged, optColorGreen.CheckedChanged, optColorBlue.CheckedChanged
 
-    If Loading Or Not Sender.checked Then Exit Sub
+    Dim opt As RadioButton = Sender
+
+    If Loading Or Not opt.Checked Then Exit Sub
 
     If Sender Is optColorAll Then
       Channel = "master"
@@ -201,7 +195,7 @@ Public Class frmHisto
       Channel = "blue"
     End If
 
-    For i As Integer = 0 To 255 : newMap(i) = i : Next
+    For i As Byte = 0 To 255 : newMap(i) = i : Next
     resetFreeform()
     mapReDraw(False)
     If Not Loading Then showHisto(pView2, histSource, histXscale, histYscale)
@@ -236,10 +230,10 @@ Public Class frmHisto
       picMoving = True
 
       i = (pic.Left) + e.X - pDown
-      If i < (pView2.Left) - (picUp0.Width) / 2 Then
-        i = (pView2.Left) - (picUp0.Width) / 2
-      ElseIf i > (pView2.Left) + (pView2.Width) - (picUp0.Width) / 2 Then
-        i = (pView2.Left) + (pView2.Width) - (picUp0.Width) / 2
+      If i < CInt((pView2.Left) - (picUp0.Width) / 2) Then
+        i = CInt((pView2.Left) - (picUp0.Width) / 2)
+      ElseIf i > CInt((pView2.Left) + (pView2.Width) - (picUp0.Width) / 2) Then
+        i = CInt((pView2.Left) + (pView2.Width) - (picUp0.Width) / 2)
       End If
 
       If index = 0 And i > (picUp1.Left) Then i = (picUp1.Left)
@@ -247,7 +241,7 @@ Public Class frmHisto
 
       pic.Left = (i)
       Sliding = True
-      spinner.Value = ((i + (picUp0.Width) / 2) - (pView2.Left)) / (pView2.Width) * 255
+      spinner.Value = CInt(((i + (picUp0.Width) / 2) - (pView2.Left)) / (pView2.Width) * 255)
       slideIndex = index + 2
       Timer1.Stop() : Timer1.Interval = 250 : Timer1.Start() ' slideChange(index + 2) after 250 milliseconds
 
@@ -295,9 +289,9 @@ Public Class frmHisto
 
       i = (pic.Top) + e.Y - pDown
       If i < (pView2.Top) - (picRight0.Height) / 2 Then
-        i = (pView2.Top) - (picRight0.Height) / 2
+        i = CInt((pView2.Top) - (picRight0.Height) / 2)
       ElseIf i > (pView2.Top) + (pView2.Height) - (picRight0.Height) / 2 Then
-        i = (pView2.Top) + (pView2.Height) - (picRight0.Height) / 2
+        i = CInt((pView2.Top) + (pView2.Height) - (picRight0.Height) / 2)
       End If
 
       If index = 0 And i < (picRight1.Top) Then i = (picRight1.Top)
@@ -305,7 +299,7 @@ Public Class frmHisto
 
       pic.Top = (i)
       Sliding = True
-      spinner.Value = 255 - ((i + (picRight0.Height) / 2) - (pView2.Top)) / (pView2.Height) * 255
+      spinner.Value = CInt(255 - ((i + (picRight0.Height) / 2) - (pView2.Top)) / (pView2.Height) * 255)
 
       slideIndex = index
       Timer1.Stop() : Timer1.Interval = 250 : Timer1.Start() ' slideChange(index) after 250 milliseconds
@@ -323,7 +317,7 @@ Public Class frmHisto
 
   End Sub
 
-  Private Sub slideChange(ByRef index As Short)
+  Private Sub slideChange(ByRef index As Integer)
 
     Dim i As Integer
     Dim sum As Integer
@@ -342,7 +336,7 @@ Public Class frmHisto
     Sliding = True
     Select Case index
       Case 0
-        For i = 0 To nmSlide0.Value - 1
+        For i = 0 To CInt(nmSlide0.Value) - 1
           If Channel = "master" Or Channel = "red" Then sum = sum + histSource(0, i)
           If Channel = "master" Or Channel = "green" Then sum = sum + histSource(1, i)
           If Channel = "master" Or Channel = "blue" Then sum = sum + histSource(2, i)
@@ -350,7 +344,7 @@ Public Class frmHisto
         lbPct0.Text = Format(sum / sumPixels, "##0.0%")
         lbPct0.Refresh()
       Case 1
-        For i = nmSlide1.Value + 1 To 255
+        For i = CInt(nmSlide1.Value) + 1 To 255
           If Channel = "master" Or Channel = "red" Then sum = sum + histSource(0, i)
           If Channel = "master" Or Channel = "green" Then sum = sum + histSource(1, i)
           If Channel = "master" Or Channel = "blue" Then sum = sum + histSource(2, i)
@@ -358,7 +352,7 @@ Public Class frmHisto
         lbPct1.Text = Format(sum / sumPixels, "##0.0%")
         lbPct1.Refresh()
       Case 2
-        For i = 0 To nmSlide2.Value - 1
+        For i = 0 To CInt(nmSlide2.Value) - 1
           If Channel = "master" Or Channel = "red" Then sum = sum + histSource(0, i)
           If Channel = "master" Or Channel = "green" Then sum = sum + histSource(1, i)
           If Channel = "master" Or Channel = "blue" Then sum = sum + histSource(2, i)
@@ -366,7 +360,7 @@ Public Class frmHisto
         lbPct2.Text = Format(sum / sumPixels, "##0.0%")
         lbPct2.Refresh()
       Case 3
-        For i = nmSlide3.Value + 1 To 255
+        For i = CInt(nmSlide3.Value) + 1 To 255
           If Channel = "master" Or Channel = "red" Then sum = sum + histSource(0, i)
           If Channel = "master" Or Channel = "green" Then sum = sum + histSource(1, i)
           If Channel = "master" Or Channel = "blue" Then sum = sum + histSource(2, i)
@@ -386,13 +380,13 @@ Public Class frmHisto
 
     Select Case index
       Case 0
-        picRight0.Top = ((pView2.Top) + (pView2.Height) - ((picRight0.Height) / 2 + nmSlide0.Value / 255 * (pView2.Height)))
+        picRight0.Top = CInt(((pView2.Top) + (pView2.Height) - ((picRight0.Height) / 2 + nmSlide0.Value / 255 * (pView2.Height))))
       Case 1
-        picRight1.Top = ((pView2.Top) + (pView2.Height) - ((picRight0.Height) / 2 + nmSlide1.Value / 255 * (pView2.Height)))
+        picRight1.Top = CInt(((pView2.Top) + (pView2.Height) - ((picRight0.Height) / 2 + nmSlide1.Value / 255 * (pView2.Height))))
       Case 2
-        picUp0.Left = ((pView2.Left) - (picUp0.Width) / 2 + nmSlide2.Value / 255 * (pView2.Width))
+        picUp0.Left = CInt(((pView2.Left) - (picUp0.Width) / 2 + nmSlide2.Value / 255 * (pView2.Width)))
       Case 3
-        picUp1.Left = ((pView2.Left) - (picUp0.Width) / 2 + nmSlide3.Value / 255 * (pView2.Width))
+        picUp1.Left = CInt(((pView2.Left) - (picUp0.Width) / 2 + nmSlide3.Value / 255 * (pView2.Width)))
     End Select
 
   End Sub
@@ -417,20 +411,20 @@ Public Class frmHisto
     Dim by, ay, cy As Double
     Dim xt, yt As Double
     Dim slope As Double
-    Dim i2, i3 As Integer
+    Dim i2, i3 As Byte
 
     If Loading Or busy Or aview.pView1.Bitmap Is Nothing Then Exit Sub
     busy = True
 
-    For i = 0 To 255 : newMap(i) = i : Next i
+    For j As Byte = 0 To 255 : newMap(j) = j : Next j
 
-    i2 = nmSlide2.Value
-    i3 = nmSlide3.Value
+    i2 = CByte(nmSlide2.Value)
+    i3 = CByte(nmSlide3.Value)
 
     ' linear spread
     x = 256 / (i3 - i2 + 1)
     For i = i2 To i3
-      newMap(i) = (newMap(i) - i2) * x
+      newMap(i) = CByte((newMap(i) - i2) * x)
     Next i
     For i = 0 To i2
       newMap(i) = 0
@@ -467,13 +461,13 @@ Public Class frmHisto
       by = 3 * (y2 - y1) - cy
       ay = y3 - y0 - cy - by
 
-      k = x0 * 255
+      k = CInt(x0 * 255)
       For i = 0 To 500
         t = i / 500
         xt = ax * t ^ 3 + bx * t ^ 2 + cx * t + x0
         If xt * 255 >= k Then
           yt = ay * t ^ 3 + by * t ^ 2 + cy * t + y0
-          newMap(k) = yt * 255
+          newMap(k) = CByte(yt * 255)
           k = k + 1
           If k > 255 Then Exit For
         End If
@@ -483,9 +477,9 @@ Public Class frmHisto
     ' clip results
     For i = 0 To 255
       If newMap(i) < nmSlide0.Value Then
-        newMap(i) = nmSlide0.Value
+        newMap(i) = CByte(nmSlide0.Value)
       ElseIf newMap(i) > nmSlide1.Value Then
-        newMap(i) = nmSlide1.Value
+        newMap(i) = CByte(nmSlide1.Value)
       End If
     Next i
 
@@ -546,7 +540,7 @@ Public Class frmHisto
 
   End Sub
 
-  Sub remapintensity(ByRef bmp As Bitmap, newmap() As Integer, Channel As String)
+  Sub remapintensity(ByRef bmp As Bitmap, newmap() As Byte, Channel As String)
 
     Dim bb() As Byte
     bb = getBmpBytes(bmp)
@@ -610,14 +604,13 @@ Public Class frmHisto
 
   Sub drawMap(g As Graphics)
 
-    Dim i As Integer
     Dim yscale As Double
     Dim p(255) As PointF
 
     yscale = pView2.ClientSize.Height / 255
-    For i = 0 To 255
-      p(i).X = i * histXscale
-      p(i).Y = pView2.ClientSize.Height - newMap(i) * yscale
+    For i As Integer = 0 To 255
+      p(i).X = CSng(i * histXscale)
+      p(i).Y = CSng(pView2.ClientSize.Height - newMap(i) * yscale)
     Next i
 
     g.SmoothingMode = SmoothingMode.HighQuality
@@ -784,9 +777,9 @@ Public Class frmHisto
     For i = 0 To 255
       x = i * pView2.ClientSize.Width / 256
       If x > xs(L + 1) Then L = L + 1
-      k = (pView2.ClientSize.Height - spline(x, xs, ys, s, L)) * 256 / pView2.ClientSize.Height
+      k = CInt((pView2.ClientSize.Height - spline(x, xs, ys, s, L)) * 256 / pView2.ClientSize.Height)
       If k > 255 Then k = 255 Else If k < 0 Then k = 0
-      newMap(i) = k
+      newMap(i) = CByte(k)
     Next i
 
     If redraw Then mapReDraw(False)
@@ -854,7 +847,7 @@ Public Class frmHisto
       Using gPath As New GraphicsPath
         ' add the line
         For i As Integer = 1 To n
-          zp.Add(New Point(xn(i), fn(i)))
+          zp.Add(New Point(CInt(xn(i)), CInt(fn(i))))
         Next i
         zp = getCurve(zp, 4)
         gPath.AddLines(zp.ToArray)
@@ -862,7 +855,7 @@ Public Class frmHisto
 
         ' add the knots
         For i As Integer = 1 To n
-          pView2.RubberPoints.Add(New Point(xn(i) - 2, fn(i) - 2))
+          pView2.RubberPoints.Add(New Point(CInt(xn(i) - 2), CInt(fn(i) - 2)))
         Next i
 
         pView2.RubberPath = gPath.Clone

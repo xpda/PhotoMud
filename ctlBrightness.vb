@@ -115,7 +115,7 @@
 
   Public Sub setMode(ByVal inCommand As cmd)
 
-    If eqstr(inCommand, cmd.Brightness) Then
+    If inCommand = cmd.Brightness Then
       lbBrightness.Text = "&Brightness:"
       trkBrightness.Value = 0
       trkBrightness.Minimum = -100
@@ -195,12 +195,12 @@
   End Sub
   Private Sub ctlBrightness_MouseMove(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles Me.MouseMove
     If e.Button = System.Windows.Forms.MouseButtons.Left Then
-      Me.Location = Me.Location + e.Location - clickPoint
+      Me.Location = Me.Location + New Size(e.Location) - New Size(clickPoint)
     End If
   End Sub
   Private Sub ctlBrightness_MouseUp(ByVal sender As Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles Me.MouseUp
     If e.Button = System.Windows.Forms.MouseButtons.Left Then
-      Me.Location = Me.Location + e.Location - clickPoint
+      Me.Location = Me.Location + New Size(e.Location) - New Size(clickPoint)
     End If
     Me.Cursor = Cursors.Default
   End Sub

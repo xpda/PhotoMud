@@ -9,7 +9,7 @@ Public Class frmOptions
   Inherits Form
 
   Dim FontName As String
-  Dim FontSize As Single
+  Dim FontSize As Double
   Dim FontBold As Boolean
   Dim FontItalic As Boolean
   Dim FontUnderline As Boolean
@@ -56,7 +56,7 @@ Public Class frmOptions
     iniDisableUndo = chkDisableUndo.Checked
     iniPngIndexed = chkPNGIndexed.Checked
     iniShowTips = chkShowTips.Checked
-    iniSlideOrder = 0
+    iniSlideOrder = "0"
     If optSlideOrderRandom.Checked Then iniSlideOrder = "random"
     If optSlideOrderFilename.Checked Then iniSlideOrder = "filename"
     If optSlideOrderPhotoDate.Checked Then iniSlideOrder = "photodate"
@@ -66,7 +66,7 @@ Public Class frmOptions
     iniSlideShowDescription = chkSlideShowDescription.Checked
     iniSlideShowPhotoDate = chkSlideshowPhotoDate.Checked
     iniViewToolbar = chkViewToolbar.Checked
-    iniWebConvertUTCtoLocal = chkWebConvertUTCtoLocal.Checked
+    iniWebConvertUTCtoLocal = CInt(chkWebConvertUTCtoLocal.Checked)
     iniZoomOne = chkZoomOne.Checked
     iniDelRawFiles = chkDelRawFiles.Checked
     iniAdjustIndColor = chkAdjustIndColor.Checked
@@ -182,7 +182,7 @@ Public Class frmOptions
     chkSlideShowDescription.Checked = iniSlideShowDescription
     chkSlideshowPhotoDate.Checked = iniSlideShowPhotoDate
     chkViewToolbar.Checked = iniViewToolbar
-    chkWebConvertUTCtoLocal.Checked = iniWebConvertUTCtoLocal
+    chkWebConvertUTCtoLocal.Checked = CBool(iniWebConvertUTCtoLocal)
     chkZoomOne.Checked = iniZoomOne
     chkDelRawFiles.Checked = iniDelRawFiles
     chkAdjustIndColor.Checked = iniAdjustIndColor

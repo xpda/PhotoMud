@@ -41,7 +41,7 @@ Public Class frmToolbar
 
     If List2.SelectedIndex <= 0 Then Exit Sub
     k = List2.SelectedIndex
-    s = List2.Items(k - 1)
+    s = CStr(List2.Items(k - 1))
     List2.Items(k - 1) = List2.Items(k)
     List2.Items(k) = s
     List2.SelectedIndex = k - 1
@@ -54,7 +54,7 @@ Public Class frmToolbar
 
     If List2.SelectedIndex >= List2.Items.Count - 1 Then Exit Sub
     k = List2.SelectedIndex
-    s = List2.Items(k + 1)
+    s = CStr(List2.Items(k + 1))
     List2.Items(k + 1) = List2.Items(k)
     List2.Items(k) = s
     List2.SelectedIndex = k + 1
@@ -84,7 +84,7 @@ Public Class frmToolbar
       Else
         For Each b As ToolStripItem In Buttons
           If b.Text = List2.Items(i) Then
-            ToolButton(nToolButtons) = b.Tag
+            ToolButton(nToolButtons) = CStr(b.Tag)
             Exit For
           End If
         Next b
@@ -116,7 +116,7 @@ Public Class frmToolbar
     If k < 0 Then Exit Sub
 
     If List2.Items(k) <> List1.Items(0) Then
-      insert(List1, List2.Items(k))
+      insert(List1, CStr(List2.Items(k)))
     End If
 
     List2.Items.RemoveAt(k) ' keep separator
@@ -211,7 +211,7 @@ Public Class frmToolbar
           Exit For
         End If
       Next j
-      If k = 0 And b.Tag <> "---" Then insert(List1, b.Text)
+      If k = 0 And CStr(b.Tag) <> "---" Then insert(List1, b.Text)
     Next b
 
     If List1.Items.Count > 0 Then List1.SelectedIndex = 0

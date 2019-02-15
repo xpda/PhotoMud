@@ -398,6 +398,8 @@ Public Class frmConvert
       End If
     End If
 
+    Return mResult
+
   End Function
 
   Function getTargetFilename(sourceFile As String, targetPath As String, commonPath As String, _

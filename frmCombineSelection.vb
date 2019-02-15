@@ -21,7 +21,7 @@ Public Class frmCombineSelection
     Dim i As Integer
 
     If ListView1.SelectedItems.Count > 0 Then
-      i = ListView1.SelectedItems(0).ImageKey
+      i = CInt(ListView1.SelectedItems(0).ImageKey)
       frmMain.combineRview = mViews(i)
     End If
     Me.DialogResult = DialogResult.OK
@@ -39,8 +39,8 @@ Public Class frmCombineSelection
 
     Dim i As Double
     Dim mv As mudViewer
-    Dim thumbXres, thumbYres As Single
-    Dim xSize, ySize As Single
+    Dim thumbXres, thumbYres As Integer
+    'Dim xSize, ySize As Double
     Dim shadowSize As Integer = 6
     Dim img As Bitmap
 
@@ -57,7 +57,8 @@ Public Class frmCombineSelection
     For i = 1 To mViews.Count
       mv = mViews(i)
       If mv IsNot frmMain.mView Then
-        mv.ResizeBitmap(xSize, ySize, mv.Bitmap, gImage) ' size limits, no aspect change
+        mv.ResizeBitmap(thumbXres, thumbYres, mv.Bitmap, gImage) ' size limits, no aspect change 
+        ' is this right? Replaced xSize, ySize with thumbXres and thumbYres 2/15/19
 
         ' add the shadow to gdi image and pad it to fit imagelist.
         img = getShadow(gImage, shadowSize, ListView1.BackColor, thumbXres, thumbYres)

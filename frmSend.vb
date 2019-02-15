@@ -6,8 +6,8 @@ Imports System.Collections.Generic
 Public Class frmSend
   Inherits Form
 
-  Dim OriginalXres As Single
-  Dim OriginalYres As Single
+  Dim OriginalXres As Double
+  Dim OriginalYres As Double
   Dim picInfo As pictureInfo
 
   Private Sub cmbFiletype_SelectedIndexChanged(ByVal Sender As Object, ByVal e As EventArgs) Handles cmbFiletype.SelectedIndexChanged
@@ -212,7 +212,7 @@ Public Class frmSend
 
     Dim i As Short
     Dim s As String
-    Dim x As Single
+    Dim x As Double
     s = txtPct.Text
     i = s.indexof("%")
     If i >= 0 Then s = s.substring(0, i - 1)

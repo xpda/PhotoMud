@@ -954,7 +954,7 @@ Public Class frmPrint
     Dim Bord As Double ' border size 
     Dim specWidth, specHeight As Double
     Dim nx, ny As Integer
-    Dim ix, iy As Single
+    Dim ix, iy As Integer
     Dim msg As String = ""
 
     If busy Then Exit Sub

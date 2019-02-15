@@ -10,8 +10,8 @@ Public Class frmSharpen
   Dim Loading As Boolean = True
   Dim Sliding As Boolean
 
-  Dim downx As Single
-  Dim downy As Single
+  Dim downx As Double
+  Dim downy As Double
 
   Dim gpath As GraphicsPath = Nothing
 
@@ -126,7 +126,7 @@ Public Class frmSharpen
 
     aview.ZoomViews(0.5)
 
-    pCenter = New PointF(aview.pView0.Bitmap.Width / 2, aview.pView0.Bitmap.Height / 2)
+    pCenter = New PointF(CSng(aview.pView0.Bitmap.Width / 2), CSng(aview.pView0.Bitmap.Height / 2))
 
     Loading = False
     Sliding = False
@@ -230,9 +230,11 @@ Public Class frmSharpen
   Private Sub optSharpen_CheckedChanged(ByVal sender As System.Object, ByVal e As EventArgs) _
     Handles optSharpen.CheckedChanged, optUnsharp.CheckedChanged
 
+    Dim opt As RadioButton = sender
+
     If Loading Then Exit Sub
 
-    If sender.checked Then
+    If opt.Checked Then
       If optSharpen.Checked Then
         nmSharpen2.Visible = False
         trkSharpen2.Visible = False

@@ -52,7 +52,7 @@ Public Class frmCalendar
   Dim fontName As String
   Dim calTitle As String
 
-  Dim hMargin, vMargin As Single ' horizontal and vertical margins
+  Dim hMargin, vMargin As Double ' horizontal and vertical margins
   Dim marginsChanged As Boolean
   Public chkCat As New List(Of CheckBox)
 
@@ -64,7 +64,7 @@ Public Class frmCalendar
   Sub setPreview()
 
     Dim rBox, rPic As New RectangleF
-    Dim z As Single
+    Dim z As Double
     Dim msg As String = ""
 
     If Me.WindowState = FormWindowState.Minimized Or Picture1.ClientSize.Width <= 0 Or Picture1.ClientSize.Height <= 0 Then Exit Sub
@@ -637,7 +637,7 @@ Public Class frmCalendar
     Dim img As Bitmap = Nothing
     Dim kCal As Integer ' calendar and photo to print
     Dim dt As DateTime
-    Dim hm, vm As Single
+    Dim hm, vm As Double
     Dim msg As String = ""
 
     If optEvenPages.Checked Then pageNumber = pageNumber + 1
@@ -727,7 +727,7 @@ Public Class frmCalendar
     Dim kPic, kCal As Integer ' calendar and photo to print
     Dim dt As DateTime
     Dim halfPage As Integer
-    Dim hm, vm As Single
+    Dim hm, vm As Double
     Dim msg As String = ""
 
     If chkCollate.Checked Then
@@ -829,7 +829,7 @@ Public Class frmCalendar
     Dim gImage As Bitmap = Nothing
     Dim kCal As Integer ' calendar and photo to print
     Dim dt As DateTime
-    Dim hm, vm As Single
+    Dim hm, vm As Double
     Dim msg As String = ""
 
     e.HasMorePages = True
@@ -906,7 +906,7 @@ Public Class frmCalendar
     Dim tScale As Double
     Dim x As Double
     Dim fmt As New StringFormat
-    Dim ix, iy As Single
+    Dim ix, iy As Double
     Dim tSize As Double
 
     g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias  ' not sure which of these works
@@ -941,7 +941,7 @@ Public Class frmCalendar
     Dim tScale As Double
     Dim x As Double
     Dim fmt As New StringFormat
-    Dim ix, iy As Single
+    Dim ix, iy As Double
     Dim tSize As Double
     Dim dx, dy As Double
     Dim d1, d2 As Double

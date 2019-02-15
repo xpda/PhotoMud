@@ -387,8 +387,8 @@ Public Class frmWebPage
 
   Private Sub picWeb_MouseDown(ByVal Sender As Object, ByVal e As MouseEventArgs) Handles picWeb.MouseDown
 
-    Dim x As Single
-    Dim y As Single
+    Dim x As Double
+    Dim y As Double
 
     x = e.X
     y = e.Y
@@ -922,7 +922,7 @@ Public Class frmWebPage
 
       i = askOverwrite(strToFile, True, overwriteFlag)
       If i < 0 Then ' cancel
-        SaveImages = MsgBoxResult.Cancel
+        Return MsgBoxResult.Cancel
         Exit For
       ElseIf i = 0 Then
         gBitmap = Nothing ' don't overwrite
@@ -942,7 +942,7 @@ Public Class frmWebPage
         msg = saver.write(gBitmap, strToFile, True)
         '        If convertfile(strToFile, targetExt, x, y, JPGQuality, gBitmap, imgPath(ix(j)), pView) < 0 Then
         If msg <> "" Then
-          SaveImages = MsgBoxResult.Cancel
+          Return MsgBoxResult.Cancel
           Exit For
         End If
       End If
@@ -950,6 +950,8 @@ Public Class frmWebPage
     Next j
 
     clearBitmap(gBitmap)
+
+    Return MsgBoxResult.Ok
 
   End Function
 

@@ -249,6 +249,8 @@ Public Class frmSlideShow
       End Try
     End If
 
+    Return Nothing
+
   End Function
 
   Private Sub bkgLoad_dowork(ByVal Sender As Object, ByVal e As System.ComponentModel.DoWorkEventArgs) _

@@ -102,9 +102,9 @@ Public Module main
   End Class
 
   Structure ifdEntry
-    Dim tag As UInteger
+    Dim tag As Integer
     Dim dataType As UShort
-    Dim count As UInteger
+    Dim count As Integer
     Dim Value As UInteger
   End Structure
 
@@ -229,7 +229,7 @@ Public Module main
 
   Public Const MaxRes As Integer = 20000
   Public Const Maxzoom As Integer = 100000
-  Public Const bigMegapix As Single = 20000000
+  Public Const bigMegapix As Double = 20000000
 
   Public AppName As String
   Public appLongTitle As String
@@ -307,8 +307,8 @@ Public Module main
   Public iniSendJPGQuality As Integer
   Public iniSendFiletype As String
   Public iniSendResize As Boolean
-  Public iniSendXSize As Single
-  Public iniSendYSize As Single
+  Public iniSendXSize As Double
+  Public iniSendYSize As Double
   Public iniSendOriginal As Boolean
 
   Public iniViewToolbar As Boolean
@@ -316,7 +316,7 @@ Public Module main
   Public iniTextAngle As Double
   Public iniTextColor As System.Drawing.Color
   Public iniFontName As String
-  Public iniFontSize As Single
+  Public iniFontSize As Double
   Public iniFontBold As Boolean
   Public iniFontitalic As Boolean
   Public iniFontUnderline As Boolean
@@ -328,7 +328,7 @@ Public Module main
   Public iniSharpen(3) As Integer
   Public iniArtEffect As Integer
 
-  Public iniSlideRate As Double
+  Public iniSlideRate As Integer
   Public iniSlideFadeTime As Integer
   Public iniSlideOrder As String
   Public iniSlideShowName As Boolean
@@ -415,7 +415,7 @@ Public Module main
   Public helpFile As String
 
   Public Clock As Stopwatch
-  Public milli(20) As Integer ' for debug time tests
+  Public milli(20) As Long ' for debug time tests
 
   Dim fuzCircle(12) As PointF ' circular path points for fuzzyShadow corners
   Dim fuzType(12) As Byte ' for the circular path points for fuzzyShadow corners
@@ -1425,6 +1425,8 @@ Public Module main
         Return 1
       Case "none"
         checkOverwrite = "none" ' overwrite no files
+        Return 0
+      Case Else
         Return 0
     End Select
 
@@ -3057,7 +3059,7 @@ Public Module main
   End Function
 
 
-  Sub MergeSort(ByRef v As Object, ByRef ix As List(Of Integer), min As Integer, max As Integer)
+  Sub MergeSort(v As Object, ByRef ix As List(Of Integer), min As Integer, max As Integer)
 
     Dim half As Integer
     Dim isString As Boolean
@@ -4342,10 +4344,6 @@ Public Module main
 
   End Sub
 
-  Function getSmallerImage(ByRef sourceImage As Bitmap, ByRef gImage As Bitmap) As Double
-    ' resize sourceImage and save it in gImage
-  End Function
-
   Function getSmallerImage(ByRef sourceBitmap As Bitmap, qView As pViewer, Optional quarterSize As Boolean = False) As Double
     ' resize sourceImage and save it in qview
     ' returns the amount it was scaled down
@@ -4976,7 +4974,7 @@ Public Module main
     Public Function Compare(ByVal x As Object, ByVal y As Object) As Integer _
     Implements IComparer.Compare
 
-      If CType(x, ListViewItem).SubItems.Count - 1 < uColumn Or uColumn < 0 Then Exit Function
+      If CType(x, ListViewItem).SubItems.Count - 1 < uColumn Or uColumn < 0 Then Return 0
       s1 = CType(x, ListViewItem).SubItems(uColumn).Text
       s2 = CType(y, ListViewItem).SubItems(uColumn).Text
 
@@ -5009,6 +5007,9 @@ Public Module main
             End Try
           End If
           If d1 < d2 Then Compare = -1 Else If d1 > d2 Then Compare = 1 Else Compare = 0
+
+        Case Else
+          Compare = 0
       End Select
 
       If uSortOrder < 0 Then Compare = -Compare

@@ -24,8 +24,8 @@ Public Class frmColorMerge
   Dim useExposure As Boolean
   Dim isMars As Boolean
 
-  Dim downx As Single
-  Dim downy As Single
+  Dim downx As Double
+  Dim downy As Double
 
   Dim gBitmap As Bitmap
   Dim pComments As List(Of PropertyItem)

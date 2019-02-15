@@ -63,7 +63,7 @@ Public Class frmBatchInfoCopy
       Me.Cursor = Cursors.WaitCursor
 
       If Not pathAssigned Then
-        tx.Text = e.Node.Tag
+        tx.Text = CStr(e.Node.Tag)
       Else
         pathAssigned = False
       End If
@@ -71,7 +71,7 @@ Public Class frmBatchInfoCopy
       loadNode(e.Node)
       e.Node.ImageIndex = 1
       e.Node.SelectedImageIndex = 1
-      tx.Text = e.Node.Tag
+      tx.Text = CStr(e.Node.Tag)
       Me.Cursor = Cursors.Default
 
     End If
@@ -115,7 +115,7 @@ Public Class frmBatchInfoCopy
     i = CheckFolder(s, True)
 
     If i < 0 Then
-      tx.Text = tv.SelectedNode.Tag
+      tx.Text = CStr(tv.SelectedNode.Tag)
       tx.select()
     Else
       If i = 1 Then ' directory created -- add to treeview
@@ -172,8 +172,8 @@ Public Class frmBatchInfoCopy
     Dim bkg As BackgroundWorker
 
     bkg = sender
-    sourcePath = e.Argument(0)
-    destPath = e.Argument(1)
+    sourcePath = CStr(e.Argument(0))
+    destPath = CStr(e.Argument(1))
 
     ' get filenames
     i = getFilePaths(sourcePath, sourceFiles, False)
@@ -249,10 +249,10 @@ Public Class frmBatchInfoCopy
       s = ""
       If Not chkOverwrite.Checked Then
         destComments = readPropertyItems(destFile)
-        s = getBmpComment(propID.ImageDescription, destComments)
+        s = CStr(getBmpComment(propID.ImageDescription, destComments))
       End If
       If s = "" Then ' only copy if destination is blank or overwrite is checked
-        s = getBmpComment(propID.ImageDescription, pComments)
+        s = CStr(getBmpComment(propID.ImageDescription, pComments))
         If s <> "" Then
           setBmpComment(propID.ImageDescription, destComments, s, exifType.typeAscii)
           attachPropertyItems(bmp, destComments)

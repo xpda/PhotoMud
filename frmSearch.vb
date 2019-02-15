@@ -128,11 +128,11 @@ Public Class frmSearch
     chkSubfolders.Checked = True
     chkFilenames.Checked = False
 
-    ListView1.Columns.Item(0).Width = (ListView1.Width - 20) * 0.6
+    ListView1.Columns.Item(0).Width = CInt((ListView1.Width - 20) * 0.6)
     ListView1.Columns.Item(0).TextAlign = HorizontalAlignment.Left
-    ListView1.Columns.Item(1).Width = (ListView1.Width - 20) * 0.12
+    ListView1.Columns.Item(1).Width = CInt((ListView1.Width - 20) * 0.12)
     ListView1.Columns.Item(1).TextAlign = HorizontalAlignment.Right
-    ListView1.Columns.Item(2).Width = (ListView1.Width - 20) * 0.26
+    ListView1.Columns.Item(2).Width = CInt((ListView1.Width - 20) * 0.26)
     ListView1.Columns.Item(2).TextAlign = HorizontalAlignment.Left
 
     cmdTag.Enabled = False
@@ -237,7 +237,7 @@ Public Class frmSearch
         Me.Cursor = Cursors.Default
         Exit Sub
       End If
-      ProgressBar1.Value = (iFile + 1) / ns.Count * ProgressBar1.Maximum
+      ProgressBar1.Value = CInt((iFile + 1) / ns.Count * ProgressBar1.Maximum)
 
       Clock = New Stopwatch
       Clock.Reset() : Clock.Start()
@@ -251,7 +251,7 @@ Public Class frmSearch
 
         If minDate <> Nothing Or maxDate <> Nothing Then
 
-          s = getBmpComment(propID.DateTime, pComments)
+          s = CStr(getBmpComment(propID.DateTime, pComments))
           If Len(s) = 19 Then
             s = vb.Left(s, 10) ' use date only, no time
             s = s.Replace(":", "/")
@@ -265,9 +265,9 @@ Public Class frmSearch
 
         If vDate = Nothing Or ((minDate = Nothing Or vDate >= minDate) And (maxDate = Nothing Or vDate <= maxDate)) Then
           ' date passes, check comments
-          s = getBmpComment(propID.ImageDescription, pComments)
-          s &= " " & getBmpComment(propID.DateTime, pComments)
-          s &= " " & getBmpComment(propID.DateTimeOriginal, pComments)
+          s = CStr(getBmpComment(propID.ImageDescription, pComments))
+          s &= " " & CStr(getBmpComment(propID.DateTime, pComments))
+          s &= " " & CStr(getBmpComment(propID.DateTimeOriginal, pComments))
 
           s3 = Path.GetFileNameWithoutExtension(ns(iFile)) ' for filename search
           If optAllWords.Checked Then ' and search
