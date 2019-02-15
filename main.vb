@@ -2062,44 +2062,6 @@ Public Module main
 
   End Sub
 
-  Function Acquire() As DialogResult
-
-    ' this is called by mnuFileAcquire_click in parent and child forms
-    Dim gImage As Bitmap = Nothing
-    Dim mView As mudViewer
-
-    Dim scanDialog As New WIA.CommonDialog
-    Dim scanned As WIA.ImageFile
-
-    Try
-      scanned = scanDialog.ShowAcquireImage(WIA.WiaDeviceType.ScannerDeviceType)
-    Catch
-      MsgBox("No scanner or camera can be accessed.")
-      Return DialogResult.Cancel
-    End Try
-
-    If scanned Is Nothing Then Exit Function
-
-    ' gets undocumented errors if I try to access scanned.ARGBData directly
-    If File.Exists(UndoPath & "scantmp~.x") Then File.Delete(UndoPath & "scantmp~.x")
-    scanned.SaveFile(UndoPath & "scantmp~.x")
-    Using img As MagickImage = New MagickImage(UndoPath & "scantmp~.x")
-      gImage = img.ToBitmap
-    End Using
-
-    If gImage IsNot Nothing AndAlso gImage.Width > 0 And gImage.Height > 0 Then
-      mView = newWindow(gImage.Width, gImage.Height)
-      mView.Caption = "Scan " & frmMain.mainTabs.SelectedIndex + 1
-      mView.setBitmap(gImage)
-      clearBitmap(gImage)
-      frmMain.redraw(mView, 3)
-      mView.picModified = True
-      Return DialogResult.OK
-    Else
-      Return DialogResult.Cancel
-    End If
-
-  End Function
 
   Sub HelpAbout()
     Using frm As New frmAbout

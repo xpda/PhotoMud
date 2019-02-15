@@ -3661,13 +3661,6 @@ Public Class frmMainf
     closeAll()
   End Sub
 
-  Private Sub mnuFileAcquire_Click(sender As Object, e As EventArgs) Handles mnuFileAcquire.Click
-    CommandPrep(AddressOf mnuFileAcquire_Click, False)
-    Me.Cursor = Cursors.WaitCursor
-    Acquire()
-    Me.Cursor = Cursors.Default
-  End Sub
-
   Private Sub mnuFileExit_Click(sender As Object, e As EventArgs) Handles mnuFileExit.Click
     abortClosing = False
     Me.Close()

@@ -10335,7 +10335,6 @@ Public Module ImageInfo
     Dim parm As String = ""
     Dim s As String
     Dim x As Double
-    Dim bb() As Byte
     Dim v As Object
     Dim decode(255) As Byte
     Dim encode(255) As Byte

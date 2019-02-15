@@ -57,8 +57,6 @@
     Me.mnuFileSaveAs = New System.Windows.Forms.ToolStripMenuItem()
     Me.mnuFileSaveSelection = New System.Windows.Forms.ToolStripMenuItem()
     Me.fileline5 = New System.Windows.Forms.ToolStripSeparator()
-    Me.mnuFileAcquire = New System.Windows.Forms.ToolStripMenuItem()
-    Me.ToolStripSeparator15 = New System.Windows.Forms.ToolStripSeparator()
     Me.mnuFilePrint = New System.Windows.Forms.ToolStripMenuItem()
     Me.mnuFileSend = New System.Windows.Forms.ToolStripMenuItem()
     Me.ToolStripSeparator16 = New System.Windows.Forms.ToolStripSeparator()
@@ -259,81 +257,81 @@
     Me.mnx.ImageScalingSize = New System.Drawing.Size(20, 20)
     Me.mnx.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnxSave, Me.mnxSaveAs, Me.mnxClose, Me.ToolStripSeparator3, Me.mnxPrint, Me.mnxSend, Me.mnuContextImageLine1, Me.mnxCopy, Me.ToolStripSeparator20, Me.mnxZoomIn, Me.mnxZoomOut, Me.mnxViewFit, Me.mnxZoom100})
     Me.mnx.Name = "mnContextImage"
-    Me.mnx.Size = New System.Drawing.Size(207, 282)
+    Me.mnx.Size = New System.Drawing.Size(201, 262)
     '
     'mnxSave
     '
     Me.mnxSave.Name = "mnxSave"
-    Me.mnxSave.Size = New System.Drawing.Size(206, 26)
+    Me.mnxSave.Size = New System.Drawing.Size(200, 24)
     Me.mnxSave.Text = "&Save"
     '
     'mnxSaveAs
     '
     Me.mnxSaveAs.Name = "mnxSaveAs"
-    Me.mnxSaveAs.Size = New System.Drawing.Size(206, 26)
+    Me.mnxSaveAs.Size = New System.Drawing.Size(200, 24)
     Me.mnxSaveAs.Text = "Save &As"
     '
     'mnxClose
     '
     Me.mnxClose.Name = "mnxClose"
-    Me.mnxClose.Size = New System.Drawing.Size(206, 26)
+    Me.mnxClose.Size = New System.Drawing.Size(200, 24)
     Me.mnxClose.Text = "&Close"
     '
     'ToolStripSeparator3
     '
     Me.ToolStripSeparator3.Name = "ToolStripSeparator3"
-    Me.ToolStripSeparator3.Size = New System.Drawing.Size(203, 6)
+    Me.ToolStripSeparator3.Size = New System.Drawing.Size(197, 6)
     '
     'mnxPrint
     '
     Me.mnxPrint.Name = "mnxPrint"
-    Me.mnxPrint.Size = New System.Drawing.Size(206, 26)
+    Me.mnxPrint.Size = New System.Drawing.Size(200, 24)
     Me.mnxPrint.Text = "&Print"
     '
     'mnxSend
     '
     Me.mnxSend.Name = "mnxSend"
-    Me.mnxSend.Size = New System.Drawing.Size(206, 26)
+    Me.mnxSend.Size = New System.Drawing.Size(200, 24)
     Me.mnxSend.Text = "E&mail Photo"
     '
     'mnuContextImageLine1
     '
     Me.mnuContextImageLine1.Name = "mnuContextImageLine1"
-    Me.mnuContextImageLine1.Size = New System.Drawing.Size(203, 6)
+    Me.mnuContextImageLine1.Size = New System.Drawing.Size(197, 6)
     '
     'mnxCopy
     '
     Me.mnxCopy.Name = "mnxCopy"
-    Me.mnxCopy.Size = New System.Drawing.Size(206, 26)
+    Me.mnxCopy.Size = New System.Drawing.Size(200, 24)
     Me.mnxCopy.Text = "&Copy to Clipboard"
     '
     'ToolStripSeparator20
     '
     Me.ToolStripSeparator20.Name = "ToolStripSeparator20"
-    Me.ToolStripSeparator20.Size = New System.Drawing.Size(203, 6)
+    Me.ToolStripSeparator20.Size = New System.Drawing.Size(197, 6)
     '
     'mnxZoomIn
     '
     Me.mnxZoomIn.Name = "mnxZoomIn"
-    Me.mnxZoomIn.Size = New System.Drawing.Size(206, 26)
+    Me.mnxZoomIn.Size = New System.Drawing.Size(200, 24)
     Me.mnxZoomIn.Text = "Zoom &In"
     '
     'mnxZoomOut
     '
     Me.mnxZoomOut.Name = "mnxZoomOut"
-    Me.mnxZoomOut.Size = New System.Drawing.Size(206, 26)
+    Me.mnxZoomOut.Size = New System.Drawing.Size(200, 24)
     Me.mnxZoomOut.Text = "Zoom &Out"
     '
     'mnxViewFit
     '
     Me.mnxViewFit.Name = "mnxViewFit"
-    Me.mnxViewFit.Size = New System.Drawing.Size(206, 26)
+    Me.mnxViewFit.Size = New System.Drawing.Size(200, 24)
     Me.mnxViewFit.Text = "Fit to &Window"
     '
     'mnxZoom100
     '
     Me.mnxZoom100.Name = "mnxZoom100"
-    Me.mnxZoom100.Size = New System.Drawing.Size(206, 26)
+    Me.mnxZoom100.Size = New System.Drawing.Size(200, 24)
     Me.mnxZoom100.Text = "&100% Zoom"
     '
     'StatusStrip1
@@ -370,14 +368,14 @@
     Me.mnu.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuFile, Me.mnuEdit, Me.mnuImage, Me.mnuColor, Me.mnuDraw, Me.mnuTools, Me.mnuview, Me.mnuHelp})
     Me.mnu.Location = New System.Drawing.Point(0, 0)
     Me.mnu.Name = "mnu"
-    Me.mnu.Size = New System.Drawing.Size(990, 26)
+    Me.mnu.Size = New System.Drawing.Size(990, 28)
     Me.mnu.TabIndex = 12
     '
     'mnuFile
     '
-    Me.mnuFile.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuFileNew, Me.mnuFileOpen, Me.ToolStripSeparator2, Me.mnuFileClose, Me.mnuFileCloseAll, Me.ToolStripSeparator1, Me.mnuFileSave, Me.mnuFileSaveAs, Me.mnuFileSaveSelection, Me.fileline5, Me.mnuFileAcquire, Me.ToolStripSeparator15, Me.mnuFilePrint, Me.mnuFileSend, Me.ToolStripSeparator16, Me.mnuFileExplore, Me.mnuFileExit, Me.ToolStripSeparator17, Me.mnuFileMru1, Me.mnuFileMru2, Me.mnuFileMru3, Me.mnuFileMru4, Me.mnuFileMru5, Me.mnuFileMru6, Me.mnuFileMru7, Me.mnuFileMru8, Me.mnuFileMru9})
+    Me.mnuFile.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuFileNew, Me.mnuFileOpen, Me.ToolStripSeparator2, Me.mnuFileClose, Me.mnuFileCloseAll, Me.ToolStripSeparator1, Me.mnuFileSave, Me.mnuFileSaveAs, Me.mnuFileSaveSelection, Me.fileline5, Me.mnuFilePrint, Me.mnuFileSend, Me.ToolStripSeparator16, Me.mnuFileExplore, Me.mnuFileExit, Me.ToolStripSeparator17, Me.mnuFileMru1, Me.mnuFileMru2, Me.mnuFileMru3, Me.mnuFileMru4, Me.mnuFileMru5, Me.mnuFileMru6, Me.mnuFileMru7, Me.mnuFileMru8, Me.mnuFileMru9})
     Me.mnuFile.Name = "mnuFile"
-    Me.mnuFile.Size = New System.Drawing.Size(40, 22)
+    Me.mnuFile.Size = New System.Drawing.Size(40, 24)
     Me.mnuFile.Text = "&File"
     '
     'mnuFileNew
@@ -458,19 +456,6 @@
     Me.fileline5.MergeIndex = 9
     Me.fileline5.Name = "fileline5"
     Me.fileline5.Size = New System.Drawing.Size(208, 6)
-    '
-    'mnuFileAcquire
-    '
-    Me.mnuFileAcquire.MergeIndex = 100
-    Me.mnuFileAcquire.Name = "mnuFileAcquire"
-    Me.mnuFileAcquire.Size = New System.Drawing.Size(211, 26)
-    Me.mnuFileAcquire.Text = "Scan..."
-    Me.mnuFileAcquire.ToolTipText = "Scan a photo or document and load it into Photo Mud Editor."
-    '
-    'ToolStripSeparator15
-    '
-    Me.ToolStripSeparator15.Name = "ToolStripSeparator15"
-    Me.ToolStripSeparator15.Size = New System.Drawing.Size(208, 6)
     '
     'mnuFilePrint
     '
@@ -591,7 +576,7 @@
     '
     Me.mnuEdit.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuEditUndo, Me.mnuEditRedo, Me.mnuEditRevert, Me.mnuEditRepeatCommand, Me.mnuEditLine3, Me.mnuEditCopy, Me.mnuEditCut, Me.mnuEditPaste, Me.mnuEditPasteNew, Me.mnuEditPasteV, Me.mnuEditLine2, Me.mnuEditDeleteSelection, Me.mnuEditDeleteFile, Me.ToolStripSeparator4, Me.mnuEditSelectRectangle, Me.mnuEditSelectEllipse, Me.mnuEditSelectFreehand, Me.ToolStripSeparator19, Me.mnuEditSelectSimilar, Me.mnuEditInvertSelection, Me.editline3, Me.mnuEditInsertPage, Me.mnuEditDeletePage})
     Me.mnuEdit.Name = "mnuEdit"
-    Me.mnuEdit.Size = New System.Drawing.Size(43, 22)
+    Me.mnuEdit.Size = New System.Drawing.Size(43, 24)
     Me.mnuEdit.Text = "&Edit"
     '
     'mnuEditUndo
@@ -761,7 +746,7 @@
     Me.mnuImage.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuImageResize, Me.mnuImageExpand, Me.mnuImageLine2, Me.mnuImageRotate, Me.mnuImageFlipHoriz, Me.mnuImageFlipVert, Me.mnuImageStretch, Me.mnuImageAlign, Me.ToolStripSeparator5, Me.mnuImageBlur, Me.mnuImageContrastStretch, Me.mnuImageSharpen, Me.mnuImageMedian, Me.mnuImageEdgeDetect, Me.mnuImageRedeye, Me.ToolStripSeparator21, Me.mnuImageEffects, Me.mnuImageArtEffects, Me.mnuImageBorder, Me.ToolStripSeparator6, Me.mnuImageSetCrop, Me.mnuImageCrop})
     Me.mnuImage.MergeIndex = 2
     Me.mnuImage.Name = "mnuImage"
-    Me.mnuImage.Size = New System.Drawing.Size(63, 22)
+    Me.mnuImage.Size = New System.Drawing.Size(63, 24)
     Me.mnuImage.Text = "&Image"
     '
     'mnuImageResize
@@ -916,7 +901,7 @@
     Me.mnuColor.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuColorEnhance, Me.ToolStripSeparator18, Me.mnuColorBrightness, Me.mnuColorAdjust, Me.mnuColorHisto, Me.ToolStripSeparator7, Me.mnuImageLightAmp, Me.ToolStripSeparator8, Me.mnuColorHalftone, Me.mnuColorGrayscale, Me.mnuColorNegative, Me.mnuColorSepia})
     Me.mnuColor.MergeIndex = 3
     Me.mnuColor.Name = "mnuColor"
-    Me.mnuColor.Size = New System.Drawing.Size(52, 22)
+    Me.mnuColor.Size = New System.Drawing.Size(52, 24)
     Me.mnuColor.Text = "&Color"
     '
     'mnuColorEnhance
@@ -1005,7 +990,7 @@
     Me.mnuDraw.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuDrawText, Me.mnuDrawLine, Me.mnuDrawCurve, Me.mnuDrawArrow, Me.mnuDrawCircle, Me.mnuDrawEllipse, Me.mnuDrawBox, Me.ToolStripSeparator9, Me.mnuDrawLineOptions, Me.ToolStripSeparator10, Me.mnuDrawSketch, Me.ToolStripSeparator11, Me.mnuDrawFill, Me.mnuDrawFillSelection, Me.drawline2, Me.mnuDrawColor, Me.mnuDrawBackColor, Me.mnuColorSample})
     Me.mnuDraw.MergeIndex = 4
     Me.mnuDraw.Name = "mnuDraw"
-    Me.mnuDraw.Size = New System.Drawing.Size(53, 22)
+    Me.mnuDraw.Size = New System.Drawing.Size(53, 24)
     Me.mnuDraw.Text = "&Draw"
     '
     'mnuDrawText
@@ -1131,7 +1116,7 @@
     '
     Me.mnuTools.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuToolsInfo, Me.mnuToolsComment, Me.mnuToolsBugPhotos, Me.mnuToolsMeasure, Me.ToolStripSeparator13, Me.mnuToolsSearch, Me.mnuToolsPicSearch, Me.ToolStripSeparator12, Me.mnuToolsCombine, Me.mnuToolsConcatenate, Me.mnuToolsPicturize, Me.mnuToolsFilter, Me.toolsline1, Me.mnuToolsAssoc, Me.mnuToolsFileFilter, Me.mnuToolsWallpaper, Me.ToolStripSeparator14, Me.mnuToolsToolbar, Me.mnuToolsOptions})
     Me.mnuTools.Name = "mnuTools"
-    Me.mnuTools.Size = New System.Drawing.Size(55, 22)
+    Me.mnuTools.Size = New System.Drawing.Size(55, 24)
     Me.mnuTools.Text = "&Tools"
     '
     'mnuToolsInfo
@@ -1260,7 +1245,7 @@
     '
     Me.mnuview.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuViewZoomIn, Me.mnuViewZoomOut, Me.mnuViewZoomWindow, Me.viewline3, Me.mnuViewFullscreen, Me.mnuViewToolbar, Me.mnuViewRefresh, Me.viewline4, Me.mnuViewZoomFit, Me.mnuViewZoom25, Me.mnuViewZoom50, Me.mnuViewZoom100, Me.mnuViewZoom200, Me.ToolStripSeparator22, Me.mnuViewNext})
     Me.mnuview.Name = "mnuview"
-    Me.mnuview.Size = New System.Drawing.Size(49, 22)
+    Me.mnuview.Size = New System.Drawing.Size(49, 24)
     Me.mnuview.Text = "&View"
     '
     'mnuViewZoomIn
@@ -1376,7 +1361,7 @@
     Me.mnuHelp.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuHelpHelpTopics, Me.mnuHelpHelpIndex, Me.mnuHelpTips, Me.helpLine1, Me.mnuHelpRegister, Me.mnuHelpUpdate, Me.mnuHelpAbout})
     Me.mnuHelp.Font = New System.Drawing.Font("Tahoma", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
     Me.mnuHelp.Name = "mnuHelp"
-    Me.mnuHelp.Size = New System.Drawing.Size(48, 22)
+    Me.mnuHelp.Size = New System.Drawing.Size(48, 24)
     Me.mnuHelp.Text = "&Help"
     '
     'mnuHelpHelpTopics
@@ -1431,7 +1416,7 @@
     Me.ToolStrip1.ContextMenuStrip = Me.mnxT
     Me.ToolStrip1.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
     Me.ToolStrip1.ImageScalingSize = New System.Drawing.Size(32, 32)
-    Me.ToolStrip1.Location = New System.Drawing.Point(0, 26)
+    Me.ToolStrip1.Location = New System.Drawing.Point(0, 28)
     Me.ToolStrip1.Name = "ToolStrip1"
     Me.ToolStrip1.Size = New System.Drawing.Size(990, 25)
     Me.ToolStrip1.TabIndex = 13
@@ -1442,48 +1427,48 @@
     Me.mnxT.ImageScalingSize = New System.Drawing.Size(20, 20)
     Me.mnxT.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnxTSmallIcons, Me.mnxTLargeIcons, Me.toolbarline3, Me.mnxTCustomize, Me.mnxTHide, Me.toolbarline2, Me.mnxTHelp})
     Me.mnxT.Name = "ContextMenuStrip1"
-    Me.mnxT.Size = New System.Drawing.Size(210, 146)
+    Me.mnxT.Size = New System.Drawing.Size(204, 136)
     '
     'mnxTSmallIcons
     '
     Me.mnxTSmallIcons.CheckOnClick = True
     Me.mnxTSmallIcons.Name = "mnxTSmallIcons"
-    Me.mnxTSmallIcons.Size = New System.Drawing.Size(209, 26)
+    Me.mnxTSmallIcons.Size = New System.Drawing.Size(203, 24)
     Me.mnxTSmallIcons.Text = "&Small Icons"
     '
     'mnxTLargeIcons
     '
     Me.mnxTLargeIcons.CheckOnClick = True
     Me.mnxTLargeIcons.Name = "mnxTLargeIcons"
-    Me.mnxTLargeIcons.Size = New System.Drawing.Size(209, 26)
+    Me.mnxTLargeIcons.Size = New System.Drawing.Size(203, 24)
     Me.mnxTLargeIcons.Text = "&Large Icons"
     '
     'toolbarline3
     '
     Me.toolbarline3.Name = "toolbarline3"
-    Me.toolbarline3.Size = New System.Drawing.Size(206, 6)
+    Me.toolbarline3.Size = New System.Drawing.Size(200, 6)
     '
     'mnxTCustomize
     '
     Me.mnxTCustomize.Name = "mnxTCustomize"
-    Me.mnxTCustomize.Size = New System.Drawing.Size(209, 26)
+    Me.mnxTCustomize.Size = New System.Drawing.Size(203, 24)
     Me.mnxTCustomize.Text = "Customi&ze Toolbar"
     '
     'mnxTHide
     '
     Me.mnxTHide.Name = "mnxTHide"
-    Me.mnxTHide.Size = New System.Drawing.Size(209, 26)
+    Me.mnxTHide.Size = New System.Drawing.Size(203, 24)
     Me.mnxTHide.Text = "&Hide Toolbar"
     '
     'toolbarline2
     '
     Me.toolbarline2.Name = "toolbarline2"
-    Me.toolbarline2.Size = New System.Drawing.Size(206, 6)
+    Me.toolbarline2.Size = New System.Drawing.Size(200, 6)
     '
     'mnxTHelp
     '
     Me.mnxTHelp.Name = "mnxTHelp"
-    Me.mnxTHelp.Size = New System.Drawing.Size(209, 26)
+    Me.mnxTHelp.Size = New System.Drawing.Size(203, 24)
     Me.mnxTHelp.Text = "&Help"
     '
     'nmPage
@@ -1688,8 +1673,6 @@
   Public WithEvents mnuFileNew As System.Windows.Forms.ToolStripMenuItem
   Public WithEvents mnuFileOpen As System.Windows.Forms.ToolStripMenuItem
   Public WithEvents mnuFileCloseAll As System.Windows.Forms.ToolStripMenuItem
-  Public WithEvents mnuFileAcquire As System.Windows.Forms.ToolStripMenuItem
-  Friend WithEvents ToolStripSeparator15 As System.Windows.Forms.ToolStripSeparator
   Friend WithEvents ToolStripSeparator16 As System.Windows.Forms.ToolStripSeparator
   Public WithEvents mnuFileExit As System.Windows.Forms.ToolStripMenuItem
   Public WithEvents mnuFileMru9 As System.Windows.Forms.ToolStripMenuItem

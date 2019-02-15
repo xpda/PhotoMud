@@ -173,18 +173,6 @@ Public Class frmExploref
 
   End Sub
 
-  Private Sub mnuFileAcquire_Click(ByVal Sender As Object, ByVal e As EventArgs) Handles mnuFileAcquire.Click
-
-    Dim dResult As DialogResult
-
-    Me.Cursor = Cursors.WaitCursor
-    dResult = Acquire()
-    Me.Cursor = Cursors.Default
-    If mViews.Count > 0 And dResult <> DialogResult.Cancel Then changeForm(Me, frmMain)
-
-
-  End Sub
-
   Private Sub mnuHelpTips_Click(ByVal Sender As Object, ByVal e As EventArgs) Handles mnuHelpTips.Click
     Using frm As New frmTips
       dResult = frm.ShowDialog()
