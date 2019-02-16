@@ -103,7 +103,7 @@ Public Class frmHisto
     Channel = "master"
     resetSlides()
 
-    For i As Byte = 0 To 255 : newMap(i) = i : Next i
+    For i As Integer = 0 To 255 : newMap(i) = CByte(i) : Next i
 
     If frmMain.mView.FloaterPath IsNot Nothing Then gpath = frmMain.mView.FloaterPath.Clone
 
@@ -147,7 +147,7 @@ Public Class frmHisto
     aview.pView1.setBitmap(aview.pView1.Bitmap)
     aview.Repaint()
 
-    For i As Byte = 0 To 255 : newMap(i) = i : Next i
+    For i As Integer = 0 To 255 : newMap(i) = CByte(i) : Next i
 
     mapReDraw(False)
 
@@ -172,7 +172,7 @@ Public Class frmHisto
       resetSlides()
     End If
 
-    For i As Byte = 0 To 255 : newMap(i) = i : Next
+    For i As Integer = 0 To 255 : newMap(i) = CByte(i) : Next
     resetFreeform()
     If Not Loading Then showHisto(pView2, histSource, histXscale, histYscale)
 
@@ -195,7 +195,7 @@ Public Class frmHisto
       Channel = "blue"
     End If
 
-    For i As Byte = 0 To 255 : newMap(i) = i : Next
+    For i As Integer = 0 To 255 : newMap(i) = CByte(i) : Next
     resetFreeform()
     mapReDraw(False)
     If Not Loading Then showHisto(pView2, histSource, histXscale, histYscale)
@@ -319,14 +319,13 @@ Public Class frmHisto
 
   Private Sub slideChange(ByRef index As Integer)
 
-    Dim i As Integer
     Dim sum As Integer
     Dim sumPixels As Integer
 
     Me.Cursor = Cursors.WaitCursor
     sum = 0
     sumPixels = 0
-    For i = 0 To 255 ' get sumpixels for percentage
+    For i As Integer = 0 To 255 ' get sumpixels for percentage
       If Channel = "master" Or Channel = "red" Then sumPixels += histSource(0, i)
       If Channel = "master" Or Channel = "green" Then sumPixels += histSource(1, i)
       If Channel = "master" Or Channel = "blue" Then sumPixels += histSource(2, i)
@@ -336,7 +335,7 @@ Public Class frmHisto
     Sliding = True
     Select Case index
       Case 0
-        For i = 0 To CInt(nmSlide0.Value) - 1
+        For i As Integer = 0 To CInt(nmSlide0.Value) - 1
           If Channel = "master" Or Channel = "red" Then sum = sum + histSource(0, i)
           If Channel = "master" Or Channel = "green" Then sum = sum + histSource(1, i)
           If Channel = "master" Or Channel = "blue" Then sum = sum + histSource(2, i)
@@ -344,7 +343,7 @@ Public Class frmHisto
         lbPct0.Text = Format(sum / sumPixels, "##0.0%")
         lbPct0.Refresh()
       Case 1
-        For i = CInt(nmSlide1.Value) + 1 To 255
+        For i As Integer = CInt(nmSlide1.Value) + 1 To 255
           If Channel = "master" Or Channel = "red" Then sum = sum + histSource(0, i)
           If Channel = "master" Or Channel = "green" Then sum = sum + histSource(1, i)
           If Channel = "master" Or Channel = "blue" Then sum = sum + histSource(2, i)
@@ -352,7 +351,7 @@ Public Class frmHisto
         lbPct1.Text = Format(sum / sumPixels, "##0.0%")
         lbPct1.Refresh()
       Case 2
-        For i = 0 To CInt(nmSlide2.Value) - 1
+        For i As Integer = 0 To CInt(nmSlide2.Value) - 1
           If Channel = "master" Or Channel = "red" Then sum = sum + histSource(0, i)
           If Channel = "master" Or Channel = "green" Then sum = sum + histSource(1, i)
           If Channel = "master" Or Channel = "blue" Then sum = sum + histSource(2, i)
@@ -360,7 +359,7 @@ Public Class frmHisto
         lbPct2.Text = Format(sum / sumPixels, "##0.0%")
         lbPct2.Refresh()
       Case 3
-        For i = CInt(nmSlide3.Value) + 1 To 255
+        For i As Integer = CInt(nmSlide3.Value) + 1 To 255
           If Channel = "master" Or Channel = "red" Then sum = sum + histSource(0, i)
           If Channel = "master" Or Channel = "green" Then sum = sum + histSource(1, i)
           If Channel = "master" Or Channel = "blue" Then sum = sum + histSource(2, i)
@@ -416,7 +415,7 @@ Public Class frmHisto
     If Loading Or busy Or aview.pView1.Bitmap Is Nothing Then Exit Sub
     busy = True
 
-    For j As Byte = 0 To 255 : newMap(j) = j : Next j
+    For j As Integer = 0 To 255 : newMap(j) = CByte(j) : Next j
 
     i2 = CByte(nmSlide2.Value)
     i3 = CByte(nmSlide3.Value)
@@ -758,11 +757,11 @@ Public Class frmHisto
     Dim xs(n + 2) As Double
     Dim ys(n + 2) As Double
     Dim x As Double
-    Dim i, k As Integer
+    Dim k As Integer
     Dim L As Integer
 
     ' add a point on each end to make the curve more natural
-    For i = 1 To n
+    For i As Integer = 1 To n
       xs(i + 1) = xn(i)
       ys(i + 1) = fn(i)
     Next i
@@ -774,7 +773,7 @@ Public Class frmHisto
     spcoeff(xs, ys, s, n + 2)
 
     L = 2
-    For i = 0 To 255
+    For i As Integer = 0 To 255
       x = i * pView2.ClientSize.Width / 256
       If x > xs(L + 1) Then L = L + 1
       k = CInt((pView2.ClientSize.Height - spline(x, xs, ys, s, L)) * 256 / pView2.ClientSize.Height)
