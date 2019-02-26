@@ -895,7 +895,6 @@ Public Module bugMain
     Optional ByRef parm1 As Object = "", Optional ByRef parm2 As Object = "", Optional ByRef parm3 As Object = "") As Object
 
     ' returns ds, uses @parm1 and @parm2 in query
-
     Dim cmd As MySqlCommand
     Dim q As Object
 

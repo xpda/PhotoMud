@@ -28,14 +28,14 @@ Public Class uTag
       End Set
   End Property
 
-  ReadOnly Property singleValue(Optional ByVal Subscript As Object = 0) As Object
+  ReadOnly Property singleValue(Optional ByVal Subscript As Integer = 0) As Object
     Get
       singleValue = Nothing
       If Not IsArray(uValue) Then
         singleValue = uValue
       Else
         If Subscript >= 0 And Subscript <= uuBound(uValue) Then singleValue = uValue(Subscript)
-        End If
+      End If
     End Get
   End Property
 
