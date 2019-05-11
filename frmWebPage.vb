@@ -997,7 +997,7 @@ Public Class frmWebPage
       getGPSLocation(pcomments, Location, Altitude, xLat, xLon, iAltitude)
       If Location <> "" Then
         imgLatLon(ix(i)) = Location.Replace("°", " ")
-        imgLatLon(ix(i)) = imgLatLon(ix(i)).Replace("'", "")
+        'imgLatLon(ix(i)) = imgLatLon(ix(i)).Replace("'", "")
         imgXLat(ix(i)) = xLat
         imgXLon(ix(i)) = xLon
       End If

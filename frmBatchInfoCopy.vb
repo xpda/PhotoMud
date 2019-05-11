@@ -4,6 +4,7 @@ Imports System.ComponentModel
 Imports System.Threading
 Imports System.Drawing.Imaging
 Imports System.IO
+Imports System.Text
 Imports ImageMagick
 
 Public Class frmBatchInfoCopy
@@ -239,6 +240,19 @@ Public Class frmBatchInfoCopy
     pComments = readPropertyItems(sourceFile)
     If pComments.Count <= 2 Then Return 0
     copied = False
+
+    For i1 As Integer = pComments.Count - 1 To 0 Step -1
+      If pComments(i1).Id = 270 Then ' description
+        s = Encoding.Default.GetString(pComments(i1).Value).Trim({Chr(0), Chr(32), Chr(13), Chr(10), Chr(9)}) ' get the zero
+        If (eqstr(s, "Minolta DSC") OrElse
+            eqstr(s, "OLYMPUS DIGITAL CAMERA") OrElse
+            eqstr(s, "LEAD Technologies Inc. V1.01")) Then ' remove description left by cameras
+          pComments.RemoveAt(i1)
+          Exit For
+        End If
+
+      End If
+    Next i1
 
     Using iStream As New FileStream(destFile, FileMode.Open, FileAccess.Read)
       bmp = Image.FromStream(iStream, True, False)

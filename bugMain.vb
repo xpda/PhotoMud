@@ -12,9 +12,6 @@ Imports System.IO
 Imports System.Data
 Imports MySql.Data.MySqlClient
 
-Imports System.Xml
-Imports System.Xml.Serialization
-
 Imports Newtonsoft.Json
 Imports Newtonsoft.Json.Linq
 
@@ -26,17 +23,52 @@ Public Module bugMain
     Dim type As String
   End Structure
 
-  Structure taxrec
-    Dim rank As String
-    Dim taxon As String
-    Dim descr As String
-    Dim taxid As String
-    Dim parentid As String
-    Dim imageCounter As Integer
-    Dim childimageCounter As Integer
-    Dim link As String
-    Dim authority As String
-  End Structure
+  '  Structure taxrec
+  ' Dim rank As String
+  ' Dim taxon As String
+  ' Dim descr As String
+  ' Dim taxid As String
+  ' Dim parentid As String
+  ' Dim imageCounter As Integer
+  ' Dim childimageCounter As Integer
+  ' Dim link As String
+  ' Dim authority As String
+  ' End Structure
+
+  Public Class taxrec
+    Public rank As String
+    Public taxon As String
+    Public descr As String
+    Public taxid As String
+    Public parentid As String
+    Public imageCounter As Integer
+    Public childimageCounter As Integer
+    Public link As String
+    Public taxlink As String
+    Public authority As String
+
+    ' old wikirec stuff, now in oddinfo
+    Public wikipediaPageID As String
+    Public commonNames As List(Of String)
+    Public commonWikiLink As String
+
+    Sub New()
+      rank = ""
+      taxon = ""
+      descr = ""
+      taxid = ""
+      parentid = ""
+      link = ""
+      taxlink = ""
+      authority = ""
+      commonNames = New List(Of String)
+
+      ' old wikirec stuff, now in oddinfo
+      wikipediaPageID = 0
+      commonWikiLink = ""
+
+    End Sub
+  End Class
 
   Public itisRankID As New Dictionary(Of String, Integer)(System.StringComparer.OrdinalIgnoreCase)
   Public itisRanks As New Dictionary(Of Integer, String)
@@ -269,7 +301,7 @@ Public Module bugMain
     Dim m As New taxrec
     Dim matches As New List(Of taxrec)
 
-    If taxid = "" Then Return Nothing
+    If taxid = "" Then Return matches ' empty list
 
     If eqstr(taxid.Substring(0, 1), "g") Then ' gbif database
       ds = getDS("select * from gbif.tax where taxid = @parm1 and usable = 'ok';",
@@ -315,6 +347,56 @@ Public Module bugMain
   End Function
 
   Function getTaxrecg(ByRef dr As DataRow) As taxrec
+    ' get a taxref from gbif database
+    Dim match As New taxrec
+    Dim matches As New List(Of taxrec)
+    Dim vnames As New List(Of String)
+    Dim taxid As String
+    Dim ds As DataSet
+    Dim s As String
+    Dim ss() As String
+
+    If IsDBNull(dr("taxid")) Then taxid = "" Else taxid = dr("taxid")
+    If taxid <> "" Then match.taxid = "g" & taxid ' gbif id prefix
+
+    ' load dr into match
+    If IsDBNull(dr("rank")) Then match.rank = "" Else match.rank = dr("rank")
+    If IsDBNull(dr("name")) Then match.taxon = "" Else match.taxon = dr("name")
+    If IsDBNull(dr("parent")) Then match.parentid = "" Else match.parentid = "g" & dr("parent")
+    If IsDBNull(dr("imagecounter")) Then match.imageCounter = 0 Else match.imageCounter = dr("imagecounter")
+    If IsDBNull(dr("childimagecounter")) Then match.childimageCounter = 0 Else match.childimageCounter = dr("childimagecounter")
+    If IsDBNull(dr("authority")) Then match.authority = "" Else match.authority = dr("authority")
+    If IsDBNull(dr("link")) Then match.link = "" Else match.link = dr("link")
+
+    ' get common names from oddinfo
+    ds = getDS("select * from oddinfo where name = @parm1", match.taxon)
+    For Each dr2 As DataRow In ds.Tables(0).Rows
+      If dr2("commonnames") <> "" Then
+        s = dr2("commonnames")
+        ss = s.Split("|")
+        If ss.Count >= 1 AndAlso ss(0) <> "" Then
+          match.commonNames = ss.ToList
+        End If
+        Exit For
+      End If
+    Next dr2
+
+    ' get descr from taxatable, if possible
+    ds = getDS("select * from taxatable where taxon = @parm1", match.taxon)
+    For Each dr2 As DataRow In ds.Tables(0).Rows
+      If dr2("descr") <> "" Then
+        match.descr = dr2("descr")
+        Exit For
+      End If
+    Next dr2
+
+    If match.taxlink = "" Then match.taxlink = "https://www.gbif.org/species/" & match.taxid.Substring(1) ' no "g"
+
+    Return match
+
+  End Function
+
+  Function getTaxrecgxxx(ByRef dr As DataRow) As taxrec
     ' get a taxref from gbif database
     Dim match As New taxrec
     Dim matches As New List(Of taxrec)
@@ -466,12 +548,14 @@ Public Module bugMain
     Dim matches As List(Of taxrec)
     Dim parent As String
     Dim iter As Integer = 0
-    Dim i As Integer
+    Dim taxid As String
+
+    If inMatch.taxid = "" Then Return ""
 
     If inMatch.parentid = "" Then ' inmatch might only have the taxonid
       ' load everything else into inmatch
-      i = inMatch.taxid
-      matches = getTaxrecByID(i)
+      taxid = inMatch.taxid
+      matches = getTaxrecByID(taxid)
       If matches.Count > 0 Then inMatch = matches(0)
     End If
 
@@ -954,6 +1038,10 @@ Public Module bugMain
 
     findme = findme.Trim
 
+    findme = "aberrant cellophane bee"
+
+    If findme = "OLYMPUS DIGITAL CAMERA" Then Return matches ' empty list
+
     If isQuery Then
       suffix = " and (childimagecounter > 0) order by taxon"
       suffixg = " and (childimagecounter > 0) and usable = 'ok' order by name"
@@ -977,15 +1065,19 @@ Public Module bugMain
       s = s.Replace("`", "[- ]")
       s = s.Replace("(", "\(")
       s = s.Replace(")", "\)")
-      matches = queryTax("select * from taxatable where (descr rlike @parm1)" & suffix, s)
+
+      matches = queryTax("select * from oddinfo join taxatable using (taxid) where commonnames rlike @parm1", s)
+
+      If matches.Count = 0 Then matches = queryTax("select * from taxatable where (descr rlike @parm1)" & suffix, s)
 
       If matches.Count = 0 Then
         ds = getDS("select * from gbif.vernacularname where vernacularname rlike @parm1 and (language = 'en' or language = '')", s)
+        'ds = getDS("select * from gbif.vernacularname where vernacularname = @parm1 and (language = 'en' or language = '')", s)
         If ds IsNot Nothing AndAlso ds.Tables(0).Rows.Count > 0 Then
           cmd = "select * from gbif.tax where ("
           For Each dr As DataRow In ds.Tables(0).Rows
             taxid = dr("taxid")
-            If taxid <> "" AndAlso taxid <> "-1" AndAlso cmd.IndexOf(taxid) < 0 Then cmd &= "taxid = '" & taxid & "' or "
+            If taxid <> "" AndAlso cmd.IndexOf(taxid) < 0 Then cmd &= "taxid = '" & taxid & "' or "
           Next dr
           If cmd.EndsWith(" or ") Then
             cmd = cmd.Substring(0, cmd.Length - 4)

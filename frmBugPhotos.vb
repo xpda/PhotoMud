@@ -342,6 +342,10 @@ Public Class frmBugPhotos
     uDescription = getBmpComment(propID.ImageDescription, pComments)
     uDate = getBmpComment(propID.DateTimeOriginal, pComments)
 
+    If (eqstr(uDescription, "Minolta DSC") OrElse
+        eqstr(uDescription, "OLYMPUS DIGITAL CAMERA") OrElse
+        eqstr(uDescription, "LEAD Technologies Inc. V1.01")) Then uDescription = ""
+
     If Len(uDate) = 19 Then
       uDate = Mid(uDate, 6, 2) & "/" & Mid(uDate, 9, 2) & "/" & uDate.Substring(0, 4) & uDate.Substring(uDate.Length - 9)
     End If
@@ -572,10 +576,7 @@ Public Class frmBugPhotos
         taxonid = matches(0).taxid
       End If
 
-      If udescription <> "" AndAlso
-        (Not eqstr(udescription, "Minolta DSC") AndAlso
-        Not eqstr(udescription, "OLYMPUS DIGITAL CAMERA") AndAlso
-        Not eqstr(udescription, "LEAD Technologies Inc. V1.01")) Then
+      If udescription <> "" Then
 
         s = udescription
         s = s.Replace(Crlf, " ")
@@ -1935,7 +1936,7 @@ Public Class frmBugPhotos
     Dim photoDate, lastUpdate As DateTime
     Dim ancestry As String
     Dim taxKey As String
-    Dim taxID As Integer
+    Dim taxID As String
     Dim bugguideID As Integer
 
     Dim comments As String
