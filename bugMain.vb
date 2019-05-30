@@ -363,10 +363,14 @@ Public Module bugMain
     If IsDBNull(dr("rank")) Then match.rank = "" Else match.rank = dr("rank")
     If IsDBNull(dr("name")) Then match.taxon = "" Else match.taxon = dr("name")
     If IsDBNull(dr("parent")) Then match.parentid = "" Else match.parentid = "g" & dr("parent")
-    If IsDBNull(dr("imagecounter")) Then match.imageCounter = 0 Else match.imageCounter = dr("imagecounter")
-    If IsDBNull(dr("childimagecounter")) Then match.childimageCounter = 0 Else match.childimageCounter = dr("childimagecounter")
     If IsDBNull(dr("authority")) Then match.authority = "" Else match.authority = dr("authority")
-    If IsDBNull(dr("link")) Then match.link = "" Else match.link = dr("link")
+
+    match.imageCounter = getScalar("select imagecounter from gbifplus where taxid = @parm1", dr("taxid"))
+    match.childimageCounter = getScalar("select childimagecounter from gbifplus where taxid = @parm1", dr("taxid"))
+    match.link = getScalar("select link from gbifplus where taxid = @parm1", dr("taxid"))
+    'If IsDBNull(dr("imagecounter")) Then match.imageCounter = 0 Else match.imageCounter = dr("imagecounter")
+    'If IsDBNull(dr("childimagecounter")) Then match.childimageCounter = 0 Else match.childimageCounter = dr("childimagecounter")
+    'If IsDBNull(dr("link")) Then match.link = "" Else match.link = dr("link")
 
     ' get common names from oddinfo
     ds = getDS("select * from oddinfo where name = @parm1", match.taxon)
@@ -1037,8 +1041,6 @@ Public Module bugMain
     Dim taxid As String
 
     findme = findme.Trim
-
-    findme = "aberrant cellophane bee"
 
     If findme = "OLYMPUS DIGITAL CAMERA" Then Return matches ' empty list
 

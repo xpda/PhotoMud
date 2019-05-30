@@ -34,6 +34,7 @@
 Imports System.Net
 Imports System.Net.Http
 Imports System.Text
+Imports System.Text.RegularExpressions
 Imports System.Collections.Generic
 Imports System.Drawing.Drawing2D
 Imports System.Drawing.Imaging
@@ -1056,7 +1057,7 @@ Public Class frmBugPhotos
     Dim matches As List(Of taxrec)
     'Dim gmatches As List(Of taxrec)
     Dim nd As TreeNode = Nothing
-    Dim ndc As TreeNode = Nothing
+    Dim s As String
 
     Me.Cursor = Cursors.WaitCursor
 
@@ -1072,12 +1073,12 @@ Public Class frmBugPhotos
       nd.Tag = matches(0).taxid
     End If
 
-    populate(nd, False)  ' load Arthropoda
+    populate(nd, False)  ' load root node (animalia)
     nd.ExpandAll()
     ' Now get down through insects
-    For Each ndc In nd.Nodes
-      If Mid(ndc.Text, 1, 7) = "Hexapoda" Then
-        populate(ndc, False)  ' load Hexapoda
+    For Each ndc As TreeNode In nd.Nodes
+      If ndc.Text.StartsWith("Arthropoda") Or ndc.Text.StartsWith("Euarthropoda") Then
+        populate(ndc, False)  ' load Arthropoda
         ndc.Expand()
         Exit For
       End If
