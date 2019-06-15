@@ -118,7 +118,7 @@ Public Class frmBugPhotos
     Dim matches As New List(Of taxrec)
     Dim setID As Integer
     Dim oldTaxid As String = ""
-    Dim status As String
+    Dim usable As String
 
     Me.Cursor = Cursors.WaitCursor
     fName = Trim(txFileName.Text)
@@ -157,8 +157,8 @@ Public Class frmBugPhotos
         ' omit all the doubtfuls and see if there is one match
         For i As Integer = matches.Count - 1 To 0 Step -1
           If matches(i).taxid.StartsWith("g") Then ' gbif record, check status
-            status = getScalar("select status from gbif.tax where taxid = @parm1", matches(i).taxid.Substring(1))
-            If Not eqstr(status, "accepted") Then
+            usable = getScalar("select usable from gbif.tax where taxid = @parm1", matches(i).taxid.Substring(1))
+            If usable = "" Then
               matches.RemoveAt(i)
             End If
           End If
@@ -499,8 +499,10 @@ Public Class frmBugPhotos
         txPixelsPerMM.Text = "275.4"
       ElseIf s.Contains("E-M1MarkII") Or s.Contains("E-M1 Mark II") Then
         txPixelsPerMM.Text = "303"
+      ElseIf s.Contains("DC-G95") Then
+        txPixelsPerMM.Text = "306.6"
       End If
-
+      '
     ElseIf lens.Contains("Olympus M.Zuiko Digital ED 30mm F3.5 Macro") Then
       If s.Contains("E-M1MarkII") Or s.Contains("E-M1 Mark II") Then
         txPixelsPerMM.Text = "409"
@@ -1055,9 +1057,8 @@ Public Class frmBugPhotos
 
     Dim match As New bugMain.taxrec
     Dim matches As List(Of taxrec)
-    'Dim gmatches As List(Of taxrec)
+    Dim gmatches As List(Of taxrec)
     Dim nd As TreeNode = Nothing
-    Dim s As String
 
     Me.Cursor = Cursors.WaitCursor
 
@@ -1065,8 +1066,9 @@ Public Class frmBugPhotos
     tvTaxon.Visible = True
     cmdCloseTree.Visible = True
 
-    'matches = queryTax("select * from taxatable where taxon = @parm1", "arthropoda")
-    matches = queryTax("select * from gbif.tax join taxa.gbifplus using (taxid) where name = @parm1 and usable = 'ok'", "animalia")
+    matches = queryTax("select * from taxatable where taxon = @parm1 order by taxon", "arthropoda")
+    gmatches = queryTax("select * from gbif.tax where name = @parm1 and usable <> '' order by name", "animalia")
+    matches = mergeMatches(matches, gmatches)
 
     If matches.Count > 0 Then
       nd = tvTaxon.Nodes.Add(taxaLabel(matches(0), False, False))
@@ -1507,14 +1509,14 @@ Public Class frmBugPhotos
 
     Dim count As Integer = 0
     Dim imageCounter As Integer
-    Dim childImageCounter As Integer
+    Dim childImageCounter As Integer = 0
     Dim i As Integer
     Dim matches As List(Of taxrec)
 
     imageCounter = getScalar("select count(*) from images where images.taxonid = @parm1", taxid)
 
     If taxid.StartsWith("g") Then
-      matches = queryTax("select * from gbif.tax join taxa.gbifplus using (taxid) where parent = @parm1 and usable = 'ok'", taxid.Substring(1))
+      matches = queryTax("select * from gbif.tax where parent = @parm1 and usable <> ''", taxid.Substring(1))
     Else
       matches = queryTax("select * from taxatable where parentid = @parm1", taxid)
     End If
@@ -1522,13 +1524,17 @@ Public Class frmBugPhotos
     childImageCounter = imageCounter
     For Each m As taxrec In matches ' children
       i = setimageCount(m.taxid)
-      childImageCounter = childImageCounter + i
+      childImageCounter += i
     Next m
 
     If childImageCounter <> 0 Then
       If taxid.StartsWith("g") Then
         i = nonQuery("update gbifplus set imagecounter = @parm1, childimagecounter = @parm2 where taxid = @parm3", _
               imageCounter, childImageCounter, taxid.Substring(1))
+        If i = 0 Then ' gbifplus doesn't contain all the gbif records
+          i = nonQuery("insert into gbifplus (taxid, imagecounter, childimagecounter) values " &
+                        "(@parm1, @parm2, @parm3)", taxid.Substring(1), imageCounter, childImageCounter)
+        End If
         If i <> 1 Then Stop
       Else
         i = nonQuery("update taxatable set imagecounter = @parm1, childimagecounter = @parm2 where taxid = @parm3", _
@@ -1581,8 +1587,8 @@ Public Class frmBugPhotos
     Dim arthropodCount(UBound(ranks)) As Integer
     Dim arthropodCountTotal(UBound(ranks)) As Integer
 
-    matches = queryTax("select * from taxatable where childimagecounter > 0", "")
-    gmatches = queryTax("select * from gbif.tax join taxa.gbifplus using (taxid) where childimagecounter > 0", "")
+    matches = queryTax("select * from taxatable where childimagecounter > 0, order by taxon", "")
+    gmatches = queryTax("select * from gbif.tax join taxa.gbifplus using (taxid) where childimagecounter > 0 order by name", "")
     matches = mergeMatches(matches, gmatches)
 
     For Each m As taxrec In matches
@@ -1688,7 +1694,7 @@ Public Class frmBugPhotos
       k = getScalar("select count(*) from taxatable where imagecounter > 0")
 
       i1 = nonQuery("update gbifplus set imagecounter = 0, childimagecounter = 0 where childimagecounter <> 0")
-      matches = queryTax("select * from gbif.tax join taxa.gbifplus using (taxid) where name = 'animalia' and usable = 'ok'", "")
+      matches = queryTax("select * from gbif.tax join taxa.gbifplus using (taxid) where name = 'animalia' and usable <> ''", "")
       id = matches(0).taxid
       i1 = setimageCount(id)
       k1 = getScalar("select count(*) from gbif.tax join taxa.gbifplus using (taxid) where imagecounter > 0")
@@ -2246,120 +2252,6 @@ Public Class frmBugPhotos
       Me.Cursor = Cursors.Default
       Exit Sub
     End If
-
-  End Sub
-
-
-
-
-  Private Sub Button_Click(sender As Object, e As EventArgs)
-
-    ' makes a tab-separated file comparing species in the database with articles in wikipedia
-    '     topics to be created
-    '     topics the can be edited (redirected to common or other names)
-    '     topics that already have a photo
-    '     topics with article that need a photo
-    '     topics redirected to a genus
-
-
-    Dim client As New cWebClient
-    Dim s, s1 As String
-    Dim link As String
-    Dim taxonkey As String
-    Dim i, j, k As Integer
-    Dim matches As List(Of taxrec)
-    Dim gmatches As List(Of taxrec)
-    Dim sb As New StringBuilder
-
-    Dim cook As Cookie
-
-    Me.Cursor = Cursors.WaitCursor
-
-    cook = New Cookie
-    cook.Domain = "en.wikipedia.org"
-    cook.Name = "loginnotify_prevlogins"
-    cook.Value = "2017-krpybj-mtrdo42urmr27yb8oas59kwgndhycra"
-    client.cc.Add(cook)
-
-    cook = New Cookie
-    cook.Domain = "en.wikipedia.org"
-    cook.Name = "CP"
-    cook.Value = "H2"
-    client.cc.Add(cook)
-
-    cook = New Cookie
-    cook.Domain = "en.wikipedia.org"
-    cook.Name = "enwikiSession"
-    cook.Value = "rru3jchvup317plb29uf3mrk3a5r7pon"
-    client.cc.Add(cook)
-
-    cook = New Cookie
-    cook.Domain = "en.wikipedia.org"
-    cook.Name = "enwikiUserName"
-    cook.Value = "Xpda"
-    client.cc.Add(cook)
-
-    cook.Domain = "en.wikipedia.org"
-    cook.Name = "WMF-Last-Access"
-    cook.Value = "06-Dec-2017"
-    client.cc.Add(cook)
-
-    matches = queryTax("select * from taxatable where imagecounter > 0 and rank = @parm1 order by id;", "Species")
-    gmatches = queryTax("select * from gbif.tax join taxa.gbifplus using (taxid) where imagecounter > 0 and rank = @parm1 order by id;", "Species")
-    matches = mergeMatches(matches, gmatches)
-
-    For Each match As taxrec In matches ' children
-
-      taxonkey = match.taxon
-
-      link = "https://en.wikipedia.org/w/index.php?title=" & taxonkey.Replace(" ", "_") & "&action=edit"
-
-      j = 0
-      s = client.DownloadString(link)
-      'File.WriteAllText("c:\tmp.htm", s)
-      s = LCase(s)
-      i = InStr(s, "{{speciesbox")
-      If i <= 0 Then i = InStr(s, "{{taxobox")
-      If i > 0 Then
-        k = InStr(i, s, "}}")
-        If k > 0 Then
-          s = LCase(Mid(s, i, k - i + 1))
-          s1 = s.Replace(" ", "")
-          j = InStr(s1, "|image=")
-          If j = 0 Then
-            sb.AppendLine("need picture" & vbTab & taxonkey & vbTab & match.taxon & vbTab & link)
-          Else
-            sb.AppendLine("has picture" & vbTab & taxonkey & vbTab & match.taxon & vbTab & link)
-          End If
-        End If
-
-      Else ' no {{species and no {{taxobox -- not a normal entry
-        If InStr(s, "<title>editing " & LCase(taxonkey)) > 0 Then
-          If InStr(s, LCase("#REDIRECT [[")) > 0 Then ' redirect
-            i = InStr(taxonkey, " ")
-            If i > 0 Then s1 = Mid(taxonkey, 1, i - 1) Else s1 = "" ' s1 is genus?
-            If s1 <> "" AndAlso InStr(s, LCase("#REDIRECT [[" & s1 & "]]")) > 0 Then ' redirect to genus
-              sb.AppendLine("redirect genus" & vbTab & taxonkey & vbTab & match.taxon & vbTab & link)
-            Else ' redirect probably to common name
-              sb.AppendLine("editing - redirect" & vbTab & taxonkey & vbTab & match.taxon & vbTab & link)
-            End If
-          Else
-            sb.AppendLine("editing - redirectless" & vbTab & taxonkey & vbTab & match.taxon & vbTab & link)
-          End If
-        ElseIf InStr(s, "<title>creating") > 0 Then
-          sb.AppendLine("creating" & vbTab & taxonkey & vbTab & match.taxon & vbTab & link)
-        ElseIf InStr(s, "permission error") > 0 Then
-          sb.AppendLine("create (permission)" & vbTab & taxonkey & vbTab & match.taxon & vbTab & link)
-        Else
-          sb.AppendLine("other" & vbTab & taxonkey & vbTab & match.taxon & vbTab & link)
-        End If
-      End If
-    Next match
-
-    s = sb.ToString
-    File.WriteAllText("c:\tmp1.txt", s)
-
-    Me.Cursor = Cursors.Default
 
   End Sub
 

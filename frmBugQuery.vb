@@ -50,8 +50,9 @@ Public Class frmBugQuery
 
     tvTaxon.Nodes.Clear()
 
-    matches = queryTax("select * from taxatable where taxon = @parm1", "arthropoda")
-    gmatches = queryTax("select * from gbif.tax join taxa.gbifplus using (taxid) where name = @parm1 and usable = 'ok'", "animalia")
+    matches = queryTax("select * from taxatable where taxon = 'arthropoda' order by taxon", "")
+    gmatches = queryTax(
+      "select * from gbif.tax join taxa.gbifplus using (taxid) where name = 'animalia' and usable <> '' order by name", "")
     matches = mergeMatches(matches, gmatches)
 
     For Each m As taxrec In matches
@@ -238,49 +239,6 @@ Public Class frmBugQuery
     Next match
   End Sub
 
-  Sub addChildrenx(ByRef inmatch As taxrec, ByRef queryNames As List(Of String), ByRef imgCmd As MySqlCommand)
-
-    ' adds the current tid filename, and recurses for the children
-
-    Dim adapt As New MySqlDataAdapter
-    Dim dset As New DataSet
-    Dim drow As DataRow
-    Dim matches As List(Of taxrec)
-    Dim i As Integer
-    Dim s As String
-
-    nn = nn + 1
-
-    ' process the children
-    ' change to include children from both databases
-    If inmatch.taxid.StartsWith("g") Then
-      matches = queryTax("select * from gbif.tax join taxa.gbifplus using (taxid) where parent = @parm1 and childimagecounter > 0", inmatch.taxid)
-    Else
-      matches = queryTax("select * from taxatable where parentid = @parm1 and childimagecounter > 0", inmatch.taxid)
-    End If
-
-    For Each match As taxrec In matches
-      If match.childimageCounter > 0 Then
-        ' grab filenames
-        dset.Clear()
-        i = imgCmd.Parameters.IndexOf("@id")
-        If i >= 0 Then imgCmd.Parameters.RemoveAt(i)
-        imgCmd.Parameters.AddWithValue("@id", match.taxid)
-        adapt.SelectCommand = imgCmd
-        adapt.Fill(dset)
-        For Each drow In dset.Tables(0).Rows
-          If Not IsDBNull(drow("filename")) Then
-            s = folderPath & drow("filename")
-            If Not queryNames.Contains(s) Then queryNames.Add(s)
-          End If
-        Next drow
-
-        ' process child
-        addChildren(match, queryNames, imgCmd)
-      End If
-
-    Next match
-  End Sub
   Function queryparms(sql As String, orderBy As String, useTaxon As Boolean, useRank As Boolean,
                       ByRef conn As MySqlConnection) As MySqlCommand
 
