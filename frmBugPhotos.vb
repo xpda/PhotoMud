@@ -1075,7 +1075,7 @@ Public Class frmBugPhotos
       nd.Tag = matches(0).taxid
     End If
 
-    populate(nd, False)  ' load root node (animalia)
+    ' ''populate(nd, False)  ' load root node (animalia) commented out 6/22/19
     nd.ExpandAll()
     ' Now get down through insects
     For Each ndc As TreeNode In nd.Nodes

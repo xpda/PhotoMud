@@ -170,7 +170,7 @@ Public Class frmFullscreen
 
       k = tagged(picpath)
 
-      If k > 0 Then ' clear the tag
+      If k >= 0 Then ' clear the tag
         tagPath.RemoveAt(k)
       End If
 
@@ -185,7 +185,7 @@ Public Class frmFullscreen
 
     If File.Exists(picpath) Then
       k = tagged(picpath)
-      If k > 0 Then
+      If k >= 0 Then
         ' it's tagged -- remove it from the tag list
         tagPath.RemoveAt(k)
       Else
@@ -203,7 +203,7 @@ Public Class frmFullscreen
     If callingForm Is frmExplore Then
       mnxTag.Visible = True
       mnxDelete.Visible = True
-      If tagged(picpath) > 0 Then mnxTag.Checked = True Else mnxTag.Checked = False
+      If tagged(picpath) >= 0 Then mnxTag.Checked = True Else mnxTag.Checked = False
     Else
       mnxTag.Visible = False
       mnxDelete.Visible = False
@@ -214,15 +214,11 @@ Public Class frmFullscreen
   Function tagged(ByVal fpath As String) As Integer
     ' returns -1 if file is not tagged, the tag index otherwise
 
-    Dim i As Integer
-
-    tagged = -1
-    For i = 0 To tagPath.Count - 1
-      If eqstr(tagPath(i), fpath) Then
-        tagged = i
-        Exit For
-      End If
+    For i As Integer = 0 To tagPath.Count - 1
+      If eqstr(tagPath(i), fpath) Then Return i
     Next i
+
+    Return -1
 
   End Function
 
@@ -230,7 +226,7 @@ Public Class frmFullscreen
 
     Dim r As Rectangle
 
-    If callingForm Is frmExplore AndAlso tagged(picpath) > 0 Then
+    If callingForm Is frmExplore AndAlso tagged(picpath) >= 0 Then
       r = rview.ClientRectangle
       picTagCheck.Left = r.Left + r.Width - picTagCheck.Width + 1
       picTagCheck.Top = r.Top + 2

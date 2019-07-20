@@ -276,7 +276,7 @@ Public Class frmConvert
 
       targetFilename = getTargetFilename(tfile, targetPath, commonPath, targetExt, namePrefix)
       If overwriteFlag = "all" OrElse Not File.Exists(targetFilename) OrElse _
-        overwriteList.IndexOf(targetFilename) > 0 Then
+        overwriteList.IndexOf(targetFilename) >= 0 Then
         mResult = saveit(tfile, targetFilename)
         If mResult = MsgBoxResult.Cancel Then Exit Sub
 

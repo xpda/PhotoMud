@@ -1902,29 +1902,25 @@ Public Module main
   Function getMenuItem(ByRef filemenu As ToolStripMenuItem, ByRef mName As String) As ToolStripMenuItem
 
     Dim item As ToolStripMenuItem
+    Dim childItem As ToolStripMenuItem
     Dim q As ToolStripItem
 
-    getMenuItem = Nothing
-
     For Each q In filemenu.DropDownItems
       If TypeOf q Is ToolStripMenuItem Then
         item = q
-        If eqstr(item.Name, mName) Then
-          getMenuItem = item
-          Exit Function
-        End If
+        If eqstr(item.Name, mName) Then Return item
       End If
     Next q
 
     For Each q In filemenu.DropDownItems
       If TypeOf q Is ToolStripMenuItem Then
         item = q
-        getMenuItem = checkChildItems(item, mName)
-        If getMenuItem IsNot Nothing Then
-          Exit Function
-        End If
+        childItem = checkChildItems(item, mName)
+        If childItem IsNot Nothing Then Return childItem
       End If
     Next q
+
+    Return Nothing
 
   End Function
 
@@ -2097,16 +2093,15 @@ Public Module main
     ' returns true if the number is between min and max inclusive, x has the value
 
     If Not IsNumeric(txt) Then
-      checknumber = False
-      Exit Function
+      Return False
     End If
 
     x = Val(txt)
 
     If x < min Or x > max Then
-      checknumber = False
+      Return False
     Else
-      checknumber = True
+      Return True
     End If
 
   End Function
@@ -3115,11 +3110,7 @@ Public Module main
     Dim fNames As New List(Of String)
     Dim dirNames As New List(Of String)
 
-    getFilePaths = 0
-    If Not Directory.Exists(fPath) Then
-      getFilePaths = -1
-      Exit Function
-    End If
+    If Not Directory.Exists(fPath) Then Return -1
 
     abort = False
 
@@ -3130,8 +3121,8 @@ Public Module main
       Try
         dirNames = Directory.GetDirectories(fPath).ToList
       Catch
-        getFilePaths = -1
         dirNames = Nothing
+        Return -1
       End Try
       If dirNames IsNot Nothing Then
         For Each s As String In dirNames
@@ -3139,6 +3130,8 @@ Public Module main
         Next s
       End If
     End If
+
+    Return 0
 
   End Function
 
@@ -3152,16 +3145,14 @@ Public Module main
     If Left(dirPath, 1) = "\" Then dirPath = Left(dirPath, Len(dirPath) - 1) ' remove trailing "\"
 
     If Directory.Exists(dirPath) Then
-      CheckFolder = 0
-      Exit Function
+      Return 0
     End If
 
     ' not found - return 1 if created, -1 of "no" or error.
     Try
       s = Path.GetDirectoryName(dirPath)
     Catch
-      CheckFolder = 1
-      Exit Function
+      Return 1
     End Try
 
     k = CheckFolder(s, Ask)
@@ -3176,15 +3167,15 @@ Public Module main
       If mResult = MsgBoxResult.Yes Then
         Try
           Directory.CreateDirectory(dirPath)
-          CheckFolder = 1
+          Return 1
         Catch
-          CheckFolder = -1
+          Return -1
         End Try
       Else
-        CheckFolder = -1
+        Return -1
       End If
     Else
-      CheckFolder = k  ' 1 or 0
+      Return k  ' 1 or 0
     End If
 
   End Function
