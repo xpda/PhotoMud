@@ -90,11 +90,11 @@ Public Class frmOptions
     If chkNormalCaptionSize.Checked Then iniWebCaptionSize = 0 Else iniWebCaptionSize = nmWebCaptionSize.Value ' 0 = normal
     iniWebCaptionAlign = cmbWebCaptionAlign.Text
     iniWebCellPadding = nmWebCellPadding.Value
-    iniWebCellSpacing = nmWebCellSpacing.Value
+    'iniWebCellSpacing = nmWebCellSpacing.Value
     iniWebFont = txWebFont.Text
     iniWebGoogleAnalytics = txWebGoogleAnalytics.Text
     iniWebGoogleEvents = chkWebGoogleEvents.Checked
-    iniWebnColumns = nmWebnColumns.Value
+    'iniWebnColumns = nmWebnColumns.Value
     If chkWebTarget.Checked Then iniWebTarget = 1 Else iniWebTarget = 0
     iniWebTableBorder = nmWebTableBorder.Value
     iniWebThumbX = nmWebThumbX.Value
@@ -226,8 +226,8 @@ Public Class frmOptions
       cmbWebCaptionAlign.SelectedIndex = 0
     End If
     If iniWebCellPadding >= nmWebCellPadding.Minimum And iniWebCellPadding <= nmWebCellPadding.Maximum Then nmWebCellPadding.Value = iniWebCellPadding
-    If iniWebCellSpacing >= nmWebCellSpacing.Minimum And iniWebCellSpacing <= nmWebCellSpacing.Maximum Then nmWebCellSpacing.Value = iniWebCellSpacing
-    If iniWebnColumns >= nmWebnColumns.Minimum And iniWebnColumns <= nmWebnColumns.Maximum Then nmWebnColumns.Value = iniWebnColumns
+    'If iniWebCellSpacing >= nmWebCellSpacing.Minimum And iniWebCellSpacing <= nmWebCellSpacing.Maximum Then nmWebCellSpacing.Value = iniWebCellSpacing
+    'If iniWebnColumns >= nmWebnColumns.Minimum And iniWebnColumns <= nmWebnColumns.Maximum Then nmWebnColumns.Value = iniWebnColumns
     If iniWebTarget = 0 Then chkWebTarget.Checked = False Else chkWebTarget.Checked = True
     If iniWebTableBorder >= nmWebTableBorder.Minimum And iniWebTableBorder <= nmWebTableBorder.Maximum Then nmWebTableBorder.Value = iniWebTableBorder
     If iniWebThumbX >= nmWebThumbX.Minimum And iniWebThumbX <= nmWebThumbX.Maximum Then nmWebThumbX.Value = iniWebThumbX

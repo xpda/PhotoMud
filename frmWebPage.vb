@@ -575,11 +575,7 @@ Public Class frmWebPage
   End Function
   Function SaveHtml(ByRef fName As String) As Short
 
-    Dim cellwidth As Integer
-    Dim i As Integer
-    Dim j As Integer
-    Dim k As Integer
-    Dim nrows As Integer
+    'Dim nrows As Integer
     Dim red As Integer
     Dim green As Integer
     Dim blue As Integer
@@ -604,7 +600,7 @@ Public Class frmWebPage
     Dim ds As DataSet
     Dim pic As pixClass
 
-    nrows = Int((nimages + 1) / nColumns + 0.999999)
+    'nrows = Int((nimages + 1) / nColumns + 0.999999)
 
     wBackColor = ColorTranslator.ToHtml(iniWebBackColor)
     wForeColor = ColorTranslator.ToHtml(iniWebForeColor)
@@ -621,6 +617,7 @@ Public Class frmWebPage
     sf.Add("<html>")
     sf.Add("<head>")
     sf.Add("<meta charset=""utf-8"">")
+    sf.Add("<meta name=""viewport"" content=""initial-scale=1.0"">")
     sf.Add("<title>" & txTitle.Text & "</title>")
     sf.Add("<meta name=""description"" content=""" & txTitle.Text & """>")
     sf.Add("<style>")
@@ -643,21 +640,17 @@ Public Class frmWebPage
       sf.Add("  font-size:" & iniWebTitleSize & "pt;")
     End If
     sf.Add("}")
-    sf.Add("td {")
-    sf.Add("  border: " & iniWebTableBorder & "px " & wFrameColor & " solid;")
-    sf.Add("  vertical-align: top;")
-    cellwidth = Round(100 / nColumns)
-    sf.Add("  width: " & cellwidth & "%;")
-    sf.Add("  padding: " & iniWebCellPadding & "px;")
-    sf.Add("  border-spacing: " & iniWebCellSpacing & "px;")
-    sf.Add("}")
-    sf.Add("table { ")
-    sf.Add("  border-collapse:collapse;")
-    sf.Add("  border-width:0;")
-    sf.Add("  margin:0 auto; ")
-    i = (iniWebThumbX + iniWebCellPadding * 2) * nColumns + (iniWebCellSpacing + iniWebTableBorder) * (nColumns + 1)
-    sf.Add("  width:" & i & "px;")
+
+    sf.Add(".flex { ")
+    sf.Add("  display: flex;")
+    sf.Add("  flex-flow: row wrap;")
     sf.Add("  }")
+
+    sf.Add(".flex > div {")
+    sf.Add("  border: " & iniWebTableBorder & "px " & wFrameColor & " solid;")
+    sf.Add("  padding: " & iniWebCellPadding & "px;")
+    sf.Add("}")
+
     sf.Add("img {border:0; margin:3px; box-shadow: 4px 4px 7px #222;}")
     sf.Add(".heading {")
     sf.Add("  width:60%;")
@@ -696,182 +689,173 @@ Public Class frmWebPage
     End If
     sf.Add("</div>")
 
-    sf.Add("<table>")
-    k = 0
-    For j = 1 To nrows
-      sf.Add("<tr>")
-      For i = 1 To nColumns
-        sf.Add("<td>")
+    sf.Add("<div class=flex>")
+    For k As Integer = 0 To nimages
+      sf.Add("<div>")
 
-        If k <= nimages Then ' add column content
-          ' title, for tooltip
-          s = Trim(webCaption(ix(k)))
-          If InStr(s, crlf) > 0 Then s = Trim(Mid(s, 1, InStr(s, crlf) - 1))
-          If s = "" Then s = imgName(ix(k)) & ", " & imgX(ix(k)) & "x" & imgY(ix(k)) ' title, for tooltip
-          alt = imgName(ix(k))
-          sfl = "<a href=""" & imgName(ix(k)) & """"
-          If iniWebTarget = 1 Then sfl &= " target=""_blank"""
-          If iniWebGoogleEvents And Len(iniWebGoogleAnalytics) > 0 Then
-            sfl &= " onclick=""ga('send', 'event', 'Photo', 'Download', '" & txTitle.Text & " - " & imgName(ix(k)) & "');"""
-          End If
-          sf.Add(sfl & ">")
+      ' title, for tooltip
+      s = Trim(webCaption(ix(k)))
+      If InStr(s, crlf) > 0 Then s = Trim(Mid(s, 1, InStr(s, crlf) - 1))
+      If s = "" Then s = imgName(ix(k)) & ", " & imgX(ix(k)) & "x" & imgY(ix(k)) ' title, for tooltip
+      alt = imgName(ix(k))
+      sfl = "<a href=""" & imgName(ix(k)) & """"
+      If iniWebTarget = 1 Then sfl &= " target=""_blank"""
+      If iniWebGoogleEvents And Len(iniWebGoogleAnalytics) > 0 Then
+        sfl &= " onclick=""ga('send', 'event', 'Photo', 'Download', '" & txTitle.Text & " - " & imgName(ix(k)) & "');"""
+      End If
+      sf.Add(sfl & ">")
 
-          strName = "small_" & Path.ChangeExtension(imgName(ix(k)), ".jpg")
-          Try ' read thumbnail to get width and height
-            img = Bitmap.FromFile(Path.GetDirectoryName(fName) & "\" & strName)
-          Catch ex As Exception
-            img = Nothing
-          End Try
-          If img IsNot Nothing Then
-            sf.Add("<img src=""" & strName & """ alt=""" & alt & """ title=""" & s & """ width=""" & img.Width & """ height=""" & img.Height & """></a><br>")
-            img.Dispose()
+      strName = "small_" & Path.ChangeExtension(imgName(ix(k)), ".jpg")
+      Try ' read thumbnail to get width and height
+        img = Bitmap.FromFile(Path.GetDirectoryName(fName) & "\" & strName)
+      Catch ex As Exception
+        img = Nothing
+      End Try
+      If img IsNot Nothing Then
+        sf.Add("<img src=""" & strName & """ alt=""" & alt & """ title=""" & s & """ width=""" & img.Width & """ height=""" & img.Height & """></a><br>")
+        img.Dispose()
+      Else
+        sf.Add("<img src=""" & strName & """ alt=""" & alt & """ title=""" & s & """></a><br>")
+      End If
+
+      sComment = ""
+
+      If webCaption(ix(k)).Trim <> "" Then
+        sComment = sComment & addBreaks(webCaption(ix(k)))
+        If (imgDate(ix(k)) <> Nothing And chkCapDate.Checked) Or _
+           (imgDate(ix(k)) <> Nothing And chkCapTime.Checked) Or _
+           (Len(Trim(imgName(ix(k)))) <> 0 And chkCapName.Checked) Or _
+           (Len(Trim(imgLatLon(ix(k)))) <> 0 And chkCapLatLon.Checked) Or _
+           (Len(Trim(imgAltitude(ix(k)))) <> 0 And chkCapAltitude.Checked) Or _
+           (Len(Trim(imgLatLon(ix(k)))) <> 0 And chkCapLocation.Checked) Or _
+           (Len(Trim(imgLatLon(ix(k)))) <> 0 And chkCapMaplink.Checked) Or _
+           (Trim(imgX(ix(k))) > 0 And chkCapResolution.Checked) Then
+          sComment = sComment & "<br>"
+        End If
+      End If
+
+      If chkCapDescription.Checked Then
+        If imgComments(ix(k)) <> "" Then
+          s = addBreaks(imgComments(ix(k)))
+          sComment = sComment & s & "<br>"
+        End If
+
+        If useQuery Then ' add bug descriptions
+          ds = getDS("select * from images, taxatable where filename = @parm1 and images.taxonid = taxatable.taxid", imgName(ix(k)))
+          If ds IsNot Nothing AndAlso ds.Tables(0).Rows.Count > 0 Then
+            pic = New pixClass(ds.Tables(0).Rows(0))
+            s = getCaption(pic)
+            sComment = sComment & s
           Else
-            sf.Add("<img src=""" & strName & """ alt=""" & alt & """ title=""" & s & """></a><br>")
-          End If
-
-          sComment = ""
-
-          If webCaption(ix(k)).Trim <> "" Then
-            sComment = sComment & addBreaks(webCaption(ix(k)))
-            If (imgDate(ix(k)) <> Nothing And chkCapDate.Checked) Or _
-               (imgDate(ix(k)) <> Nothing And chkCapTime.Checked) Or _
-               (Len(Trim(imgName(ix(k)))) <> 0 And chkCapName.Checked) Or _
-               (Len(Trim(imgLatLon(ix(k)))) <> 0 And chkCapLatLon.Checked) Or _
-               (Len(Trim(imgAltitude(ix(k)))) <> 0 And chkCapAltitude.Checked) Or _
-               (Len(Trim(imgLatLon(ix(k)))) <> 0 And chkCapLocation.Checked) Or _
-               (Len(Trim(imgLatLon(ix(k)))) <> 0 And chkCapMaplink.Checked) Or _
-               (Trim(imgX(ix(k))) > 0 And chkCapResolution.Checked) Then
-              sComment = sComment & "<br>"
+            ds = getDS("select * from images, gbif.tax where filename = @parm1 and substring(images.taxonid, 2) = gbif.tax.taxid", imgName(ix(k)))
+            If ds IsNot Nothing AndAlso ds.Tables(0).Rows.Count > 0 Then
+              pic = New pixClass(ds.Tables(0).Rows(0))
+              s = getCaption(pic)
+              sComment = sComment & s
             End If
           End If
+        End If
+      End If
 
-          If chkCapDescription.Checked Then
-            If imgComments(ix(k)) <> "" Then
-              s = addBreaks(imgComments(ix(k)))
-              sComment = sComment & s & "<br>"
-            End If
+      If (imgDate(ix(k)) <> Nothing And chkCapDate.Checked) Or _
+         (imgDate(ix(k)) <> Nothing And chkCapTime.Checked) Or _
+         (Len(Trim(imgName(ix(k)))) <> 0 And chkCapName.Checked) Or _
+         (Len(Trim(imgLatLon(ix(k)))) <> 0 And chkCapLatLon.Checked) Or _
+         (Len(Trim(imgAltitude(ix(k)))) <> 0 And chkCapAltitude.Checked) Or _
+         (Len(Trim(imgLatLon(ix(k)))) <> 0 And chkCapLocation.Checked) Or _
+         (Len(Trim(imgLatLon(ix(k)))) <> 0 And chkCapMaplink.Checked) Or _
+         (Trim(imgX(ix(k))) > 0 And chkCapResolution.Checked) Then
+        If sComment <> "" Then
+          sComment = sComment & crlf & "<div style=""text-align:center; font-size:smaller""><br>"
+        Else
+          sComment = sComment & "<div style=""text-align:center; font-size:smaller"">"
+        End If
+      End If
 
-            If useQuery Then ' add bug descriptions
-              ds = getDS("select * from images, taxatable where filename = @parm1 and images.taxonid = taxatable.taxid", imgName(ix(k)))
-              If ds IsNot Nothing AndAlso ds.Tables(0).Rows.Count > 0 Then
-                pic = New pixClass(ds.Tables(0).Rows(0))
-                s = getCaption(pic)
-                sComment = sComment & s
-              Else
-                ds = getDS("select * from images, gbif.tax where filename = @parm1 and substring(images.taxonid, 2) = gbif.tax.taxid", imgName(ix(k)))
-                If ds IsNot Nothing AndAlso ds.Tables(0).Rows.Count > 0 Then
-                  pic = New pixClass(ds.Tables(0).Rows(0))
-                  s = getCaption(pic)
-                  sComment = sComment & s
-                End If
-              End If
-            End If
-          End If
+      If imgDate(ix(k)) <> Nothing And (chkCapDate.Checked Or chkCapTime.Checked) Then
+        s = ""
+        d = imgDate(ix(k))
+        x = nmTimeOffset.Value
+        d = d.Add(New TimeSpan(x, 0, 0))
 
-          If (imgDate(ix(k)) <> Nothing And chkCapDate.Checked) Or _
-             (imgDate(ix(k)) <> Nothing And chkCapTime.Checked) Or _
-             (Len(Trim(imgName(ix(k)))) <> 0 And chkCapName.Checked) Or _
-             (Len(Trim(imgLatLon(ix(k)))) <> 0 And chkCapLatLon.Checked) Or _
-             (Len(Trim(imgAltitude(ix(k)))) <> 0 And chkCapAltitude.Checked) Or _
-             (Len(Trim(imgLatLon(ix(k)))) <> 0 And chkCapLocation.Checked) Or _
-             (Len(Trim(imgLatLon(ix(k)))) <> 0 And chkCapMaplink.Checked) Or _
-             (Trim(imgX(ix(k))) > 0 And chkCapResolution.Checked) Then
-            If sComment <> "" Then
-              sComment = sComment & crlf & "<div style=""text-align:center; font-size:smaller""><br>"
-            Else
-              sComment = sComment & "<div style=""text-align:center; font-size:smaller"">"
-            End If
-          End If
+        If chkCapDate.Checked Then s = Format(d, "short date") & " "
+        If chkCapTime.Checked Then s = s & Format(d, "short time")
+        sComment = sComment & s & "<br>"
+      End If
 
-          If imgDate(ix(k)) <> Nothing And (chkCapDate.Checked Or chkCapTime.Checked) Then
-            s = ""
-            d = imgDate(ix(k))
-            x = nmTimeOffset.Value
-            d = d.Add(New TimeSpan(x, 0, 0))
+      If imgName(ix(k)) <> "" And chkCapName.Checked Then
+        sComment = sComment & imgName(ix(k)) & "<br>"
+      End If
 
-            If chkCapDate.Checked Then s = Format(d, "short date") & " "
-            If chkCapTime.Checked Then s = s & Format(d, "short time")
-            sComment = sComment & s & "<br>"
-          End If
+      If imgX(ix(k)) > 0 And chkCapResolution.Checked Then
+        sComment = sComment & imgX(ix(k)) & " x " & imgY(ix(k)) & "<br>"
+      End If
 
-          If imgName(ix(k)) <> "" And chkCapName.Checked Then
-            sComment = sComment & imgName(ix(k)) & "<br>"
-          End If
+      If imgLatLon(ix(k)) <> "" And chkCapLatLon.Checked Then
+        sComment = sComment & imgLatLon(ix(k)) & "<br>"
+      End If
 
-          If imgX(ix(k)) > 0 And chkCapResolution.Checked Then
-            sComment = sComment & imgX(ix(k)) & " x " & imgY(ix(k)) & "<br>"
-          End If
+      If imgAltitude(ix(k)) <> "" And chkCapAltitude.Checked Then
+        sComment = sComment & imgAltitude(ix(k)) & "<br>"
+      End If
 
-          If imgLatLon(ix(k)) <> "" And chkCapLatLon.Checked Then
-            sComment = sComment & imgLatLon(ix(k)) & "<br>"
-          End If
+      If imgLatLon(ix(k)) <> "" And chkCapLocation.Checked Then
+        GPSLocate(imgLatLon(ix(k)), locale, county, state, country)
+        If locale = "" And county = "" And state = "" And country = "" Then GPSLocate(imgLatLon(ix(k)), locale, county, state, country) ' sometimes it doesn't work.
+        If locale = "" And county = "" And state = "" And country = "" Then GPSLocate(imgLatLon(ix(k)), locale, county, state, country)
 
-          If imgAltitude(ix(k)) <> "" And chkCapAltitude.Checked Then
-            sComment = sComment & imgAltitude(ix(k)) & "<br>"
-          End If
+        s = locale
+        ' If county = "" Then s = locale Else s = "" ' skip town if there's a county
+        If county <> "" Then
+          If s <> "" Then s &= ", "
+          s &= county
+          If country = "USA" Or country = "" Then s &= " County"
+        End If
+        If state <> "" Then
+          If s <> "" Then s &= ", "
+          s &= state
+        End If
+        If country <> "" And country <> "USA" Then
+          If s <> "" Then s &= ", "
+          s &= country
+        End If
+        sComment &= crlf & s & "<br>"
+      End If
 
-          If imgLatLon(ix(k)) <> "" And chkCapLocation.Checked Then
-            GPSLocate(imgLatLon(ix(k)), locale, county, state, country)
-            If locale = "" And county = "" And state = "" And country = "" Then GPSLocate(imgLatLon(ix(k)), locale, county, state, country) ' sometimes it doesn't work.
-            If locale = "" And county = "" And state = "" And country = "" Then GPSLocate(imgLatLon(ix(k)), locale, county, state, country)
+      If imgLatLon(ix(k)) <> "" And chkCapMaplink.Checked Then
+        s = imgLatLon(ix(k))
+        s = s.Replace("°", " ")
+        If s.Contains("""") Then s = s.Replace("'", " ") Else s = s.Replace("'", "")
+        s = s.Replace("""", "")
+        's = s & "(" & imgName(ix(k)) & ")"
+        sComment = sComment & crlf &
+          "<a href=""https://www.google.com/maps/place/" & s & "/@" &
+          Format(imgXLat(ix(k)), "0.0#####") & "," & Format(imgXLon(ix(k)), "0.0#####") & ",14z/" &
+          "data=!4m2!3m1!1s0x0:0x0!5m1!1e4"">-map-</a><br>"
+        ' "<a href=""http://maps.google.com/maps?z=14&amp;t=h&amp;q=" & s & """ target=_blank title=""" & imgName(ix(k)) & """>-map-</a><br>" ' old google maps format
+      End If
+      If vb.Right(sComment, 6) = "<br>" Then sComment = vb.Left(sComment, Len(sComment) - 4)
 
-            s = locale
-            ' If county = "" Then s = locale Else s = "" ' skip town if there's a county
-            If county <> "" Then
-              If s <> "" Then s &= ", "
-              s &= county
-              If country = "USA" Or country = "" Then s &= " County"
-            End If
-            If state <> "" Then
-              If s <> "" Then s &= ", "
-              s &= state
-            End If
-            If country <> "" And country <> "USA" Then
-              If s <> "" Then s &= ", "
-              s &= country
-            End If
-            sComment &= crlf & s & "<br>"
-          End If
+      If (imgDate(ix(k)) <> Nothing And chkCapDate.Checked) Or _
+         (imgDate(ix(k)) <> Nothing And chkCapTime.Checked) Or _
+         (Len(Trim(imgName(ix(k)))) <> 0 And chkCapName.Checked) Or _
+         (Len(Trim(imgLatLon(ix(k)))) <> 0 And chkCapLatLon.Checked) Or _
+         (Len(Trim(imgAltitude(ix(k)))) <> 0 And chkCapAltitude.Checked) Or _
+         (Len(Trim(imgLatLon(ix(k)))) <> 0 And chkCapLocation.Checked) Or _
+         (Len(Trim(imgLatLon(ix(k)))) <> 0 And chkCapMaplink.Checked) Or _
+         (Trim(imgX(ix(k))) > 0 And chkCapResolution.Checked) Then
+        sComment = sComment & "</div>"
+      End If
 
-          If imgLatLon(ix(k)) <> "" And chkCapMaplink.Checked Then
-            s = imgLatLon(ix(k))
-            s = s.Replace("°", " ")
-            If s.Contains("""") Then s = s.Replace("'", " ") Else s = s.Replace("'", "")
-            s = s.Replace("""", "")
-            's = s & "(" & imgName(ix(k)) & ")"
-            sComment = sComment & crlf &
-              "<a href=""https://www.google.com/maps/place/" & s & "/@" &
-              Format(imgXLat(ix(k)), "0.0#####") & "," & Format(imgXLon(ix(k)), "0.0#####") & ",14z/" &
-              "data=!4m2!3m1!1s0x0:0x0!5m1!1e4"">-map-</a><br>"
-            ' "<a href=""http://maps.google.com/maps?z=14&amp;t=h&amp;q=" & s & """ target=_blank title=""" & imgName(ix(k)) & """>-map-</a><br>" ' old google maps format
-          End If
-          If vb.Right(sComment, 6) = "<br>" Then sComment = vb.Left(sComment, Len(sComment) - 4)
+      If sComment <> "" Then
+        sComment = "<div class=caption>" & sComment & "</div>"
+        sf.Add(sComment)
+      End If ' column content
 
-          If (imgDate(ix(k)) <> Nothing And chkCapDate.Checked) Or _
-             (imgDate(ix(k)) <> Nothing And chkCapTime.Checked) Or _
-             (Len(Trim(imgName(ix(k)))) <> 0 And chkCapName.Checked) Or _
-             (Len(Trim(imgLatLon(ix(k)))) <> 0 And chkCapLatLon.Checked) Or _
-             (Len(Trim(imgAltitude(ix(k)))) <> 0 And chkCapAltitude.Checked) Or _
-             (Len(Trim(imgLatLon(ix(k)))) <> 0 And chkCapLocation.Checked) Or _
-             (Len(Trim(imgLatLon(ix(k)))) <> 0 And chkCapMaplink.Checked) Or _
-             (Trim(imgX(ix(k))) > 0 And chkCapResolution.Checked) Then
-            sComment = sComment & "</div>"
-          End If
+      sf.Add("</div>")
+    Next k
 
-          k = k + 1
-          If sComment <> "" Then
-            sComment = "<div class=caption>" & sComment & "</div>"
-            sf.Add(sComment)
-          End If
-        End If ' column content
-
-        sf.Add("</td>")
-      Next i
-
-      sf.Add("</tr>")
-    Next j
-
-    sf.Add("</table>")
+    sf.Add("</div>")
     sf.Add("<br><br><br>")
 
     sf.Add("</div></body>")

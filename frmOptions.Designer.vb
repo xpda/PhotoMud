@@ -440,6 +440,7 @@
     '
     'nmWebCellSpacing
     '
+    Me.nmWebCellSpacing.Enabled = False
     Me.nmWebCellSpacing.Location = New System.Drawing.Point(345, 234)
     Me.nmWebCellSpacing.Name = "nmWebCellSpacing"
     Me.nmWebCellSpacing.Size = New System.Drawing.Size(77, 25)
@@ -489,6 +490,7 @@
     '
     'nmWebnColumns
     '
+    Me.nmWebnColumns.Enabled = False
     Me.nmWebnColumns.Location = New System.Drawing.Point(345, 79)
     Me.nmWebnColumns.Maximum = New Decimal(New Integer() {200, 0, 0, 0})
     Me.nmWebnColumns.Minimum = New Decimal(New Integer() {1, 0, 0, 0})
@@ -1093,6 +1095,7 @@
     'Label16
     '
     Me.Label16.AutoSize = True
+    Me.Label16.Enabled = False
     Me.Label16.Location = New System.Drawing.Point(94, 236)
     Me.Label16.Name = "Label16"
     Me.Label16.Size = New System.Drawing.Size(147, 17)
@@ -1165,6 +1168,7 @@
     'Label3
     '
     Me.Label3.AutoSize = True
+    Me.Label3.Enabled = False
     Me.Label3.Location = New System.Drawing.Point(94, 81)
     Me.Label3.Name = "Label3"
     Me.Label3.Size = New System.Drawing.Size(208, 17)
