@@ -641,17 +641,20 @@ Public Class frmWebPage
     End If
     sf.Add("}")
 
-    sf.Add(".flex { ")
+    sf.Add(".flexz { ")
     sf.Add("  display: flex;")
     sf.Add("  flex-flow: row wrap;")
+    sf.Add("  align-items: top;")
+    sf.Add("  justify-content: center;")
     sf.Add("  }")
 
-    sf.Add(".flex > div {")
+    sf.Add(".flexz > div {")
     sf.Add("  border: " & iniWebTableBorder & "px " & wFrameColor & " solid;")
     sf.Add("  padding: " & iniWebCellPadding & "px;")
+    sf.Add("  width: " & thumbXres & "px;")
     sf.Add("}")
 
-    sf.Add("img {border:0; margin:3px; box-shadow: 4px 4px 7px #222;}")
+    sf.Add("img {border:0; margin:3px; box-shadow: " & iniShadowSize & "px " & iniShadowSize & "px " & iniShadowSize * 2 & "px #222;}")
     sf.Add(".heading {")
     sf.Add("  width:60%;")
     sf.Add("  margin:0 auto;")
@@ -689,7 +692,7 @@ Public Class frmWebPage
     End If
     sf.Add("</div>")
 
-    sf.Add("<div class=flex>")
+    sf.Add("<div class=flexz>")
     For k As Integer = 0 To nimages
       sf.Add("<div>")
 
