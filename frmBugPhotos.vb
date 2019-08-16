@@ -40,7 +40,7 @@ Imports System.Drawing.Drawing2D
 Imports System.Drawing.Imaging
 Imports System.Math
 Imports System.IO
-Imports ImageMagick
+'Imports ImageMagick
 
 Imports System.Data
 Imports MySql.Data.MySqlClient
@@ -1587,7 +1587,7 @@ Public Class frmBugPhotos
     Dim arthropodCount(UBound(ranks)) As Integer
     Dim arthropodCountTotal(UBound(ranks)) As Integer
 
-    matches = queryTax("select * from taxatable where childimagecounter > 0, order by taxon", "")
+    matches = queryTax("select * from taxatable where childimagecounter > 0 order by taxon", "")
     gmatches = queryTax("select * from gbif.tax join taxa.gbifplus using (taxid) where childimagecounter > 0 order by name", "")
     matches = mergeMatches(matches, gmatches)
 

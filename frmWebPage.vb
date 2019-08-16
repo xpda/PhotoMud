@@ -210,7 +210,7 @@ Public Class frmWebPage
 
   Private Sub fmWebPage_Load(ByVal Sender As Object, ByVal e As EventArgs) Handles MyBase.Load
 
-    Dim exif As ExifProfile = Nothing
+    'Dim exif As ExifProfile = Nothing
 
     Dim j As Integer
 

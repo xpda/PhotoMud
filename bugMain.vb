@@ -1003,7 +1003,7 @@ Public Module bugMain
 
     matches = queryTax("select * from taxatable where taxon = @parm1" & suffix, findme)
     If matches.Count = 0 Then
-      matches = queryTax("select * from gbif.tax where name = @parm1" & suffixg, findme)
+      matches = queryTax("select * from gbif.tax, gbifplus where (tax.taxid = gbifplus.taxid and name = @parm1)" & suffixg, findme)
     End If
     If matches.Count = 0 Then
       matches = queryTax("select * from taxatable where (taxon like @parm1)" & suffix, "%" & findme & "%")
