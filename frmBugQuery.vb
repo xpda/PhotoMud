@@ -15,19 +15,12 @@ Public Class frmBugQuery
   Dim nn As Integer = 0
   Dim folderPath As String
 
-  Private Sub frmBugQuery_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
-    'QueryTaxon = ""
-  End Sub
-
   Private Sub frmBugQuery_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
 
     Dim s As String = ""
     Dim s1 As String = ""
 
     processing = True
-
-    'helpProvider1.SetHelpNavigator(Me, HelpNavigator.Topic)
-    'helpProvider1.SetHelpKeyword(Me, Me.Name & ".html")
 
     tvTaxon.ShowNodeToolTips = True
 
@@ -80,15 +73,22 @@ Public Class frmBugQuery
 
   End Sub
 
+
+
+
   Private Sub cmdOK_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdOK.Click
 
     If txTaxon.Text.Trim = "" Then
       ' txTaxon.Text = "Arthropoda"
       chkDescendants.Checked = True
     End If
+
     queryExec()
 
   End Sub
+
+
+
 
   Sub queryExec()
 
@@ -96,8 +96,7 @@ Public Class frmBugQuery
     Dim imgCmd As MySqlCommand = Nothing
     Dim adapt As New MySqlDataAdapter
     Dim adaptg As New MySqlDataAdapter
-    Dim dset As New DataSet
-    Dim drow As DataRow
+    Dim ds As New DataSet
     Dim matches As New List(Of taxrec)
     Dim gmatches As New List(Of taxrec)
     Dim sql As String
@@ -122,28 +121,28 @@ Public Class frmBugQuery
       cmd = queryparms(sql, "photodate", True, True, conn)
       If cmd IsNot Nothing Then
         adapt.SelectCommand = cmd
-        adapt.Fill(dset)
-        For Each drow In dset.Tables(0).Rows
-          s1 = CStr(drow("taxon"))
+        adapt.Fill(ds)
+        For Each dr As DataRow In ds.Tables(0).Rows
+          s1 = CStr(dr("taxon"))
           If s = "" OrElse eqstr(s, s1) Then ' taxonkey matches
-            If Not IsDBNull(drow("filename")) Then queryNames.Add(folderPath & drow("filename"))
+            If Not IsDBNull(dr("filename")) Then queryNames.Add(folderPath & dr("filename"))
           End If
-        Next drow
+        Next dr
       End If
 
       sql = "select images.filename, gbif.tax.name from images, gbif.tax where " &
         "substring(images.taxonid, 2) = gbif.tax.taxid and substring(images.taxonid, 1, 1) = 'g' "
       cmd = queryparms(sql, "photodate", True, True, conn)
-      dset.Clear()
+      ds.Clear()
       If cmd IsNot Nothing Then
         adapt.SelectCommand = cmd
-        adapt.Fill(dset)
-        For Each drow In dset.Tables(0).Rows
-          s1 = drow("name")
+        adapt.Fill(ds)
+        For Each dr As DataRow In ds.Tables(0).Rows
+          s1 = dr("name")
           If s = "" OrElse eqstr(s, s1) Then ' taxonkey matches
-            If Not IsDBNull(drow("filename")) Then queryNames.Add(folderPath & drow("filename"))
+            If Not IsDBNull(dr("filename")) Then queryNames.Add(folderPath & dr("filename"))
           End If
-        Next drow
+        Next dr
       End If
 
       If chkDescendants.Checked And txTaxon.Text.Trim <> "" Then
@@ -173,15 +172,15 @@ Public Class frmBugQuery
         For Each fname In queryNames
           id = getScalar("select imageid from images where filename = @parm1", Path.GetFileName(fname))
           setid = getScalar("select setid from imagesets where imageid = @parm1 limit 1", id)
-          dset = getDS("select * from imagesets where setid = @parm1", setid)
+          ds = getDS("select * from imagesets where setid = @parm1", setid)
 
-          If dset IsNot Nothing Then
-            For Each drow In dset.Tables(0).Rows
-              If Not IsDBNull(drow("imageid")) Then
-                s = folderPath & getScalar("select filename from images where imageid = @parm1", drow("imageid"))
+          If ds IsNot Nothing Then
+            For Each dr As DataRow In ds.Tables(0).Rows
+              If Not IsDBNull(dr("imageid")) Then
+                s = folderPath & getScalar("select filename from images where imageid = @parm1", dr("imageid"))
                 If Not queryNames.Contains(s) Then newNames.Add(s)
               End If
-            Next drow
+            Next dr
           End If
         Next fname
 
@@ -452,6 +451,25 @@ Public Class frmBugQuery
   Private Sub cmdCancel_Click(sender As Object, e As EventArgs) Handles cmdCancel.Click
     Me.DialogResult = DialogResult.Cancel
     Me.Close()
+  End Sub
+
+  Private Sub cmdTmp_Click(sender As Object, e As EventArgs) Handles cmdTmp.click
+
+    ' load files as a query based on filenames tagged (ignore folder)
+    Me.Cursor = Cursors.WaitCursor
+
+    queryNames = New List(Of String)
+    folderPath = iniBugPath
+    If Not folderPath.EndsWith("\") Then folderPath &= "\"
+
+    For i1 As Integer = 0 To tagPath.Count - 1
+      queryNames.Add(folderPath & Path.GetFileName(tagPath(i1)))
+    Next i1
+
+    Me.Cursor = Cursors.Default
+    Me.DialogResult = DialogResult.OK
+    Me.Close()
+
   End Sub
 
 End Class

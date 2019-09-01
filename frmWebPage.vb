@@ -661,7 +661,7 @@ Public Class frmWebPage
     sf.Add("}")
     sf.Add(".caption {")
     sf.Add("  font-family: Arial,Helvetica,sans-serif;")
-    sf.Add("  line-size: normal;")
+    sf.Add("  line-height: normal;")
     If iniWebCaptionSize > 0 Then
       sf.Add("  font-size:" & iniWebCaptionSize & "pt;")
     End If

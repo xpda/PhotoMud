@@ -1762,20 +1762,23 @@ Public Module main
             img.Ping(fName)
         End Select
 
+
+
         picInfo.FormatID = img.Format
         picInfo.FormatDescription = img.FormatInfo.Description
         picInfo.Width = img.Width
         picInfo.Height = img.Height
-        picInfo.fileSize = img.FileSize
+        'magickupdate picInfo.fileSize = img.FileSize
         picInfo.colorSpace = img.ColorSpace
         picInfo.colorDepth = img.Depth
         picInfo.hasPages = img.FormatInfo.IsMultiFrame
         picInfo.hasAlpha = img.HasAlpha
-        picInfo.Compression = img.CompressionMethod
+        'magickupdate picInfo.Compression = img.CompressionMethod
+        picInfo.Compression = img.Compression
         picInfo.Orientation = img.Orientation
         picInfo.ResolutionX = img.Density.X
         picInfo.ResolutionY = img.Density.Y
-        picInfo.fileSize = img.FileSize
+        'magickupdate picInfo.fileSize = img.FileSize
         picInfo.isNull = False
       Catch ex As Exception
         picInfo.isNull = True
@@ -4700,7 +4703,7 @@ Public Module main
                   img.ColorSpace = ColorSpace
                   img.Depth = ColorDepth
                   img.HasAlpha = hasAlpha
-                  img.CompressionMethod = compressionMethod
+                  'magickupdate img.CompressionMethod = compressionMethod
                   img.Density = New Density(pixelDPI, pixelDPI)
 
                   img.AnimationDelay = 100
@@ -4741,7 +4744,7 @@ Public Module main
             img.ColorSpace = ColorSpace
             img.Depth = ColorDepth
             img.HasAlpha = hasAlpha
-            img.CompressionMethod = compressionMethod
+            'magickupdate img.CompressionMethod = compressionMethod
             img.Density = New Density(pixelDPI, pixelDPI)
 
             img.Settings.SetDefine(MagickFormat.Pdf, "pdf:fit-to-page", True) ' untested

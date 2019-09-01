@@ -3428,6 +3428,7 @@ Public Class frmExploref
     dirWatch.EnableRaisingEvents = False
     Me.Cursor = Cursors.WaitCursor
     ListViewLoad(TreeView.SelectedNode.Tag)
+    cleartags()
     Me.Cursor = Cursors.Default
 
   End Sub

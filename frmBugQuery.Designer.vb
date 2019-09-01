@@ -61,6 +61,7 @@ Partial Class frmBugQuery
     Me.Label7 = New System.Windows.Forms.Label()
     Me.txRank = New System.Windows.Forms.TextBox()
     Me.Label11 = New System.Windows.Forms.Label()
+    Me.cmdTmp = New System.Windows.Forms.Button()
     Me.Panel1.SuspendLayout()
     Me.SuspendLayout()
     '
@@ -431,6 +432,15 @@ Partial Class frmBugQuery
     Me.Label11.TabIndex = 16
     Me.Label11.Text = "Ran&k:"
     '
+    'cmdTmp
+    '
+    Me.cmdTmp.Location = New System.Drawing.Point(415, 654)
+    Me.cmdTmp.Name = "cmdTmp"
+    Me.cmdTmp.Size = New System.Drawing.Size(88, 44)
+    Me.cmdTmp.TabIndex = 83
+    Me.cmdTmp.Text = "tmp"
+    Me.cmdTmp.UseVisualStyleBackColor = True
+    '
     'frmBugQuery
     '
     Me.AcceptButton = Me.cmdOK
@@ -438,6 +448,7 @@ Partial Class frmBugQuery
     Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
     Me.CancelButton = Me.cmdCancel
     Me.ClientSize = New System.Drawing.Size(1127, 722)
+    Me.Controls.Add(Me.cmdTmp)
     Me.Controls.Add(Me.txRank)
     Me.Controls.Add(Me.Label11)
     Me.Controls.Add(Me.Panel1)
@@ -508,4 +519,5 @@ Partial Class frmBugQuery
   Friend WithEvents txModMin As System.Windows.Forms.TextBox
   Friend WithEvents txRank As System.Windows.Forms.TextBox
   Public WithEvents Label11 As System.Windows.Forms.Label
+  Friend WithEvents cmdTmp As System.Windows.Forms.Button
 End Class

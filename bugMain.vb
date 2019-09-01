@@ -1133,26 +1133,26 @@ Public Module bugMain
     s = ""
 
     descr = getDescr(pic.match, False)
-    If descr <> "" AndAlso Not descr.Contains(":") Then s += descr & "<br>"
+    If descr <> "" AndAlso Not descr.Contains(":") Then s &= descr & "<br>"
 
     taxonkey = pic.match.taxon
-    s += "<i>" & taxonkey & "</i>"
+    s &= "<i>" & taxonkey & "</i>"
     If String.Compare(pic.match.rank, "species", True) <> 0 And String.Compare(pic.match.rank, "subspecies", True) <> 0 And _
       String.Compare(pic.match.rank, "no taxon", True) <> 0 Then
       s = s & " " & pic.match.rank
     End If
-    s += "<br>"
+    s &= "<br>"
 
-    If descr <> "" AndAlso descr.Contains(":") Then s += descr & "<br>"
+    If descr <> "" AndAlso descr.Contains(":") Then s &= descr & "<br>"
 
     s1 = LocationLabel(pic)
-    If s1 <> "" Then s += s1 & "<br>"
+    If s1 <> "" Then s &= s1 & "<br>"
 
-    If pic.Remarks <> Nothing AndAlso pic.Remarks <> "" Then s += "Remarks: " & pic.Remarks & "<br>"
-    If pic.Size <> Nothing AndAlso pic.Size <> "" Then s += "Size: " & pic.Size & "<br>"
-    If pic.photoDate <> Nothing Then s += Format(pic.photoDate, "d")
+    If pic.Remarks <> Nothing AndAlso pic.Remarks <> "" Then s &= "Remarks: " & pic.Remarks & "<br>"
+    If pic.Size <> Nothing AndAlso pic.Size <> "" Then s &= "Size: " & pic.Size & "<br>"
+    If pic.photoDate <> Nothing Then s &= Format(pic.photoDate, "d")
 
-    s += vbCrLf & "</div>"
+    's &= vbCrLf & "</div>"
 
     Return (s)
 
