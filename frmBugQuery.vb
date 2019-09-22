@@ -45,7 +45,7 @@ Public Class frmBugQuery
 
     matches = queryTax("select * from taxatable where taxon = 'arthropoda' order by taxon", "")
     gmatches = queryTax(
-      "select * from gbif.tax join taxa.gbifplus using (taxid) where name = 'animalia' and usable <> '' order by name", "")
+      "select * from gbif.tax where name = 'animalia' and usable <> '' order by name", "")
     matches = mergeMatches(matches, gmatches)
 
     For Each m As taxrec In matches
@@ -149,7 +149,7 @@ Public Class frmBugQuery
         sTaxon = Split(txTaxon.Text.Trim, " ", 2) ' separate 1st word
         matches = queryTax("select * from taxatable where taxon = @parm1", sTaxon(UBound(sTaxon)))
         gmatches = queryTax(
-          "select * from gbif.tax join taxa.gbifplus using (taxid) where name = @parm1 and usable = 'ok'", sTaxon(UBound(sTaxon)))
+          "select * from gbif.tax where name = @parm1 and usable = 'ok'", sTaxon(UBound(sTaxon)))
         matches = mergeMatches(matches, gmatches)
 
         'sql = "select images.*, taxatable.parentid, taxatable.rank, taxatable.taxon " &
