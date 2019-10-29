@@ -1,4 +1,7 @@
-﻿' for picload service - load a file from Windows Explorer double-click
+﻿'Photo Mud is licensed under Creative Commons BY-NC-SA 4.0
+'https://creativecommons.org/licenses/by-nc-sa/4.0/
+
+' for picload service - load a file from Windows Explorer double-click
 Imports System.IO
 Imports System.ServiceModel
 Imports System.ServiceModel.Description

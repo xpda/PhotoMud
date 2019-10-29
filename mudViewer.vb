@@ -1,4 +1,7 @@
-﻿' Mudviewer is like pviewer, but it also supports the tabbs in frmMain
+﻿'Photo Mud is licensed under Creative Commons BY-NC-SA 4.0
+'https://creativecommons.org/licenses/by-nc-sa/4.0/
+
+' Mudviewer is like pviewer, but it also supports the tabbs in frmMain
 Imports System.Drawing.Drawing2D
 Imports System.Drawing.Imaging
 Imports System.Drawing.Text

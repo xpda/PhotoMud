@@ -1,4 +1,7 @@
-﻿Public Class ctlBrightness
+﻿'Photo Mud is licensed under Creative Commons BY-NC-SA 4.0
+'https://creativecommons.org/licenses/by-nc-sa/4.0/
+
+Public Class ctlBrightness
 
   Dim busy As Boolean = False
   Dim loading As Boolean = True
@@ -178,7 +181,7 @@
       '      nmSaturation.Value = trkSaturation.Value
     End If
 
-    nmBrightness.select()
+    nmBrightness.Select()
     nmBrightness.Select(0, Len(nmBrightness.Text))
 
   End Sub

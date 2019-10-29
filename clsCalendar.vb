@@ -1,4 +1,7 @@
-﻿' history: military, science, math, political, US, countries, mountaineering, aerospace, astronomy, tides
+﻿'Photo Mud is licensed under Creative Commons BY-NC-SA 4.0
+'https://creativecommons.org/licenses/by-nc-sa/4.0/
+
+' history: military, science, math, political, US, countries, mountaineering, aerospace, astronomy, tides
 ' birthdays: major, music, math, science, political, military, aerospace, mountaineering, world peace, nobel winners, nature, etc.
 
 Imports vb = Microsoft.VisualBasic

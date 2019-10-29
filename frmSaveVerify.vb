@@ -1,3 +1,6 @@
+'Photo Mud is licensed under Creative Commons BY-NC-SA 4.0
+'https://creativecommons.org/licenses/by-nc-sa/4.0/
+
 Public Class frmSaveVerify
   Inherits Form
 
@@ -23,7 +26,7 @@ Public Class frmSaveVerify
     End If
     If Not IsNumeric(txtXres.Text) Or x <= 0 Then
       MsgBox("Invalid Resolution: " & txtXres.Text & ".", MsgBoxStyle.OkOnly)
-      txtXres.select()
+      txtXres.Select()
       Exit Sub
     Else
       frmWeb.Xres = x
@@ -35,7 +38,7 @@ Public Class frmSaveVerify
     End If
     If Not IsNumeric(txtYres.Text) Or x <= 0 Then
       MsgBox("Invalid Resolution: " & txtYres.Text & ".", MsgBoxStyle.OkOnly)
-      txtYres.select()
+      txtYres.Select()
       Exit Sub
     Else
       frmWeb.Yres = x
@@ -47,7 +50,7 @@ Public Class frmSaveVerify
     End If
     If Not IsNumeric(txtXres.Text) Or x < 2 Or x > 255 Then
       MsgBox("Invalid Compression Value: " & txtQuality.Text & ".", MsgBoxStyle.OkOnly)
-      txtQuality.select()
+      txtQuality.Select()
       Exit Sub
     Else
       frmWeb.JPGQuality = x

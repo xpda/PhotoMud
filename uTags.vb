@@ -1,3 +1,6 @@
+'Photo Mud is licensed under Creative Commons BY-NC-SA 4.0
+'https://creativecommons.org/licenses/by-nc-sa/4.0/
+
 Public Class uTag
 
   Dim uKey As String
@@ -22,10 +25,10 @@ Public Class uTag
   Property Value() As Object
     Get
       If IsArray(uValue) Then Value = uValue.clone Else Value = uValue
-      End Get
+    End Get
     Set(ByVal Value As Object)
       If IsArray(Value) Then uValue = Value.clone Else uValue = Value
-      End Set
+    End Set
   End Property
 
   ReadOnly Property singleValue(Optional ByVal Subscript As Integer = 0) As Object

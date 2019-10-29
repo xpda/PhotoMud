@@ -1,3 +1,6 @@
+'Photo Mud is licensed under Creative Commons BY-NC-SA 4.0
+'https://creativecommons.org/licenses/by-nc-sa/4.0/
+
 Imports System.Drawing
 Imports System.Drawing.Imaging
 Imports System.Drawing.Drawing2D

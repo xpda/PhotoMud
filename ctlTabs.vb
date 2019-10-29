@@ -1,4 +1,7 @@
-﻿Imports System.Windows.Forms
+﻿'Photo Mud is licensed under Creative Commons BY-NC-SA 4.0
+'https://creativecommons.org/licenses/by-nc-sa/4.0/
+
+Imports System.Windows.Forms
 ' this displays a tab control without the tabs if there is only one tabpage.
 Public Class ctlTabs
 Inherits TabControl

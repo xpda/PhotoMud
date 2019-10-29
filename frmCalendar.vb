@@ -1,4 +1,7 @@
-﻿Imports System.Runtime.InteropServices
+﻿'Photo Mud is licensed under Creative Commons BY-NC-SA 4.0
+'https://creativecommons.org/licenses/by-nc-sa/4.0/
+
+Imports System.Runtime.InteropServices
 Imports System.Drawing.Drawing2D
 Imports System.Drawing.Printing
 Imports System.Drawing.Imaging
