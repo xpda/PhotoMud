@@ -171,6 +171,7 @@
     Me.mnuToolsBugPhotos = New System.Windows.Forms.ToolStripMenuItem()
     Me.mnuToolsLinkBugPhotos = New System.Windows.Forms.ToolStripMenuItem()
     Me.mnuToolsBugQuery = New System.Windows.Forms.ToolStripMenuItem()
+    Me.mnuToolsExportFilenames = New System.Windows.Forms.ToolStripMenuItem()
     Me.toolsline1 = New System.Windows.Forms.ToolStripSeparator()
     Me.mnuToolsWebpage = New System.Windows.Forms.ToolStripMenuItem()
     Me.mnuToolsWallpaper = New System.Windows.Forms.ToolStripMenuItem()
@@ -723,7 +724,7 @@
     '
     'mnuTools
     '
-    Me.mnuTools.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuToolsInfo, Me.mnuToolsComment, Me.mnuToolsBatchInfoCopy, Me.mnuToolsBugseparator, Me.mnuToolsBugPhotos, Me.mnuToolsLinkBugPhotos, Me.mnuToolsBugQuery, Me.toolsline1, Me.mnuToolsWebpage, Me.mnuToolsWallpaper, Me.mnuToolsSlideshow, Me.mnuToolsMergeColor, Me.toolsline9, Me.mnuToolsSearch, Me.mnuToolsPicSearch, Me.toolsline2, Me.mnuToolsAssoc, Me.mnuToolsFileFilter, Me.ToolStripSeparator8, Me.mnuToolsCalendar, Me.ToolStripSeparator9, Me.mnuToolsToolbar, Me.mnuToolsOptions})
+    Me.mnuTools.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuToolsInfo, Me.mnuToolsComment, Me.mnuToolsBatchInfoCopy, Me.mnuToolsBugseparator, Me.mnuToolsBugPhotos, Me.mnuToolsLinkBugPhotos, Me.mnuToolsBugQuery, Me.mnuToolsExportFilenames, Me.toolsline1, Me.mnuToolsWebpage, Me.mnuToolsWallpaper, Me.mnuToolsSlideshow, Me.mnuToolsMergeColor, Me.toolsline9, Me.mnuToolsSearch, Me.mnuToolsPicSearch, Me.toolsline2, Me.mnuToolsAssoc, Me.mnuToolsFileFilter, Me.ToolStripSeparator8, Me.mnuToolsCalendar, Me.ToolStripSeparator9, Me.mnuToolsToolbar, Me.mnuToolsOptions})
     Me.mnuTools.Name = "mnuTools"
     Me.mnuTools.Size = New System.Drawing.Size(55, 24)
     Me.mnuTools.Text = "&Tools"
@@ -774,6 +775,12 @@
     Me.mnuToolsBugQuery.ShortcutKeys = CType((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.F), System.Windows.Forms.Keys)
     Me.mnuToolsBugQuery.Size = New System.Drawing.Size(295, 26)
     Me.mnuToolsBugQuery.Text = "Bug &Query"
+    '
+    'mnuToolsExportFilenames
+    '
+    Me.mnuToolsExportFilenames.Name = "mnuToolsExportFilenames"
+    Me.mnuToolsExportFilenames.Size = New System.Drawing.Size(295, 26)
+    Me.mnuToolsExportFilenames.Text = "E&xport Tagged Filenames"
     '
     'toolsline1
     '
@@ -1425,5 +1432,6 @@
   Friend WithEvents mnuToolsLinkBugPhotos As System.Windows.Forms.ToolStripMenuItem
   Friend WithEvents mnuToolsBugQuery As System.Windows.Forms.ToolStripMenuItem
   Friend WithEvents mnxFMap As System.Windows.Forms.ToolStripMenuItem
+  Friend WithEvents mnuToolsExportFilenames As System.Windows.Forms.ToolStripMenuItem
 #End Region
 End Class

@@ -96,6 +96,7 @@ Public Module bugMain
   Public lastbugConfidence As String = ""
   Public lastbugRemarks As String = ""
   Public lastbugBugguide As String = ""
+  Public lastbugiNaturalist As String = ""
   Public bugDBEnabled As Boolean = True
   Public lastbugLocationAutocomplete As AutoCompleteStringCollection = Nothing
   Public iniBugPixelsPerMM As Double = 274.5 ' gx1: 268.4 macro, 56.5 for zoom, gh4: 274.5 macro, 57.8 zoom
@@ -311,7 +312,7 @@ Public Module bugMain
                  taxid.Substring(1).Trim)
       If ds IsNot Nothing Then
         For Each dr As DataRow In ds.Tables(0).Rows
-          m = getTaxrecg(dr)
+          m = getTaxrecg(dr, False)
           matches.Add(m)
         Next dr
       End If
@@ -335,51 +336,53 @@ Public Module bugMain
     Dim match As New taxrec
 
     ' load drow into match
-    If IsDBNull(dr("rank")) Then match.rank = "" Else match.rank = dr("rank")
-    If IsDBNull(dr("taxon")) Then match.taxon = "" Else match.taxon = dr("taxon")
-    If IsDBNull(dr("descr")) Then match.descr = "" Else match.descr = dr("descr")
-    If IsDBNull(dr("taxid")) Then match.taxid = "" Else match.taxid = dr("taxid")
-    If IsDBNull(dr("parentid")) Then match.parentid = "" Else match.parentid = dr("parentid")
-    If IsDBNull(dr("imagecounter")) Then match.imageCounter = 0 Else match.imageCounter = dr("imagecounter")
-    If IsDBNull(dr("childimagecounter")) Then match.childimageCounter = 0 Else match.childimageCounter = dr("childimagecounter")
-    If IsDBNull(dr("link")) Then match.link = "" Else match.link = dr("link")
-    If IsDBNull(dr("authority")) Then match.authority = "" Else match.authority = dr("authority")
+    match.rank = dr("rank")
+    match.taxon = dr("taxon")
+    match.descr = dr("descr")
+    match.taxid = dr("taxid")
+    match.parentid = dr("parentid")
+    match.imageCounter = dr("imagecounter")
+    match.childimageCounter = dr("childimagecounter")
+    match.link = dr("link")
+    match.authority = dr("authority")
 
     Return match
 
   End Function
 
-  Function getTaxrecg(ByRef dr As DataRow) As taxrec
+  Function getTaxrecg(ByRef dr As DataRow, noCommon As Boolean) As taxrec
     ' get a taxref from gbif database
     Dim match As New taxrec
     Dim matches As New List(Of taxrec)
     Dim vnames As New List(Of String)
-    Dim taxid As String
+    Dim taxid As String = ""
     Dim ds As DataSet
     Dim s As String
     Dim ss() As String
 
-    If IsDBNull(dr("taxid")) Then taxid = "" Else taxid = dr("taxid")
+    taxid = dr("taxid")
     If taxid <> "" Then match.taxid = "g" & taxid ' gbif id prefix
 
     ' load dr into match
-    If IsDBNull(dr("rank")) Then match.rank = "" Else match.rank = dr("rank")
-    If IsDBNull(dr("name")) Then match.taxon = "" Else match.taxon = dr("name")
-    If IsDBNull(dr("parent")) Then match.parentid = "" Else match.parentid = "g" & dr("parent")
-    If IsDBNull(dr("authority")) Then match.authority = "" Else match.authority = dr("authority")
+    match.rank = dr("rank")
+    match.taxon = dr("name")
+    match.parentid = "g" & dr("parent")
+    match.authority = dr("authority")
     match.authority = match.authority.Replace(" and ", " & ")
-    If IsDBNull(dr("usable")) Then match.gbifUsable = "" Else match.gbifUsable = dr("usable")
+    match.gbifUsable = dr("usable")
 
     ' get image counters and links, if possible
     ds = getDS("select * from gbifplus where taxid = @parm1", taxid)
     For Each dr2 As DataRow In ds.Tables(0).Rows
-      If IsDBNull(dr2("imagecounter")) Then match.imageCounter = 0 Else match.imageCounter = dr2("imagecounter")
-      If IsDBNull(dr2("childimagecounter")) Then match.childimageCounter = 0 Else match.childimageCounter = dr2("childimagecounter")
-      If IsDBNull(dr2("link")) Then match.link = "" Else match.link = dr2("link")
+      match.imageCounter = dr2("imagecounter")
+      match.childimageCounter = dr2("childimagecounter")
+      match.link = dr2("link")
     Next dr2
 
+    If noCommon Then Return match
+
     ' get common names from oddinfo
-    ds = getDS("select * from oddinfo where name = @parm1", match.taxon)
+    ds = getDS("select * from oddinfo where taxid = @parm1", match.taxid)
     For Each dr2 As DataRow In ds.Tables(0).Rows
       If dr2("commonnames") <> "" Then
         s = dr2("commonnames")
@@ -436,7 +439,7 @@ Public Module bugMain
     If ds IsNot Nothing Then
       For Each dr As DataRow In ds.Tables(0).Rows
         If cmd.Contains("gbif.") Then
-          match = getTaxrecg(dr)
+          match = getTaxrecg(dr, True) ' no common names
         Else
           match = getTaxrec(dr)
         End If
@@ -716,7 +719,7 @@ Public Module bugMain
       saveImageSetID(linktoID, setid) ' assigns setid
     End If
 
-    Call saveImageSet(fName, setid) ' save the one for the new file
+    saveImageSet(fName, setid) ' save the one for the new file
 
   End Sub
 
@@ -865,8 +868,7 @@ Public Module bugMain
     Dim dLat, dLon As Double
     Dim jq As JObject
 
-    s = LCase(latlon)
-    Call latlonVerify(s, dLat, dLon)
+    latlonVerify(latlon, dLat, dLon)
 
     'link = "http://maps.googleapis.com/maps/api/geocode/xml?sensor=true&latlng=" & Format(dLat, "###.#####") & "," & Format(dLon, "###.#####")
     url = "https://nominatim.openstreetmap.org/reverse?format=json&lat=" & Format(dLat, "###.#####") & "&lon=" & Format(dLon, "###.#####") &
@@ -874,12 +876,11 @@ Public Module bugMain
 
     Try
       s = qClient.GetStringAsync(url).Result
+      jq = JObject.Parse(s)
     Catch ex As Exception
       MsgBox(ex.Message)
       Exit Sub
     End Try
-
-    jq = JObject.Parse(s)
 
     If jq.SelectToken("address") IsNot Nothing Then
       If jq.SelectToken("address.city") IsNot Nothing Then
@@ -1446,7 +1447,7 @@ Public Class pixClass
     s = dr("taxonid")
 
     If s.StartsWith("g") Then
-      match = getTaxrecg(dr)
+      match = getTaxrecg(dr, False)
     Else
       match = getTaxrec(dr)
     End If

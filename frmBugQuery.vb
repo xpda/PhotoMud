@@ -48,7 +48,7 @@ Public Class frmBugQuery
 
     matches = queryTax("select * from taxatable where taxon = 'arthropoda' order by taxon", "")
     gmatches = queryTax(
-      "select * from gbif.tax where name = 'animalia' and usable <> '' order by name", "")
+      "select * from gbif.tax where name = 'animalia' and usable <> '' and usable <> 'notinpaleo' order by name", "")
     matches = mergeMatches(matches, gmatches)
 
     For Each m As taxrec In matches

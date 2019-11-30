@@ -257,6 +257,7 @@ Public Class frmExploref
     ElseIf Sender Is mnuToolsBugPhotos Then
       Using frm As New frmBugPhotos
         frm.ShowDialog()
+        setTags() ' in case something was tagged
       End Using
     End If
 
@@ -1267,10 +1268,8 @@ Public Class frmExploref
 
   Private Sub mnuFileCopy_Click(ByVal Sender As Object, ByVal e As EventArgs) Handles mnuFileCopy.Click
 
-    Dim i As Integer
     Dim targetFile As String
     Dim sourceFile As String
-    Dim sFilter As String
     Dim ext As String
 
     If ListView1.SelectedItems.Count <> 1 Then Exit Sub
@@ -1278,36 +1277,11 @@ Public Class frmExploref
     sourceFile = ListView1.SelectedItems(0).Tag
     ext = Path.GetExtension(sourceFile)
 
-    sFilter = "All Files|*.*"  ' if no extension on current file
-    For i = 0 To fmtCommon.Count - 1
-      sFilter = sFilter & "|" & fmtCommon(i).Description & "|*" & fmtCommon(i).Ext
-      If (ext = ".jpg" Or ext = ".jpeg") And fmtCommon(i).ID = ".jpg" Or _
-         (ext = ".tif" Or ext = ".tiff") And fmtCommon(i).ID = ".tif" Then
-        saveDialog1.FilterIndex = i + 2
-      End If
-    Next i
+    targetFile = getSaveFilename(ext, sourceFile)
 
-    saveDialog1.AddExtension = True
-    saveDialog1.FileName = Path.GetFileName(sourceFile)
-    saveDialog1.Filter = sFilter
-    saveDialog1.DefaultExt = ext
-    saveDialog1.InitialDirectory = iniSavePath
-    saveDialog1.CheckPathExists = True
-    saveDialog1.OverwritePrompt = True
-
-    Try
-      dResult = saveDialog1.ShowDialog()
-    Catch ex As Exception
-      MsgBox(ex.Message)
-    End Try
-
-    If dResult = DialogResult.OK Then
-      targetFile = saveDialog1.FileName
-
-      If targetFile <> "" Then
-        FileCopy(sourceFile, targetFile)
-        iniSavePath = Path.GetDirectoryName(targetFile)
-      End If
+    If targetFile <> "" Then
+      FileCopy(sourceFile, targetFile)
+      iniSavePath = Path.GetDirectoryName(targetFile)
     End If
 
   End Sub
@@ -3431,10 +3405,66 @@ Public Class frmExploref
     dirWatch.EnableRaisingEvents = False
     Me.Cursor = Cursors.WaitCursor
     ListViewLoad(TreeView.SelectedNode.Tag)
+    ' cleartags()  11/15/2019
+    Me.Cursor = Cursors.Default
+
+  End Sub
+
+  Private Sub mnuToolsExportFilenames_Click(sender As Object, e As EventArgs) Handles mnuToolsExportFilenames.Click
+
+    Dim fname As String
+
+    Me.Cursor = Cursors.WaitCursor
+    ' export names
+
+    fname = getSaveFilename("txt", "")
+    If fname <> "" Then File.WriteAllLines(fname, tagPath)
     cleartags()
     Me.Cursor = Cursors.Default
 
   End Sub
+
+  Private Function getSaveFilename(ext As String, sourcefile As String) As String
+
+    Dim sFilter As String
+
+    If ext.ToLower.EndsWith("txt") Then
+      sFilter = "All Files|*.*|Text Files|*.txt"  ' if no extension on current file
+    Else ' images
+      sFilter = "All Files|*.*"  ' if no extension on current file
+      For i As Integer = 0 To fmtCommon.Count - 1
+        sFilter = sFilter & "|" & fmtCommon(i).Description & "|*" & fmtCommon(i).Ext
+        If (ext = ".jpg" Or ext = ".jpeg") And fmtCommon(i).ID = ".jpg" Or _
+           (ext = ".tif" Or ext = ".tiff") And fmtCommon(i).ID = ".tif" Then
+          saveDialog1.FilterIndex = i + 2
+        End If
+      Next i
+    End If
+
+    saveDialog1.AddExtension = True
+    If sourcefile <> "" Then saveDialog1.FileName = path.GetFileName(sourcefile)
+    saveDialog1.Filter = sFilter
+    saveDialog1.DefaultExt = ext
+    saveDialog1.InitialDirectory = iniSavePath
+    saveDialog1.CheckPathExists = True
+    saveDialog1.OverwritePrompt = True
+
+    Try
+      dResult = saveDialog1.ShowDialog()
+    Catch ex As Exception
+      MsgBox(ex.Message)
+      Return ""
+    End Try
+
+    If dResult = DialogResult.OK Then
+      Return saveDialog1.FileName
+    Else
+      Return ""
+    End If
+
+  End Function
+
+
 
   Protected Overrides Function ProcessDialogKey(ByVal keyData As Keys) As Boolean
 

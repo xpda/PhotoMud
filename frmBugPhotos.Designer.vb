@@ -26,6 +26,9 @@ Partial Class frmBugPhotos
     Me.LbFname = New System.Windows.Forms.Label()
     Me.rText0 = New System.Windows.Forms.RichTextBox()
     Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+    Me.mnxTagged = New System.Windows.Forms.CheckBox()
+    Me.txiNaturalist = New System.Windows.Forms.TextBox()
+    Me.Label12 = New System.Windows.Forms.Label()
     Me.txElevation = New System.Windows.Forms.TextBox()
     Me.Label11 = New System.Windows.Forms.Label()
     Me.Label10 = New System.Windows.Forms.Label()
@@ -113,6 +116,9 @@ Partial Class frmBugPhotos
     'GroupBox1
     '
     Me.GroupBox1.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+    Me.GroupBox1.Controls.Add(Me.mnxTagged)
+    Me.GroupBox1.Controls.Add(Me.txiNaturalist)
+    Me.GroupBox1.Controls.Add(Me.Label12)
     Me.GroupBox1.Controls.Add(Me.txElevation)
     Me.GroupBox1.Controls.Add(Me.Label11)
     Me.GroupBox1.Controls.Add(Me.Label10)
@@ -153,9 +159,39 @@ Partial Class frmBugPhotos
     Me.GroupBox1.Controls.Add(Me.LbFname)
     Me.GroupBox1.Location = New System.Drawing.Point(21, 102)
     Me.GroupBox1.Name = "GroupBox1"
-    Me.GroupBox1.Size = New System.Drawing.Size(489, 582)
+    Me.GroupBox1.Size = New System.Drawing.Size(489, 584)
     Me.GroupBox1.TabIndex = 43
     Me.GroupBox1.TabStop = False
+    '
+    'mnxTagged
+    '
+    Me.mnxTagged.AutoSize = True
+    Me.mnxTagged.Enabled = False
+    Me.mnxTagged.Location = New System.Drawing.Point(21, 552)
+    Me.mnxTagged.Name = "mnxTagged"
+    Me.mnxTagged.Size = New System.Drawing.Size(77, 21)
+    Me.mnxTagged.TabIndex = 51
+    Me.mnxTagged.Text = "Tagged"
+    Me.mnxTagged.UseVisualStyleBackColor = True
+    '
+    'txiNaturalist
+    '
+    Me.txiNaturalist.Location = New System.Drawing.Point(359, 388)
+    Me.txiNaturalist.Name = "txiNaturalist"
+    Me.txiNaturalist.Size = New System.Drawing.Size(113, 25)
+    Me.txiNaturalist.TabIndex = 50
+    '
+    'Label12
+    '
+    Me.Label12.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+    Me.Label12.AutoSize = True
+    Me.Label12.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+    Me.Label12.Location = New System.Drawing.Point(282, 391)
+    Me.Label12.Name = "Label12"
+    Me.Label12.Size = New System.Drawing.Size(76, 17)
+    Me.Label12.TabIndex = 49
+    Me.Label12.Text = "&iNaturalist:"
+    Me.Label12.TextAlign = System.Drawing.ContentAlignment.TopRight
     '
     'txElevation
     '
@@ -422,7 +458,7 @@ Partial Class frmBugPhotos
     '
     Me.Label5.AutoSize = True
     Me.Label5.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.Label5.Location = New System.Drawing.Point(303, 324)
+    Me.Label5.Location = New System.Drawing.Point(304, 324)
     Me.Label5.Name = "Label5"
     Me.Label5.Size = New System.Drawing.Size(54, 17)
     Me.Label5.TabIndex = 28
@@ -664,7 +700,7 @@ Partial Class frmBugPhotos
     Me.pView.DrawFilled = False
     Me.pView.DrawFont = Nothing
     Me.pView.DrawForeColor = System.Drawing.Color.Navy
-    Me.pView.DrawLineWidth = 1.0!
+    Me.pView.DrawLineWidth = 1.0R
     Me.pView.DrawPath = Nothing
     Me.pView.DrawPoints = CType(resources.GetObject("pView.DrawPoints"), System.Collections.Generic.List(Of System.Drawing.Point))
     Me.pView.DrawShape = PhotoMud.shape.Line
@@ -806,4 +842,7 @@ Partial Class frmBugPhotos
   Public WithEvents Label11 As System.Windows.Forms.Label
   Friend WithEvents pView As PhotoMud.pViewer
   Friend WithEvents cmdWikimedia As System.Windows.Forms.Button
+  Friend WithEvents txiNaturalist As System.Windows.Forms.TextBox
+  Public WithEvents Label12 As System.Windows.Forms.Label
+  Friend WithEvents mnxTagged As System.Windows.Forms.CheckBox
 End Class

@@ -206,15 +206,16 @@ Public Class frmBugPhotos
             " rating = @rating, " & _
             " confidence = @confidence, " & _
             " remarks = @remarks, " & _
-            " bugguide = @bugguide" & _
+            " bugguide = @bugguide," & _
+            " inaturalist = @inaturalist" & _
             " where imageid = @id"
 
         Else
           sql = "insert into images " & _
             "(filename, photodate, dateadded, modified, taxonid, location, county, state, country, size, " & _
-              "gps, elevation, rating, confidence, remarks, bugguide, originalpath) " & _
+              "gps, elevation, rating, confidence, remarks, bugguide, inaturalist, originalpath) " & _
               "values (@filename, @photodate, @dateadded, @modified, @taxonid, @location, @county, @state, @country, @size, " & _
-              "@gps, @elevation, @rating, @confidence, @remarks, @bugguide, @originalpath)"
+              "@gps, @elevation, @rating, @confidence, @remarks, @bugguide, @inaturalist, @originalpath)"
         End If
 
         cmd = New MySqlCommand(sql, conn)
@@ -234,6 +235,7 @@ Public Class frmBugPhotos
         If IsNumeric(txConfidence.Text) Then cmd.Parameters.AddWithValue("@confidence", Int(txConfidence.Text)) Else cmd.Parameters.AddWithValue("@confidence", "0")
         cmd.Parameters.AddWithValue("@remarks", Trim(txRemarks.Text))
         If IsNumeric(txBugguide.Text) Then cmd.Parameters.AddWithValue("@bugguide", Int(txBugguide.Text)) Else cmd.Parameters.AddWithValue("@bugguide", 0)
+        If IsNumeric(txiNaturalist.Text) Then cmd.Parameters.AddWithValue("@inaturalist", Int(txiNaturalist.Text)) Else cmd.Parameters.AddWithValue("@inaturalist", 0)
         cmd.Parameters.AddWithValue("@originalpath", Trim(txOriginalPath.Text))
         If id <> "" Then cmd.Parameters.AddWithValue("@id", id)
 
@@ -279,6 +281,7 @@ Public Class frmBugPhotos
     lastbugConfidence = txConfidence.Text()
     lastbugRemarks = txRemarks.Text
     lastbugBugguide = txBugguide.Text
+    lastbugiNaturalist = txiNaturalist.Text
     ' lastbugLocationAutocomplete = txLocation.AutoCompleteCustomSource
     bugPrevFilename = fName
 
@@ -361,6 +364,7 @@ Public Class frmBugPhotos
     txConfidence.Text = "0"
     txRemarks.Text = ""
     txBugguide.Text = ""
+    txiNaturalist.Text = ""
 
     setChkLink()
 
@@ -415,7 +419,8 @@ Public Class frmBugPhotos
       If Not IsDBNull(drow("rating")) Then txRating.Text = drow("rating")
       If Not IsDBNull(drow("confidence")) Then txConfidence.Text = drow("confidence")
       If Not IsDBNull(drow("remarks")) Then txRemarks.Text = drow("remarks")
-      If Not IsDBNull(drow("bugguide")) Then txBugguide.Text = drow("bugguide")
+      If Not IsDBNull(drow("bugguide")) AndAlso drow("bugguide") <> 0 Then txBugguide.Text = drow("bugguide")
+      If Not IsDBNull(drow("inaturalist")) AndAlso drow("inaturalist") <> 0 Then txiNaturalist.Text = drow("inaturalist")
       If Not IsDBNull(drow("size")) Then txSize.Text = drow("size")
       If Not IsDBNull(drow("originalpath")) Then txOriginalPath.Text = drow("originalpath")
       If Not IsDBNull(drow("gps")) Then txGPS.Text = drow("gps")
@@ -521,6 +526,8 @@ Public Class frmBugPhotos
     ElseIf s.Contains("DSC-RX10M4") Then
       txPixelsPerMM.Text = "79.4"
     End If
+
+    If tagged(picpath) >= 0 Then mnxTagged.Checked = True Else mnxTagged.Checked = False
 
     dataChanged = False
     picChanged = False
@@ -734,18 +741,20 @@ Public Class frmBugPhotos
 
     Dim lastCallingForm As Form
 
-    If pView.Bitmap Is Nothing Or cropping Or measuring Or processing Then Exit Sub
+    If e.Button = MouseButtons.Left Then
+      If pView.Bitmap Is Nothing Or cropping Or measuring Or processing Then Exit Sub
 
-    lastCallingForm = callingForm ' preserve for next, previous commands
-    callingForm = Me
-    currentpicPath = filenames(ix(iPic))
-    If qImage IsNot Nothing Then qImage.Dispose()
-    qImage = pView.Bitmap.Clone
-    Using frm As New frmFullscreen
-      frm.ShowDialog()
-    End Using
-    clearBitmap(qImage)
-    callingForm = lastCallingForm
+      lastCallingForm = callingForm ' preserve for next, previous commands
+      callingForm = Me
+      currentpicPath = filenames(ix(iPic))
+      If qImage IsNot Nothing Then qImage.Dispose()
+      qImage = pView.Bitmap.Clone
+      Using frm As New frmFullscreen
+        frm.ShowDialog()
+      End Using
+      clearBitmap(qImage)
+      callingForm = lastCallingForm
+    End If
 
   End Sub
 
@@ -849,7 +858,7 @@ Public Class frmBugPhotos
 
   Private Sub tx_Enter(ByVal Sender As Object, ByVal e As EventArgs) Handles txBugguide.Enter, txConfidence.Enter, txCountry.Enter, _
     txCounty.Enter, txElevation.Enter, txFileName.Enter, txGPS.Enter, txImageSet.Enter, txLocation.Enter, txPixelsPerMM.Enter, _
-    txRating.Enter, txRemarks.Enter, txSize.Enter, txState.Enter, txTaxon.Enter
+    txRating.Enter, txRemarks.Enter, txSize.Enter, txState.Enter, txTaxon.Enter, txiNaturalist.Enter
 
     Dim tx As TextBox
     Dim rtx As RichTextBox
@@ -931,6 +940,11 @@ Public Class frmBugPhotos
       pView.RubberColor = Color.Yellow
       pView.Cursor = Cursors.Cross
       pView.Invalidate() ' draw pview.rubber box
+
+    ElseIf e.Button = MouseButtons.XButton2 AndAlso cmdNext.Visible Then
+      nextPic(iPic + 1)
+    ElseIf e.Button = MouseButtons.XButton1 AndAlso cmdBack.Visible Then
+      nextPic(iPic - 1)
     End If
 
   End Sub
@@ -969,7 +983,7 @@ Public Class frmBugPhotos
     txLocation.KeyDown, txCounty.KeyDown, txState.KeyDown, txCountry.KeyDown, txElevation.KeyDown, _
     txBugguide.KeyDown, txSize.KeyDown, cmdMeasure.KeyDown, cmdTaxon.KeyDown, cmdGPSLocate.KeyDown, _
     cmdNext.KeyDown, cmdBack.KeyDown, cmdSaveAll.KeyDown, cmdSaveData.KeyDown, cmdDelete.KeyDown, cmdCrop.KeyDown, Me.KeyDown, _
-    txImageSet.KeyDown, cbImageSet.KeyDown
+    txImageSet.KeyDown, cbImageSet.KeyDown, txiNaturalist.KeyDown
 
     globalkey(e)
   End Sub
@@ -977,6 +991,7 @@ Public Class frmBugPhotos
   Private Sub globalkey(ByRef e As KeyEventArgs)
 
     Dim inMatch As New bugMain.taxrec
+    Dim k As Integer
 
     Select Case e.KeyCode
       Case 113 ' F2 = clear
@@ -1000,6 +1015,7 @@ Public Class frmBugPhotos
         txConfidence.Text = lastbugConfidence
         txRemarks.Text = lastbugRemarks
         txBugguide.Text = lastbugBugguide
+        txiNaturalist.Text = lastbuginaturalist
         e.Handled = True
 
       Case Keys.Home
@@ -1048,11 +1064,36 @@ Public Class frmBugPhotos
           Me.Cursor = Cursors.Default
         End If
 
+      Case Keys.T
+        If e.Alt Then ' tag or untag
+          Me.Cursor = Cursors.WaitCursor
+          k = tagged(picpath)
+          If k >= 0 Then
+            ' it's tagged -- remove it from the tag list
+            tagPath.RemoveAt(k)
+            mnxTagged.Checked = False
+          Else
+            ' not tagged -- add it to the tag list
+            tagPath.Add(picpath)
+            mnxTagged.Checked = True
+          End If
+          Me.Cursor = Cursors.Default
+        End If
+
       Case Else
         e.Handled = False
     End Select
 
   End Sub
+
+  Function tagged(ByVal fpath As String) As Integer
+    ' returns -1 if file is not tagged, the tag index otherwise
+    For i As Integer = 0 To tagPath.Count - 1
+      If eqstr(tagPath(i), fpath) Then Return i
+    Next i
+    Return -1
+  End Function
+
 
   Private Sub cmdTaxon_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdTaxon.Click
 
@@ -1301,6 +1342,9 @@ Public Class frmBugPhotos
       filenames.Add(currentpicPath) ' should never happen
       iPic = 0
     End If
+
+    i = tagged(picpath)
+    If i >= 0 Then mnxTagged.Checked = True Else mnxTagged.Checked = False
 
     processing = False
     Me.Cursor = Cursors.Default
