@@ -179,7 +179,7 @@ Partial Class frmBugPhotos
     Me.txiNaturalist.Location = New System.Drawing.Point(359, 388)
     Me.txiNaturalist.Name = "txiNaturalist"
     Me.txiNaturalist.Size = New System.Drawing.Size(113, 25)
-    Me.txiNaturalist.TabIndex = 50
+    Me.txiNaturalist.TabIndex = 37
     '
     'Label12
     '
@@ -189,8 +189,8 @@ Partial Class frmBugPhotos
     Me.Label12.Location = New System.Drawing.Point(282, 391)
     Me.Label12.Name = "Label12"
     Me.Label12.Size = New System.Drawing.Size(76, 17)
-    Me.Label12.TabIndex = 49
-    Me.Label12.Text = "&iNaturalist:"
+    Me.Label12.TabIndex = 36
+    Me.Label12.Text = "iNa&turalist:"
     Me.Label12.TextAlign = System.Drawing.ContentAlignment.TopRight
     '
     'txElevation

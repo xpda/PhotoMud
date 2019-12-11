@@ -39,38 +39,45 @@ Public Module bugMain
   ' End Structure
 
   Public Class taxrec
-    Public rank As String
-    Public taxon As String
-    Public descr As String
-    Public taxid As String
-    Public parentid As String
-    Public imageCounter As Integer ' from gbifplus, if gbif record
-    Public childimageCounter As Integer ' from gbifplus, if gbif record
-    Public link As String ' from gbifplus, if gbif record
-    Public authority As String
+    Public rank As String = ""
+    Public taxon As String = ""
+    Public descr As String = ""
+    Public taxid As String = ""
+    Public parentid As String = ""
+    Public imageCounter As Integer = 0 ' from gbifplus, if gbif record
+    Public childimageCounter As Integer = 0 ' from gbifplus, if gbif record
+    Public link As String = "" ' from gbifplus, if gbif record
+    Public authority As String = ""
 
-    Public gbifUsable As String ' from gbif
+    Public gbifUsable As String = "" ' from gbif
 
     ' old wikirec stuff, now in oddinfo
-    Public wikipediaPageID As String
-    Public commonNames As List(Of String)
-    Public commonWikiLink As String
+    Public wikipediaPageID As String = ""
+    Public commonNames As New List(Of String)
+    Public commonWikiLink As String = ""
+  End Class
 
-    Sub New()
-      rank = ""
-      taxon = ""
-      descr = ""
-      taxid = ""
-      parentid = ""
-      link = ""
-      authority = ""
-      commonNames = New List(Of String)
-
-      ' old wikirec stuff, now in oddinfo
-      wikipediaPageID = 0
-      commonWikiLink = ""
-
-    End Sub
+  Class imagerec
+    Public imageid As Integer = 0
+    Public filename As String = ""
+    Public photodate As String = ""
+    Public dateadded As String = ""
+    Public modified As String = ""
+    Public taxonid As String = ""
+    Public gps As String = ""
+    Public elevation As String = ""
+    Public rating As Integer = 0
+    Public confidence As Integer = 0
+    Public remarks As String = ""
+    Public originalpath As String = ""
+    Public bugguide As Integer = 0
+    Public inaturalist As Integer = 0
+    Public size As String = ""
+    Public location As String = ""
+    Public county As String = ""
+    Public state As String = ""
+    Public country As String = ""
+    Public imageSetID As Integer = 0
   End Class
 
   Public itisRankID As New Dictionary(Of String, Integer)(System.StringComparer.OrdinalIgnoreCase)
@@ -296,6 +303,82 @@ Public Module bugMain
 
   End Function
 
+  Function getImageRecbyID(imageid As String) As imagerec
+
+    ' gets an imagerec from the taxa database, based on the image id
+
+    Dim ds As New DataSet
+    Dim dr As DataRow
+    Dim irec As New imagerec
+
+    ds = getDS("select * from images where imageid = @parm1", imageid)
+
+    If ds IsNot Nothing AndAlso ds.Tables(0).Rows.Count <> 1 Then
+      Return irec
+    Else
+      dr = ds.Tables(0).Rows(0)
+      irec = getimagerecDr(dr)    ' load drow into irec
+    End If
+
+    Return irec
+
+  End Function
+
+
+  Function getImageRec(fname As String) As imagerec
+
+    ' gets an imagerec from the taxa database, based on the file name.
+
+    Dim ds As New DataSet
+    Dim dr As DataRow
+    Dim irec As New imagerec
+
+    ds = getDS("select * from images where filename = @parm1", fname)
+
+    If ds IsNot Nothing AndAlso ds.Tables(0).Rows.Count <> 1 Then
+      Return irec
+    Else
+      dr = ds.Tables(0).Rows(0)
+      irec = getimagerecDr(dr)    ' load drow into irec
+    End If
+
+    Return irec
+
+  End Function
+
+  Function getimagerecDr(dr As DataRow) As imagerec
+
+    Dim irec As New imagerec
+
+    ' load dr into irec
+    irec.imageid = dr.Item("imageid")
+    irec.filename = dr.Item("filename")
+    If IsDBNull(dr.Item("photodate")) Then irec.photodate = "" Else irec.photodate = dr.Item("photodate")
+    If IsDBNull(dr.Item("dateadded")) Then irec.dateadded = "" Else irec.dateadded = dr.Item("dateadded")
+    If IsDBNull(dr.Item("modified")) Then irec.modified = "" Else irec.modified = dr.Item("modified")
+    irec.taxonid = dr.Item("taxonid")
+    irec.gps = dr.Item("gps")
+    irec.elevation = dr.Item("elevation")
+    irec.rating = dr.Item("rating")
+    irec.confidence = dr.Item("confidence")
+    irec.remarks = dr.Item("remarks")
+    irec.originalpath = dr.Item("originalpath")
+    irec.bugguide = dr.Item("bugguide")
+    irec.inaturalist = dr.Item("inaturalist")
+    irec.size = dr.Item("size")
+    irec.location = dr.Item("location")
+    irec.county = dr.Item("county")
+    irec.state = dr.Item("state")
+    irec.country = dr.Item("country")
+
+    If irec.imageid > 0 Then ' check for imagesets
+      Dim k As Integer = getScalar("select setid from imagesets where imageid = @parm1", irec.imageid)
+      irec.imageSetID = k
+    End If
+
+    Return irec
+
+  End Function
 
   Function getTaxrecByID(ByVal taxid As String) As List(Of taxrec)
 
@@ -644,7 +727,7 @@ Public Module bugMain
 
     If initialize Or queryNames Is Nothing Then
       If useQuery Then ' bugs
-        Using frm As New frmBugQuery
+        Using frm As New chk
           frm.ShowDialog()
         End Using
       End If

@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class frmBugQuery
+Partial Class chk
   Inherits System.Windows.Forms.Form
 
   'Form overrides dispose to clean up the component list.
@@ -22,7 +22,7 @@ Partial Class frmBugQuery
   'Do not modify it using the code editor.
   <System.Diagnostics.DebuggerStepThrough()> _
   Private Sub InitializeComponent()
-    Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmBugQuery))
+    Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(chk))
     Me.txRemarks = New System.Windows.Forms.RichTextBox()
     Me.txTaxon = New System.Windows.Forms.TextBox()
     Me.cmdTaxon = New System.Windows.Forms.Button()
@@ -61,7 +61,8 @@ Partial Class frmBugQuery
     Me.Label7 = New System.Windows.Forms.Label()
     Me.txRank = New System.Windows.Forms.TextBox()
     Me.Label11 = New System.Windows.Forms.Label()
-    Me.cmdTmp = New System.Windows.Forms.Button()
+    Me.chkBugguide = New System.Windows.Forms.CheckBox()
+    Me.chkInat = New System.Windows.Forms.CheckBox()
     Me.Panel1.SuspendLayout()
     Me.SuspendLayout()
     '
@@ -102,7 +103,7 @@ Partial Class frmBugQuery
     Me.tvTaxon.Location = New System.Drawing.Point(519, 49)
     Me.tvTaxon.Name = "tvTaxon"
     Me.tvTaxon.ShowNodeToolTips = True
-    Me.tvTaxon.Size = New System.Drawing.Size(585, 641)
+    Me.tvTaxon.Size = New System.Drawing.Size(585, 669)
     Me.tvTaxon.TabIndex = 4
     '
     'txLocation
@@ -159,7 +160,7 @@ Partial Class frmBugQuery
     'cmdOK
     '
     Me.cmdOK.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.cmdOK.Location = New System.Drawing.Point(111, 654)
+    Me.cmdOK.Location = New System.Drawing.Point(115, 686)
     Me.cmdOK.Name = "cmdOK"
     Me.cmdOK.Size = New System.Drawing.Size(103, 44)
     Me.cmdOK.TabIndex = 80
@@ -170,7 +171,7 @@ Partial Class frmBugQuery
     '
     Me.cmdCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
     Me.cmdCancel.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.cmdCancel.Location = New System.Drawing.Point(277, 654)
+    Me.cmdCancel.Location = New System.Drawing.Point(281, 686)
     Me.cmdCancel.Name = "cmdCancel"
     Me.cmdCancel.Size = New System.Drawing.Size(103, 44)
     Me.cmdCancel.TabIndex = 81
@@ -259,16 +260,16 @@ Partial Class frmBugQuery
     Me.Panel1.Controls.Add(Me.Label5)
     Me.Panel1.Controls.Add(Me.Label8)
     Me.Panel1.Controls.Add(Me.Label7)
-    Me.Panel1.Location = New System.Drawing.Point(30, 381)
+    Me.Panel1.Location = New System.Drawing.Point(30, 433)
     Me.Panel1.Name = "Panel1"
-    Me.Panel1.Size = New System.Drawing.Size(459, 246)
+    Me.Panel1.Size = New System.Drawing.Size(459, 230)
     Me.Panel1.TabIndex = 82
     '
     'Label9
     '
     Me.Label9.AutoSize = True
     Me.Label9.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.Label9.Location = New System.Drawing.Point(13, 84)
+    Me.Label9.Location = New System.Drawing.Point(13, 76)
     Me.Label9.Name = "Label9"
     Me.Label9.Size = New System.Drawing.Size(96, 17)
     Me.Label9.TabIndex = 106
@@ -277,7 +278,7 @@ Partial Class frmBugQuery
     'txModMax
     '
     Me.txModMax.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.txModMax.Location = New System.Drawing.Point(299, 84)
+    Me.txModMax.Location = New System.Drawing.Point(299, 76)
     Me.txModMax.Name = "txModMax"
     Me.txModMax.Size = New System.Drawing.Size(142, 25)
     Me.txModMax.TabIndex = 108
@@ -285,7 +286,7 @@ Partial Class frmBugQuery
     'txModMin
     '
     Me.txModMin.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.txModMin.Location = New System.Drawing.Point(138, 84)
+    Me.txModMin.Location = New System.Drawing.Point(138, 76)
     Me.txModMin.Name = "txModMin"
     Me.txModMin.Size = New System.Drawing.Size(142, 25)
     Me.txModMin.TabIndex = 107
@@ -294,7 +295,7 @@ Partial Class frmBugQuery
     '
     Me.lbDate2.AutoSize = True
     Me.lbDate2.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.lbDate2.Location = New System.Drawing.Point(13, 46)
+    Me.lbDate2.Location = New System.Drawing.Point(13, 38)
     Me.lbDate2.Name = "lbDate2"
     Me.lbDate2.Size = New System.Drawing.Size(85, 17)
     Me.lbDate2.TabIndex = 103
@@ -303,7 +304,7 @@ Partial Class frmBugQuery
     'txElevationMax
     '
     Me.txElevationMax.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.txElevationMax.Location = New System.Drawing.Point(299, 123)
+    Me.txElevationMax.Location = New System.Drawing.Point(299, 115)
     Me.txElevationMax.Name = "txElevationMax"
     Me.txElevationMax.Size = New System.Drawing.Size(87, 25)
     Me.txElevationMax.TabIndex = 111
@@ -311,7 +312,7 @@ Partial Class frmBugQuery
     'txConfidenceMin
     '
     Me.txConfidenceMin.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.txConfidenceMin.Location = New System.Drawing.Point(138, 159)
+    Me.txConfidenceMin.Location = New System.Drawing.Point(138, 151)
     Me.txConfidenceMin.Name = "txConfidenceMin"
     Me.txConfidenceMin.Size = New System.Drawing.Size(87, 25)
     Me.txConfidenceMin.TabIndex = 113
@@ -320,7 +321,7 @@ Partial Class frmBugQuery
     '
     Me.Label4.AutoSize = True
     Me.Label4.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.Label4.Location = New System.Drawing.Point(12, 126)
+    Me.Label4.Location = New System.Drawing.Point(12, 118)
     Me.Label4.Name = "Label4"
     Me.Label4.Size = New System.Drawing.Size(67, 17)
     Me.Label4.TabIndex = 109
@@ -329,7 +330,7 @@ Partial Class frmBugQuery
     'txElevationMin
     '
     Me.txElevationMin.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.txElevationMin.Location = New System.Drawing.Point(138, 123)
+    Me.txElevationMin.Location = New System.Drawing.Point(138, 115)
     Me.txElevationMin.Name = "txElevationMin"
     Me.txElevationMin.Size = New System.Drawing.Size(87, 25)
     Me.txElevationMin.TabIndex = 110
@@ -338,7 +339,7 @@ Partial Class frmBugQuery
     '
     Me.lbConfidence.AutoSize = True
     Me.lbConfidence.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.lbConfidence.Location = New System.Drawing.Point(13, 162)
+    Me.lbConfidence.Location = New System.Drawing.Point(13, 154)
     Me.lbConfidence.Name = "lbConfidence"
     Me.lbConfidence.Size = New System.Drawing.Size(104, 17)
     Me.lbConfidence.TabIndex = 112
@@ -347,7 +348,7 @@ Partial Class frmBugQuery
     'txDateMax
     '
     Me.txDateMax.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.txDateMax.Location = New System.Drawing.Point(299, 46)
+    Me.txDateMax.Location = New System.Drawing.Point(299, 38)
     Me.txDateMax.Name = "txDateMax"
     Me.txDateMax.Size = New System.Drawing.Size(142, 25)
     Me.txDateMax.TabIndex = 105
@@ -355,7 +356,7 @@ Partial Class frmBugQuery
     'txDateMin
     '
     Me.txDateMin.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.txDateMin.Location = New System.Drawing.Point(138, 46)
+    Me.txDateMin.Location = New System.Drawing.Point(138, 38)
     Me.txDateMin.Name = "txDateMin"
     Me.txDateMin.Size = New System.Drawing.Size(142, 25)
     Me.txDateMin.TabIndex = 104
@@ -363,7 +364,7 @@ Partial Class frmBugQuery
     'txConfidenceMax
     '
     Me.txConfidenceMax.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.txConfidenceMax.Location = New System.Drawing.Point(299, 159)
+    Me.txConfidenceMax.Location = New System.Drawing.Point(299, 151)
     Me.txConfidenceMax.Name = "txConfidenceMax"
     Me.txConfidenceMax.Size = New System.Drawing.Size(87, 25)
     Me.txConfidenceMax.TabIndex = 114
@@ -371,7 +372,7 @@ Partial Class frmBugQuery
     'txRatingMin
     '
     Me.txRatingMin.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.txRatingMin.Location = New System.Drawing.Point(138, 195)
+    Me.txRatingMin.Location = New System.Drawing.Point(138, 187)
     Me.txRatingMin.Name = "txRatingMin"
     Me.txRatingMin.Size = New System.Drawing.Size(87, 25)
     Me.txRatingMin.TabIndex = 116
@@ -379,7 +380,7 @@ Partial Class frmBugQuery
     'txRatingMax
     '
     Me.txRatingMax.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.txRatingMax.Location = New System.Drawing.Point(299, 195)
+    Me.txRatingMax.Location = New System.Drawing.Point(299, 187)
     Me.txRatingMax.Name = "txRatingMax"
     Me.txRatingMax.Size = New System.Drawing.Size(87, 25)
     Me.txRatingMax.TabIndex = 117
@@ -388,7 +389,7 @@ Partial Class frmBugQuery
     '
     Me.Label5.AutoSize = True
     Me.Label5.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.Label5.Location = New System.Drawing.Point(13, 198)
+    Me.Label5.Location = New System.Drawing.Point(13, 190)
     Me.Label5.Name = "Label5"
     Me.Label5.Size = New System.Drawing.Size(54, 17)
     Me.Label5.TabIndex = 115
@@ -397,7 +398,7 @@ Partial Class frmBugQuery
     'Label8
     '
     Me.Label8.AutoSize = True
-    Me.Label8.Location = New System.Drawing.Point(302, 22)
+    Me.Label8.Location = New System.Drawing.Point(302, 14)
     Me.Label8.Name = "Label8"
     Me.Label8.Size = New System.Drawing.Size(73, 17)
     Me.Label8.TabIndex = 102
@@ -406,7 +407,7 @@ Partial Class frmBugQuery
     'Label7
     '
     Me.Label7.AutoSize = True
-    Me.Label7.Location = New System.Drawing.Point(141, 22)
+    Me.Label7.Location = New System.Drawing.Point(141, 14)
     Me.Label7.Name = "Label7"
     Me.Label7.Size = New System.Drawing.Size(69, 17)
     Me.Label7.TabIndex = 101
@@ -432,23 +433,41 @@ Partial Class frmBugQuery
     Me.Label11.TabIndex = 16
     Me.Label11.Text = "Ran&k:"
     '
-    'cmdTmp
+    'chkBugguide
     '
-    Me.cmdTmp.Location = New System.Drawing.Point(415, 654)
-    Me.cmdTmp.Name = "cmdTmp"
-    Me.cmdTmp.Size = New System.Drawing.Size(88, 44)
-    Me.cmdTmp.TabIndex = 83
-    Me.cmdTmp.Text = "tmp"
-    Me.cmdTmp.UseVisualStyleBackColor = True
+    Me.chkBugguide.AutoSize = True
+    Me.chkBugguide.Checked = True
+    Me.chkBugguide.CheckState = System.Windows.Forms.CheckState.Indeterminate
+    Me.chkBugguide.Location = New System.Drawing.Point(155, 389)
+    Me.chkBugguide.Name = "chkBugguide"
+    Me.chkBugguide.Size = New System.Drawing.Size(91, 21)
+    Me.chkBugguide.TabIndex = 20
+    Me.chkBugguide.Text = "&Bugguide"
+    Me.chkBugguide.ThreeState = True
+    Me.chkBugguide.UseVisualStyleBackColor = True
     '
-    'frmBugQuery
+    'chkInat
+    '
+    Me.chkInat.AutoSize = True
+    Me.chkInat.Checked = True
+    Me.chkInat.CheckState = System.Windows.Forms.CheckState.Indeterminate
+    Me.chkInat.Location = New System.Drawing.Point(393, 389)
+    Me.chkInat.Name = "chkInat"
+    Me.chkInat.Size = New System.Drawing.Size(94, 21)
+    Me.chkInat.TabIndex = 24
+    Me.chkInat.Text = "iNa&turalist"
+    Me.chkInat.ThreeState = True
+    Me.chkInat.UseVisualStyleBackColor = True
+    '
+    'chk
     '
     Me.AcceptButton = Me.cmdOK
     Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 17.0!)
     Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
     Me.CancelButton = Me.cmdCancel
-    Me.ClientSize = New System.Drawing.Size(1127, 722)
-    Me.Controls.Add(Me.cmdTmp)
+    Me.ClientSize = New System.Drawing.Size(1127, 750)
+    Me.Controls.Add(Me.chkInat)
+    Me.Controls.Add(Me.chkBugguide)
     Me.Controls.Add(Me.txRank)
     Me.Controls.Add(Me.Label11)
     Me.Controls.Add(Me.Panel1)
@@ -472,7 +491,7 @@ Partial Class frmBugQuery
     Me.Controls.Add(Me.Label1)
     Me.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
     Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
-    Me.Name = "frmBugQuery"
+    Me.Name = "chk"
     Me.ShowInTaskbar = False
     Me.Text = "Query"
     Me.Panel1.ResumeLayout(False)
@@ -519,5 +538,6 @@ Partial Class frmBugQuery
   Friend WithEvents txModMin As System.Windows.Forms.TextBox
   Friend WithEvents txRank As System.Windows.Forms.TextBox
   Public WithEvents Label11 As System.Windows.Forms.Label
-  Friend WithEvents cmdTmp As System.Windows.Forms.Button
+  Friend WithEvents chkBugguide As System.Windows.Forms.CheckBox
+  Friend WithEvents chkInat As System.Windows.Forms.CheckBox
 End Class

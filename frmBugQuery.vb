@@ -12,7 +12,7 @@ Imports System.IO
 Imports System.Data
 Imports MySql.Data.MySqlClient
 
-Public Class frmBugQuery
+Public Class chk
 
   Dim processing As Boolean
   Dim nn As Integer = 0
@@ -104,10 +104,12 @@ Public Class frmBugQuery
     Dim gmatches As New List(Of taxrec)
     Dim sql As String
     Dim newNames As New List(Of String)
-    Dim s, s1, fname As String
+    Dim delNames As New List(Of String)
+    Dim s, s1 As String
     Dim sTaxon() As String
-    Dim id As Integer
-    Dim setid As Integer
+    Dim inat As Boolean
+    Dim k As Integer
+    Dim irec As imagerec
 
     If tvTaxon.Focused Then Exit Sub
     Me.Cursor = Cursors.WaitCursor
@@ -170,28 +172,57 @@ Public Class frmBugQuery
       End If
 
       ' add all the images from associated imagesets for queries using filename
-      If txFilename.Text <> "" Then
-        newNames = New List(Of String)
-        For Each fname In queryNames
-          id = getScalar("select imageid from images where filename = @parm1", Path.GetFileName(fname))
-          setid = getScalar("select setid from imagesets where imageid = @parm1 limit 1", id)
-          ds = getDS("select * from imagesets where setid = @parm1", setid)
+      'If txFilename.Text <> "" Then
+      newNames = New List(Of String)
+      For Each fname As String In queryNames
+        irec = getImageRec(Path.GetFileName(fname))
+        ds = getDS("select * from imagesets where setid = @parm1", irec.imageSetID)
 
-          If ds IsNot Nothing Then
-            For Each dr As DataRow In ds.Tables(0).Rows
-              If Not IsDBNull(dr("imageid")) Then
-                s = folderPath & getScalar("select filename from images where imageid = @parm1", dr("imageid"))
-                If Not queryNames.Contains(s) Then newNames.Add(s)
-              End If
-            Next dr
-          End If
-        Next fname
+        If ds Is Nothing OrElse ds.Tables(0).Rows.Count = 0 Then ' no imageset -- add file name
+          s = folderPath & irec.filename
+          If Not newNames.Contains(s) AndAlso
+            ((chkInat.CheckState = CheckState.Unchecked And Not inat) Or
+             (chkInat.CheckState = CheckState.Checked And inat) Or
+             (chkInat.CheckState = CheckState.Indeterminate)) Then newNames.Add(s)
 
-        For Each s In newNames ' add the names to querylist - done separately for previous loop
-          queryNames.Add(s)
-        Next s
+        Else ' add the entire imageset
+          inat = False ' true if any images in the set have inat
+          For Each dr As DataRow In ds.Tables(0).Rows
+            k = getScalar("select inaturalist from images where imageid = @parm1", dr("imageid"))
+            If k > 0 Then
+              inat = True
+              Exit For
+            End If
+          Next dr
 
-      End If
+          For Each dr As DataRow In ds.Tables(0).Rows
+            ' add files if inat qualifies
+            irec = getImageRecbyID(dr("imageid"))
+            If irec.imageid <= 0 Then Stop
+
+            s = folderPath & irec.filename
+            If Not newNames.Contains(s) AndAlso
+              ((chkInat.CheckState = CheckState.Unchecked And Not inat) Or
+               (chkInat.CheckState = CheckState.Checked And inat) Or
+               (chkInat.CheckState = CheckState.Indeterminate)) Then newNames.Add(s)
+          Next dr
+
+        End If
+      Next fname
+
+      queryNames = New List(Of String)
+      queryNames.AddRange(newNames)
+
+      'For Each s In newNames ' add the names to querylist - done separately for previous loop
+      'If queryNames.IndexOf(s) < 0 Then queryNames.Add(s)
+      'Next s
+      'For Each s In delNames ' add the names to querylist - done separately for previous loop
+      ' If queryNames.IndexOf(s) >= 0 Then queryNames.Remove(s)
+      ' Next s
+      '
+      'queryNames.Sort()
+
+      'End If
 
     End Using
 
@@ -273,6 +304,11 @@ Public Class frmBugQuery
     If IsNumeric(txConfidenceMax.Text.Trim) Then qlist.Add("images.confidence <= @confidencemax")
     If IsNumeric(txElevationMin.Text.Trim) Then qlist.Add("images.elevation >= @elevationmin")
     If IsNumeric(txElevationMax.Text.Trim) Then qlist.Add("images.elevation <= @elevationmax")
+
+    If chkBugguide.CheckState = CheckState.Checked Then qlist.Add("images.bugguide > 0")
+    If chkBugguide.CheckState = CheckState.Unchecked Then qlist.Add("images.bugguide <= 0")
+    If chkInat.CheckState = CheckState.Checked Then qlist.Add("images.inaturalist > 0")
+    If chkInat.CheckState = CheckState.Unchecked Then qlist.Add("images.inaturalist <= 0")
 
     'If qlist.Count = 0 Then
     '  cmd = Nothing
@@ -456,7 +492,7 @@ Public Class frmBugQuery
     Me.Close()
   End Sub
 
-  Private Sub cmdTmp_Click(sender As Object, e As EventArgs) Handles cmdTmp.click
+  Private Sub cmdTmp_Click(sender As Object, e As EventArgs)
 
     ' load files as a query based on filenames tagged (ignore folder)
     Me.Cursor = Cursors.WaitCursor
