@@ -1,4 +1,21 @@
-﻿'Photo Mud is licensed under Creative Commons BY-NC-SA 4.0
+﻿Imports System.Net
+Imports System.Net.Http
+Imports System.Text
+Imports System.Text.RegularExpressions
+Imports System.Collections.Generic
+Imports System.Drawing.Drawing2D
+Imports System.Drawing.Imaging
+Imports System.Math
+Imports System.IO
+'Imports ImageMagick
+
+Imports System.Data
+Imports MySql.Data.MySqlClient
+
+Imports System.Xml
+Imports System.Xml.Serialization
+
+'Photo Mud is licensed under Creative Commons BY-NC-SA 4.0
 'https://creativecommons.org/licenses/by-nc-sa/4.0/
 
 ' alter user bugs with login=bugs
@@ -34,22 +51,6 @@
 ' upload new images
 ' rebuild and upload bugpage.aspx
 
-Imports System.Net
-Imports System.Net.Http
-Imports System.Text
-Imports System.Text.RegularExpressions
-Imports System.Collections.Generic
-Imports System.Drawing.Drawing2D
-Imports System.Drawing.Imaging
-Imports System.Math
-Imports System.IO
-'Imports ImageMagick
-
-Imports System.Data
-Imports MySql.Data.MySqlClient
-
-Imports System.Xml
-Imports System.Xml.Serialization
 
 Public Class frmBugPhotos
 

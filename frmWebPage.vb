@@ -623,6 +623,33 @@ Public Class frmWebPage
     sf.Add("<meta name=""viewport"" content=""initial-scale=1.0"">")
     sf.Add("<title>" & txTitle.Text & "</title>")
     sf.Add("<meta name=""description"" content=""" & txTitle.Text & """>")
+
+    If Trim(iniWebGoogleAnalytics) <> "" Then
+      sf.Add("<!-- analytics -->")
+      sf.Add("<script>")
+      sf.Add("(function (i, s, o, g, r, a, m) {")
+      sf.Add("i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {")
+      sf.Add("(i[r].q = i[r].q || []).push(arguments)")
+      sf.Add("}, i[r].l = 1 * new Date(); a = s.createElement(o),")
+      sf.Add("m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)")
+      sf.Add("})(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');")
+      sf.Add("ga('create', 'UA-494460-1', 'auto');")
+      sf.Add("ga('send', 'pageview');")
+      sf.Add("</script>")
+      sf.Add("<!-- end analytics -->")
+
+      'sf.Add("<script>")
+      'sf.Add("  var _gaq = _gaq || [];")
+      'sf.Add("  _gaq.push(['_setAccount', '" & iniWebGoogleAnalytics & "']);")
+      'sf.Add("  _gaq.push(['_trackPageview']);")
+      'sf.Add("  (function() {")
+      'sf.Add("    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;")
+      'sf.Add("    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';")
+      'sf.Add("    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);")
+      'sf.Add("  })();")
+      'sf.Add("</script>")
+    End If
+
     sf.Add("<style>")
     sf.Add("")
     sf.Add("body {")
@@ -671,19 +698,6 @@ Public Class frmWebPage
     sf.Add("  text-align:" & iniWebCaptionAlign & ";")
     sf.Add("}")
     sf.Add("</style>")
-
-    If Trim(iniWebGoogleAnalytics) <> "" Then
-      sf.Add("<script>")
-      sf.Add("  var _gaq = _gaq || [];")
-      sf.Add("  _gaq.push(['_setAccount', '" & iniWebGoogleAnalytics & "']);")
-      sf.Add("  _gaq.push(['_trackPageview']);")
-      sf.Add("  (function() {")
-      sf.Add("    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;")
-      sf.Add("    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';")
-      sf.Add("    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);")
-      sf.Add("  })();")
-      sf.Add("</script>")
-    End If
 
     sf.Add("</head>")
 
