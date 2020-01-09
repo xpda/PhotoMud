@@ -39,7 +39,7 @@ Imports System.Xml.Serialization
 '    SET images.size=bugguide.size
 '	where (images.filename = bugguide.filename or 
 '	bugguide.filename like concat(mid(images.filename, 1, length(images.filename)-1), "%"))
-'	and (images.size = "" or images.size is null)
+'	and (images.size = "")
 '	and abs(datediff(images.photodate, bugguide.photodate)) <= 2;
 
 ' updates:
@@ -2011,8 +2011,6 @@ Public Class frmBugPhotos
       If i > 0 Then i1 = InStr(i, link, """>")
       If i > 0 And i1 > 0 Then
         link = Mid(link, i + Len(s1), i1 - i - Len(s1))
-        System.Threading.Thread.Sleep(200)
-        s = client.DownloadString(link)
         i = InStr(link, "/view/")
         bugguideID = Mid(link, i + 6)
         location = ""
@@ -2020,6 +2018,9 @@ Public Class frmBugPhotos
         state = ""
         country = ""
         size = ""
+
+        System.Threading.Thread.Sleep(200)
+        s = client.DownloadString(link)
 
         s1 = "<td align=""right"" class=""bgimage-id"">P1"
         i1 = InStr(s, s1)
@@ -2177,7 +2178,6 @@ Public Class frmBugPhotos
 
         End If
       End If ' link OK
-
     Next link
 
     Me.Cursor = Cursors.Default
@@ -2431,7 +2431,7 @@ Public Class cWebClient
       Dim cook As New Cookie
       cook.Domain = "bugguide.net"
       cook.Name = "PHPSESSID"
-      cook.Value = "93m4lpqnl6rq4okni6bn2f4gf5"
+      cook.Value = "lai76ps3ijbjkgdb95fg8vt5h2"
       cc.Add(cook)
     End If
 

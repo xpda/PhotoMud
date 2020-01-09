@@ -524,7 +524,6 @@ Partial Class frmBugPhotos
     Me.cmdReadweb.TabStop = False
     Me.cmdReadweb.Text = "read web"
     Me.cmdReadweb.UseVisualStyleBackColor = True
-    Me.cmdReadweb.Visible = False
     '
     'cmdImageUpdate
     '

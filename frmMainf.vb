@@ -1123,6 +1123,19 @@ Public Class frmMainf
 
   End Sub
 
+  Private Sub mnuImageAutoCrop_click(sender As Object, e As EventArgs) Handles mnuImageAutoCrop.Click
+
+    Dim bmp As Bitmap
+
+    CommandPrep(AddressOf mnuImageAutoCrop_click, False)
+    SaveUndo()
+
+    bmp = autoCrop(mView)
+
+    mView.Zoom()
+
+  End Sub
+
   Private Sub mnuEditRedo_click(sender As Object, e As EventArgs) Handles mnuEditRedo.Click
 
     ClearProcesses(True)

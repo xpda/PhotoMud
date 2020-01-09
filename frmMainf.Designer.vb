@@ -208,6 +208,7 @@
     Me.nmPage = New System.Windows.Forms.NumericUpDown()
     Me.panelPage = New System.Windows.Forms.Panel()
     Me.lbPage = New System.Windows.Forms.Label()
+    Me.mnuImageAutoCrop = New System.Windows.Forms.ToolStripMenuItem()
     Me.mnx.SuspendLayout()
     Me.StatusStrip1.SuspendLayout()
     Me.mnu.SuspendLayout()
@@ -743,7 +744,7 @@
     '
     'mnuImage
     '
-    Me.mnuImage.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuImageResize, Me.mnuImageExpand, Me.mnuImageLine2, Me.mnuImageRotate, Me.mnuImageFlipHoriz, Me.mnuImageFlipVert, Me.mnuImageStretch, Me.mnuImageAlign, Me.ToolStripSeparator5, Me.mnuImageBlur, Me.mnuImageContrastStretch, Me.mnuImageSharpen, Me.mnuImageMedian, Me.mnuImageEdgeDetect, Me.mnuImageRedeye, Me.ToolStripSeparator21, Me.mnuImageEffects, Me.mnuImageArtEffects, Me.mnuImageBorder, Me.ToolStripSeparator6, Me.mnuImageSetCrop, Me.mnuImageCrop})
+    Me.mnuImage.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuImageResize, Me.mnuImageExpand, Me.mnuImageLine2, Me.mnuImageRotate, Me.mnuImageFlipHoriz, Me.mnuImageFlipVert, Me.mnuImageStretch, Me.mnuImageAlign, Me.ToolStripSeparator5, Me.mnuImageBlur, Me.mnuImageContrastStretch, Me.mnuImageSharpen, Me.mnuImageMedian, Me.mnuImageEdgeDetect, Me.mnuImageRedeye, Me.ToolStripSeparator21, Me.mnuImageEffects, Me.mnuImageArtEffects, Me.mnuImageBorder, Me.ToolStripSeparator6, Me.mnuImageSetCrop, Me.mnuImageCrop, Me.mnuImageAutoCrop})
     Me.mnuImage.MergeIndex = 2
     Me.mnuImage.Name = "mnuImage"
     Me.mnuImage.Size = New System.Drawing.Size(63, 24)
@@ -1504,6 +1505,12 @@
     Me.lbPage.TabIndex = 23
     Me.lbPage.Text = "Page (of 33): "
     '
+    'mnuImageAutoCrop
+    '
+    Me.mnuImageAutoCrop.Name = "mnuImageAutoCrop"
+    Me.mnuImageAutoCrop.Size = New System.Drawing.Size(279, 26)
+    Me.mnuImageAutoCrop.Text = "A&uto Crop"
+    '
     'frmMainf
     '
     Me.BackColor = System.Drawing.SystemColors.Control
@@ -1727,5 +1734,6 @@
   Friend WithEvents mnuImageContrastStretch As System.Windows.Forms.ToolStripMenuItem
   Friend WithEvents mnuDrawEllipse As System.Windows.Forms.ToolStripMenuItem
   Friend WithEvents mnuImageAlign As System.Windows.Forms.ToolStripMenuItem
+  Friend WithEvents mnuImageAutoCrop As System.Windows.Forms.ToolStripMenuItem
 #End Region
 End Class

@@ -4485,6 +4485,129 @@ Public Module main
 
   End Function
 
+  Function autoCrop(mview As mudViewer) As Bitmap
+
+    Dim bb() As Byte
+    Dim dx(2) As Integer
+    Dim avg(2) As Integer
+    Dim checkDiff As Boolean
+    Dim ix1, iy1, ix2, iy2 As Integer
+    Dim k As Integer
+    Dim lastAvg(3) As Integer
+    Dim border As Boolean
+    Dim iHeight, iWidth As Integer
+    iHeight = mview.Bitmap.Height : iWidth = mview.Bitmap.Width
+
+    bb = getBmpBytes(mview.Bitmap)
+
+    iy1 = 0
+
+    For iy As Integer = 0 To (iHeight - 1) * iWidth * 4 Step iWidth * 4
+      If iy \ (iWidth * 4) > 4 Then checkDiff = True Else checkDiff = False
+      border = checkCropBytes(bb, iWidth, iy, 4, checkDiff)
+      If border Then
+        iy1 = iy \ (iWidth * 4)
+        Exit For
+      End If
+    Next iy
+
+    For iy As Integer = (iHeight - 1) * iWidth * 4 To 0 Step -iWidth * 4
+      If iy \ iWidth * 4 < (iHeight - 5) Then checkDiff = True Else checkDiff = False
+      border = checkCropBytes(bb, iWidth, iy, 4, checkDiff)
+      If border Then
+        iy2 = iy \ (iWidth * 4)
+        Exit For
+      End If
+    Next iy
+
+    For ix As Integer = 0 To (iWidth - 1) * 4 Step 4
+      If ix \ 4 > 4 Then checkDiff = True Else checkDiff = False
+      border = checkCropBytes(bb, iHeight, ix, iWidth * 4, checkDiff)
+      If border Then
+        ix1 = ix \ 4
+        Exit For
+      End If
+    Next ix
+
+    For ix As Integer = (iWidth - 1) * 4 To 0 Step -4
+      If ix \ 4 < (iWidth - 5) Then checkDiff = True Else checkDiff = False
+      border = checkCropBytes(bb, iHeight, ix, iWidth * 4, checkDiff)
+      If border Then
+        ix2 = ix \ 4
+        Exit For
+      End If
+    Next ix
+
+
+    mview.Crop(New Rectangle(ix1, iy1, ix2 - ix1 + 1, iy2 - iy1 + 1))
+
+
+    Return Nothing
+
+  End Function
+
+  Function checkCropBytes(bb() As Byte, iLength As Integer, yoff As Integer, iStep As Integer,
+                          checkDiff As Boolean) As Boolean
+
+    ' returns whether row is non-blank
+    ' checkdiff turns true at row 5
+
+    Static lastavg(2) As Integer
+    Static firstavg(2) As Integer
+    Dim avg(2) As Integer
+    Dim dx(2) As Integer
+    Dim i, k As Integer
+    Dim i1, i2, i3 As Integer
+
+    Dim avglimit As Integer = 27 ' 40 - absolute average
+    Dim dxLimit As Integer = 13 ' 18 - difference from first
+    Dim diffLimit As Integer = 9 ' 3 - difference from previous
+
+    avg(0) = 0 : avg(1) = 0 : avg(2) = 0
+    dx(0) = 0 : dx(1) = 0 : dx(2) = 0
+    For ix As Integer = 0 To (iLength - 1) * iStep Step iStep
+      i = ix + yoff
+      avg(0) += bb(i)
+      avg(1) += bb(i + 1)
+      avg(2) += bb(i + 2)
+    Next ix
+    avg(0) = avg(0) \ iLength
+    avg(1) = avg(1) \ iLength
+    avg(2) = avg(2) \ iLength
+
+    If checkDiff AndAlso firstavg(0) = 0 Then
+      firstavg(0) = avg(0)
+      firstavg(1) = avg(1)
+      firstavg(2) = avg(2)
+    End If
+
+    dx(0) = Abs(firstavg(0) - avg(0))
+    dx(1) = Abs(firstavg(1) - avg(1))
+    dx(2) = Abs(firstavg(2) - avg(2))
+
+    i1 = 0 : i2 = 0 : i3 = 0
+    If avg(0) > avglimit Or avg(1) > avglimit Or avg(2) > avglimit Then
+      i1 = 1
+    End If
+
+    If checkDiff AndAlso (dx(0) > dxLimit Or dx(1) > dxLimit Or dx(2) > dxLimit) Then
+      i2 = 1
+    End If
+
+    If checkDiff AndAlso (Abs(lastavg(0) - avg(0)) > diffLimit Or Abs(lastavg(1) - avg(1)) > diffLimit Or Abs(lastavg(2) - avg(2)) > diffLimit) Then
+      i3 = 1
+    End If
+
+    If i1 + i2 + i3 >= 2 Then Return True Else Return False
+
+    lastavg(0) = avg(0)
+    lastavg(1) = avg(1)
+    lastavg(2) = avg(2)
+
+    Return False
+
+  End Function
+
   Function getBmpBytes(bmp As Bitmap, Optional colorPlane As Integer = 0) As Byte()
     ' return bmp bytes. Values are b-g-r-a.
     ' colorPlane should be 0 for all colors, or 1, 2, 3, 4 for B, R, G, A
@@ -5298,7 +5421,7 @@ Public Module main
     rp(257).Y = rp(256).Y
 
     Using g As Graphics = Graphics.FromImage(bmp),
-      gBrush As New solidbrush(col)
+      gBrush As New SolidBrush(col)
       g.SmoothingMode = SmoothingMode.HighQuality
       g.PixelOffsetMode = PixelOffsetMode.HighQuality
       g.Clear(Color.Black)
