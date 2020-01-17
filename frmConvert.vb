@@ -297,7 +297,6 @@ Public Class frmConvert
 
     Dim saver As ImageSave
     Dim mResult As MsgBoxResult
-    Dim pView As New pViewer ' for convertfile, text
     Dim Xres, Yres As Integer
     Dim msg As String = ""
     Dim picinfo As pictureInfo
@@ -347,33 +346,48 @@ Public Class frmConvert
       End If
 
       If colorAdjust Then
-        pView = New pViewer
-        If Not picinfo.hasPages Then
-          batchAdjust(gBitMap, pView) ' uses crlvalue() from frmColorBatchAdjust to change color stuff
-        Else
-          For Each bmp As Bitmap In bmpFrames : batchAdjust(bmp, pView) : Next bmp
-        End If
-        pView.Dispose()
+        Using pView As New pViewer
+          If Not picinfo.hasPages Then
+            batchAdjust(gBitMap, pView) ' uses crlvalue() from frmColorBatchAdjust to change color stuff
+          Else
+            For Each bmp As Bitmap In bmpFrames : batchAdjust(bmp, pView) : Next bmp
+          End If
+        End Using
+      End If
+
+      If chkAutocrop.Checked Then
+        Using pView As New pViewer
+          If Not picinfo.hasPages Then
+            pView.setBitmap(gBitMap)
+            autoCrop(pView)
+            gBitMap = pView.Bitmap.Clone
+          Else
+            For Each bmp As Bitmap In bmpFrames
+              pView.setBitmap(gBitMap)
+              autoCrop(pView)
+              gBitMap = pView.Bitmap
+            Next bmp
+          End If
+        End Using
       End If
 
       If watermarkFile <> "" Then
+        Using pview As New pViewer
+          Using g As Graphics = Graphics.FromImage(gBitMap)
+            ' watermarkfile is text string, temporarily
+            isize = 90
+            pview.Font = getFont(1, "Lucida Console", isize, False, False, False)
+            textFmt = StringFormat.GenericTypographic
+            textFmt.Alignment = StringAlignment.Center
+            textFmt.LineAlignment = StringAlignment.Center
+            textFmt.Trimming = StringTrimming.None
+            textFmt.FormatFlags = StringFormatFlags.MeasureTrailingSpaces Or StringFormatFlags.NoClip Or StringFormatFlags.FitBlackBox
+            tSize = Size.Round(g.MeasureString(watermarkFile, pview.Font, New Point(isize \ 2, isize \ 2), textFmt))
+            textP = New Point(tSize.Height * 2 + tSize.Width \ 2, g.VisibleClipBounds.Height - tSize.Height * 1.5)
 
-        Using g As Graphics = Graphics.FromImage(gBitMap)
-          ' watermarkfile is text string, temporarily
-          isize = 90
-          pView.Font = getFont(1, "Lucida Console", isize, False, False, False)
-          textFmt = StringFormat.GenericTypographic
-          textFmt.Alignment = StringAlignment.Center
-          textFmt.LineAlignment = StringAlignment.Center
-          textFmt.Trimming = StringTrimming.None
-          textFmt.FormatFlags = StringFormatFlags.MeasureTrailingSpaces Or StringFormatFlags.NoClip Or StringFormatFlags.FitBlackBox
-          tSize = Size.Round(g.MeasureString(watermarkFile, pView.Font, New Point(isize \ 2, isize \ 2), textFmt))
-          textP = New Point(tSize.Height * 2 + tSize.Width \ 2, g.VisibleClipBounds.Height - tSize.Height * 1.5)
-
-          pView.DrawText(g, watermarkFile, textP,
-                         pView.Font, Color.Beige, Color.Black, False, 0, textFmt)
-
-
+            pview.DrawText(g, watermarkFile, textP,
+                           pview.Font, Color.Beige, Color.Black, False, 0, textFmt)
+          End Using
         End Using
         '        Using bmpWatermark As Bitmap = readBitmap(watermarkFile, msg)
         ' Dim r As Rectangle

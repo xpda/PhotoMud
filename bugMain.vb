@@ -1114,7 +1114,7 @@ Public Module bugMain
         If ds IsNot Nothing AndAlso ds.Tables(0).Rows.Count > 0 Then
           cmd = "select * from gbif.tax where ("
           For Each dr As DataRow In ds.Tables(0).Rows
-            taxid = dr("taxid")
+            taxid = dr("taxonid")
             If taxid <> "" AndAlso cmd.IndexOf(taxid) < 0 Then cmd &= "taxid = '" & taxid & "' or "
           Next dr
           If cmd.EndsWith(" or ") Then

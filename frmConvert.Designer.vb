@@ -58,6 +58,7 @@
     Me.Label2 = New System.Windows.Forms.Label()
     Me.nmPngCompression = New System.Windows.Forms.NumericUpDown()
     Me.chkExif = New System.Windows.Forms.CheckBox()
+    Me.cmdWatermark = New System.Windows.Forms.Button()
     Me.cmdCancel = New System.Windows.Forms.Button()
     Me.fmResize = New System.Windows.Forms.GroupBox()
     Me.Label1 = New System.Windows.Forms.Label()
@@ -73,7 +74,7 @@
     Me.chkPngIndexed = New System.Windows.Forms.CheckBox()
     Me.fmJPG = New System.Windows.Forms.GroupBox()
     Me.bkgSave = New System.ComponentModel.BackgroundWorker()
-    Me.cmdWatermark = New System.Windows.Forms.Button()
+    Me.chkAutocrop = New System.Windows.Forms.CheckBox()
     CType(Me.nmYres, System.ComponentModel.ISupportInitialize).BeginInit()
     CType(Me.nmXres, System.ComponentModel.ISupportInitialize).BeginInit()
     CType(Me.nmQuality, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -88,11 +89,11 @@
     '
     Me.cmdColor.Anchor = System.Windows.Forms.AnchorStyles.Bottom
     Me.cmdColor.Font = New System.Drawing.Font("Arial", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.cmdColor.Location = New System.Drawing.Point(427, 609)
+    Me.cmdColor.Location = New System.Drawing.Point(427, 619)
     Me.cmdColor.Name = "cmdColor"
     Me.cmdColor.Size = New System.Drawing.Size(101, 46)
     Me.cmdColor.TabIndex = 50
-    Me.cmdColor.Text = "&Adjust Colors"
+    Me.cmdColor.Text = "Ad&just Colors"
     Me.ToolTip1.SetToolTip(Me.cmdColor, "Set a color adjustment for the photos being converted")
     Me.cmdColor.UseVisualStyleBackColor = False
     '
@@ -127,7 +128,7 @@
     '
     Me.cmdStart.Anchor = System.Windows.Forms.AnchorStyles.Bottom
     Me.cmdStart.Font = New System.Drawing.Font("Arial", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.cmdStart.Location = New System.Drawing.Point(711, 609)
+    Me.cmdStart.Location = New System.Drawing.Point(711, 619)
     Me.cmdStart.Name = "cmdStart"
     Me.cmdStart.Size = New System.Drawing.Size(101, 46)
     Me.cmdStart.TabIndex = 52
@@ -258,7 +259,7 @@
     '
     Me.Label2.AutoSize = True
     Me.Label2.Font = New System.Drawing.Font("Arial", 9.0!)
-    Me.Label2.Location = New System.Drawing.Point(36, 40)
+    Me.Label2.Location = New System.Drawing.Point(36, 38)
     Me.Label2.Name = "Label2"
     Me.Label2.Size = New System.Drawing.Size(135, 17)
     Me.Label2.TabIndex = 6
@@ -291,12 +292,24 @@
     Me.ToolTip1.SetToolTip(Me.chkExif, "Change the size of the output files")
     Me.chkExif.UseVisualStyleBackColor = False
     '
+    'cmdWatermark
+    '
+    Me.cmdWatermark.Anchor = System.Windows.Forms.AnchorStyles.Bottom
+    Me.cmdWatermark.Font = New System.Drawing.Font("Arial", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+    Me.cmdWatermark.Location = New System.Drawing.Point(569, 619)
+    Me.cmdWatermark.Name = "cmdWatermark"
+    Me.cmdWatermark.Size = New System.Drawing.Size(101, 46)
+    Me.cmdWatermark.TabIndex = 51
+    Me.cmdWatermark.Text = "&Watermark"
+    Me.ToolTip1.SetToolTip(Me.cmdWatermark, "Set a color adjustment for the photos being converted")
+    Me.cmdWatermark.UseVisualStyleBackColor = False
+    '
     'cmdCancel
     '
     Me.cmdCancel.Anchor = System.Windows.Forms.AnchorStyles.Bottom
     Me.cmdCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel
     Me.cmdCancel.Font = New System.Drawing.Font("Arial", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.cmdCancel.Location = New System.Drawing.Point(853, 609)
+    Me.cmdCancel.Location = New System.Drawing.Point(853, 619)
     Me.cmdCancel.Name = "cmdCancel"
     Me.cmdCancel.Size = New System.Drawing.Size(101, 46)
     Me.cmdCancel.TabIndex = 53
@@ -315,7 +328,7 @@
     Me.fmResize.Location = New System.Drawing.Point(20, 283)
     Me.fmResize.Name = "fmResize"
     Me.fmResize.Padding = New System.Windows.Forms.Padding(0)
-    Me.fmResize.Size = New System.Drawing.Size(398, 181)
+    Me.fmResize.Size = New System.Drawing.Size(393, 181)
     Me.fmResize.TabIndex = 18
     Me.fmResize.TabStop = False
     Me.fmResize.Text = "Resize"
@@ -337,7 +350,7 @@
     Me.lbCompression.Font = New System.Drawing.Font("Arial", 8.0!)
     Me.lbCompression.Location = New System.Drawing.Point(6, 89)
     Me.lbCompression.Name = "lbCompression"
-    Me.lbCompression.Size = New System.Drawing.Size(381, 70)
+    Me.lbCompression.Size = New System.Drawing.Size(376, 70)
     Me.lbCompression.TabIndex = 19
     Me.lbCompression.Text = "(see form load for caption)"
     '
@@ -373,7 +386,7 @@
     Me.TreeView.Location = New System.Drawing.Point(427, 77)
     Me.TreeView.Name = "TreeView"
     Me.TreeView.SelectedImageIndex = 0
-    Me.TreeView.Size = New System.Drawing.Size(529, 516)
+    Me.TreeView.Size = New System.Drawing.Size(529, 526)
     Me.TreeView.TabIndex = 27
     Me.TreeView.TabStop = False
     '
@@ -388,7 +401,7 @@
     '
     Me.StatusStrip1.ImageScalingSize = New System.Drawing.Size(20, 20)
     Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ProgressBar1, Me.lbCount})
-    Me.StatusStrip1.Location = New System.Drawing.Point(0, 671)
+    Me.StatusStrip1.Location = New System.Drawing.Point(0, 681)
     Me.StatusStrip1.Name = "StatusStrip1"
     Me.StatusStrip1.Size = New System.Drawing.Size(978, 24)
     Me.StatusStrip1.TabIndex = 28
@@ -412,9 +425,9 @@
     Me.fmPng.Controls.Add(Me.chkPngIndexed)
     Me.fmPng.Controls.Add(Me.Label2)
     Me.fmPng.Controls.Add(Me.nmPngCompression)
-    Me.fmPng.Location = New System.Drawing.Point(22, 542)
+    Me.fmPng.Location = New System.Drawing.Point(22, 563)
     Me.fmPng.Name = "fmPng"
-    Me.fmPng.Size = New System.Drawing.Size(399, 126)
+    Me.fmPng.Size = New System.Drawing.Size(393, 107)
     Me.fmPng.TabIndex = 30
     Me.fmPng.TabStop = False
     Me.fmPng.Text = "PNG Options"
@@ -422,7 +435,7 @@
     'chkPngIndexed
     '
     Me.chkPngIndexed.AutoSize = True
-    Me.chkPngIndexed.Location = New System.Drawing.Point(39, 80)
+    Me.chkPngIndexed.Location = New System.Drawing.Point(39, 75)
     Me.chkPngIndexed.Name = "chkPngIndexed"
     Me.chkPngIndexed.Size = New System.Drawing.Size(80, 21)
     Me.chkPngIndexed.TabIndex = 8
@@ -437,30 +450,32 @@
     Me.fmJPG.Controls.Add(Me.nmQuality)
     Me.fmJPG.Location = New System.Drawing.Point(22, 125)
     Me.fmJPG.Name = "fmJPG"
-    Me.fmJPG.Size = New System.Drawing.Size(396, 172)
+    Me.fmJPG.Size = New System.Drawing.Size(391, 172)
     Me.fmJPG.TabIndex = 31
     Me.fmJPG.TabStop = False
     '
     'bkgSave
     '
     '
-    'cmdWatermark
+    'chkAutocrop
     '
-    Me.cmdWatermark.Anchor = System.Windows.Forms.AnchorStyles.Bottom
-    Me.cmdWatermark.Font = New System.Drawing.Font("Arial", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.cmdWatermark.Location = New System.Drawing.Point(569, 609)
-    Me.cmdWatermark.Name = "cmdWatermark"
-    Me.cmdWatermark.Size = New System.Drawing.Size(101, 46)
-    Me.cmdWatermark.TabIndex = 51
-    Me.cmdWatermark.Text = "&Watermark"
-    Me.ToolTip1.SetToolTip(Me.cmdWatermark, "Set a color adjustment for the photos being converted")
-    Me.cmdWatermark.UseVisualStyleBackColor = False
+    Me.chkAutocrop.AutoSize = True
+    Me.chkAutocrop.Font = New System.Drawing.Font("Arial", 9.0!)
+    Me.chkAutocrop.Location = New System.Drawing.Point(30, 515)
+    Me.chkAutocrop.Name = "chkAutocrop"
+    Me.chkAutocrop.Size = New System.Drawing.Size(95, 21)
+    Me.chkAutocrop.TabIndex = 54
+    Me.chkAutocrop.Text = "&Auto Crop"
+    Me.ToolTip1.SetToolTip(Me.chkAutocrop, "If you have tagged photos from multiple folders," & Global.Microsoft.VisualBasic.ChrW(13) & Global.Microsoft.VisualBasic.ChrW(10) & "you can save them under their s" & _
+        "ubfolder names.")
+    Me.chkAutocrop.UseVisualStyleBackColor = False
     '
     'frmConvert
     '
     Me.BackColor = System.Drawing.SystemColors.Control
     Me.CancelButton = Me.cmdCancel
-    Me.ClientSize = New System.Drawing.Size(978, 695)
+    Me.ClientSize = New System.Drawing.Size(978, 705)
+    Me.Controls.Add(Me.chkAutocrop)
     Me.Controls.Add(Me.cmdWatermark)
     Me.Controls.Add(Me.fmJPG)
     Me.Controls.Add(Me.fmPng)
@@ -519,5 +534,6 @@
   Public WithEvents chkExif As System.Windows.Forms.CheckBox
   Friend WithEvents bkgSave As System.ComponentModel.BackgroundWorker
   Public WithEvents cmdWatermark As System.Windows.Forms.Button
+  Public WithEvents chkAutocrop As System.Windows.Forms.CheckBox
 #End Region
 End Class

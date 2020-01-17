@@ -1125,12 +1125,10 @@ Public Class frmMainf
 
   Private Sub mnuImageAutoCrop_click(sender As Object, e As EventArgs) Handles mnuImageAutoCrop.Click
 
-    Dim bmp As Bitmap
-
     CommandPrep(AddressOf mnuImageAutoCrop_click, False)
     SaveUndo()
 
-    bmp = autoCrop(mView)
+    autoCrop(mView)
 
     mView.Zoom()
 

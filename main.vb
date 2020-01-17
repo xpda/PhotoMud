@@ -162,6 +162,7 @@ Public Module main
 
   ' parameters between fmconvert and fmcoloradjust
   Public colorAdjust As Boolean  ' flag for fileconvert
+  Public aCrop As Boolean  ' flag for autocrop
   Public clrValue(7) As Integer  ' parameters for fileconvert from frmColorBatchAdjust
 
   Public iniWindowSizeX As Integer
@@ -4485,23 +4486,22 @@ Public Module main
 
   End Function
 
-  Function autoCrop(mview As mudViewer) As Bitmap
+  Sub autoCrop(pview As pViewer)
 
     Dim bb() As Byte
     Dim dx(2) As Integer
     Dim avg(2) As Integer
     Dim checkDiff As Boolean
     Dim ix1, iy1, ix2, iy2 As Integer
-    Dim k As Integer
     Dim lastAvg(3) As Integer
     Dim border As Boolean
     Dim iHeight, iWidth As Integer
-    iHeight = mview.Bitmap.Height : iWidth = mview.Bitmap.Width
 
-    bb = getBmpBytes(mview.Bitmap)
+    iHeight = pview.Bitmap.Height : iWidth = pview.Bitmap.Width
 
-    iy1 = 0
+    bb = getBmpBytes(pview.Bitmap)
 
+    ix1 = 0 : iy1 = 0 : ix2 = 0 : iy2 = 0
     For iy As Integer = 0 To (iHeight - 1) * iWidth * 4 Step iWidth * 4
       If iy \ (iWidth * 4) > 4 Then checkDiff = True Else checkDiff = False
       border = checkCropBytes(bb, iWidth, iy, 4, checkDiff)
@@ -4538,13 +4538,11 @@ Public Module main
       End If
     Next ix
 
+    If ix1 <> 0 And iy1 <> 0 And ix2 <> 0 And iy2 <> 0 Then
+      pview.Crop(New Rectangle(ix1, iy1, ix2 - ix1 + 1, iy2 - iy1 + 1))
+    End If
 
-    mview.Crop(New Rectangle(ix1, iy1, ix2 - ix1 + 1, iy2 - iy1 + 1))
-
-
-    Return Nothing
-
-  End Function
+  End Sub
 
   Function checkCropBytes(bb() As Byte, iLength As Integer, yoff As Integer, iStep As Integer,
                           checkDiff As Boolean) As Boolean
@@ -4556,12 +4554,12 @@ Public Module main
     Static firstavg(2) As Integer
     Dim avg(2) As Integer
     Dim dx(2) As Integer
-    Dim i, k As Integer
+    Dim i As Integer
     Dim i1, i2, i3 As Integer
 
-    Dim avglimit As Integer = 27 ' 40 - absolute average
-    Dim dxLimit As Integer = 13 ' 18 - difference from first
-    Dim diffLimit As Integer = 9 ' 3 - difference from previous
+    Dim avglimit As Integer = 30 ' 40 - absolute average
+    Dim dxLimit As Integer = 15 ' 18 - difference from first
+    Dim diffLimit As Integer = 23 ' 3 - difference from previous
 
     avg(0) = 0 : avg(1) = 0 : avg(2) = 0
     dx(0) = 0 : dx(1) = 0 : dx(2) = 0
@@ -4571,30 +4569,20 @@ Public Module main
       avg(1) += bb(i + 1)
       avg(2) += bb(i + 2)
     Next ix
-    avg(0) = avg(0) \ iLength
-    avg(1) = avg(1) \ iLength
-    avg(2) = avg(2) \ iLength
 
-    If checkDiff AndAlso firstavg(0) = 0 Then
-      firstavg(0) = avg(0)
-      firstavg(1) = avg(1)
-      firstavg(2) = avg(2)
-    End If
-
-    dx(0) = Abs(firstavg(0) - avg(0))
-    dx(1) = Abs(firstavg(1) - avg(1))
-    dx(2) = Abs(firstavg(2) - avg(2))
+    For j As Integer = 0 To 2
+      avg(j) = avg(j) \ iLength
+      If checkDiff AndAlso firstavg(0) = 0 Then firstavg(j) = avg(j)
+      dx(j) = Abs(firstavg(j) - avg(j))
+    Next j
 
     i1 = 0 : i2 = 0 : i3 = 0
-    If avg(0) > avglimit Or avg(1) > avglimit Or avg(2) > avglimit Then
-      i1 = 1
-    End If
+    If avg(0) > avglimit Or avg(1) > avglimit Or avg(2) > avglimit Then i1 = 1
 
-    If checkDiff AndAlso (dx(0) > dxLimit Or dx(1) > dxLimit Or dx(2) > dxLimit) Then
-      i2 = 1
-    End If
+    If checkDiff AndAlso (dx(0) > dxLimit + dx(1) > dxLimit + dx(2) > dxLimit) Then i2 = 1
 
-    If checkDiff AndAlso (Abs(lastavg(0) - avg(0)) > diffLimit Or Abs(lastavg(1) - avg(1)) > diffLimit Or Abs(lastavg(2) - avg(2)) > diffLimit) Then
+    If checkDiff AndAlso
+      (Abs(lastavg(0) - avg(0)) > diffLimit Or Abs(lastavg(1) - avg(1)) > diffLimit Or Abs(lastavg(2) - avg(2)) > diffLimit) Then
       i3 = 1
     End If
 
