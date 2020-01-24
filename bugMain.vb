@@ -307,18 +307,19 @@ Public Module bugMain
 
     ' gets an imagerec from the taxa database, based on the image id
 
-    Dim ds As New DataSet
     Dim dr As DataRow
     Dim irec As New imagerec
 
-    ds = getDS("select * from images where imageid = @parm1", imageid)
+    Using ds As DataSet = getDS("select * from images where imageid = @parm1", imageid)
 
-    If ds IsNot Nothing AndAlso ds.Tables(0).Rows.Count <> 1 Then
-      Return irec
-    Else
-      dr = ds.Tables(0).Rows(0)
-      irec = getimagerecDr(dr)    ' load drow into irec
-    End If
+      If ds IsNot Nothing AndAlso ds.Tables(0).Rows.Count <> 1 Then
+        Return irec
+      Else
+        dr = ds.Tables(0).Rows(0)
+        irec = getimagerecDr(dr)    ' load drow into irec
+      End If
+
+    End Using
 
     Return irec
 
@@ -329,18 +330,18 @@ Public Module bugMain
 
     ' gets an imagerec from the taxa database, based on the file name.
 
-    Dim ds As New DataSet
     Dim dr As DataRow
     Dim irec As New imagerec
 
-    ds = getDS("select * from images where filename = @parm1", fname)
+    Using ds As DataSet = getDS("select * from images where filename = @parm1", fname)
 
-    If ds IsNot Nothing AndAlso ds.Tables(0).Rows.Count <> 1 Then
-      Return irec
-    Else
-      dr = ds.Tables(0).Rows(0)
-      irec = getimagerecDr(dr)    ' load drow into irec
-    End If
+      If ds IsNot Nothing AndAlso ds.Tables(0).Rows.Count <> 1 Then
+        Return irec
+      Else
+        dr = ds.Tables(0).Rows(0)
+        irec = getimagerecDr(dr)    ' load drow into irec
+      End If
+    End Using
 
     Return irec
 
@@ -384,30 +385,31 @@ Public Module bugMain
 
     ' gbif ids start with g: g1234, for example.
 
-    Dim ds As New DataSet
     Dim m As New taxrec
     Dim matches As New List(Of taxrec)
 
     If taxid = "" Then Return matches ' empty list
 
     If eqstr(taxid.Substring(0, 1), "g") Then ' gbif database
-      ds = getDS("select * from gbif.tax where taxid = @parm1 and usable <> '';",
+      Using ds As DataSet = getDS("select * from gbif.tax where taxid = @parm1 and usable <> '';",
                  taxid.Substring(1).Trim)
-      If ds IsNot Nothing Then
-        For Each dr As DataRow In ds.Tables(0).Rows
-          m = getTaxrecg(dr, False)
-          matches.Add(m)
-        Next dr
-      End If
+        If ds IsNot Nothing Then
+          For Each dr As DataRow In ds.Tables(0).Rows
+            m = getTaxrecg(dr, False)
+            matches.Add(m)
+          Next dr
+        End If
+      End Using
 
     Else ' taxatable database
-      ds = getDS("select * from taxatable where taxid = @parm1", taxid)
-      If ds IsNot Nothing Then
-        For Each dr As DataRow In ds.Tables(0).Rows
-          m = getTaxrec(dr)
-          matches.Add(m)
-        Next dr
-      End If
+      Using ds As DataSet = getDS("select * from taxatable where taxid = @parm1", taxid)
+        If ds IsNot Nothing Then
+          For Each dr As DataRow In ds.Tables(0).Rows
+            m = getTaxrec(dr)
+            matches.Add(m)
+          Next dr
+        End If
+      End Using
     End If
 
     Return matches
@@ -439,7 +441,6 @@ Public Module bugMain
     Dim matches As New List(Of taxrec)
     Dim vnames As New List(Of String)
     Dim taxid As String = ""
-    Dim ds As DataSet
     Dim s As String
     Dim ss() As String
 
@@ -455,36 +456,40 @@ Public Module bugMain
     match.gbifUsable = dr("usable")
 
     ' get image counters and links, if possible
-    ds = getDS("select * from gbifplus where taxid = @parm1", taxid)
-    For Each dr2 As DataRow In ds.Tables(0).Rows
-      match.imageCounter = dr2("imagecounter")
-      match.childimageCounter = dr2("childimagecounter")
-      match.link = dr2("link")
-    Next dr2
+    Using ds As DataSet = getDS("select * from gbifplus where taxid = @parm1", taxid)
+      For Each dr2 As DataRow In ds.Tables(0).Rows
+        match.imageCounter = dr2("imagecounter")
+        match.childimageCounter = dr2("childimagecounter")
+        match.link = dr2("link")
+      Next dr2
+    End Using
 
     If noCommon Then Return match
 
     ' get common names from oddinfo
-    ds = getDS("select * from oddinfo where taxid = @parm1", match.taxid)
-    For Each dr2 As DataRow In ds.Tables(0).Rows
-      If dr2("commonnames") <> "" Then
-        s = dr2("commonnames")
-        ss = s.Split("|")
-        If ss.Count >= 1 AndAlso ss(0) <> "" Then
-          match.commonNames = ss.ToList
+    Using ds As DataSet = getDS("select * from oddinfo where taxid = @parm1", match.taxid)
+      For Each dr2 As DataRow In ds.Tables(0).Rows
+        If dr2("commonnames") <> "" Then
+          s = dr2("commonnames")
+          ss = s.Split("|")
+          If ss.Count >= 1 AndAlso ss(0) <> "" Then
+            match.commonNames = ss.ToList
+          End If
+          Exit For
         End If
-        Exit For
-      End If
-    Next dr2
+      Next dr2
+    End Using
+
 
     ' get descr from taxatable, if possible
-    ds = getDS("select * from taxatable where taxon = @parm1", match.taxon)
-    For Each dr2 As DataRow In ds.Tables(0).Rows
-      If dr2("descr") <> "" Then
-        match.descr = dr2("descr")
-        Exit For
-      End If
-    Next dr2
+    Using ds As DataSet = getDS("select * from taxatable where taxon = @parm1", match.taxon)
+      For Each dr2 As DataRow In ds.Tables(0).Rows
+        If dr2("descr") <> "" Then
+          match.descr = dr2("descr")
+          Exit For
+        End If
+      Next dr2
+    End Using
 
     Return match
 
@@ -514,21 +519,21 @@ Public Module bugMain
 
   Function queryTax(cmd As String, val As String) As List(Of taxrec)
 
-    Dim ds As New DataSet
     Dim match As New taxrec
     Dim matches As New List(Of taxrec)
     '```
-    ds = getDS(cmd, val)
-    If ds IsNot Nothing Then
-      For Each dr As DataRow In ds.Tables(0).Rows
-        If cmd.Contains("gbif.") Then
-          match = getTaxrecg(dr, True) ' no common names
-        Else
-          match = getTaxrec(dr)
-        End If
-        If match.taxid <> "" Then matches.Add(match)
-      Next dr
-    End If
+    Using ds As DataSet = getDS(cmd, val)
+      If ds IsNot Nothing Then
+        For Each dr As DataRow In ds.Tables(0).Rows
+          If cmd.Contains("gbif.") Then
+            match = getTaxrecg(dr, True) ' no common names
+          Else
+            match = getTaxrec(dr)
+          End If
+          If match.taxid <> "" Then matches.Add(match)
+        Next dr
+      End If
+    End Using
 
     Return matches
 
@@ -829,8 +834,6 @@ Public Module bugMain
   Sub saveImageSet(ByVal fName As String, ByRef setID As Integer)
     ' save an imageset record for fName with setID. May replace an existing one.
 
-    Dim dset As New DataSet
-
     Dim i As Integer
     Dim newUid, oldSetid As Integer
     Dim imageID As Integer = 0
@@ -845,28 +848,29 @@ Public Module bugMain
     End If
 
     ' find existing link for current image
-    dset = getDS("select id, setid from imagesets where imageid = @parm1", imageID)
-    If dset Is Nothing Then Exit Sub
+    Using ds As DataSet = getDS("select id, setid from imagesets where imageid = @parm1", imageID)
+      If ds Is Nothing Then Exit Sub
 
-    If dset.Tables.Count > 0 And dset.Tables(0).Rows.Count > 0 Then
-      newUid = dset.Tables(0).Rows(0)("id")
-      oldSetid = dset.Tables(0).Rows(0)("setid")
-    Else
-      newUid = 0
-    End If
-
-    If newUid <= 0 Then
-      ' add current image to new imageset record
-      i = nonQuery("insert into imagesets (imageid, setid) values (@parm1, @parm2)", imageID, setID)
-    Else
-      ' add current image to existing imageset record
-      i = nonQuery("update imagesets set imageid = @parm1, setid = @parm2 where id = @parm3", imageID, setID, newUid)
-      ' delete the rest of the old imageset if there's only one image left
-      i = getScalar("select count(*) from imagesets where setid = @parm1", oldSetid)
-      If i = 1 Then ' delete it
-        i = nonQuery("delete from imagesets where setid = @parm1", oldSetid)
+      If ds.Tables.Count > 0 And ds.Tables(0).Rows.Count > 0 Then
+        newUid = ds.Tables(0).Rows(0)("id")
+        oldSetid = ds.Tables(0).Rows(0)("setid")
+      Else
+        newUid = 0
       End If
-    End If
+
+      If newUid <= 0 Then
+        ' add current image to new imageset record
+        i = nonQuery("insert into imagesets (imageid, setid) values (@parm1, @parm2)", imageID, setID)
+      Else
+        ' add current image to existing imageset record
+        i = nonQuery("update imagesets set imageid = @parm1, setid = @parm2 where id = @parm3", imageID, setID, newUid)
+        ' delete the rest of the old imageset if there's only one image left
+        i = getScalar("select count(*) from imagesets where setid = @parm1", oldSetid)
+        If i = 1 Then ' delete it
+          i = nonQuery("delete from imagesets where setid = @parm1", oldSetid)
+        End If
+      End If
+    End Using
 
   End Sub
 
@@ -993,25 +997,25 @@ Public Module bugMain
 
     Dim cmd As MySqlCommand
     Dim da As New MySqlDataAdapter
-    Dim ds As New DataSet
 
-    ds.Clear()
-    Try
-      Using conn As New MySqlConnection(iniDBConnStr)
-        conn.Open()
-        cmd = New MySqlCommand(scmd, conn)
-        cmd.Parameters.AddWithValue("@parm1", parm1)
-        cmd.Parameters.AddWithValue("@parm2", parm2)
-        cmd.Parameters.AddWithValue("@parm3", parm3)
-        da.SelectCommand = cmd
-        da.Fill(ds)
-      End Using
-    Catch ex As Exception
-      MsgBox("Error, getDS: " & ex.Message)
-      Return Nothing
-    End Try
+    Using ds As DataSet = New DataSet
+      Try
+        Using conn As New MySqlConnection(iniDBConnStr)
+          conn.Open()
+          cmd = New MySqlCommand(scmd, conn)
+          cmd.Parameters.AddWithValue("@parm1", parm1)
+          cmd.Parameters.AddWithValue("@parm2", parm2)
+          cmd.Parameters.AddWithValue("@parm3", parm3)
+          da.SelectCommand = cmd
+          da.Fill(ds)
+        End Using
+      Catch ex As Exception
+        MsgBox("Error, getDS: " & ex.Message)
+        Return Nothing
+      End Try
 
-    Return ds
+      Return ds
+    End Using
 
   End Function
 
@@ -1073,7 +1077,6 @@ Public Module bugMain
     Dim matches As New List(Of taxrec)
     Dim s As String
     Dim suffix, suffixg As String
-    Dim ds As New DataSet
     Dim taxid As String
 
     findme = findme.Trim
@@ -1109,20 +1112,21 @@ Public Module bugMain
       If matches.Count = 0 Then matches = queryTax("select * from taxatable where (descr rlike @parm1)" & suffix, s)
 
       If matches.Count = 0 Then
-        ds = getDS("select * from gbif.vernacularname where vernacularname rlike @parm1 and (language = 'en' or language = '')", s)
-        'ds = getDS("select * from gbif.vernacularname where vernacularname = @parm1 and (language = 'en' or language = '')", s)
-        If ds IsNot Nothing AndAlso ds.Tables(0).Rows.Count > 0 Then
-          cmd = "select * from gbif.tax where ("
-          For Each dr As DataRow In ds.Tables(0).Rows
-            taxid = dr("taxonid")
-            If taxid <> "" AndAlso cmd.IndexOf(taxid) < 0 Then cmd &= "taxid = '" & taxid & "' or "
-          Next dr
-          If cmd.EndsWith(" or ") Then
-            cmd = cmd.Substring(0, cmd.Length - 4)
-            cmd &= ") and usable <> '' order by name"
-            matches = queryTax(cmd, "")
+        Using ds As DataSet = getDS("select * from gbif.vernacularname where vernacularname rlike @parm1 and (language = 'en' or language = '')", s)
+          'ds = getDS("select * from gbif.vernacularname where vernacularname = @parm1 and (language = 'en' or language = '')", s)
+          If ds IsNot Nothing AndAlso ds.Tables(0).Rows.Count > 0 Then
+            cmd = "select * from gbif.tax where ("
+            For Each dr As DataRow In ds.Tables(0).Rows
+              taxid = dr("taxonid")
+              If taxid <> "" AndAlso cmd.IndexOf(taxid) < 0 Then cmd &= "taxid = '" & taxid & "' or "
+            Next dr
+            If cmd.EndsWith(" or ") Then
+              cmd = cmd.Substring(0, cmd.Length - 4)
+              cmd &= ") and usable <> '' order by name"
+              matches = queryTax(cmd, "")
+            End If
           End If
-        End If
+        End Using
       End If
 
     End If
@@ -1364,12 +1368,6 @@ Public Module bugMain
 
   Function validTaxon(m As taxrec) As String
 
-    Dim ds As DataSet = Nothing
-    Dim ds2 As DataSet = Nothing
-    Dim ds3 As DataSet = Nothing
-    Dim dr As DataRow = Nothing
-    Dim dr2 As DataRow = Nothing
-    'Dim n, iRow As Integer
     Dim s As String
 
     s = LCase(m.taxon)

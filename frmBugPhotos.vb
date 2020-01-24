@@ -307,8 +307,7 @@ Public Class frmBugPhotos
     Dim match As New taxrec
     Dim matches As New List(Of taxrec)
 
-    Dim dset As New DataSet
-    Dim drow As DataRow
+    Dim dr As DataRow
 
     Dim picInfo As pictureInfo
 
@@ -400,133 +399,137 @@ Public Class frmBugPhotos
 
     txDateAdded.Text = Format(Now, "MM/dd/yyyy HH:mm")
 
-    dset = getDS("select * from images where filename = @parm1 limit 1", txFileName.Text)
 
-    If dset IsNot Nothing AndAlso dset.Tables(0).Rows.Count > 0 Then
-      drow = dset.Tables(0).Rows(0)
-      If Not IsDBNull(drow("taxonid")) Then
-        taxonid = drow("taxonid")
-        matches = getTaxrecByID(taxonid)
-        If matches.Count = 0 Then match = New taxrec Else match = matches(0)
-      End If
+    Using ds As DataSet = getDS("select * from images where filename = @parm1 limit 1", txFileName.Text)
 
-      If Not IsDBNull(drow("photodate")) Then txDate.Text = Format(drow("photodate"), "MM/dd/yyyy HH:mm:ss")
-      If Not IsDBNull(drow("dateadded")) Then txDateAdded.Text = Format(drow("dateadded"), "MM/dd/yyyy")
-      If Not IsDBNull(drow("location")) Then txLocation.Text = drow("location")
-      If Not IsDBNull(drow("county")) Then txCounty.Text = drow("county")
-      If Not IsDBNull(drow("state")) Then txState.Text = drow("state")
-      If Not IsDBNull(drow("country")) Then txCountry.Text = drow("country")
-      If Not IsDBNull(drow("size")) Then txSize.Text = drow("size")
-      If Not IsDBNull(drow("rating")) Then txRating.Text = drow("rating")
-      If Not IsDBNull(drow("confidence")) Then txConfidence.Text = drow("confidence")
-      If Not IsDBNull(drow("remarks")) Then txRemarks.Text = drow("remarks")
-      If Not IsDBNull(drow("bugguide")) AndAlso drow("bugguide") <> 0 Then txBugguide.Text = drow("bugguide")
-      If Not IsDBNull(drow("inaturalist")) AndAlso drow("inaturalist") <> 0 Then txiNaturalist.Text = drow("inaturalist")
-      If Not IsDBNull(drow("size")) Then txSize.Text = drow("size")
-      If Not IsDBNull(drow("originalpath")) Then txOriginalPath.Text = drow("originalpath")
-      If Not IsDBNull(drow("gps")) Then txGPS.Text = drow("gps")
-      If Not IsDBNull(drow("elevation")) Then
-        iElevation = drow("elevation")
-        If iElevation = -32768 Or iElevation = 0 Then
-          txElevation.Text = ""
-        Else
-          txElevation.Text = Str(iElevation)
-          formatElevation() ' format it, assign to ielevation
+      If ds IsNot Nothing AndAlso ds.Tables(0).Rows.Count > 0 Then
+        dr = ds.Tables(0).Rows(0)
+        If Not IsDBNull(dr("taxonid")) Then
+          taxonid = dr("taxonid")
+          matches = getTaxrecByID(taxonid)
+          If matches.Count = 0 Then match = New taxrec Else match = matches(0)
         End If
+
+        If Not IsDBNull(dr("photodate")) Then txDate.Text = Format(dr("photodate"), "MM/dd/yyyy HH:mm:ss")
+        If Not IsDBNull(dr("dateadded")) Then txDateAdded.Text = Format(dr("dateadded"), "MM/dd/yyyy")
+        txLocation.Text = dr("location")
+        txCounty.Text = dr("county")
+        txState.Text = dr("state")
+        txCountry.Text = dr("country")
+        txSize.Text = dr("size")
+        txRating.Text = dr("rating")
+        txConfidence.Text = dr("confidence")
+        txRemarks.Text = dr("remarks")
+        txBugguide.Text = dr("bugguide")
+        txiNaturalist.Text = dr("inaturalist")
+        txSize.Text = dr("size")
+        txOriginalPath.Text = dr("originalpath")
+        txGPS.Text = dr("gps")
+
+        If Not IsDBNull(dr("elevation")) Then
+          iElevation = dr("elevation")
+          If iElevation = -32768 Or iElevation = 0 Then
+            txElevation.Text = ""
+          Else
+            txElevation.Text = Str(iElevation)
+            formatElevation() ' format it, assign to ielevation
+          End If
+        Else
+          iElevation = -32768
+          txElevation.Text = ""
+        End If
+
+        If txGPS.Text = "" Then
+          cmdGPSLocate.Enabled = False
+        Else
+          cmdGPSLocate.Enabled = True
+        End If
+      End If
+
+      If match.taxon = "" Then  ' try to get the taxon from the jpg comment
+        grabTaxon(uDescription, match)
+        taxonid = match.taxid
+      End If
+      txTaxon.Text = match.taxon
+      txCommon.Text = getDescr(match, False)
+
+      ' put into the label the count of database records for this original path
+      ' i = getScalar("select count(*) from images where originalpath = @parm1", txOriginalPath.Text)
+
+      ' add the setid, if there is one
+      i = getScalar("select setid from imagesets where imageid = (select imageid from images where filename = @parm1)", txFileName.Text)
+      If i > 0 Then
+        txImageSet.Text = i
       Else
-        iElevation = -32768
-        txElevation.Text = ""
+        txImageSet.Text = ""
+      End If
+      loadimageset()
+
+      If i = 0 Then ' no records
+        lbOriginalPath.Text = "Original Path:"
       End If
 
-      If txGPS.Text = "" Then
-        cmdGPSLocate.Enabled = False
-      Else
-        cmdGPSLocate.Enabled = True
+      ' check to see if it was taken with manual focus, if so enable cmdMeasure. Specific for Panasonic GX-1 or GH-1
+      s = ""
+      picInfo = getPicinfo(picpath, True)
+      uComments = readComments(picpath, True, True)
+      pComments = readPropertyItems(picpath)
+      formatExifComments(True, False, False, False, s, uComments, picInfo, pComments) ' s has the answer
+
+      i = InStr(s, "Focus Mode:")
+      If i > 0 Then
+        i = i + 12
+        i1 = InStr(i, s, "\")
+        s1 = Mid(s, i, i1 - i)
       End If
-    End If
+      If s1 = "Manual" Or s1 = "MF, MF" Then txPixelsPerMM.Enabled = True Else txPixelsPerMM.Enabled = False
 
-    If match.taxon = "" Then  ' try to get the taxon from the jpg comment
-      grabTaxon(uDescription, match)
-      taxonid = match.taxid
-    End If
-    txTaxon.Text = match.taxon
-    txCommon.Text = getDescr(match, False)
-
-    ' put into the label the count of database records for this original path
-    ' i = getScalar("select count(*) from images where originalpath = @parm1", txOriginalPath.Text)
-
-    ' add the setid, if there is one
-    i = getScalar("select setid from imagesets where imageid = (select imageid from images where filename = @parm1)", txFileName.Text)
-    If i > 0 Then
-      txImageSet.Text = i
-    Else
-      txImageSet.Text = ""
-    End If
-    loadimageset()
-
-    If i = 0 Then ' no records
-      lbOriginalPath.Text = "Original Path:"
-    End If
-
-    ' check to see if it was taken with manual focus, if so enable cmdMeasure. Specific for Panasonic GX-1 or GH-1
-    s = ""
-    picInfo = getPicinfo(picpath, True)
-    uComments = readComments(picpath, True, True)
-    pComments = readPropertyItems(picpath)
-    formatExifComments(True, False, False, False, s, uComments, picInfo, pComments) ' s has the answer
-
-    i = InStr(s, "Focus Mode:")
-    If i > 0 Then
-      i = i + 12
-      i1 = InStr(i, s, "\")
-      s1 = Mid(s, i, i1 - i)
-    End If
-    If s1 = "Manual" Or s1 = "MF, MF" Then txPixelsPerMM.Enabled = True Else txPixelsPerMM.Enabled = False
-
-    lens = ""
-    i = InStr(s, "Lens Type:")
-    If i > 0 Then
-      i = i + 11
-      i1 = InStr(i, s, "\")
-      lens = Mid(s, i, i1 - i)
-    End If
-
-    camera = ""
-    i = InStr(s, "Model:")
-    If i > 0 Then
-      i = i + 7
-      i1 = InStr(i, s, "\")
-      camera = Mid(s, i, i1 - i)
-    End If
-
-    ' set the pixels per mm according to the camera and lens
-    ' gx1: 268.4 macro, 56.5 for zoom, gh4: 274.5 macro, 57.8 zoom
-    If lens.Contains("MACRO-ELMARIT 45/F2.8") Or lens.Contains("Leica DG Macro-Elmarit 45mm F2.8 Asph. Mega OIS") Then
-      If s.Contains("DMC-GX1") Then
-        txPixelsPerMM.Text = "268.4"
-      ElseIf s.Contains("DMC-GH4") Then
-        txPixelsPerMM.Text = "275.4"
-      ElseIf s.Contains("E-M1MarkII") Or s.Contains("E-M1 Mark II") Then
-        txPixelsPerMM.Text = "303"
-      ElseIf s.Contains("DC-G95") Then
-        txPixelsPerMM.Text = "306.6"
-      End If
-      '
-    ElseIf lens.Contains("Olympus M.Zuiko Digital ED 30mm F3.5 Macro") Then
-      If s.Contains("E-M1MarkII") Or s.Contains("E-M1 Mark II") Then
-        txPixelsPerMM.Text = "409"
+      lens = ""
+      i = InStr(s, "Lens Type:")
+      If i > 0 Then
+        i = i + 11
+        i1 = InStr(i, s, "\")
+        lens = Mid(s, i, i1 - i)
       End If
 
-    ElseIf lens.Contains("VARIO 100-300/F4.0-5.6") Then
-      If s.Contains("DMC-GX1") Then
-        txPixelsPerMM.Text = "56.5"
-      ElseIf s.Contains("DMC-GH4") Then
-        txPixelsPerMM.Text = "57.8"
+      camera = ""
+      i = InStr(s, "Model:")
+      If i > 0 Then
+        i = i + 7
+        i1 = InStr(i, s, "\")
+        camera = Mid(s, i, i1 - i)
       End If
 
-    ElseIf s.Contains("DSC-RX10M4") Then
-      txPixelsPerMM.Text = "79.4"
-    End If
+      ' set the pixels per mm according to the camera and lens
+      ' gx1: 268.4 macro, 56.5 for zoom, gh4: 274.5 macro, 57.8 zoom
+      If lens.Contains("MACRO-ELMARIT 45/F2.8") Or lens.Contains("Leica DG Macro-Elmarit 45mm F2.8 Asph. Mega OIS") Then
+        If s.Contains("DMC-GX1") Then
+          txPixelsPerMM.Text = "268.4"
+        ElseIf s.Contains("DMC-GH4") Then
+          txPixelsPerMM.Text = "275.4"
+        ElseIf s.Contains("E-M1MarkII") Or s.Contains("E-M1 Mark II") Then
+          txPixelsPerMM.Text = "303"
+        ElseIf s.Contains("DC-G95") Then
+          txPixelsPerMM.Text = "306.6"
+        End If
+        '
+      ElseIf lens.Contains("Olympus M.Zuiko Digital ED 30mm F3.5 Macro") Then
+        If s.Contains("E-M1MarkII") Or s.Contains("E-M1 Mark II") Then
+          txPixelsPerMM.Text = "409"
+        End If
+
+      ElseIf lens.Contains("VARIO 100-300/F4.0-5.6") Then
+        If s.Contains("DMC-GX1") Then
+          txPixelsPerMM.Text = "56.5"
+        ElseIf s.Contains("DMC-GH4") Then
+          txPixelsPerMM.Text = "57.8"
+        End If
+
+      ElseIf s.Contains("DSC-RX10M4") Then
+        txPixelsPerMM.Text = "79.4"
+      End If
+
+    End Using
 
     If tagged(picpath) >= 0 Then mnxTagged.Checked = True Else mnxTagged.Checked = False
 
@@ -545,9 +548,6 @@ Public Class frmBugPhotos
     Dim s As String
     Dim i1, i2, eol As Integer
     Dim matches As New List(Of taxrec)
-
-    Dim adapt As New MySqlDataAdapter
-    Dim dset As New DataSet
 
     s = ""
     If udescription <> "" Then  ' get the scientific name
@@ -1098,8 +1098,6 @@ Public Class frmBugPhotos
 
   Private Sub cmdTaxon_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdTaxon.Click
 
-    Dim dset As New DataSet
-
     Dim match As New bugMain.taxrec
     Dim matches As List(Of taxrec)
     Dim gmatches As List(Of taxrec)
@@ -1602,7 +1600,6 @@ Public Class frmBugPhotos
     Dim s As String
     Dim sb As New StringBuilder
 
-    Dim ds2 As New DataSet
     Dim matches As List(Of taxrec)
     Dim amatches As New List(Of taxrec)
     Dim gmatches As List(Of taxrec)
@@ -1702,7 +1699,6 @@ Public Class frmBugPhotos
     Dim id As String = ""
     Dim count As Integer = 0
     Dim cmd As MySqlCommand
-    Dim ds As New DataSet
     Dim dr As DataRow
     Dim i, k, i1, k1 As Integer
     Dim setid, imageid, lastimage As Integer
@@ -1758,52 +1754,54 @@ Public Class frmBugPhotos
     If mResult <> MsgBoxResult.Yes Then Exit Sub
 
     ' remove empty and duplicate imagesets
-    ds = getDS("select distinct a.* from imagesets as a, imagesets as b where a.imageid = b.imageid and a.setid = b.setid and a.id <> b.id order by a.imageid, a.setid")
+    Using ds As DataSet = getDS("select distinct a.* from imagesets as a, imagesets as b where a.imageid = b.imageid and a.setid = b.setid and a.id <> b.id order by a.imageid, a.setid")
 
-    lastimage = -1
-    If ds IsNot Nothing AndAlso ds.Tables.Count > 0 Then
-      For Each dr In ds.Tables(0).Rows
-        id = dr("id")
-        setid = dr("setid")
-        imageid = dr("imageid")
-        i = getScalar("select count(*) from imagesets where setid = @parm1", setid)
-        If i <= 2 Then ' delete both (or a single) records
-          i = nonQuery("delete from imagesets where setid = @parm1", setid)
-        Else ' delete all but one record with imageid
-          If imageid = lastimage Then ' delete the record except for the first one
-            i = nonQuery("delete from imagesets where id = @parm1", id)
-          Else
-            lastimage = imageid
+      lastimage = -1
+      If ds IsNot Nothing AndAlso ds.Tables.Count > 0 Then
+        For Each dr In ds.Tables(0).Rows
+          id = dr("id")
+          setid = dr("setid")
+          imageid = dr("imageid")
+          i = getScalar("select count(*) from imagesets where setid = @parm1", setid)
+          If i <= 2 Then ' delete both (or a single) records
+            i = nonQuery("delete from imagesets where setid = @parm1", setid)
+          Else ' delete all but one record with imageid
+            If imageid = lastimage Then ' delete the record except for the first one
+              i = nonQuery("delete from imagesets where id = @parm1", id)
+            Else
+              lastimage = imageid
+            End If
           End If
-        End If
-      Next dr
-    End If
+        Next dr
+      End If
+    End Using
 
     ' delete single member image sets
-    ds = getDS("select * from imagesets as a where (select count(*) from imagesets as b where a.setid = b.setid) = 1")
+    Using ds As DataSet = getDS("select * from imagesets as a where (select count(*) from imagesets as b where a.setid = b.setid) = 1")
 
-    If ds IsNot Nothing AndAlso ds.Tables.Count = 1 Then
-      For Each dr In ds.Tables(0).Rows
-        i = nonQuery("delete from imagesets where id = @parm1", dr("id"))
-      Next dr
-    End If
-
+      If ds IsNot Nothing AndAlso ds.Tables.Count = 1 Then
+        For Each dr In ds.Tables(0).Rows
+          i = nonQuery("delete from imagesets where id = @parm1", dr("id"))
+        Next dr
+      End If
+    End Using
 
     delrecs = New List(Of Integer)
     ' get records without images
-    ds = getDS("select * from images")
-    If ds IsNot Nothing Then
-      For Each dr In ds.Tables(0).Rows
-        s = iniBugPath
-        If Not s.EndsWith("\") Then s &= "\"
-        s = s & dr("filename")
+    Using ds As DataSet = getDS("select * from images")
+      If ds IsNot Nothing Then
+        For Each dr In ds.Tables(0).Rows
+          s = iniBugPath
+          If Not s.EndsWith("\") Then s &= "\"
+          s = s & dr("filename")
 
-        If Not File.Exists(s) Then
-          sl.Add(dr("originalpath"))
-          delrecs.Add(dr("imageid"))
-        End If
-      Next dr
-    End If
+          If Not File.Exists(s) Then
+            sl.Add(dr("originalpath"))
+            delrecs.Add(dr("imageid"))
+          End If
+        Next dr
+      End If
+    End Using
 
     sl.Add(Crlf & Crlf & "unattached files" & Crlf)
 
@@ -1829,133 +1827,135 @@ Public Class frmBugPhotos
 
     ' find images that should be in imagesets
     ' uncomment section at bottom of frmexplore mnuToolsComment_Click
-    ds = getDS("select * from images where (select count(*) from imagesets where images.imageid = imageid) = 0 order by photodate;")
-    lastDate = "1/1/1974"
-    lastTaxon = 0
-    lastFilename = ""
+    Using ds As DataSet = getDS("select * from images where (select count(*) from imagesets where images.imageid = imageid) = 0 order by photodate;")
+      lastDate = "1/1/1974"
+      lastTaxon = 0
+      lastFilename = ""
 
-    queryNames = New List(Of String)
-    useQuery = True
+      queryNames = New List(Of String)
+      useQuery = True
 
-    For Each dr In ds.Tables(0).Rows
-      If IsDate(dr("photodate")) AndAlso DateDiff(DateInterval.Minute, lastDate, dr("photodate")) < 2 AndAlso lastTaxon = dr("taxonid") Then ' add to potential imagesets
-        If lastFilename <> "" Then queryNames.Add(iniBugPath & "\" & lastFilename)
-        lastFilename = ""
-        queryNames.Add(iniBugPath & "\" & dr("filename"))
-      Else
-        lastFilename = dr("filename")
-      End If
-      lastTaxon = dr("taxonid")
-      If IsDate(dr("photodate")) Then lastDate = dr("photodate")
-    Next dr
+      For Each dr In ds.Tables(0).Rows
+        If IsDate(dr("photodate")) AndAlso DateDiff(DateInterval.Minute, lastDate, dr("photodate")) < 2 AndAlso lastTaxon = dr("taxonid") Then ' add to potential imagesets
+          If lastFilename <> "" Then queryNames.Add(iniBugPath & "\" & lastFilename)
+          lastFilename = ""
+          queryNames.Add(iniBugPath & "\" & dr("filename"))
+        Else
+          lastFilename = dr("filename")
+        End If
+        lastTaxon = dr("taxonid")
+        If IsDate(dr("photodate")) Then lastDate = dr("photodate")
+      Next dr
 
-    useQuery = True
+      useQuery = True
 
-    Me.Cursor = Cursors.Default
-    Me.DialogResult = DialogResult.OK
-    Me.Close()
+      Me.Cursor = Cursors.Default
+      Me.DialogResult = DialogResult.OK
+      Me.Close()
 
-    If 1 = 1 Then Exit Sub
-
+      If 1 = 1 Then Exit Sub
+    End Using
 
 
 
     ' update gps data (shouldn't need any more)
-    ds = getDS("select * from images where gps <> ''")
+    Using ds As DataSet = getDS("select * from images where gps <> ''")
 
-    If ds IsNot Nothing Then
-      For Each dr In ds.Tables(0).Rows
-        fName = iniBugPath
-        If Not fName.EndsWith("\") Then fName &= "\"
-        fName = fName & dr("filename")
-        pComments = readPropertyItems(fName)
-        getGPSLocation(pComments, gps, s, xLat, xLon, k)
+      If ds IsNot Nothing Then
+        For Each dr In ds.Tables(0).Rows
+          fName = iniBugPath
+          If Not fName.EndsWith("\") Then fName &= "\"
+          fName = fName & dr("filename")
+          pComments = readPropertyItems(fName)
+          getGPSLocation(pComments, gps, s, xLat, xLon, k)
 
-        If k <> 0 Then
-          i = nonQuery("update images set elevation = @parm2 where imageid = @parm1", dr("imageid"), k)
-        End If
-      Next dr
-    End If
+          If k <> 0 Then
+            i = nonQuery("update images set elevation = @parm2 where imageid = @parm1", dr("imageid"), k)
+          End If
+        Next dr
+      End If
+    End Using
 
     ' get county, state, country from location
-    ds = getDS("select * from images")
+    Using ds As DataSet = getDS("select * from images")
 
-    If ds IsNot Nothing Then
-      For Each dr In ds.Tables(0).Rows
-        ' If Not IsDBNull(dr("location")) Then location = dr("location") Else location = ""
-        location = ""
-        id = dr("imageid")
-        If Not IsDBNull(dr("state")) Then state = dr("state") Else state = ""
-        If Not IsDBNull(dr("county")) Then county = dr("county") Else county = ""
-        If Not IsDBNull(dr("country")) Then country = dr("country") Else country = ""
+      If ds IsNot Nothing Then
+        For Each dr In ds.Tables(0).Rows
+          ' If Not IsDBNull(dr("location")) Then location = dr("location") Else location = ""
+          location = ""
+          id = dr("imageid")
+          If Not IsDBNull(dr("state")) Then state = dr("state") Else state = ""
+          If Not IsDBNull(dr("county")) Then county = dr("county") Else county = ""
+          If Not IsDBNull(dr("country")) Then country = dr("country") Else country = ""
 
-        If Not IsDBNull(dr("location")) AndAlso dr("location") <> "" And state = "" And county = "" And country = "" Then
-          s = dr("location")
-          s = s.Trim
-          s = s.Replace("  ", " ")
-          'If vb.Right(s, 5) = ", USA" Then s = Mid(s, 1, Len(s) - 5)
-          If s.EndsWith(", USA") Then s = s.Substring(0, s.Length - 6)
+          If Not IsDBNull(dr("location")) AndAlso dr("location") <> "" And state = "" And county = "" And country = "" Then
+            s = dr("location")
+            s = s.Trim
+            s = s.Replace("  ", " ")
+            'If vb.Right(s, 5) = ", USA" Then s = Mid(s, 1, Len(s) - 5)
+            If s.EndsWith(", USA") Then s = s.Substring(0, s.Length - 6)
 
-          ss = s.Split(",")
-          For i = 0 To UBound(ss) : ss(i) = ss(i).Trim : Next i
-          i = UBound(ss)
-          Select Case ss(i)
-            Case "Cuba, Australia, Nepal, Canada, UK, U.K., New Zealand, France"
-              country = ss(i)
-            Case "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", _
-                    "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", _
-                    "WV", "WI", "WY", "AS", "DC", "FM", "GU", "MH", "MP", "PW", "PR", "VI"
-              state = ss(i)
-            Case "Oklahoma"
-              state = "OK"
-            Case "Colorado"
-              state = "CO"
-            Case "Florida"
-              state = "FL"
-            Case "Virginia"
-              state = "VA"
-            Case "Maryland"
-              state = "VA"
-            Case Else
-              location = ss(i)
-          End Select
+            ss = s.Split(",")
+            For i = 0 To UBound(ss) : ss(i) = ss(i).Trim : Next i
+            i = UBound(ss)
+            Select Case ss(i)
+              Case "Cuba, Australia, Nepal, Canada, UK, U.K., New Zealand, France"
+                country = ss(i)
+              Case "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", _
+                      "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", _
+                      "WV", "WI", "WY", "AS", "DC", "FM", "GU", "MH", "MP", "PW", "PR", "VI"
+                state = ss(i)
+              Case "Oklahoma"
+                state = "OK"
+              Case "Colorado"
+                state = "CO"
+              Case "Florida"
+                state = "FL"
+              Case "Virginia"
+                state = "VA"
+              Case "Maryland"
+                state = "VA"
+              Case Else
+                location = ss(i)
+            End Select
 
-          If UBound(ss) >= 1 And location = "" Then
-            i = UBound(ss) - 1
-            'If LCase(vb.Right(ss(i), 6)) = "county" Then county = vb.Left(ss(i), Len(ss(i)) - 7)
-            If LCase(ss(i)).EndsWith("county") Then county = ss(i).Substring(0, ss(i).Length - 7)
+            If UBound(ss) >= 1 And location = "" Then
+              i = UBound(ss) - 1
+              'If LCase(vb.Right(ss(i), 6)) = "county" Then county = vb.Left(ss(i), Len(ss(i)) - 7)
+              If LCase(ss(i)).EndsWith("county") Then county = ss(i).Substring(0, ss(i).Length - 7)
 
-            If county = "" Then
+              If county = "" Then
+                If location = "" Then
+                  location = ss(i)
+                Else
+                  location = ss(i) & ", " & location
+                End If
+              End If
+            End If
+
+            For i = UBound(ss) - 2 To 0 Step -1
               If location = "" Then
                 location = ss(i)
               Else
                 location = ss(i) & ", " & location
               End If
-            End If
+            Next i
+
+            Using conn As New MySqlConnection(iniDBConnStr)
+              conn.Open()
+              cmd = New MySqlCommand("update images set location = @location, county = @county, state = @state, country = @country  where imageid = @id", conn)
+              cmd.Parameters.AddWithValue("@id", id)
+              cmd.Parameters.AddWithValue("@location", location)
+              cmd.Parameters.AddWithValue("@county", county)
+              cmd.Parameters.AddWithValue("@state", state)
+              cmd.Parameters.AddWithValue("@country", country)
+              cmd.ExecuteNonQuery()
+            End Using
           End If
 
-          For i = UBound(ss) - 2 To 0 Step -1
-            If location = "" Then
-              location = ss(i)
-            Else
-              location = ss(i) & ", " & location
-            End If
-          Next i
-
-          Using conn As New MySqlConnection(iniDBConnStr)
-            conn.Open()
-            cmd = New MySqlCommand("update images set location = @location, county = @county, state = @state, country = @country  where imageid = @id", conn)
-            cmd.Parameters.AddWithValue("@id", id)
-            cmd.Parameters.AddWithValue("@location", location)
-            cmd.Parameters.AddWithValue("@county", county)
-            cmd.Parameters.AddWithValue("@state", state)
-            cmd.Parameters.AddWithValue("@country", country)
-            cmd.ExecuteNonQuery()
-          End Using
-        End If
-
-      Next dr
-    End If
+        Next dr
+      End If
+    End Using
 
   End Sub
 
@@ -2216,8 +2216,7 @@ Public Class frmBugPhotos
 
   Sub loadimageset()
 
-    Dim dset As New DataSet
-    Dim drow As DataRow
+    Dim dr As DataRow
     Dim setid, imageid As Integer
     Dim fName As String
     Dim i As Integer
@@ -2229,22 +2228,23 @@ Public Class frmBugPhotos
 
     setid = txImageSet.Text
 
-    dset = getDS("select * from imagesets where setid = @parm1", setid)
+    Using ds As DataSet = getDS("select * from imagesets where setid = @parm1", setid)
 
-    i = -1
-    If dset IsNot Nothing AndAlso dset.Tables.Count >= 0 Then
-      For Each drow In dset.Tables(0).Rows
-        If Not IsDBNull(drow("imageid")) Then
-          imageid = drow("imageid")
-          fName = getScalar("SELECT filename FROM images WHERE imageid = @parm1", imageid)
-          If fName <> "" Then
-            cbImageSet.Items.Add(fName)
-            If fName = txFileName.Text Then i = cbImageSet.Items.Count - 1
+      i = -1
+      If ds IsNot Nothing AndAlso ds.Tables.Count >= 0 Then
+        For Each dr In ds.Tables(0).Rows
+          If Not IsDBNull(dr("imageid")) Then
+            imageid = dr("imageid")
+            fName = getScalar("SELECT filename FROM images WHERE imageid = @parm1", imageid)
+            If fName <> "" Then
+              cbImageSet.Items.Add(fName)
+              If fName = txFileName.Text Then i = cbImageSet.Items.Count - 1
+            End If
           End If
-        End If
-      Next drow
-      If i >= 0 Then cbImageSet.SelectedIndex = i
-    End If
+        Next dr
+        If i >= 0 Then cbImageSet.SelectedIndex = i
+      End If
+    End Using
 
   End Sub
 
@@ -2338,7 +2338,6 @@ Public Class frmBugPhotos
     Dim match As New bugMain.taxrec
     Dim matches As New List(Of taxrec)
     Dim ancestor As New List(Of taxrec)
-    Dim dset As New DataSet
 
     Me.Cursor = Cursors.WaitCursor
 

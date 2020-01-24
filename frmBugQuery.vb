@@ -99,7 +99,6 @@ Public Class chk
     Dim imgCmd As MySqlCommand = Nothing
     Dim adapt As New MySqlDataAdapter
     Dim adaptg As New MySqlDataAdapter
-    Dim ds As New DataSet
     Dim matches As New List(Of taxrec)
     Dim gmatches As New List(Of taxrec)
     Dim sql As String
@@ -121,34 +120,38 @@ Public Class chk
 
     Using conn As New MySqlConnection(iniDBConnStr)
       conn.Open()
-      sql = "select images.filename, taxatable.parentid, taxatable.rank, taxatable.taxon " &
-            "  from images, taxatable where images.taxonid = taxatable.taxid "
-      cmd = queryparms(sql, "photodate", True, True, conn)
-      If cmd IsNot Nothing Then
-        adapt.SelectCommand = cmd
-        adapt.Fill(ds)
-        For Each dr As DataRow In ds.Tables(0).Rows
-          s1 = CStr(dr("taxon"))
-          If s = "" OrElse eqstr(s, s1) Then ' taxonkey matches
-            If Not IsDBNull(dr("filename")) Then queryNames.Add(folderPath & dr("filename"))
-          End If
-        Next dr
-      End If
 
-      sql = "select images.filename, gbif.tax.name from images, gbif.tax where " &
-        "substring(images.taxonid, 2) = gbif.tax.taxid and substring(images.taxonid, 1, 1) = 'g' "
-      cmd = queryparms(sql, "photodate", True, True, conn)
-      ds.Clear()
-      If cmd IsNot Nothing Then
-        adapt.SelectCommand = cmd
-        adapt.Fill(ds)
-        For Each dr As DataRow In ds.Tables(0).Rows
-          s1 = dr("name")
-          If s = "" OrElse eqstr(s, s1) Then ' taxonkey matches
-            If Not IsDBNull(dr("filename")) Then queryNames.Add(folderPath & dr("filename"))
-          End If
-        Next dr
-      End If
+      Using ds As New DataSet
+        sql = "select images.filename, taxatable.parentid, taxatable.rank, taxatable.taxon " &
+              "  from images, taxatable where images.taxonid = taxatable.taxid "
+        cmd = queryparms(sql, "photodate", True, True, conn)
+        If cmd IsNot Nothing Then
+          adapt.SelectCommand = cmd
+          adapt.Fill(ds)
+          For Each dr As DataRow In ds.Tables(0).Rows
+            s1 = CStr(dr("taxon"))
+            If s = "" OrElse eqstr(s, s1) Then ' taxonkey matches
+              If Not IsDBNull(dr("filename")) Then queryNames.Add(folderPath & dr("filename"))
+            End If
+          Next dr
+        End If
+      End Using
+
+      Using ds As New DataSet
+        sql = "select images.filename, gbif.tax.name from images, gbif.tax where " &
+          "substring(images.taxonid, 2) = gbif.tax.taxid and substring(images.taxonid, 1, 1) = 'g' "
+        cmd = queryparms(sql, "photodate", True, True, conn)
+        If cmd IsNot Nothing Then
+          adapt.SelectCommand = cmd
+          adapt.Fill(ds)
+          For Each dr As DataRow In ds.Tables(0).Rows
+            s1 = dr("name")
+            If s = "" OrElse eqstr(s, s1) Then ' taxonkey matches
+              If Not IsDBNull(dr("filename")) Then queryNames.Add(folderPath & dr("filename"))
+            End If
+          Next dr
+        End If
+      End Using
 
       If chkDescendants.Checked And txTaxon.Text.Trim <> "" Then
         sTaxon = Split(txTaxon.Text.Trim, " ", 2) ' separate 1st word
@@ -176,53 +179,43 @@ Public Class chk
       newNames = New List(Of String)
       For Each fname As String In queryNames
         irec = getImageRec(Path.GetFileName(fname))
-        ds = getDS("select * from imagesets where setid = @parm1", irec.imageSetID)
+        Using ds As DataSet = getDS("select * from imagesets where setid = @parm1", irec.imageSetID)
 
-        If ds Is Nothing OrElse ds.Tables(0).Rows.Count = 0 Then ' no imageset -- add file name
-          s = folderPath & irec.filename
-          If Not newNames.Contains(s) AndAlso
-            ((chkInat.CheckState = CheckState.Unchecked And Not inat) Or
-             (chkInat.CheckState = CheckState.Checked And inat) Or
-             (chkInat.CheckState = CheckState.Indeterminate)) Then newNames.Add(s)
-
-        Else ' add the entire imageset
-          inat = False ' true if any images in the set have inat
-          For Each dr As DataRow In ds.Tables(0).Rows
-            k = getScalar("select inaturalist from images where imageid = @parm1", dr("imageid"))
-            If k > 0 Then
-              inat = True
-              Exit For
-            End If
-          Next dr
-
-          For Each dr As DataRow In ds.Tables(0).Rows
-            ' add files if inat qualifies
-            irec = getImageRecbyID(dr("imageid"))
-            If irec.imageid <= 0 Then Stop
-
+          If ds Is Nothing OrElse ds.Tables(0).Rows.Count = 0 Then ' no imageset -- add file name
             s = folderPath & irec.filename
             If Not newNames.Contains(s) AndAlso
               ((chkInat.CheckState = CheckState.Unchecked And Not inat) Or
                (chkInat.CheckState = CheckState.Checked And inat) Or
                (chkInat.CheckState = CheckState.Indeterminate)) Then newNames.Add(s)
-          Next dr
 
-        End If
+          Else ' add the entire imageset
+            inat = False ' true if any images in the set have inat
+            For Each dr As DataRow In ds.Tables(0).Rows
+              k = getScalar("select inaturalist from images where imageid = @parm1", dr("imageid"))
+              If k > 0 Then
+                inat = True
+                Exit For
+              End If
+            Next dr
+
+            For Each dr As DataRow In ds.Tables(0).Rows
+              ' add files if inat qualifies
+              irec = getImageRecbyID(dr("imageid"))
+              If irec.imageid <= 0 Then Stop
+
+              s = folderPath & irec.filename
+              If Not newNames.Contains(s) AndAlso
+                ((chkInat.CheckState = CheckState.Unchecked And Not inat) Or
+                 (chkInat.CheckState = CheckState.Checked And inat) Or
+                 (chkInat.CheckState = CheckState.Indeterminate)) Then newNames.Add(s)
+            Next dr
+
+          End If
+        End Using
       Next fname
 
       queryNames = New List(Of String)
       queryNames.AddRange(newNames)
-
-      'For Each s In newNames ' add the names to querylist - done separately for previous loop
-      'If queryNames.IndexOf(s) < 0 Then queryNames.Add(s)
-      'Next s
-      'For Each s In delNames ' add the names to querylist - done separately for previous loop
-      ' If queryNames.IndexOf(s) >= 0 Then queryNames.Remove(s)
-      ' Next s
-      '
-      'queryNames.Sort()
-
-      'End If
 
     End Using
 
@@ -236,9 +229,8 @@ Public Class chk
 
     ' adds the current tid filename, and recurses for the children
 
-    Dim adapt As New MySqlDataAdapter
-    Dim dset As New DataSet
-    Dim drow As DataRow
+    Dim da As New MySqlDataAdapter
+    Dim dr As DataRow
     Dim matches As List(Of taxrec)
     Dim i As Integer
     Dim s As String
@@ -249,27 +241,29 @@ Public Class chk
     ' change to include children from both databases
     matches = getChildren(inmatch, False, 9, True)
 
-    For Each match As taxrec In matches
-      If match.childimageCounter > 0 Then
-        ' grab filenames
-        dset.Clear()
-        i = imgCmd.Parameters.IndexOf("@id")
-        If i >= 0 Then imgCmd.Parameters.RemoveAt(i)
-        imgCmd.Parameters.AddWithValue("@id", match.taxid)
-        adapt.SelectCommand = imgCmd
-        adapt.Fill(dset)
-        For Each drow In dset.Tables(0).Rows
-          If Not IsDBNull(drow("filename")) Then
-            s = folderPath & drow("filename")
-            If Not queryNames.Contains(s) Then queryNames.Add(s)
-          End If
-        Next drow
+    Using ds As New DataSet
+      For Each match As taxrec In matches
+        If match.childimageCounter > 0 Then
+          ' grab filenames
+          i = imgCmd.Parameters.IndexOf("@id")
+          If i >= 0 Then imgCmd.Parameters.RemoveAt(i)
+          imgCmd.Parameters.AddWithValue("@id", match.taxid)
+          da.SelectCommand = imgCmd
+          da.Fill(ds)
+          For Each dr In ds.Tables(0).Rows
+            If Not IsDBNull(dr("filename")) Then
+              s = folderPath & dr("filename")
+              If Not queryNames.Contains(s) Then queryNames.Add(s)
+            End If
+          Next dr
 
-        ' process child
-        addChildren(match, queryNames, imgCmd)
-      End If
+          ' process child
+          addChildren(match, queryNames, imgCmd)
+        End If
 
-    Next match
+      Next match
+    End Using
+
   End Sub
 
   Function queryparms(sql As String, orderBy As String, useTaxon As Boolean, useRank As Boolean,
