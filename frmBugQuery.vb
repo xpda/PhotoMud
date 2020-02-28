@@ -46,10 +46,12 @@ Public Class chk
 
     tvTaxon.Nodes.Clear()
 
-    matches = queryTax("select * from taxatable where taxon = 'arthropoda' order by taxon", "")
-    gmatches = queryTax(
-      "select * from gbif.tax where name = 'animalia' and usable <> '' and usable <> 'notinpaleo' order by name", "")
-    matches = mergeMatches(matches, gmatches)
+    matches = queryTax("select * from taxatable where taxon = 'life' order by taxon", "")
+    If (dbAllowed And 8) Then
+      gmatches = queryTax(
+        "select * from gbif.tax where name = 'animalia' and usable <> '' and usable <> 'notinpaleo' order by name", "")
+      matches = mergeMatches(matches, gmatches)
+    End If
 
     For Each m As taxrec In matches
       nd = tvTaxon.Nodes.Add(taxaLabel(m, True, True))
@@ -137,28 +139,32 @@ Public Class chk
         End If
       End Using
 
-      Using ds As New DataSet
-        sql = "select images.filename, gbif.tax.name from images, gbif.tax where " &
-          "substring(images.taxonid, 2) = gbif.tax.taxid and substring(images.taxonid, 1, 1) = 'g' "
-        cmd = queryparms(sql, "photodate", True, True, conn)
-        If cmd IsNot Nothing Then
-          adapt.SelectCommand = cmd
-          adapt.Fill(ds)
-          For Each dr As DataRow In ds.Tables(0).Rows
-            s1 = dr("name")
-            If s = "" OrElse eqstr(s, s1) Then ' taxonkey matches
-              If Not IsDBNull(dr("filename")) Then queryNames.Add(folderPath & dr("filename"))
-            End If
-          Next dr
-        End If
-      End Using
+      If (dbAllowed And 8) Then
+        Using ds As New DataSet
+          sql = "select images.filename, gbif.tax.name from images, gbif.tax where " &
+            "substring(images.taxonid, 2) = gbif.tax.taxid and substring(images.taxonid, 1, 1) = 'g' "
+          cmd = queryparms(sql, "photodate", True, True, conn)
+          If cmd IsNot Nothing Then
+            adapt.SelectCommand = cmd
+            adapt.Fill(ds)
+            For Each dr As DataRow In ds.Tables(0).Rows
+              s1 = dr("name")
+              If s = "" OrElse eqstr(s, s1) Then ' taxonkey matches
+                If Not IsDBNull(dr("filename")) Then queryNames.Add(folderPath & dr("filename"))
+              End If
+            Next dr
+          End If
+        End Using
+      End If
 
       If chkDescendants.Checked And txTaxon.Text.Trim <> "" Then
         sTaxon = Split(txTaxon.Text.Trim, " ", 2) ' separate 1st word
         matches = queryTax("select * from taxatable where taxon = @parm1", sTaxon(UBound(sTaxon)))
-        gmatches = queryTax(
-          "select * from gbif.tax where name = @parm1 and usable = 'ok'", sTaxon(UBound(sTaxon)))
-        matches = mergeMatches(matches, gmatches)
+        If dbAllowed And 8 Then
+          gmatches = queryTax(
+            "select * from gbif.tax where name = @parm1 and usable = 'ok'", sTaxon(UBound(sTaxon)))
+          matches = mergeMatches(matches, gmatches)
+        End If
 
         'sql = "select images.*, taxatable.parentid, taxatable.rank, taxatable.taxon " &
         '    "  from images, taxatable where images.taxonid = @id "

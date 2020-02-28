@@ -1109,9 +1109,11 @@ Public Class frmBugPhotos
     tvTaxon.Visible = True
     cmdCloseTree.Visible = True
 
-    matches = queryTax("select * from taxatable where taxon = @parm1 order by taxon", "arthropoda")
-    gmatches = queryTax("select * from gbif.tax where name = @parm1 and usable <> '' order by name", "animalia")
-    matches = mergeMatches(matches, gmatches)
+    matches = queryTax("select * from taxatable where taxon = @parm1 order by taxon", "life")
+    If (dballowed And 8) Then
+      gmatches = queryTax("select * from gbif.tax where name = @parm1 and usable <> '' order by name", "animalia")
+      matches = mergeMatches(matches, gmatches)
+    End If
 
     If matches.Count > 0 Then
       nd = tvTaxon.Nodes.Add(taxaLabel(matches(0), False, False))
@@ -1120,10 +1122,10 @@ Public Class frmBugPhotos
 
     ' ''populate(nd, False)  ' load root node (animalia) commented out 6/22/19
     nd.ExpandAll()
-    ' Now get down through insects
+    ' Now get down through root
     For Each ndc As TreeNode In nd.Nodes
-      If ndc.Text.StartsWith("Arthropoda") Or ndc.Text.StartsWith("Euarthropoda") Then
-        populate(ndc, False)  ' load Arthropoda
+      If ndc.Text.StartsWith("life") Then
+        populate(ndc, False)  ' load everything
         ndc.Expand()
         Exit For
       End If
@@ -1606,6 +1608,7 @@ Public Class frmBugPhotos
     Dim anc As List(Of taxrec)
 
     Dim ranks() As String = {
+        "stateofmatter",
         "kingdom",
         "phylum",
         "subphylum",
@@ -1625,16 +1628,20 @@ Public Class frmBugPhotos
         "subtribe",
         "genus",
         "species",
-        "subspecies"}
+        "subspecies",
+        "variety"}
 
     Dim rankCount(UBound(ranks)) As Integer
     Dim rankCountTotal(UBound(ranks)) As Integer
     Dim arthropodCount(UBound(ranks)) As Integer
     Dim arthropodCountTotal(UBound(ranks)) As Integer
 
+
     matches = queryTax("select * from taxatable where childimagecounter > 0 order by taxon", "")
-    gmatches = queryTax("select * from gbif.tax join taxa.gbifplus using (taxid) where childimagecounter > 0 order by name", "")
-    matches = mergeMatches(matches, gmatches)
+    If dbAllowed And 8 Then
+      gmatches = queryTax("select * from gbif.tax join taxa.gbifplus using (taxid) where childimagecounter > 0 order by name", "")
+      matches = mergeMatches(matches, gmatches)
+    End If
 
     For Each m As taxrec In matches
       anc = getancestors(m, False, "phylum")
@@ -1650,7 +1657,7 @@ Public Class frmBugPhotos
         rankCountTotal(i) += 1
         If m.imageCounter > 0 Then rankCount(i) += 1
 
-        If eqstr(anc(anc.Count - 1).taxon, "arthropoda") Then
+        If eqstr(anc(anc.Count - 1).taxon, "life") Then
           arthropodCountTotal(i) += 1
           If m.imageCounter > 0 Then arthropodCount(i) += 1
         End If
@@ -1729,19 +1736,21 @@ Public Class frmBugPhotos
     If mres = MsgBoxResult.Cancel Then Exit Sub
 
     ' should only be necessary after database changes - slow
-    If 1 = 0 Then
+    If 1 = 1 Then
       Me.Cursor = Cursors.WaitCursor
       i = nonQuery("update taxatable set imagecounter = 0, childimagecounter = 0 where childimagecounter <> 0")
-      matches = queryTax("select * from taxatable where taxon = 'arthropoda'", "")
+      matches = queryTax("select * from taxatable where taxon = 'life'", "")
       id = matches(0).taxid
       i = setimageCount(id)
       k = getScalar("select count(*) from taxatable where imagecounter > 0")
 
-      i1 = nonQuery("update gbifplus set imagecounter = 0, childimagecounter = 0 where childimagecounter <> 0")
-      matches = queryTax("select * from gbif.tax join taxa.gbifplus using (taxid) where name = 'animalia' and usable <> ''", "")
-      id = matches(0).taxid
-      i1 = setimageCount(id)
-      k1 = getScalar("select count(*) from gbif.tax join taxa.gbifplus using (taxid) where imagecounter > 0")
+      If dbAllowed And 8 Then
+        i1 = nonQuery("update gbifplus set imagecounter = 0, childimagecounter = 0 where childimagecounter <> 0")
+        matches = queryTax("select * from gbif.tax join taxa.gbifplus using (taxid) where name = 'animalia' and usable <> ''", "")
+        id = matches(0).taxid
+        i1 = setimageCount(id)
+        k1 = getScalar("select count(*) from gbif.tax join taxa.gbifplus using (taxid) where imagecounter > 0")
+      End If
 
       MsgBox(Format(i, "#,#") & " photos of " & Format(k, "#,#") & " bugs." & vbCrLf &
              Format(i1, "#,#") & " photos of " & Format(k1, "#,#") & " bugs in gbif.")

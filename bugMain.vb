@@ -105,6 +105,7 @@ Public Module bugMain
   Public lastbugBugguide As String = ""
   Public lastbugiNaturalist As String = ""
   Public bugDBEnabled As Boolean = True
+  Public dbAllowed As Integer = 1
   Public lastbugLocationAutocomplete As AutoCompleteStringCollection = Nothing
   Public iniBugPixelsPerMM As Double = 274.5 ' gx1: 268.4 macro, 56.5 for zoom, gh4: 274.5 macro, 57.8 zoom
 
@@ -199,6 +200,7 @@ Public Module bugMain
     itisRankID.Add("subgenus", 190)
     itisRankID.Add("species", 220)
     itisRankID.Add("subspecies", 230)
+    itisRankID.Add("variety", 240)
 
     itisRanks.Add(10, "kingdom")
     itisRanks.Add(20, "subkingdom")
@@ -228,6 +230,7 @@ Public Module bugMain
     itisRanks.Add(190, "subgenus")
     itisRanks.Add(220, "species")
     itisRanks.Add(230, "subspecies")
+    itisRanks.Add(240, "variety")
 
     mainRank.Add("phylum")
     mainRank.Add("class")
@@ -238,6 +241,7 @@ Public Module bugMain
     mainRank.Add("genus")
     mainRank.Add("species")
     mainRank.Add("subspecies")
+    mainRank.Add("variety")
 
     cookies = New CookieContainer
     handler = New HttpClientHandler
@@ -259,7 +263,7 @@ Public Module bugMain
     For i = 0 To tagPath.Count - 1
       fName = Path.GetFileName(tagPath(i))
       exists = True
-      If String.Compare(Path.GetDirectoryName(tagPath(i)), iniBugPath, True) <> 0 Then ' different source and target folders
+      If Not eqstr(Path.GetDirectoryName(tagPath(i)), iniBugPath) Then ' different source and target folders
         fName = getTargetFilename(iniBugPath, tagPath(i), exists) ' get the output filename (last match, if more than one)
       End If
       If exists Then
@@ -279,6 +283,12 @@ Public Module bugMain
     Dim ms As New List(Of taxrec)
     Dim taxa As New List(Of String)
     Dim i1, i2 As Integer
+
+
+    ms.AddRange(matches)
+    ms.AddRange(gmatches)
+    Return ms
+
 
     i1 = 0 : i2 = 0
     Do While i1 < matches.Count
@@ -504,8 +514,10 @@ Public Module bugMain
     s = match.taxon
 
     If verbose Then
-      If String.Compare(match.rank, "species", True) <> 0 And String.Compare(match.rank, "subspecies", True) <> 0 Then
-        If match.rank <> "No Taxon" Then s = s & " " & match.rank
+      If Not eqstr(match.rank, "species") And
+        Not eqstr(match.rank, "subspecies") And
+        Not eqstr(match.rank, "variety") Then
+        If Not eqstr(match.rank, "No Taxon") Then s = s & " " & match.rank
       End If
     End If
 
@@ -615,8 +627,10 @@ Public Module bugMain
       If matches.Count <= 0 OrElse matches(0).taxon = "" Then Return ""
       match = matches(0)
 
-      If match.descr <> "" AndAlso match.rank <> "No Taxon" And (match.rank <> "Species" Or inMatch.rank = "Subspecies") And
-           match.rank <> "Subspecies" Then
+      If match.descr <> "" AndAlso Not eqstr(match.rank, "No Taxon") And
+           (Not eqstr(match.rank, "Species") Or eqstr(inMatch.rank, "Subspecies")) And
+           Not eqstr(match.rank, "Subspecies") And
+           Not eqstr(match.rank, "Variety") Then
         Return match.rank & ": " & match.descr
       End If
       parent = match.parentid
@@ -648,13 +662,14 @@ Public Module bugMain
 
     ndTarget = Nothing
     targetLevel = 999
+    ndParent = tvTax.Nodes(0) ' 9/25/14
+    populate(ndParent, isQuery)
 
     For Each match As taxrec In matches
-      ancestor = getancestors(match, False, "kingdom")  ' retrieve ancestors of ancestor(0). false = don't exclude "no taxons"
+      ancestor = getancestors(match, False, "stateofmatter")  ' retrieve ancestors of ancestor(0). false = don't exclude "no taxons"
 
-      ndParent = tvTax.Nodes(0) ' 9/25/14
 
-      For i = ancestor.Count - 2 To 0 Step -1  ' go through ancestors top down, starting at arthropoda children
+      For i = ancestor.Count - 2 To 0 Step -1  ' go through ancestors top down, starting at root's children
         ndc = Nothing
         For Each nd In ndParent.Nodes          ' search for next match
           If nd.Tag = ancestor(i).taxid Then
@@ -1019,7 +1034,7 @@ Public Module bugMain
 
   End Function
 
-  Function getScalar(ByVal scmd As String, _
+  Function getScalar(ByVal scmd As String,
     Optional ByRef parm1 As Object = "", Optional ByRef parm2 As Object = "", Optional ByRef parm3 As Object = "") As Object
 
     ' returns ds, uses @parm1 and @parm2 in query
@@ -1043,7 +1058,7 @@ Public Module bugMain
 
   End Function
 
-  Function nonQuery(ByVal scmd As String, _
+  Function nonQuery(ByVal scmd As String,
     Optional ByRef parm1 As Object = "", Optional ByRef parm2 As Object = "", Optional ByRef parm3 As Object = "") As Object
 
     ' returns ds, uses @parm1 and @parm2 in query
@@ -1092,10 +1107,9 @@ Public Module bugMain
     End If
 
     matches = queryTax("select * from taxatable where taxon = @parm1" & suffix, findme)
-    If matches.Count = 0 Then
-      matches = queryTax("select * from gbif.tax where name = @parm1" & suffixg, findme)
-    End If
-    If matches.Count = 0 Then
+    If matches.Count = 0 AndAlso (dbAllowed And 8) Then matches = queryTax("select * from gbif.tax where name = @parm1" & suffixg, findme)
+    If matches.Count = 0 Then matches = queryTax("select * from taxatable where (taxon like @parm1)" & suffix, findme & "%")
+    If matches.Count = 0 Then 
       matches = queryTax("select * from taxatable where (taxon like @parm1)" & suffix, "%" & findme & "%")
       ' If matches.Count = 0 Then matches = queryTax("select * from gbif.tax where (name like @parm1)" & suffixg, findme & "%") ' exact search only for gbif
     End If
@@ -1111,7 +1125,7 @@ Public Module bugMain
 
       If matches.Count = 0 Then matches = queryTax("select * from taxatable where (descr rlike @parm1)" & suffix, s)
 
-      If matches.Count = 0 Then
+      If matches.Count = 0 AndAlso (dbAllowed And 8) Then
         Using ds As DataSet = getDS("select * from gbif.vernacularname where vernacularname rlike @parm1 and (language = 'en' or language = '')", s)
           'ds = getDS("select * from gbif.vernacularname where vernacularname = @parm1 and (language = 'en' or language = '')", s)
           If ds IsNot Nothing AndAlso ds.Tables(0).Rows.Count > 0 Then
@@ -1173,14 +1187,14 @@ Public Module bugMain
     childImageCounter += inc
 
     If taxid.StartsWith("g") Then
-      i = nonQuery("update gbifplus set imagecounter = @parm1, childimagecounter = @parm2 where taxid = @parm3", _
+      i = nonQuery("update gbifplus set imagecounter = @parm1, childimagecounter = @parm2 where taxid = @parm3",
         imageCounter, childImageCounter, taxid.Substring(1)) ' remove "g"
       If i = 0 Then ' gbifplus doesn't contain all the gbif records
         i = nonQuery("insert into gbifplus (taxid, imagecounter, childimagecounter) values " &
                       "(@parm1, @parm2, @parm3)", taxid.Substring(1), imageCounter, childImageCounter)
       End If
     Else
-      i = nonQuery("update taxatable set imagecounter = @parm1, childimagecounter = @parm2 where taxid = @parm3", _
+      i = nonQuery("update taxatable set imagecounter = @parm1, childimagecounter = @parm2 where taxid = @parm3",
         imageCounter, childImageCounter, taxid)
     End If
     If i <> 1 Then Stop
@@ -1228,8 +1242,9 @@ Public Module bugMain
 
     taxonkey = pic.match.taxon
     s &= "<i>" & taxonkey & "</i>"
-    If String.Compare(pic.match.rank, "species", True) <> 0 And String.Compare(pic.match.rank, "subspecies", True) <> 0 And _
-      String.Compare(pic.match.rank, "no taxon", True) <> 0 Then
+    If Not eqstr(pic.match.rank, "species") And
+      Not eqstr(pic.match.rank, "subspecies") And
+      Not eqstr(pic.match.rank, "no taxon") Then
       s = s & " " & pic.match.rank
     End If
     s &= "<br>"
@@ -1261,8 +1276,9 @@ Public Module bugMain
 
     taxonkey = pic.match.taxon
     s += taxonkey ' tags will be removed on output
-    If String.Compare(pic.match.rank, "species", True) <> 0 And String.Compare(pic.match.rank, "subspecies", True) <> 0 And _
-      String.Compare(pic.match.rank, "no taxon", True) <> 0 Then
+    If Not eqstr(pic.match.rank, "species") And
+      Not eqstr(pic.match.rank, "subspecies") And
+      Not eqstr(pic.match.rank, "no taxon") Then
       s = s & " " & pic.match.rank
     End If
 
@@ -1435,7 +1451,7 @@ Public Module bugMain
     'Dim validName As String
     Dim recRank As String
 
-    children = getChildren(tMatch, True, 9, False) ' get immediate children, sources = dballowed, include with or without pics
+    children = getChildren(tMatch, True, 1, False) ' get immediate children, sources = dballowed, include with or without pics
 
     For i1 As Integer = children.Count - 1 To 0 Step -1
       'validName = validTaxon(children(i1))
