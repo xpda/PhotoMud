@@ -89,6 +89,11 @@ Public Class frmBugPhotos
 
     If processing Then Exit Sub
 
+    If txTaxon.Text.Trim = "" Then
+      MsgBox("Blank taxon. Dummy.")
+      Exit Sub
+    End If
+
     processing = True
     If Sender Is cmdSaveAll Then
       i = savePic()
@@ -152,7 +157,7 @@ Public Class frmBugPhotos
       matches = TaxonSearch(txTaxon.Text, False)
       taxonid = ""
 
-      If matches.Count = 1 Then
+      If matches.Count = 1 OrElse (matches.Count = 2 And eqstr(matches(1).rank, "subgenus")) Then
         taxonid = matches(0).taxid
         txCommon.Text = matches(0).descr
 
@@ -360,7 +365,7 @@ Public Class frmBugPhotos
     txTaxon.Text = ""
     txCommon.Text = ""
     txSize.Text = ""
-    txRating.Text = "40"
+    txRating.Text = "60"
     txConfidence.Text = "0"
     txRemarks.Text = ""
     txBugguide.Text = ""
@@ -1120,16 +1125,16 @@ Public Class frmBugPhotos
       nd.Tag = matches(0).taxid
     End If
 
-    ' ''populate(nd, False)  ' load root node (animalia) commented out 6/22/19
+    populate(nd, False)  ' load root node (animalia) commented out 6/22/19
     nd.ExpandAll()
     ' Now get down through root
-    For Each ndc As TreeNode In nd.Nodes
-      If ndc.Text.StartsWith("life") Then
-        populate(ndc, False)  ' load everything
-        ndc.Expand()
-        Exit For
-      End If
-    Next ndc
+    'For Each ndc As TreeNode In nd.Nodes
+    'If ndc.Text.StartsWith("Animalia") Then
+    ' populate(ndc, False)  ' load everything
+    ' ndc.Expand()
+    ' Exit For
+    ' End If
+    ' Next ndc
 
     If txTaxon.Text <> "" Then
       cmdCloseTree.Visible = True
@@ -1923,7 +1928,7 @@ Public Class frmBugPhotos
               Case "Virginia"
                 state = "VA"
               Case "Maryland"
-                state = "VA"
+                state = "MD"
               Case Else
                 location = ss(i)
             End Select

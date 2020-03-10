@@ -59,10 +59,11 @@ Partial Class chk
     Me.Label5 = New System.Windows.Forms.Label()
     Me.Label8 = New System.Windows.Forms.Label()
     Me.Label7 = New System.Windows.Forms.Label()
-    Me.txRank = New System.Windows.Forms.TextBox()
     Me.Label11 = New System.Windows.Forms.Label()
     Me.chkBugguide = New System.Windows.Forms.CheckBox()
     Me.chkInat = New System.Windows.Forms.CheckBox()
+    Me.txRankMin = New System.Windows.Forms.TextBox()
+    Me.txRankMax = New System.Windows.Forms.TextBox()
     Me.Panel1.SuspendLayout()
     Me.SuspendLayout()
     '
@@ -243,8 +244,11 @@ Partial Class chk
     'Panel1
     '
     Me.Panel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+    Me.Panel1.Controls.Add(Me.txRankMin)
+    Me.Panel1.Controls.Add(Me.txRankMax)
     Me.Panel1.Controls.Add(Me.Label9)
     Me.Panel1.Controls.Add(Me.txModMax)
+    Me.Panel1.Controls.Add(Me.Label11)
     Me.Panel1.Controls.Add(Me.txModMin)
     Me.Panel1.Controls.Add(Me.lbDate2)
     Me.Panel1.Controls.Add(Me.txElevationMax)
@@ -260,9 +264,9 @@ Partial Class chk
     Me.Panel1.Controls.Add(Me.Label5)
     Me.Panel1.Controls.Add(Me.Label8)
     Me.Panel1.Controls.Add(Me.Label7)
-    Me.Panel1.Location = New System.Drawing.Point(30, 433)
+    Me.Panel1.Location = New System.Drawing.Point(30, 393)
     Me.Panel1.Name = "Panel1"
-    Me.Panel1.Size = New System.Drawing.Size(459, 230)
+    Me.Panel1.Size = New System.Drawing.Size(459, 274)
     Me.Panel1.TabIndex = 82
     '
     'Label9
@@ -306,7 +310,7 @@ Partial Class chk
     Me.txElevationMax.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
     Me.txElevationMax.Location = New System.Drawing.Point(299, 115)
     Me.txElevationMax.Name = "txElevationMax"
-    Me.txElevationMax.Size = New System.Drawing.Size(87, 25)
+    Me.txElevationMax.Size = New System.Drawing.Size(113, 25)
     Me.txElevationMax.TabIndex = 111
     '
     'txConfidenceMin
@@ -314,7 +318,7 @@ Partial Class chk
     Me.txConfidenceMin.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
     Me.txConfidenceMin.Location = New System.Drawing.Point(138, 151)
     Me.txConfidenceMin.Name = "txConfidenceMin"
-    Me.txConfidenceMin.Size = New System.Drawing.Size(87, 25)
+    Me.txConfidenceMin.Size = New System.Drawing.Size(113, 25)
     Me.txConfidenceMin.TabIndex = 113
     '
     'Label4
@@ -332,7 +336,7 @@ Partial Class chk
     Me.txElevationMin.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
     Me.txElevationMin.Location = New System.Drawing.Point(138, 115)
     Me.txElevationMin.Name = "txElevationMin"
-    Me.txElevationMin.Size = New System.Drawing.Size(87, 25)
+    Me.txElevationMin.Size = New System.Drawing.Size(113, 25)
     Me.txElevationMin.TabIndex = 110
     '
     'lbConfidence
@@ -366,7 +370,7 @@ Partial Class chk
     Me.txConfidenceMax.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
     Me.txConfidenceMax.Location = New System.Drawing.Point(299, 151)
     Me.txConfidenceMax.Name = "txConfidenceMax"
-    Me.txConfidenceMax.Size = New System.Drawing.Size(87, 25)
+    Me.txConfidenceMax.Size = New System.Drawing.Size(113, 25)
     Me.txConfidenceMax.TabIndex = 114
     '
     'txRatingMin
@@ -374,7 +378,7 @@ Partial Class chk
     Me.txRatingMin.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
     Me.txRatingMin.Location = New System.Drawing.Point(138, 187)
     Me.txRatingMin.Name = "txRatingMin"
-    Me.txRatingMin.Size = New System.Drawing.Size(87, 25)
+    Me.txRatingMin.Size = New System.Drawing.Size(113, 25)
     Me.txRatingMin.TabIndex = 116
     '
     'txRatingMax
@@ -382,7 +386,7 @@ Partial Class chk
     Me.txRatingMax.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
     Me.txRatingMax.Location = New System.Drawing.Point(299, 187)
     Me.txRatingMax.Name = "txRatingMax"
-    Me.txRatingMax.Size = New System.Drawing.Size(87, 25)
+    Me.txRatingMax.Size = New System.Drawing.Size(113, 25)
     Me.txRatingMax.TabIndex = 117
     '
     'Label5
@@ -413,24 +417,14 @@ Partial Class chk
     Me.Label7.TabIndex = 101
     Me.Label7.Text = "minimum"
     '
-    'txRank
-    '
-    Me.txRank.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest
-    Me.txRank.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource
-    Me.txRank.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.txRank.Location = New System.Drawing.Point(155, 345)
-    Me.txRank.Name = "txRank"
-    Me.txRank.Size = New System.Drawing.Size(332, 25)
-    Me.txRank.TabIndex = 17
-    '
     'Label11
     '
     Me.Label11.AutoSize = True
     Me.Label11.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.Label11.Location = New System.Drawing.Point(34, 346)
+    Me.Label11.Location = New System.Drawing.Point(13, 229)
     Me.Label11.Name = "Label11"
     Me.Label11.Size = New System.Drawing.Size(46, 17)
-    Me.Label11.TabIndex = 16
+    Me.Label11.TabIndex = 120
     Me.Label11.Text = "Ran&k:"
     '
     'chkBugguide
@@ -438,7 +432,7 @@ Partial Class chk
     Me.chkBugguide.AutoSize = True
     Me.chkBugguide.Checked = True
     Me.chkBugguide.CheckState = System.Windows.Forms.CheckState.Indeterminate
-    Me.chkBugguide.Location = New System.Drawing.Point(155, 389)
+    Me.chkBugguide.Location = New System.Drawing.Point(155, 349)
     Me.chkBugguide.Name = "chkBugguide"
     Me.chkBugguide.Size = New System.Drawing.Size(91, 21)
     Me.chkBugguide.TabIndex = 20
@@ -451,13 +445,29 @@ Partial Class chk
     Me.chkInat.AutoSize = True
     Me.chkInat.Checked = True
     Me.chkInat.CheckState = System.Windows.Forms.CheckState.Indeterminate
-    Me.chkInat.Location = New System.Drawing.Point(393, 389)
+    Me.chkInat.Location = New System.Drawing.Point(393, 349)
     Me.chkInat.Name = "chkInat"
     Me.chkInat.Size = New System.Drawing.Size(94, 21)
     Me.chkInat.TabIndex = 24
     Me.chkInat.Text = "iNa&turalist"
     Me.chkInat.ThreeState = True
     Me.chkInat.UseVisualStyleBackColor = True
+    '
+    'txRankMin
+    '
+    Me.txRankMin.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+    Me.txRankMin.Location = New System.Drawing.Point(138, 226)
+    Me.txRankMin.Name = "txRankMin"
+    Me.txRankMin.Size = New System.Drawing.Size(134, 25)
+    Me.txRankMin.TabIndex = 121
+    '
+    'txRankMax
+    '
+    Me.txRankMax.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+    Me.txRankMax.Location = New System.Drawing.Point(299, 226)
+    Me.txRankMax.Name = "txRankMax"
+    Me.txRankMax.Size = New System.Drawing.Size(142, 25)
+    Me.txRankMax.TabIndex = 122
     '
     'chk
     '
@@ -468,8 +478,6 @@ Partial Class chk
     Me.ClientSize = New System.Drawing.Size(1127, 750)
     Me.Controls.Add(Me.chkInat)
     Me.Controls.Add(Me.chkBugguide)
-    Me.Controls.Add(Me.txRank)
-    Me.Controls.Add(Me.Label11)
     Me.Controls.Add(Me.Panel1)
     Me.Controls.Add(Me.txFilename)
     Me.Controls.Add(Me.Label2)
@@ -536,8 +544,9 @@ Partial Class chk
   Public WithEvents Label9 As System.Windows.Forms.Label
   Friend WithEvents txModMax As System.Windows.Forms.TextBox
   Friend WithEvents txModMin As System.Windows.Forms.TextBox
-  Friend WithEvents txRank As System.Windows.Forms.TextBox
   Public WithEvents Label11 As System.Windows.Forms.Label
   Friend WithEvents chkBugguide As System.Windows.Forms.CheckBox
   Friend WithEvents chkInat As System.Windows.Forms.CheckBox
+  Friend WithEvents txRankMin As System.Windows.Forms.TextBox
+  Friend WithEvents txRankMax As System.Windows.Forms.TextBox
 End Class

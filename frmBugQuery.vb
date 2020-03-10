@@ -15,7 +15,6 @@ Imports MySql.Data.MySqlClient
 Public Class chk
 
   Dim processing As Boolean
-  Dim nn As Integer = 0
   Dim folderPath As String
 
   Private Sub frmBugQuery_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
@@ -111,9 +110,13 @@ Public Class chk
     Dim inat As Boolean
     Dim k As Integer
     Dim irec As imagerec
+    Dim rankmin, rankmax, rank As Integer
 
     If tvTaxon.Focused Then Exit Sub
     Me.Cursor = Cursors.WaitCursor
+
+    If itisRankID.ContainsKey(txRankMin.Text) Then rankmin = itisRankID(txRankMin.Text) Else rankmin = 0
+    If itisRankID.ContainsKey(txRankMax.Text) Then rankmax = itisRankID(txRankMax.Text) Else rankmax = 0
 
     queryNames = New List(Of String)
     folderPath = iniBugPath
@@ -131,9 +134,12 @@ Public Class chk
           adapt.SelectCommand = cmd
           adapt.Fill(ds)
           For Each dr As DataRow In ds.Tables(0).Rows
-            s1 = CStr(dr("taxon"))
-            If s = "" OrElse eqstr(s, s1) Then ' taxonkey matches
-              If Not IsDBNull(dr("filename")) Then queryNames.Add(folderPath & dr("filename"))
+            If itisRankID.ContainsKey(dr("rank")) Then rank = itisRankID(dr("rank")) Else rank = 0
+            If rank > 0 AndAlso (rankmin = 0 Or rankmin >= rank) AndAlso (rankmax = 0 Or rankmax <= rank) Then
+              s1 = CStr(dr("taxon"))
+              If s = "" OrElse eqstr(s, s1) Then ' taxonkey matches
+                If Not IsDBNull(dr("filename")) Then queryNames.Add(folderPath & dr("filename"))
+              End If
             End If
           Next dr
         End If
@@ -233,15 +239,18 @@ Public Class chk
 
   Sub addChildren(ByRef inmatch As taxrec, ByRef queryNames As List(Of String), ByRef imgCmd As MySqlCommand)
 
-    ' adds the current tid filename, and recurses for the children
-
+    ' adds the current taxid filename, and recurses for the children
     Dim da As New MySqlDataAdapter
     Dim dr As DataRow
     Dim matches As List(Of taxrec)
     Dim i As Integer
     Dim s As String
+    Dim rankmin, rankmax, rankID As Integer
 
-    nn = nn + 1
+    If itisRankID.ContainsKey(txRankMin.Text) Then rankmin = itisRankID(txRankMin.Text) Else rankmin = 0
+    If itisRankID.ContainsKey(txRankMax.Text) Then rankmax = itisRankID(txRankMax.Text) Else rankmax = 0
+    If itisRankID.ContainsKey(inmatch.rank) Then rankID = itisRankID(inmatch.rank) Else rankID = 0
+    If rankID > 0 AndAlso (rankmin > 0 And rankID > rankmin) Then Exit Sub ' rankids are backwards
 
     ' process the children
     ' change to include children from both databases
@@ -250,23 +259,25 @@ Public Class chk
     Using ds As New DataSet
       For Each match As taxrec In matches
         If match.childimageCounter > 0 Then
-          ' grab filenames
-          i = imgCmd.Parameters.IndexOf("@id")
-          If i >= 0 Then imgCmd.Parameters.RemoveAt(i)
-          imgCmd.Parameters.AddWithValue("@id", match.taxid)
-          da.SelectCommand = imgCmd
-          da.Fill(ds)
-          For Each dr In ds.Tables(0).Rows
-            If Not IsDBNull(dr("filename")) Then
+          If itisRankID.ContainsKey(match.rank) Then rankid = itisRankID(match.rank) Else rankid = 0
+          If rankid > 0 AndAlso (rankmin = 0 Or rankmin >= rankid) AndAlso (rankmax = 0 Or rankmax <= rankid) Then
+
+            ' grab filenames
+            i = imgCmd.Parameters.IndexOf("@id")
+            If i >= 0 Then imgCmd.Parameters.RemoveAt(i)
+            imgCmd.Parameters.AddWithValue("@id", match.taxid)
+            da.SelectCommand = imgCmd
+            da.Fill(ds)
+            For Each dr In ds.Tables(0).Rows
+              'If Not IsDBNull(dr("filename")) Then
               s = folderPath & dr("filename")
               If Not queryNames.Contains(s) Then queryNames.Add(s)
-            End If
-          Next dr
-
-          ' process child
-          addChildren(match, queryNames, imgCmd)
+              'End If
+            Next dr
+            ' process child
+            addChildren(match, queryNames, imgCmd)
+          End If
         End If
-
       Next match
     End Using
 
@@ -280,13 +291,16 @@ Public Class chk
     Dim qlist As New List(Of String)
     Dim s As String
     Dim cmd As New MySqlCommand
+    Dim rankMin, rankMax As Integer
+
+    If itisRankID.ContainsKey(txRankMin.Text) Then rankMin = itisRankID(txRankMin.Text) Else rankMin = 0
+    If itisRankID.ContainsKey(txRankMax.Text) Then rankMax = itisRankID(txRankMax.Text) Else rankMax = 0
 
     If sql.Contains("gbif.") Then
       If useTaxon AndAlso txTaxon.Text.Trim <> "" Then qlist.Add("gbif.tax.name = @taxon")
-      If useRank AndAlso txRank.Text.Trim <> "" Then qlist.Add("gbif.tax.rank = @rank")
     Else
       If useTaxon AndAlso txTaxon.Text.Trim <> "" Then qlist.Add("taxatable.taxon = @taxon")
-      If useRank AndAlso txRank.Text.Trim <> "" Then qlist.Add("taxatable.rank = @rank")
+
     End If
     If txLocation.Text.Trim <> "" Then qlist.Add("images.location like @location")
     If txCounty.Text.Trim <> "" Then qlist.Add("images.county like @county")
@@ -336,7 +350,6 @@ Public Class chk
     If txCountry.Text.Trim <> "" Then cmd.Parameters.AddWithValue("@country", "%" & txCountry.Text.Trim & "%")
     If txRemarks.Text.Trim <> "" Then cmd.Parameters.AddWithValue("@remarks", "%" & txRemarks.Text.Trim & "%")
     If txFilename.Text.Trim <> "" Then cmd.Parameters.AddWithValue("@filename", "%" & txFilename.Text.Trim & "%")
-    If txRank.Text.Trim <> "" Then cmd.Parameters.AddWithValue("@rank", txRank.Text.Trim)
 
     Try
       If txDateMin.Text.Trim <> "" Then cmd.Parameters.AddWithValue("@photodatemin", Format(CDate(txDateMin.Text.Trim), "yyyy-MM-dd"))
@@ -426,7 +439,7 @@ Public Class chk
 
     taxonid = tvTaxon.SelectedNode.Tag
     matches = getTaxrecByID(taxonid)
-    If matches.count <= 0 Then match = New taxrec Else match = matches(0)
+    If matches.Count <= 0 Then match = New taxrec Else match = matches(0)
 
     txTaxon.Text = match.taxon
     txCommon.Text = getDescr(match, False)
