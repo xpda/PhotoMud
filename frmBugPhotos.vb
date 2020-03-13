@@ -77,6 +77,7 @@ Public Class frmBugPhotos
   Dim pComments As List(Of PropertyItem)
 
   Dim taxonid As String
+  Dim txTaxid As String
   Dim iElevation As Integer
   Dim abort As Boolean = False
 
@@ -127,7 +128,6 @@ Public Class frmBugPhotos
     Dim matches As New List(Of taxrec)
     Dim setID As Integer
     Dim oldTaxid As String = ""
-    Dim usable As String
 
     Me.Cursor = Cursors.WaitCursor
     fName = Trim(txFileName.Text)
@@ -142,7 +142,7 @@ Public Class frmBugPhotos
     Try
       ' does it exist?
       id = getScalar("select imageid from images where filename = @parm1", fName)
-      If id <> "" Then ' record already exists if id <> ""
+      If id <> Nothing And id <> "" Then ' record already exists if id <> ""
         mResult = MsgBox("Database record for " & fName & " already exists. Overwrite?", MsgBoxStyle.YesNoCancel)
         If mResult <> MsgBoxResult.Yes Then
           Me.Cursor = Cursors.Default
@@ -153,43 +153,32 @@ Public Class frmBugPhotos
         oldTaxid = ""
       End If
 
-      ' make sure there is one taxon
-      matches = TaxonSearch(txTaxon.Text, False)
-      taxonid = ""
-
-      If matches.Count = 1 OrElse (matches.Count = 2 And eqstr(matches(1).rank, "subgenus")) Then
-        taxonid = matches(0).taxid
-        txCommon.Text = matches(0).descr
-
-      ElseIf matches.Count > 1 Then
+      If txTaxid <> "" Then
+        matches = getTaxrecByID(txTaxid)
+      Else
+        ' make sure there is one taxon
+        matches = TaxonSearch(txTaxon.Text, False)
         taxonid = ""
-        ' omit all the doubtfuls and see if there is one match
-        For i As Integer = matches.Count - 1 To 0 Step -1
-          If matches(i).taxid.StartsWith("g") Then ' gbif record, check status
-            usable = getScalar("select usable from gbif.tax where taxid = @parm1", matches(i).taxid.Substring(1))
-            If usable = "" Then
-              matches.RemoveAt(i)
-            End If
-          End If
-        Next i
-        If matches.Count = 1 Then ' exactly one accepted or taxatable
-          taxonid = matches(0).taxid
-          txCommon.Text = matches(0).descr
 
-        Else ' abort
-          MsgBox("There is more than one " & txTaxon.Text & " in the Database.", MsgBoxStyle.OkOnly)
+        If matches.Count <= 0 Then
+          MsgBox(txTaxon.Text & " is not in the Database.", MsgBoxStyle.OkOnly)
           cmdTaxon_Click(Nothing, Nothing)
           Me.Cursor = Cursors.Default
           Return 0
         End If
 
-      Else ' matches.count <= 0 
-        MsgBox(txTaxon.Text & " is Not in the Database.", MsgBoxStyle.OkOnly)
-        cmdTaxon_Click(Nothing, Nothing)
-        Me.Cursor = Cursors.Default
-        Return 0
-      End If
+        If matches.Count = 1 OrElse (matches.Count = 2 And eqstr(matches(1).rank, "subgenus")) Then
+          taxonid = matches(0).taxid
+          txCommon.Text = matches(0).descr
 
+        ElseIf matches.Count > 1 Then
+          taxonid = ""
+          MsgBox("There is more than one " & txTaxon.Text & " in the Database.", MsgBoxStyle.OkOnly)
+          cmdTaxon_Click(Nothing, Nothing)
+          Me.Cursor = Cursors.Default
+          Return 0
+        End If
+      End If
 
       Using conn As New MySqlConnection(iniDBConnStr)
         conn.Open()
@@ -275,6 +264,7 @@ Public Class frmBugPhotos
 
     ' save for F3 only if data is saved
     lastbugTaxon = txTaxon.Text
+    lastbugTaxid = txTaxid
     lastbugTaxonID = taxonid
     lastbugLocation = txLocation.Text
     lastbugCounty = txCounty.Text
@@ -363,6 +353,7 @@ Public Class frmBugPhotos
     End If
 
     txTaxon.Text = ""
+    txTaxid = ""
     txCommon.Text = ""
     txSize.Text = ""
     txRating.Text = "60"
@@ -456,6 +447,7 @@ Public Class frmBugPhotos
         taxonid = match.taxid
       End If
       txTaxon.Text = match.taxon
+      txTaxid = match.taxid
       txCommon.Text = getDescr(match, False)
 
       ' put into the label the count of database records for this original path
@@ -592,6 +584,7 @@ Public Class frmBugPhotos
 
       If matches.Count > 0 Then
         txTaxon.Text = matches(0).taxon
+        txTaxid = matches(0).taxid
         taxonid = matches(0).taxid
       End If
 
@@ -1006,6 +999,7 @@ Public Class frmBugPhotos
 
       Case 114 ' F3 = restore the previous values
         txTaxon.Text = lastbugTaxon
+        txTaxid = lastbugTaxid
         inMatch.taxon = lastbugTaxon
         taxonid = lastbugTaxonID
         inMatch.taxid = lastbugTaxonID
@@ -1112,6 +1106,7 @@ Public Class frmBugPhotos
 
     tvTaxon.Nodes.Clear()
     tvTaxon.Visible = True
+    txTaxid = ""
     cmdCloseTree.Visible = True
 
     matches = queryTax("select * from taxatable where taxon = @parm1 order by taxon", "life")
@@ -1217,6 +1212,7 @@ Public Class frmBugPhotos
     If matches.Count <= 0 Then match = New taxrec Else match = matches(0)
 
     txTaxon.Text = match.taxon
+    txTaxid = match.taxid
     txCommon.Text = getDescr(match, False)
     txLocation.Select()
 

@@ -135,7 +135,7 @@ Public Class chk
           adapt.Fill(ds)
           For Each dr As DataRow In ds.Tables(0).Rows
             If itisRankID.ContainsKey(dr("rank")) Then rank = itisRankID(dr("rank")) Else rank = 0
-            If rank > 0 AndAlso (rankmin = 0 Or rankmin >= rank) AndAlso (rankmax = 0 Or rankmax <= rank) Then
+            If (rank <= 0) Or (rank > 0 AndAlso (rankmin = 0 Or rankmin >= rank) AndAlso (rankmax = 0 Or rankmax <= rank)) Then
               s1 = CStr(dr("taxon"))
               If s = "" OrElse eqstr(s, s1) Then ' taxonkey matches
                 If Not IsDBNull(dr("filename")) Then queryNames.Add(folderPath & dr("filename"))

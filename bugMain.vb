@@ -165,7 +165,8 @@ Public Module bugMain
 
   Public iniBugPath As String
   Public lastbugTaxon As String = ""
-  Public lastbugTaxonID As String = "0"
+  Public lastbugTaxid As String = ""
+  Public lastbugTaxonID As String = ""
   Public lastbugCommon As String = ""
   Public lastbugLocation As String = ""
   Public lastbugCounty As String = ""
@@ -1465,11 +1466,18 @@ Public Module bugMain
     Dim m As New taxrec
     Dim matches As New List(Of taxrec)
     Dim matches2 As New List(Of taxrec)
-    Dim s As String
+    Dim rDescr As String
     Dim suffix, suffixg As String
     Dim taxid As String
 
     findme = findme.Trim
+
+    rDescr = findme.Replace("-", "`") ' accept either space or dash, so "eastern tailed blue" finds "eastern tailed-blue". Only works with rlike (mysql bug).
+    rDescr = rDescr.Replace(" ", "[- ]")
+    rDescr = rDescr.Replace("`", "[- ]")
+    rDescr = rDescr.Replace("(", "\(")
+    rDescr = rDescr.Replace(")", "\)")
+
 
     If findme = "OLYMPUS DIGITAL CAMERA" Then Return matches ' empty list
 
@@ -1482,44 +1490,46 @@ Public Module bugMain
     End If
 
     matches = queryTax("select * from taxatable where taxon = @parm1" & suffix, findme)
-    If matches.Count = 0 AndAlso (dbAllowed And 8) Then matches = queryTax("select * from gbif.tax where name = @parm1" & suffixg, findme)
+    If matches.Count > 0 And (dbAllowed And 8) Then matches = queryTax("select * from gbif.tax where name = @parm1" & suffixg, findme)
+    If matches.Count > 0 Then Return matches ' exact taxon match
+
+    ' search for equal descr
+    matches = queryTax("select * from oddinfo join taxatable using (taxid) where commonnames rlike @parm1 order by taxon", rDescr)
+    matches2 = queryTax("select * from taxatable where descr rlike @parm1 order by taxon", rDescr)
+    matches = mergeMatches(matches, matches2)
+    If matches.Count > 0 Then Return matches
+
+
     If matches.Count = 0 Then matches = queryTax("select * from taxatable where (taxon like @parm1)" & suffix, findme & "%")
-    If matches.Count = 0 Then 
+    If matches.Count = 0 Then
       matches = queryTax("select * from taxatable where (taxon like @parm1)" & suffix, "%" & findme & "%")
       ' If matches.Count = 0 Then matches = queryTax("select * from gbif.tax where (name like @parm1)" & suffixg, findme & "%") ' exact search only for gbif
     End If
 
-    If matches.Count = 0 Then  ' search descr
-      s = findme.Replace("-", "`") ' accept either space or dash, so "eastern tailed blue" finds "eastern tailed-blue". Only works with rlike (mysql bug).
-      s = s.Replace(" ", "[- ]")
-      s = s.Replace("`", "[- ]")
-      s = s.Replace("(", "\(")
-      s = s.Replace(")", "\)")
+    'If matches.Count = 0 Then  ' search descr and taxon rlike
+    matches2 = queryTax("select * from oddinfo join taxatable using (taxid) where commonnames rlike @parm1 order by taxon",
+                        "%" & rDescr & "%")
+    matches = mergeMatches(matches, matches2)
+    matches2 = queryTax("select * from taxatable where taxon rlike @parm1 or descr rlike @parm1 order by taxon", "%" & rDescr & "%")
+    matches = mergeMatches(matches, matches2)
+    'End If
 
-      matches = queryTax("select * from oddinfo join taxatable using (taxid) where commonnames rlike @parm1 order by taxon", s)
-      matches2 = queryTax("select * from taxatable where descr rlike @parm1 order by taxon", s)
-      matches = mergeMatches(matches, matches2)
-
-      If matches.Count = 0 Then matches = queryTax("select * from taxatable where (descr rlike @parm1)" & suffix, s)
-
-      If matches.Count = 0 AndAlso (dbAllowed And 8) Then
-        Using ds As DataSet = getDS("select * from gbif.vernacularname where vernacularname rlike @parm1 and (language = 'en' or language = '')", s)
-          'ds = getDS("select * from gbif.vernacularname where vernacularname = @parm1 and (language = 'en' or language = '')", s)
-          If ds IsNot Nothing AndAlso ds.Tables(0).Rows.Count > 0 Then
-            cmd = "select * from gbif.tax where ("
-            For Each dr As DataRow In ds.Tables(0).Rows
-              taxid = dr("taxonid")
-              If taxid <> "" AndAlso cmd.IndexOf(taxid) < 0 Then cmd &= "taxid = '" & taxid & "' or "
-            Next dr
-            If cmd.EndsWith(" or ") Then
-              cmd = cmd.Substring(0, cmd.Length - 4)
-              cmd &= ") and usable <> '' order by name"
-              matches = queryTax(cmd, "")
-            End If
+    If matches.Count = 0 AndAlso (dbAllowed And 8) Then
+      Using ds As DataSet = getDS("select * from gbif.vernacularname where vernacularname rlike @parm1 and (language = 'en' or language = '')", rDescr)
+        'ds = getDS("select * from gbif.vernacularname where vernacularname = @parm1 and (language = 'en' or language = '')", s)
+        If ds IsNot Nothing AndAlso ds.Tables(0).Rows.Count > 0 Then
+          cmd = "select * from gbif.tax where ("
+          For Each dr As DataRow In ds.Tables(0).Rows
+            taxid = dr("taxonid")
+            If taxid <> "" AndAlso cmd.IndexOf(taxid) < 0 Then cmd &= "taxid = '" & taxid & "' or "
+          Next dr
+          If cmd.EndsWith(" or ") Then
+            cmd = cmd.Substring(0, cmd.Length - 4)
+            cmd &= ") and usable <> '' order by name"
+            matches = queryTax(cmd, "")
           End If
-        End Using
-      End If
-
+        End If
+      End Using
     End If
 
     Return matches
