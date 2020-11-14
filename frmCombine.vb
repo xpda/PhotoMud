@@ -1,7 +1,6 @@
 'Photo Mud is licensed under Creative Commons BY-NC-SA 4.0
 'https://creativecommons.org/licenses/by-nc-sa/4.0/
 
-Imports vb = Microsoft.VisualBasic
 Imports System.Drawing.Drawing2D
 Imports System.Drawing.Imaging
 Imports System.Drawing
@@ -42,7 +41,7 @@ Public Class frmCombine
       ScaleBitmap()
     Else
       chkAspect.Enabled = False
-      updateImage(pView3, gPath3, trkIntensity3, chkGray3)
+      updateImage(pView3, chkGray3)
     End If
 
     xoff = (pView2.Bitmap.Width - pView3.Bitmap.Width) / 2
@@ -63,7 +62,7 @@ Public Class frmCombine
     heightallowed = pView2.Bitmap.Height
 
     If chkAspect.Checked Then
-      updateImage(pView3, gPath3, trkIntensity3, chkGray3)
+      updateImage(pView3, chkGray3)
       If ((widthallowed * pView3.Bitmap.Height) / pView3.Bitmap.Width) < heightallowed Then
         bmpSize.width = widthallowed
         bmpSize.Height = CInt((bmpSize.Width * pView3.Bitmap.Height) / pView3.Bitmap.Width)
@@ -88,7 +87,7 @@ Public Class frmCombine
   Private Sub chkGray2_CheckedChanged(ByVal Sender As Object, ByVal e As EventArgs) Handles chkGray2.CheckedChanged
 
     If Loading Then Exit Sub
-    updateImage(pView2, gPath2, trkIntensity2, chkGray2)
+    updateImage(pView2, chkGray2)
     CombinePreview()
 
   End Sub
@@ -100,7 +99,7 @@ Public Class frmCombine
     If chkFit.Checked Then
       ScaleBitmap()
     Else
-      updateImage(pView3, gPath3, trkIntensity3, chkGray3)
+      updateImage(pView3, chkGray3)
     End If
 
     CombinePreview()
@@ -201,7 +200,7 @@ Public Class frmCombine
       ScaleBitmap()
     Else
       chkAspect.Enabled = False
-      updateImage(pView3, gPath3, trkIntensity3, chkGray3)
+      updateImage(pView3, chkGray3)
     End If
 
     strMethod(0) = "Multiply"
@@ -242,13 +241,13 @@ Public Class frmCombine
 
     pView2.Zoom(0)
     pView3.Zoom(0)
-    CombinePreview(True)
+    CombinePreview()
 
     Loading = False
 
   End Sub
 
-  Sub CombinePreview(Optional ByVal resetView As Boolean = False)
+  Sub CombinePreview()
 
     Dim destRect As Rectangle
 
@@ -271,8 +270,8 @@ Public Class frmCombine
 
   Private Sub pview1_MouseUp(ByVal sender As Object, ByVal e As MouseEventArgs) Handles pView1.MouseUp
     pView1.Cursor = Cursors.WaitCursor
-    xoff = xoff + (e.X - dragx) / pView1.ZoomFactor
-    yoff = yoff + (e.Y - dragy) / pView1.ZoomFactor
+    xoff += (e.X - dragx) / pView1.ZoomFactor
+    yoff += (e.Y - dragy) / pView1.ZoomFactor
     CombinePreview()
     pView1.Cursor = Cursors.Default
 
@@ -285,14 +284,14 @@ Public Class frmCombine
 
     Sliding = True
     If Sender Is trkIntensity2 Then
-      updateImage(pView2, gPath2, trkIntensity2, chkGray2)
+      updateImage(pView2, chkGray2)
       nmIntensity2.Value = CInt(trkIntensity2.Value / 10)
       pView2.Zoom(0)
     Else
       If chkFit.Checked Then
         ScaleBitmap()
       Else
-        updateImage(pView3, gPath3, trkIntensity3, chkGray3)
+        updateImage(pView3, chkGray3)
         nmIntensity3.Value = CInt(trkIntensity3.Value / 10)
         pView3.Zoom(0)
       End If
@@ -306,8 +305,7 @@ Public Class frmCombine
     mouseWheelZoom(pView1, e, Nothing, 1.2)
   End Sub
 
-  Sub updateImage(ByRef rview As pViewer, ByRef gPath As GraphicsPath, ByRef trkIntensity As TrackBar,
-                  ByVal chkGray As CheckBox)
+  Sub updateImage(ByRef rview As pViewer, ByVal chkGray As CheckBox)
     ' restore the image, then add the region, grayscale, and brightness
 
     If rview Is pView3 Then

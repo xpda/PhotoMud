@@ -13,15 +13,7 @@ Public Class frmSharpen
   Dim Loading As Boolean = True
   Dim Sliding As Boolean
 
-  Dim downx As Double
-  Dim downy As Double
-
   Dim gpath As GraphicsPath = Nothing
-
-  Dim imageReduced As Boolean
-  Dim xreduced As Double
-
-  Dim pCenter As PointF ' not used yet
 
   Dim WithEvents Timer1 As New Timer
 
@@ -117,19 +109,15 @@ Public Class frmSharpen
 
     ' if it's too big, reduce the size and assign that.
     If qImage.Width * qImage.Height > bigMegapix Then
-      imageReduced = True
-      xreduced = getSmallerImage(qImage, aview.pView0)
       aview.pView1.setBitmap(aview.pView0.Bitmap)
     Else
-      imageReduced = False
       aview.pView0.setBitmap(qImage)
       aview.pView1.setBitmap(qImage)
-      xreduced = 1
     End If
 
     aview.ZoomViews(0.5)
 
-    pCenter = New PointF(CSng(aview.pView0.Bitmap.Width / 2), CSng(aview.pView0.Bitmap.Height / 2))
+    'pCenter = New PointF(CSng(aview.pView0.Bitmap.Width / 2), CSng(aview.pView0.Bitmap.Height / 2))
 
     Loading = False
     Sliding = False

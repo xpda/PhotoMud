@@ -184,7 +184,7 @@ Public Class frmSlideShow
     Dim i As Integer
 
     If Len(nextFname) = 0 Or Not bkgLoad.IsBusy Then
-      iPic = iPic + inc
+      iPic += inc
       If iPic >= tagPath.Count Then iPic = 0
       If iPic < 0 Then iPic = tagPath.Count - 1
 
@@ -266,7 +266,7 @@ Public Class frmSlideShow
 
     fName = e.Argument(0)
 
-    picInfo = getPicinfo(fName, False)
+    picInfo = getPicinfo(fName)
 
     If picInfo.isNull Then
       'MsgBox("Error reading " & fname & crlf & ex.Message, MsgBoxStyle.OkOnly)
@@ -310,7 +310,6 @@ Public Class frmSlideShow
     Dim ix1 As New List(Of Integer)
 
     ix = New List(Of Integer)
-    ix1 = New List(Of Integer)
     slideKey = New List(Of Date)
 
     For i = 0 To tagPath.Count - 1
@@ -347,7 +346,7 @@ Public Class frmSlideShow
             ix(i) = k
           Else ' hunt the next free one
             For j = 0 To tagPath.Count - 1
-              k = k + 1
+              k += 1
               If k > tagPath.Count - 1 Then k = 0
               If ix1(k) = 0 Then
                 ix1(k) = 1

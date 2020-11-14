@@ -1,7 +1,6 @@
 'Photo Mud is licensed under Creative Commons BY-NC-SA 4.0
 'https://creativecommons.org/licenses/by-nc-sa/4.0/
 
-Imports VB = Microsoft.VisualBasic
 Imports System.IO
 
 Public Class frmTips
@@ -47,8 +46,8 @@ Public Class frmTips
       ' read all tips once per form show
 
       fName = exePath
-      If VB.Right(fName, 1) <> "\" Then fName = fName & "\"
-      fName = fName & "tips.dat"
+      If Not fName.EndsWith("\") Then fName &= "\"
+      fName &= "tips.dat"
       Try
         tips = File.ReadAllLines(fName)
       Catch
@@ -61,11 +60,11 @@ Public Class frmTips
         lbtip.Text = tips(iniTipNumber)
         Exit For
       End If
-      iniTipNumber = iniTipNumber + 1
+      iniTipNumber += 1
       If iniTipNumber > UBound(tips) Then iniTipNumber = 1
     Next i
 
-    iniTipNumber = iniTipNumber + 1
+    iniTipNumber += 1
     If iniTipNumber > UBound(tips) Then iniTipNumber = 1
 
   End Sub

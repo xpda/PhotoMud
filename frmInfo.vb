@@ -52,7 +52,7 @@ Public Class frmInfo
     If processing Then Exit Sub
     processing = True
 
-    If Sender Is cmdPrevious Then fpic = fpic - 1 Else fpic = fpic + 1
+    If Sender Is cmdPrevious Then fpic -= 1 Else fpic += 1
 
     If callingForm Is frmExplore Then
       picPath = frmExplore.getNextPath(fpic)
@@ -234,7 +234,7 @@ Public Class frmInfo
     Dim s As String
     Dim iTabs(0) As Integer
     Dim picInfo As pictureInfo
-    Dim pComments As New List(Of PropertyItem)
+    Dim pComments As List(Of PropertyItem)
 
     s = ""
 
@@ -243,7 +243,7 @@ Public Class frmInfo
     rtext1.SelectionTabs(0) = 25
 
     'Clock.Reset() : Clock.Start()
-    picInfo = getPicinfo(picpath, True)
+    picInfo = getPicinfo(picpath)
     ucomments = readComments(picpath, True, True)
     pComments = readPropertyItems(picpath) ' for thumbnail detection
     formatExifComments(chkMakernote.Checked, chkJpgTags.Checked, chkXmpInfo.Checked, _
@@ -254,7 +254,7 @@ Public Class frmInfo
 
     s = s.Replace(crlf, "\par       ")
     s = s.Replace(ChrW(10), "\par       ")
-    s = s & "\par "
+    s &= "\par "
     rtext1.Rtf = "{\rtf1\ansi{\pard\plain\f2\fs20\tx3500" & s & "}}"
 
     rtext1.SelectionStart = 1

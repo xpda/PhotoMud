@@ -339,33 +339,33 @@ Public Class frmHisto
     Select Case index
       Case 0
         For i As Integer = 0 To CInt(nmSlide0.Value) - 1
-          If Channel = "master" Or Channel = "red" Then sum = sum + histSource(0, i)
-          If Channel = "master" Or Channel = "green" Then sum = sum + histSource(1, i)
-          If Channel = "master" Or Channel = "blue" Then sum = sum + histSource(2, i)
+          If Channel = "master" Or Channel = "red" Then sum += histSource(0, i)
+          If Channel = "master" Or Channel = "green" Then sum += histSource(1, i)
+          If Channel = "master" Or Channel = "blue" Then sum += histSource(2, i)
         Next i
         lbPct0.Text = Format(sum / sumPixels, "##0.0%")
         lbPct0.Refresh()
       Case 1
         For i As Integer = CInt(nmSlide1.Value) + 1 To 255
-          If Channel = "master" Or Channel = "red" Then sum = sum + histSource(0, i)
-          If Channel = "master" Or Channel = "green" Then sum = sum + histSource(1, i)
-          If Channel = "master" Or Channel = "blue" Then sum = sum + histSource(2, i)
+          If Channel = "master" Or Channel = "red" Then sum += histSource(0, i)
+          If Channel = "master" Or Channel = "green" Then sum += histSource(1, i)
+          If Channel = "master" Or Channel = "blue" Then sum += histSource(2, i)
         Next i
         lbPct1.Text = Format(sum / sumPixels, "##0.0%")
         lbPct1.Refresh()
       Case 2
         For i As Integer = 0 To CInt(nmSlide2.Value) - 1
-          If Channel = "master" Or Channel = "red" Then sum = sum + histSource(0, i)
-          If Channel = "master" Or Channel = "green" Then sum = sum + histSource(1, i)
-          If Channel = "master" Or Channel = "blue" Then sum = sum + histSource(2, i)
+          If Channel = "master" Or Channel = "red" Then sum += histSource(0, i)
+          If Channel = "master" Or Channel = "green" Then sum += histSource(1, i)
+          If Channel = "master" Or Channel = "blue" Then sum += histSource(2, i)
         Next i
         lbPct2.Text = Format(sum / sumPixels, "##0.0%")
         lbPct2.Refresh()
       Case 3
         For i As Integer = CInt(nmSlide3.Value) + 1 To 255
-          If Channel = "master" Or Channel = "red" Then sum = sum + histSource(0, i)
-          If Channel = "master" Or Channel = "green" Then sum = sum + histSource(1, i)
-          If Channel = "master" Or Channel = "blue" Then sum = sum + histSource(2, i)
+          If Channel = "master" Or Channel = "red" Then sum += histSource(0, i)
+          If Channel = "master" Or Channel = "green" Then sum += histSource(1, i)
+          If Channel = "master" Or Channel = "blue" Then sum += histSource(2, i)
         Next i
         lbPct3.Text = Format(sum / sumPixels, "##0.0%")
         lbPct3.Refresh()
@@ -470,7 +470,7 @@ Public Class frmHisto
         If xt * 255 >= k Then
           yt = ay * t ^ 3 + by * t ^ 2 + cy * t + y0
           newMap(k) = CByte(yt * 255)
-          k = k + 1
+          k += 1
           If k > 255 Then Exit For
         End If
       Next i
@@ -495,7 +495,6 @@ Public Class frmHisto
 
     Static busy As Boolean = False
     Dim bmp As Bitmap
-    Dim Progress As Double
 
     If Loading OrElse aview.pView0.Bitmap Is Nothing OrElse aview.pView0.Bitmap.PixelFormat = 0 Then Exit Sub
 
@@ -524,7 +523,6 @@ Public Class frmHisto
       If Not Loading Then showHisto(pView2, histSource, histXscale, histYscale)
     End If
 
-    Progress = 0
     remapintensity(bmp, newMap, Channel)
 
     If Not fullBitmap Then
@@ -656,19 +654,19 @@ Public Class frmHisto
         xn(i) = xn(i + 1)
         fn(i) = fn(i + 1)
       Next i
-      n = n - 1
+      n -= 1
 
     ElseIf e.Button = MouseButtons.Left Then
       splineDistance(xn, fn, n, x, y, d)
       If dmin > 40 And x <> xn(inode) And d < 40 And n < UBound(xn) - 2 Then ' add new point
         dragging = True
-        If x > xn(inode) Then inode = inode + 1
+        If x > xn(inode) Then inode += 1
 
         For i = n To inode Step -1
           xn(i + 1) = xn(i)
           fn(i + 1) = fn(i)
         Next i
-        n = n + 1
+        n += 1
         xn(inode) = x
         fn(inode) = y
       ElseIf dmin < 40 Then
@@ -740,9 +738,9 @@ Public Class frmHisto
     np = 1
     L = 2
     For x = xs(2) + 1 To xs(n + 1)
-      np = np + 1
+      np += 1
       xp(np) = x
-      If x > xs(L + 1) Then L = L + 1
+      If x > xs(L + 1) Then L += 1
       yp(np) = spline(x, xs, ys, s, L)
     Next x
 
@@ -778,7 +776,7 @@ Public Class frmHisto
     L = 2
     For i As Integer = 0 To 255
       x = i * pView2.ClientSize.Width / 256
-      If x > xs(L + 1) Then L = L + 1
+      If x > xs(L + 1) Then L += 1
       k = CInt((pView2.ClientSize.Height - spline(x, xs, ys, s, L)) * 256 / pView2.ClientSize.Height)
       If k > 255 Then k = 255 Else If k < 0 Then k = 0
       newMap(i) = CByte(k)

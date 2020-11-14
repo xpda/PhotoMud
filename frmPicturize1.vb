@@ -1,7 +1,6 @@
 'Photo Mud is licensed under Creative Commons BY-NC-SA 4.0
 'https://creativecommons.org/licenses/by-nc-sa/4.0/
 
-Imports vb = Microsoft.VisualBasic
 Imports System.Drawing.Drawing2D
 Imports System.Drawing.Imaging
 Imports System.Drawing
@@ -30,7 +29,7 @@ Public Class frmPicturize1
     End If
 
     If pczCellFolder <> "" Then
-      If vb.Right(pczCellFolder, 1) <> "\" Then pczCellFolder = pczCellFolder & "\"
+      If Not pczCellFolder.EndsWith("\") Then pczCellFolder &= "\"
     End If
 
     txtCellFolder.Text = pczCellFolder
@@ -117,13 +116,12 @@ Public Class frmPicturize1
 
   Private Sub txtCellFolder_Leave(ByVal Sender As Object, ByVal e As EventArgs) Handles txtCellFolder.Leave
 
-    Dim fNames As New List(Of String)
+    Dim fNames As List(Of String)
     Dim picInfo As pictureInfo
     Dim ss As New List(Of String)
 
     pczCellFolder = txtCellFolder.Text
-    If vb.Right(pczCellFolder, 1) <> "\" Then pczCellFolder = pczCellFolder & "\"
-
+    If Not pczCellFolder.EndsWith("\") Then pczCellFolder &= "\"
     ss.Add(".jpg")
     ss.Add(".jpeg")
     fNames = dirGetfiles(pczCellFolder, ss)
@@ -133,7 +131,7 @@ Public Class frmPicturize1
     lbNPics.Text = "Contains " & pcznCellPics & " image files."
 
     If fNames IsNot Nothing AndAlso fNames.Count > 0 Then ' get the aspect ratio of the first .jpg file.
-      picInfo = getPicinfo(fNames(0), True)
+      picInfo = getPicinfo(fNames(0))
       If Not picInfo.isNull Then pczCellAspect = picInfo.Aspect
     End If
 
@@ -141,7 +139,7 @@ Public Class frmPicturize1
 
   Function countfiles(ByRef folder As String, ByRef ext As List(Of String)) As Integer
 
-    Dim fNames As New List(Of String)
+    Dim fNames As List(Of String)
 
     fNames = dirGetfiles(folder, ext)
 

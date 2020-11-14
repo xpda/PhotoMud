@@ -14,9 +14,6 @@ Public Class frmColorAdjust
 
   Dim gpath As GraphicsPath = Nothing
 
-  Dim imageReduced As Boolean
-  Dim xreduced As Double
-
   Dim WithEvents Timer1 As New Timer
 
   Dim trks(2, 2) As TrackBar
@@ -77,14 +74,10 @@ Public Class frmColorAdjust
 
     ' if it's too big, reduce the size and assign that.
     If qImage.Width * qImage.Height > bigMegapix Then
-      imageReduced = True
-      xreduced = getSmallerImage(qImage, aView.pView0)
       aView.pView1.setBitmap(aView.pView0.Bitmap)
     Else
-      imageReduced = False
       aView.pView0.setBitmap(qImage)
       aView.pView1.setBitmap(qImage)
-      xreduced = 1
     End If
 
     aView.ZoomViews(0.5)

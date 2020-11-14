@@ -1,7 +1,6 @@
 'Photo Mud is licensed under Creative Commons BY-NC-SA 4.0
 'https://creativecommons.org/licenses/by-nc-sa/4.0/
 
-Imports vb = Microsoft.VisualBasic
 Imports System.Drawing.Drawing2D
 Imports System.Drawing.Imaging
 Imports System.Drawing
@@ -14,9 +13,6 @@ Public Class frmRedeye
   Dim Sliding As Boolean
 
   Dim gpath As GraphicsPath = Nothing
-
-  Dim imageReduced As Boolean
-  Dim xReduced As Double
 
   Dim WithEvents Timer1 As New Timer
 
@@ -66,14 +62,10 @@ Public Class frmRedeye
 
     ' if it's too big, reduce the size and assign that.
     If qImage.Width * qImage.Height > bigMegapix Then
-      imageReduced = True
-      xReduced = getSmallerImage(qImage, aview.pView0)
       aview.pView1.setBitmap(aview.pView0.Bitmap)
     Else
-      imageReduced = False
       aview.pView0.setBitmap(qImage)
       aview.pView1.setBitmap(qImage)
-      xReduced = 1
     End If
 
     aview.ZoomViews(0.5)
@@ -144,7 +136,7 @@ Public Class frmRedeye
         Else
           bMark(ix, iy) = 0
         End If
-        i = i + 4
+        i += 4
       Next ix
     Next iy
 

@@ -56,7 +56,7 @@ Public Class mudViewer
 
     MyBase.New()
     MyBase.Dock = DockStyle.Fill
-    nextMview = nextMview + 1
+    nextMview += 1
     Me.Tag = nextMview
     pComments = New List(Of PropertyItem)
 

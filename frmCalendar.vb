@@ -66,9 +66,9 @@ Public Class frmCalendar
 
   Sub setPreview()
 
-    Dim rBox, rPic As New RectangleF
+    Dim rBox As RectangleF
+    Dim rPic As New RectangleF
     Dim z As Double
-    Dim msg As String = ""
 
     If Me.WindowState = FormWindowState.Minimized Or Picture1.ClientSize.Width <= 0 Or Picture1.ClientSize.Height <= 0 Then Exit Sub
     Me.Cursor = Cursors.WaitCursor
@@ -200,23 +200,17 @@ Public Class frmCalendar
         If ds IsNot Nothing AndAlso ds.Tables.Count > 0 AndAlso ds.Tables(0).Rows.Count > 0 Then
           pic = New pixClass(ds.Tables(0).Rows(0))
           calCaption(j) = getCalCaption(pic)
-        Else
-          ds = getDS("select * from images, gbif.tax where filename = @parm1 and substring(images.taxonid, 2) = gbif.tax.taxid",
-                     Path.GetFileName(tagPath(j + 1)))
-          If ds IsNot Nothing AndAlso ds.Tables.Count > 0 AndAlso ds.Tables(0).Rows.Count > 0 Then
-            pic = New pixClass(ds.Tables(0).Rows(0))
-            calCaption(j) = getCalCaption(pic)
-          End If
         End If
 
       Else ' normal caption -- exif comment or date
           If dt <> Nothing AndAlso dt.Year > 1 Then
-            If s = "" Then
-              s = "Photo taken "
-            Else
-              s = s & ", "
-            End If
-            calCaption(j) = s & Format(dt, "MMMM") & " " & Format(dt, "yyyy")
+          If s = "" Then
+            s = "Photo taken "
+          Else
+
+            s &= ", "
+          End If
+          calCaption(j) = s & Format(dt, "MMMM") & " " & Format(dt, "yyyy")
           Else
             calCaption(j) = s
           End If
@@ -327,10 +321,10 @@ Public Class frmCalendar
   Private Sub cmdPrevious_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdPreviousMonth.Click
     If chkDaily.Checked Then
       calDate = DateAdd(DateInterval.Day, -2, calDate)
-      iPicm = iPicm - 2 ' iPicm is 0 to  numberofmonths - 1
+      iPicm -= 2 ' iPicm is 0 to  numberofmonths - 1
     Else
       calDate = DateAdd(DateInterval.Month, -1, calDate)
-      iPicm = iPicm - 1 ' iPicm is 0 to  numberofmonths - 1
+      iPicm -= 1 ' iPicm is 0 to  numberofmonths - 1
     End If
     setPreview()
     enableNext()
@@ -339,10 +333,10 @@ Public Class frmCalendar
   Private Sub cmdNextMonth_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdNextMonth.Click
     If chkDaily.Checked Then
       calDate = DateAdd(DateInterval.Day, 2, calDate)
-      iPicm = iPicm + 2 ' iPicm is 0 to  numberofmonths - 1
+      iPicm += 2 ' iPicm is 0 to  numberofmonths - 1
     Else
       calDate = DateAdd(DateInterval.Month, 1, calDate)
-      iPicm = iPicm + 1 ' iPicm is 0 to  numberofmonths - 1
+      iPicm += 1 ' iPicm is 0 to  numberofmonths - 1
     End If
     setPreview()
     enableNext()
@@ -354,7 +348,7 @@ Public Class frmCalendar
 
     getcats = ""
     For i = 0 To chkCat.Count - 1
-      If chkCat(i).Checked Then getcats = getcats & chkCat(i).Tag & crlf
+      If chkCat(i).Checked Then getcats &= chkCat(i).Tag & crlf
     Next i
 
   End Function
@@ -538,12 +532,12 @@ Public Class frmCalendar
     iline = 0
     If ss IsNot Nothing Then
       Do While iline <= UBound(ss)
-        s = ss(iline) : iline = iline + 1
+        s = ss(iline) : iline += 1
         If IsNumeric(s) AndAlso CInt(s) = -1 Then ' -1 means a new category is on the next line
           chkCat.Add(New CheckBox)
           chkCat(chkCat.Count - 1).Text = Trim(ss(iline))
           chkCat(chkCat.Count - 1).Tag = Trim(ss(iline))
-          iline = iline + 1
+          iline += 1
         End If
       Loop
     End If
@@ -637,13 +631,13 @@ Public Class frmCalendar
 
     Dim i As Integer
     Dim rBox, rPic As RectangleF
-    Dim img As Bitmap = Nothing
+    Dim img As Bitmap
     Dim kCal As Integer ' calendar and photo to print
     Dim dt As DateTime
     Dim hm, vm As Double
     Dim msg As String = ""
 
-    If optEvenPages.Checked Then pageNumber = pageNumber + 1
+    If optEvenPages.Checked Then pageNumber += 1
 
     kCal = Floor(pageNumber / 2)
     dt = calBegin.AddMonths(kCal)
@@ -714,8 +708,8 @@ Public Class frmCalendar
     'p(5) = New PointF(p(2).X, p(2).Y)
     'e.Graphics.DrawLines(Pens.DarkGreen, p)
 
-    pageNumber = pageNumber + 1
-    If optOddPages.Checked Then pageNumber = pageNumber + 1
+    pageNumber += 1
+    If optOddPages.Checked Then pageNumber += 1
 
     If Floor(pageNumber / 2) >= nPages Then e.HasMorePages = False Else e.HasMorePages = True
 
@@ -726,7 +720,7 @@ Public Class frmCalendar
 
     Dim n As Integer
     Dim rBox, rPic As RectangleF
-    Dim img As Bitmap = Nothing
+    Dim img As Bitmap
     Dim kPic, kCal As Integer ' calendar and photo to print
     Dim dt As DateTime
     Dim halfPage As Integer
@@ -818,7 +812,7 @@ Public Class frmCalendar
       n = nPages
     End If
 
-    pageNumber = pageNumber + 1
+    pageNumber += 1
     If pageNumber >= n Then e.HasMorePages = False Else e.HasMorePages = True
 
   End Sub
@@ -829,11 +823,9 @@ Public Class frmCalendar
 
     Dim n As Integer
     Dim rBox As RectangleF
-    Dim gImage As Bitmap = Nothing
     Dim kCal As Integer ' calendar and photo to print
     Dim dt As DateTime
     Dim hm, vm As Double
-    Dim msg As String = ""
 
     e.HasMorePages = True
 
@@ -855,13 +847,13 @@ Public Class frmCalendar
     rBox.Width = pArea.Width - hm * 2
     rBox.Height = pArea.Height / 2 - (vm + vMargin * 100)
     printDailyHalf(rBox, e)
-    pageNumber = pageNumber + 1
+    pageNumber += 1
 
     If e.HasMorePages Then
       ' print the picture in the bottom half
       rBox.Y += rBox.Height + vMargin * 100 * 2
       printDailyHalf(rBox, e)
-      pageNumber = pageNumber + 1
+      pageNumber += 1
     End If
 
     n = nPages
@@ -908,7 +900,7 @@ Public Class frmCalendar
 
     Dim tScale As Double
     Dim x As Double
-    Dim fmt As New StringFormat
+    Dim fmt As StringFormat
     Dim ix, iy As Double
     Dim tSize As Double
 
@@ -920,9 +912,9 @@ Public Class frmCalendar
 
     tScale = Max(rBox.Width, rBox.Height) / 100
     x = (rPic.Height - tScale * tSize * 1.5) / rPic.Height ' scale down the drawing just a bit.
-    rPic.Height = rPic.Height * x
-    rPic.X = rPic.X + (rPic.Width - rPic.Width * x) / 2
-    rPic.Width = rPic.Width * x
+    rPic.Height *= x
+    rPic.X += (rPic.Width - rPic.Width * x) / 2
+    rPic.Width *= x
     fmt = StringFormat.GenericDefault
     fmt.LineAlignment = StringAlignment.Center ' center text under the drawing
     fmt.Alignment = StringAlignment.Center
@@ -943,7 +935,7 @@ Public Class frmCalendar
 
     Dim tScale As Double
     Dim x As Double
-    Dim fmt As New StringFormat
+    Dim fmt As StringFormat
     Dim ix, iy As Double
     Dim tSize As Double
     Dim dx, dy As Double
@@ -988,8 +980,8 @@ Public Class frmCalendar
       rPic.Y += (rPic.Height - rPic.Height * x) / 2
     End If
 
-    rPic.Height = rPic.Height * x
-    rPic.Width = rPic.Width * x
+    rPic.Height *= x
+    rPic.Width *= x
 
     fmt = StringFormat.GenericDefault
     fmt.LineAlignment = StringAlignment.Center ' center text under the drawing
@@ -1258,7 +1250,7 @@ Public Class frmCalendar
 
     lstFiles.Items.RemoveAt(lstFiles.SelectedIndex)
 
-    nCalPaths = nCalPaths - 1
+    nCalPaths -= 1
     lbNCalPaths.Text = "Number of Photos: " & nCalPaths
 
     If iFrom <= lstFiles.Items.Count - 1 Then

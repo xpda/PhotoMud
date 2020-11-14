@@ -21,7 +21,7 @@ Public Class frmComment
   Dim filenames As New List(Of String)
   Dim iPic As Integer
   Dim lastComment As String
-  Dim picInfo As pictureInfo
+  'Dim picInfo As pictureInfo
   Dim pComments As New List(Of PropertyItem)
 
   Private Sub cmdCancel_Click(ByVal Sender As Object, ByVal e As EventArgs) Handles cmdCancel.Click
@@ -60,8 +60,7 @@ Public Class frmComment
   Private Sub frmComment_Load(ByVal Sender As Object, ByVal e As EventArgs) Handles MyBase.Load
 
     Dim i As Integer
-    Dim s As String = ""
-    Dim s1 As String = ""
+    Dim s1 As String
     Dim sComment(3) As String
     Dim xLat, xLon As Double
     Dim iAltitude As Integer
@@ -89,7 +88,6 @@ Public Class frmComment
         Try
           pView.setBitmap(frmExplore.rview.Bitmap)
         Catch ex As Exception
-          s = ex.Message
         End Try
         pComments = frmExplore.pComments
       End If
@@ -164,7 +162,6 @@ Public Class frmComment
 
     Dim i As Integer
     Dim s As String = ""
-    Dim s1 As String = ""
     Dim sComment(3) As String
     Dim result As DialogResult
     Dim xLat, xLon As Double
@@ -187,7 +184,7 @@ Public Class frmComment
       processing = False
       Exit Sub
     End If
-    If Sender Is cmdBack Then iPic = iPic - 1 Else iPic = iPic + 1
+    If Sender Is cmdBack Then iPic -= 1 Else iPic += 1
     If iPic < 0 Then iPic = filenames.Count - 1
     If iPic >= filenames.Count Then iPic = 0
 
@@ -220,7 +217,7 @@ Public Class frmComment
     If rText0.Visible Then rText0.Focus()
 
     ' s1 = LCase(vb.Right(picpath, 4))
-    s1 = LCase(picpath.Substring(picpath.Length - 4))
+    ' s1 = LCase(picpath.Substring(picpath.Length - 4))
 
     processing = False
 
@@ -231,7 +228,6 @@ Public Class frmComment
     Dim d As Date
     Dim sComment(3) As String
     Dim xLat As Double, xLon As Double
-    Dim msg As String = ""
     Dim imgsave As New ImageSave
 
     sComment(0) = rText0.Text.Trim
@@ -284,7 +280,7 @@ Public Class frmComment
       End If
 
     Else ' save comments to file
-      picInfo = getPicinfo(picpath, True)
+      'picInfo = getPicinfo(picpath)
       imgsave.pComments = New List(Of PropertyItem)
       imgsave.pComments.AddRange(pComments)
       imgsave.Quality = iniJpgQuality
@@ -375,7 +371,7 @@ Public Class frmComment
       s = Int(xLat) & "°" & Format((xLat - Int(xLat)) * 60, "#0.####") & "'" & s1
       If xLon > 0 Then s1 = "E" Else s1 = "W"
       xLon = Abs(xLon)
-      s = s & " " & Int(xLon) & "°" & Format((xLon - Int(xLon)) * 60, "#0.####") & "'" & s1
+      s &= " " & Int(xLon) & "°" & Format((xLon - Int(xLon)) * 60, "#0.####") & "'" & s1
       rText3.Text = s
     End If
 

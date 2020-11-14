@@ -11,15 +11,12 @@ Public Class frmContrastStretch
 
   Inherits Form
 
-  Dim clock As New Stopwatch
-
   Dim Loading As Boolean = True
   Dim Sliding As Boolean = False
 
   Dim pcenter As PointF
   Dim gPath As GraphicsPath = Nothing
 
-  Dim imageReduced As Boolean
   Dim xreduced As Double
 
   Dim WithEvents Timer1 As New Timer
@@ -91,11 +88,9 @@ Public Class frmContrastStretch
 
     ' if it's too big, reduce the size and assign that.
     If qImage.Width * qImage.Height > bigMegapix Then
-      imageReduced = True
       xreduced = getSmallerImage(qImage, aView.pView0)
       aView.pView1.setBitmap(aView.pView0.Bitmap)
     Else
-      imageReduced = False
       aView.pView0.setBitmap(qImage)
       aView.pView1.setBitmap(qImage)
       xreduced = 1

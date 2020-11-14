@@ -12,11 +12,9 @@ Public Class frmHalftone
   Inherits Form
 
   Dim Loading As Boolean = True
-  Dim Sliding As Boolean = False
 
   Dim gpath As GraphicsPath = Nothing
 
-  Dim imageReduced As Boolean
   Dim xReduced As Double
 
   Dim halfMaps As New List(Of String)
@@ -124,11 +122,9 @@ Public Class frmHalftone
 
     ' if it's too big, reduce the size and assign that.
     If qImage.Width * qImage.Height > bigMegapix Then
-      imageReduced = True
       xReduced = getSmallerImage(qImage, aview.pView0)
       aview.pView1.setBitmap(aview.pView0.Bitmap)
     Else
-      imageReduced = False
       aview.pView0.setBitmap(qImage)
       aview.pView1.setBitmap(qImage)
       xReduced = 1

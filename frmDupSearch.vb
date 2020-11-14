@@ -66,7 +66,7 @@ Public Class frmDupSearch
         If ListView1.Items.Item(i).SubItems(1).Text = s Or ListView1.Items.Item(i).SubItems(2).Text = s Then
           ListView1.Items.RemoveAt(i)
         Else
-          i = i + 1
+          i += 1
         End If
       Loop
 
@@ -270,7 +270,7 @@ Public Class frmDupSearch
     Dim width0, width1, height0, height1 As Integer
     Dim fName1, fName2 As String
     Dim picInfo As pictureInfo
-    Dim msg As String = ""
+    Dim msg As String
 
     If processing Then Exit Sub
 
@@ -281,7 +281,7 @@ Public Class frmDupSearch
     fName2 = ListView1.Items(index).SubItems(2).Text
 
     'showPicture(fname1, pView0, False, Nothing, 0)
-    picInfo = getPicinfo(fName1, False)
+    picInfo = getPicinfo(fName1)
     If picInfo.isNull Then
       MsgBox(picInfo.ErrMessage)
       Exit Sub
@@ -289,7 +289,7 @@ Public Class frmDupSearch
     width0 = picInfo.Width
     height0 = picInfo.Height
 
-    picInfo = getPicinfo(fName2, False)
+    picInfo = getPicinfo(fName2)
     If picInfo.isNull Then
       MsgBox(picInfo.ErrMessage)
       Me.Cursor = Cursors.Default
@@ -402,7 +402,7 @@ Public Class frmDupSearch
         For j As Integer = 0 To 2
           k = 0
           For i = 1 To 255
-            k = k + histo(j, i) * i
+            k += histo(j, i) * i
           Next i
           rgbVal(j) = k / nPix
         Next j
@@ -544,7 +544,7 @@ Public Class frmDupSearch
 
             k = 0
             For i1 = 1 To 255
-              k = k + (histo(0, i1) + histo(1, i1) + histo(2, i1)) * iFactor(i1) ' ifactor is i1^2
+              k += (histo(0, i1) + histo(1, i1) + histo(2, i1)) * iFactor(i1) ' ifactor is i1^2
             Next i1
             x = k / nPix / 3
 
@@ -645,10 +645,10 @@ Public Class frmDupSearch
 
   Private Sub cmdOpenFile_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdOpenFile.Click
 
-    Dim fileNames(-1) As String
+    Dim fileNames As List(Of String)
 
-    fileNames = InputFilename(False)
-    If UBound(fileNames) = 0 Then txFilename.Text = fileNames(0)
+    fileNames = InputFilename()
+    If fileNames.Count > 0 Then txFilename.Text = fileNames(0)
 
   End Sub
 

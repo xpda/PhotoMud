@@ -57,7 +57,6 @@ Public Class frmBugPhotos
   Inherits Form
 
   Dim picpath As String
-  Dim ss() As String
 
   Dim editMode As Boolean ' editing the picture in inibugpath
   Dim processing As Boolean = False
@@ -73,7 +72,6 @@ Public Class frmBugPhotos
   Dim filenames As New List(Of String)
   Dim ix As New List(Of Integer)
   Dim iPic As Integer
-  Dim picInfo As pictureInfo
   Dim pComments As List(Of PropertyItem)
 
   Dim taxonid As String
@@ -122,10 +120,9 @@ Public Class frmBugPhotos
     Dim cmd As MySqlCommand
     Dim sql As String
     Dim fName As String
-    Dim id As String = ""
+    Dim id As String
     Dim k As Integer
-    Dim match As New taxrec
-    Dim matches As New List(Of taxrec)
+    Dim matches As List(Of taxrec)
     Dim setID As Integer
     Dim oldTaxid As String = ""
 
@@ -153,9 +150,7 @@ Public Class frmBugPhotos
         oldTaxid = ""
       End If
 
-      If txTaxid <> "" Then
-        matches = getTaxrecByID(txTaxid)
-      Else
+      If txTaxid = "" Then
         ' make sure there is one taxon
         matches = TaxonSearch(txTaxon.Text, False)
         taxonid = ""
@@ -292,7 +287,7 @@ Public Class frmBugPhotos
 
     Dim uDescription, uDate As String
     Dim sGPS, sElevation As String
-    Dim s As String = ""
+    Dim s As String
     Dim s1 As String = ""
     Dim i, i1 As Integer
     Dim lens, camera As String
@@ -300,7 +295,7 @@ Public Class frmBugPhotos
     Dim xLat, xLon As Double
 
     Dim match As New taxrec
-    Dim matches As New List(Of taxrec)
+    Dim matches As List(Of taxrec)
 
     Dim dr As DataRow
 
@@ -402,8 +397,7 @@ Public Class frmBugPhotos
         dr = ds.Tables(0).Rows(0)
         If Not IsDBNull(dr("taxonid")) Then
           taxonid = dr("taxonid")
-          matches = getTaxrecByID(taxonid)
-          If matches.Count = 0 Then match = New taxrec Else match = matches(0)
+          match = getTaxrecByID(taxonid, True)
         End If
 
         If Not IsDBNull(dr("photodate")) Then txDate.Text = Format(dr("photodate"), "MM/dd/yyyy HH:mm:ss")
@@ -443,11 +437,18 @@ Public Class frmBugPhotos
       End If
 
       If match.taxon = "" Then  ' try to get the taxon from the jpg comment
-        grabTaxon(uDescription, match)
-        taxonid = match.taxid
+        matches = TaxonSearch(uDescription, False)
+        If matches.Count >= 1 Then
+          taxonid = matches(0).taxid
+          txTaxid = matches(0).taxid
+          txTaxon.Text = matches(0).taxon
+          txCommon.Text = getDescr(matches(0), False)
+        Else
+          taxonid = ""
+        End If
       End If
-      txTaxon.Text = match.taxon
       txTaxid = match.taxid
+      txTaxon.Text = match.taxon
       txCommon.Text = getDescr(match, False)
 
       ' put into the label the count of database records for this original path
@@ -468,14 +469,14 @@ Public Class frmBugPhotos
 
       ' check to see if it was taken with manual focus, if so enable cmdMeasure. Specific for Panasonic GX-1 or GH-1
       s = ""
-      picInfo = getPicinfo(picpath, True)
+      picInfo = getPicinfo(picpath)
       uComments = readComments(picpath, True, True)
       pComments = readPropertyItems(picpath)
       formatExifComments(True, False, False, False, s, uComments, picInfo, pComments) ' s has the answer
 
       i = InStr(s, "Focus Mode:")
       If i > 0 Then
-        i = i + 12
+        i += 12
         i1 = InStr(i, s, "\")
         s1 = Mid(s, i, i1 - i)
       End If
@@ -484,7 +485,7 @@ Public Class frmBugPhotos
       lens = ""
       i = InStr(s, "Lens Type:")
       If i > 0 Then
-        i = i + 11
+        i += 11
         i1 = InStr(i, s, "\")
         lens = Mid(s, i, i1 - i)
       End If
@@ -492,7 +493,7 @@ Public Class frmBugPhotos
       camera = ""
       i = InStr(s, "Model:")
       If i > 0 Then
-        i = i + 7
+        i += 7
         i1 = InStr(i, s, "\")
         camera = Mid(s, i, i1 - i)
       End If
@@ -535,75 +536,6 @@ Public Class frmBugPhotos
     processing = False
     filenameChanged = False
     txTaxon.Select()
-
-  End Sub
-
-  Sub grabTaxon(ByVal udescription As String, ByRef match As taxrec)
-
-    ' try to get the taxon from the jpg comment
-
-    Dim s As String
-    Dim i1, i2, eol As Integer
-    Dim matches As New List(Of taxrec)
-
-    s = ""
-    If udescription <> "" Then  ' get the scientific name
-      eol = InStr(udescription, Chr(13)) ' end-of-line
-      If eol = 0 Then eol = InStr(udescription, Chr(10)) ' end-of-line
-      If eol = 0 Then eol = InStr(udescription, Chr(0)) ' end-of-line
-      If eol = 0 Then eol = Len(udescription) + 1
-      s = Mid(udescription, 1, eol - 1)
-      If Len(s) > 1 AndAlso Mid(udescription, Len(s), 1) = "?" Then
-        s = Mid(s, 1, Len(s) - 1) ' exclude question mark
-        txConfidence.Text = "75"
-      End If
-      If Len(s) > 9 AndAlso eqstr(Mid(s, 1, 9), "probably ") Then
-        s = Mid(s, 10) ' exclude "probably "
-        txConfidence.Text = "85"
-      End If
-
-      i1 = InStr(s, "(")
-      i2 = InStr(s, ")")
-      If i1 > 0 And i1 < i2 Then
-        s = Mid(s, i1 + 1, i2 - i1 - 1)
-      Else
-        i1 = InStr(s, ",")
-        If i1 > 1 Then
-          s = Mid(s, i1 + 2, eol - (i1 + 2))
-        Else
-          i1 = InStr(s, " - ")
-          If i1 > 1 Then s = Mid(s, i1 + 3, eol - (i1 + 3))
-        End If
-      End If
-    End If
-
-    s = s.Trim  ' s is the taxon from the jpg comment (possibly)
-
-    If s <> "" Then
-      matches = TaxonSearch(s, False)
-
-      If matches.Count > 0 Then
-        txTaxon.Text = matches(0).taxon
-        txTaxid = matches(0).taxid
-        taxonid = matches(0).taxid
-      End If
-
-      If udescription <> "" Then
-
-        s = udescription
-        s = s.Replace(Crlf, " ")
-        s = s.Replace(Chr(10), " ")
-        s = s.Replace(Chr(13), " ")
-        If txRemarks.Text = "" Then ' grab it from the .jpg if possible
-          If txTaxon.Text <> "" And eol > 0 Then ' remove the first line from s
-            txRemarks.Text = Mid(s, eol).Trim
-          Else
-            txRemarks.Text = s
-          End If
-        End If
-      End If
-
-    End If
 
   End Sub
 
@@ -678,7 +610,7 @@ Public Class frmBugPhotos
 
     s = iniBugPath
     If Not s.EndsWith("\") Then s &= "\"
-    s = s & txFileName.Text
+    s &= txFileName.Text
 
     Return s
 
@@ -775,8 +707,6 @@ Public Class frmBugPhotos
 
     If (xp - rbX) ^ 2 + (yp - rbY) ^ 2 < 10 Then Exit Sub ' click, not drag
 
-    rBoxLeft = rbX
-    rBoxTop = rbY
     If xp < rbX Then
       rBoxLeft = xp
       rBoxWidth = rbX - xp
@@ -826,8 +756,6 @@ Public Class frmBugPhotos
 
     If (xp - rbX) ^ 2 + (yp - rbY) ^ 2 < 10 Then Exit Sub ' click, not drag
 
-    rBoxLeft = rbX
-    rBoxTop = rbY
     If xp < rbX Then
       rBoxLeft = xp
       rBoxWidth = rbX - rBoxLeft
@@ -903,7 +831,7 @@ Public Class frmBugPhotos
       s = Int(xLat) & "°" & Format((xLat - Int(xLat)) * 60, "#0.####") & "'" & s1
       If xLon > 0 Then s1 = "E" Else s1 = "W"
       xLon = Abs(xLon)
-      s = s & " " & Int(xLon) & "°" & Format((xLon - Int(xLon)) * 60, "#0.####") & "'" & s1
+      s &= " " & Int(xLon) & "°" & Format((xLon - Int(xLon)) * 60, "#0.####") & "'" & s1
       txGPS.Text = s
       cmdGPSLocate.Enabled = True
     End If
@@ -1097,9 +1025,8 @@ Public Class frmBugPhotos
 
   Private Sub cmdTaxon_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdTaxon.Click
 
-    Dim match As New bugMain.taxrec
+    Dim match As bugMain.taxrec
     Dim matches As List(Of taxrec)
-    Dim gmatches As List(Of taxrec)
     Dim nd As TreeNode = Nothing
 
     Me.Cursor = Cursors.WaitCursor
@@ -1110,10 +1037,6 @@ Public Class frmBugPhotos
     cmdCloseTree.Visible = True
 
     matches = queryTax("select * from taxatable where taxon = @parm1 order by taxon", "life")
-    If (dballowed And 8) Then
-      gmatches = queryTax("select * from gbif.tax where name = @parm1 and usable <> '' order by name", "animalia")
-      matches = mergeMatches(matches, gmatches)
-    End If
 
     If matches.Count > 0 Then
       nd = tvTaxon.Nodes.Add(taxaLabel(matches(0), False, False))
@@ -1201,15 +1124,13 @@ Public Class frmBugPhotos
 
   Private Sub tvTaxon_Doubleclick(ByVal sender As Object, ByVal e As System.EventArgs) Handles tvTaxon.NodeMouseDoubleClick
 
-    Dim match As New taxrec
-    Dim matches As List(Of taxrec)
+    Dim match As taxrec
 
     If tvTaxon.SelectedNode Is Nothing Then Exit Sub
 
     taxonid = tvTaxon.SelectedNode.Tag
 
-    matches = getTaxrecByID(taxonid)
-    If matches.Count <= 0 Then match = New taxrec Else match = matches(0)
+    match = getTaxrecByID(taxonid, True)
 
     txTaxon.Text = match.taxon
     txTaxid = match.taxid
@@ -1233,8 +1154,6 @@ Public Class frmBugPhotos
 
   Sub loadInitialPic()
 
-    Dim s As String
-
     If callingForm Is frmExplore Then
       If editMode Then  ' show the pic from the target folder
         pComments = New List(Of PropertyItem)
@@ -1253,7 +1172,6 @@ Public Class frmBugPhotos
 
       cmdNext.Visible = True
       cmdBack.Visible = True
-      s = iniExplorePath
 
     ElseIf callingForm Is frmMain Then
       pView.BackColor = Me.BackColor
@@ -1307,8 +1225,6 @@ Public Class frmBugPhotos
   Private Sub frmBugPhotos_Shown(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Shown
 
     Dim i As Integer
-    Dim s As String = ""
-    Dim s1 As String = ""
 
     If Not checkDB(iniDBConnStr) Then
       MsgBox("The database could not be found.", MsgBoxStyle.OkOnly)
@@ -1427,6 +1343,7 @@ Public Class frmBugPhotos
     dataChanged = True
     If sender Is txFileName Then filenameChanged = True
     If sender Is txImageSet Then imagesetChanged = True
+    If sender Is txTaxon Then txTaxid = ""
 
   End Sub
 
@@ -1486,8 +1403,8 @@ Public Class frmBugPhotos
     ' isLinked is true if newName is linked to prevName
 
     Dim setid As Integer = 0
-    Dim previmageID As Integer = 0
-    Dim newimageID As Integer = 0
+    Dim previmageID As Integer
+    Dim newimageID As Integer
 
     countLinks = 0
     isLinked = False
@@ -1554,21 +1471,15 @@ Public Class frmBugPhotos
   Function setimageCount(ByVal taxid As String) As Integer
 
     ' sets the childimagecounter of taxid, descends recursively 
-    ' works on taxatable or gbif.tax, depending on initial taxid
 
-    Dim count As Integer = 0
     Dim imageCounter As Integer
-    Dim childImageCounter As Integer = 0
+    Dim childImageCounter As Integer
     Dim i As Integer
     Dim matches As List(Of taxrec)
 
     imageCounter = getScalar("select count(*) from images where images.taxonid = @parm1", taxid)
 
-    If taxid.StartsWith("g") Then
-      matches = queryTax("select * from gbif.tax where parent = @parm1 and usable <> ''", taxid.Substring(1))
-    Else
-      matches = queryTax("select * from taxatable where parentid = @parm1", taxid)
-    End If
+    matches = queryTax("select * from taxatable where parentid = @parm1", taxid)
 
     childImageCounter = imageCounter
     For Each m As taxrec In matches ' children
@@ -1577,19 +1488,9 @@ Public Class frmBugPhotos
     Next m
 
     If childImageCounter <> 0 Then
-      If taxid.StartsWith("g") Then
-        i = nonQuery("update gbifplus set imagecounter = @parm1, childimagecounter = @parm2 where taxid = @parm3", _
-              imageCounter, childImageCounter, taxid.Substring(1))
-        If i = 0 Then ' gbifplus doesn't contain all the gbif records
-          i = nonQuery("insert into gbifplus (taxid, imagecounter, childimagecounter) values " &
-                        "(@parm1, @parm2, @parm3)", taxid.Substring(1), imageCounter, childImageCounter)
-        End If
-        If i <> 1 Then Stop
-      Else
-        i = nonQuery("update taxatable set imagecounter = @parm1, childimagecounter = @parm2 where taxid = @parm3", _
+      i = nonQuery("update taxatable set imagecounter = @parm1, childimagecounter = @parm2 where taxid = @parm3", _
               imageCounter, childImageCounter, taxid)
-        If i <> 1 Then Stop
-      End If
+      If i <> 1 Then Stop
     End If
 
     Return childImageCounter
@@ -1599,13 +1500,11 @@ Public Class frmBugPhotos
   Function rankCounts() As String
 
     Dim i, iCount As Integer
-    Dim pid As String = ""
     Dim s As String
     Dim sb As New StringBuilder
 
     Dim matches As List(Of taxrec)
     Dim amatches As New List(Of taxrec)
-    Dim gmatches As List(Of taxrec)
     Dim anc As List(Of taxrec)
 
     Dim ranks() As String = {
@@ -1639,13 +1538,9 @@ Public Class frmBugPhotos
 
 
     matches = queryTax("select * from taxatable where childimagecounter > 0 order by taxon", "")
-    If dbAllowed And 8 Then
-      gmatches = queryTax("select * from gbif.tax join taxa.gbifplus using (taxid) where childimagecounter > 0 order by name", "")
-      matches = mergeMatches(matches, gmatches)
-    End If
 
     For Each m As taxrec In matches
-      anc = getancestors(m, False, "phylum")
+      anc = getancestors(m, "phylum")
       i = Array.IndexOf(ranks, LCase(m.rank))
       If i < 0 Then ' get next ancestor with legit rank
         For i1 As Integer = 1 To anc.Count - 1
@@ -1704,13 +1599,12 @@ Public Class frmBugPhotos
 
   Private Sub cmdImageUpdate_click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdImageUpdate.Click
 
-    Dim id As String = ""
-    Dim count As Integer = 0
+    Dim id As String
     Dim cmd As MySqlCommand
     Dim dr As DataRow
-    Dim i, k, i1, k1 As Integer
+    Dim i, k As Integer
     Dim setid, imageid, lastimage As Integer
-    Dim s As String = ""
+    Dim s As String
     Dim ss() As String
     Dim sl As New List(Of String)
     Dim delrecs As New List(Of Integer)
@@ -1745,16 +1639,7 @@ Public Class frmBugPhotos
       i = setimageCount(id)
       k = getScalar("select count(*) from taxatable where imagecounter > 0")
 
-      If dbAllowed And 8 Then
-        i1 = nonQuery("update gbifplus set imagecounter = 0, childimagecounter = 0 where childimagecounter <> 0")
-        matches = queryTax("select * from gbif.tax join taxa.gbifplus using (taxid) where name = 'animalia' and usable <> ''", "")
-        id = matches(0).taxid
-        i1 = setimageCount(id)
-        k1 = getScalar("select count(*) from gbif.tax join taxa.gbifplus using (taxid) where imagecounter > 0")
-      End If
-
-      MsgBox(Format(i, "#,#") & " photos of " & Format(k, "#,#") & " bugs." & vbCrLf &
-             Format(i1, "#,#") & " photos of " & Format(k1, "#,#") & " bugs in gbif.")
+      MsgBox(Format(i, "#,#") & " photos of " & Format(k, "#,#") & " bugs.")
 
       Me.Cursor = Cursors.Default
       If 1 = 1 Then Exit Sub
@@ -1803,7 +1688,7 @@ Public Class frmBugPhotos
         For Each dr In ds.Tables(0).Rows
           s = iniBugPath
           If Not s.EndsWith("\") Then s &= "\"
-          s = s & dr("filename")
+          s &= dr("filename")
 
           If Not File.Exists(s) Then
             sl.Add(dr("originalpath"))
@@ -1875,7 +1760,7 @@ Public Class frmBugPhotos
         For Each dr In ds.Tables(0).Rows
           fName = iniBugPath
           If Not fName.EndsWith("\") Then fName &= "\"
-          fName = fName & dr("filename")
+          fName &= dr("filename")
           pComments = readPropertyItems(fName)
           getGPSLocation(pComments, gps, s, xLat, xLon, k)
 
@@ -1987,19 +1872,15 @@ Public Class frmBugPhotos
 
 
 
-    Dim cmd As New MySqlCommand
+    Dim cmd As MySqlCommand
 
     Dim client As New cWebClient
 
     Dim s, s1, s2, sp, link As String
     Dim fName As String = ""
-    Dim location As String = ""
-    Dim county As String
-    Dim state As String
-    Dim country As String
-    Dim size As String = ""
+    Dim location As String
+    Dim size As String
     Dim photoDate, lastUpdate As DateTime
-    Dim ancestry As String
     Dim taxKey As String
     Dim taxID As String
     Dim bugguideID As Integer
@@ -2009,7 +1890,7 @@ Public Class frmBugPhotos
     Dim links() As String
     Dim i, i1, i2, i3, k As Integer
 
-    Dim matches As New List(Of taxrec)
+    Dim matches As List(Of taxrec)
 
     Me.Cursor = Cursors.WaitCursor
 
@@ -2024,9 +1905,6 @@ Public Class frmBugPhotos
         i = InStr(link, "/view/")
         bugguideID = Mid(link, i + 6)
         location = ""
-        county = ""
-        state = ""
-        country = ""
         size = ""
 
         System.Threading.Thread.Sleep(200)
@@ -2049,7 +1927,7 @@ Public Class frmBugPhotos
           s1 = "<div class=""bgimage-where-when"">"
           i1 = InStr(s, s1)
           If i1 > 0 Then
-            i1 = i1 + Len(s1)
+            i1 += Len(s1)
             i2 = InStr(i1, s, "</div>")
             s1 = Mid(s, i1, i2 - i1)
             i = InStr(s1, "<br />")
@@ -2106,7 +1984,7 @@ Public Class frmBugPhotos
             s1 = Mid(s1, 1, i - 1) & Mid(s1, i1 + 1)
             i = InStr(s1, "<")
           Loop
-          ancestry = s1
+          'ancestry = s1
 
           i = s1.LastIndexOf("»")
           taxKey = Mid(s1, i + 3)
@@ -2119,15 +1997,15 @@ Public Class frmBugPhotos
             s1 = Mid(s, i + Len(sp), i1 - i - Len(sp))
             If s1 <> "Moved" Then ' save the comment
 
-              comments = comments & s1 & Crlf
+              comments &= s1 & Crlf
               s1 = "<div class=""comment-body"">"
               k = InStr(i, s, s1)
               If k > 0 Then
                 i1 = InStr(k, s, "</div>")
-                comments = comments & Mid(s, k + Len(s1), i1 - k - Len(s1)) & Crlf
+                comments &= Mid(s, k + Len(s1), i1 - k - Len(s1)) & Crlf
               End If
 
-              comments = comments & Crlf & Crlf
+              comments &= Crlf & Crlf
             End If
 
             i = InStr(i + 1, s, sp)
@@ -2313,115 +2191,10 @@ Public Class frmBugPhotos
 
   End Sub
 
-  Private Sub cmdWikimedia_Click(sender As Object, e As EventArgs) Handles cmdWikimedia.Click
-
-    ' click to append to the file "c:\tmp\uploadwiki.txt" a line for the pattypan spreadsheet
-    ' for a bulk upload of photos to wikimedia commons
-    ' path, name, description, depicted_place, date, categories
-
-    ' template file: 
-    '=={{int:filedesc}}==
-    '{{Photograph
-    ' |author = [[User:xpda|xpda]] 
-    ' |description = ${description}
-    ' |depicted people = 
-    ' |depicted place = ${depicted_place}
-    ' |date = ${date}
-    ' |references = ${references}
-    ' |credit line = 
-    ' |notes =
-    ' |source = {{own}}
-    ' |other_versions = 
-    '}}
-    '
-    '=={{int:license-header}}==
-    '{{self|cc-by-sa-4.0}}
-    '
-    '<#if categories ? has_content>
-    '<#list categories ? split(";") as category>
-    '[[Category:${category?trim}]]
-    '</#list>
-    '<#else>{{subst:unc}}
-    '</#if>
-
-    Dim s, s1 As String
-    Dim match As New bugMain.taxrec
-    Dim matches As New List(Of taxrec)
-    Dim ancestor As New List(Of taxrec)
-
-    Me.Cursor = Cursors.WaitCursor
-
-    matches = getTaxrecByID("g2427091")
-
-    s = picpath ' path
-    s &= vbTab & txTaxon.Text & " " & Path.GetFileNameWithoutExtension(picpath) ' name
-
-    ' description
-    s1 = "''" & txTaxon.Text & "'', " & txCommon.Text
-    If txRemarks.Text <> "" Then s1 &= ", " & txRemarks.Text
-    If txSize.Text <> "" Then s1 &= ", Size: " & txSize.Text
-    If txConfidence.Text <> "40" And txConfidence.Text <> "0" Then s1 &= ", ID Confidence: " & txConfidence.Text
-    's &= vbTab & """" & s1 & """"
-    s &= vbTab & s1
-
-    s1 = txLocation.Text
-    If txCounty.Text <> "" Then
-      If s1 <> "" Then s1 &= ", "
-      s1 &= txCounty.Text & " County"
-    End If
-    If txState.Text <> "" Then
-      If s1 <> "" Then s1 &= ", "
-      s1 &= txState.Text
-    End If
-    If txCountry.Text <> "" Then
-      If s1 <> "" Then s1 &= ", "
-      s1 &= txCountry.Text
-    End If
-    If txGPS.Text <> "" Then
-      If s1 <> "" Then s1 &= ", "
-      s1 &= txGPS.Text
-    End If
-    If txElevation.Text <> "" Then
-      If s1 <> "" Then s1 &= ", "
-      s1 &= "Elevation: " & txElevation.Text
-    End If
-
-    s &= vbTab & s1 ' depicted_place
-
-    s &= vbTab & Format(CDate(txDate.Text), "yyyy-MM-dd") ' date
-    If IsNumeric(txBugguide.Text) AndAlso txBugguide.Text <> "0" Then
-      s &= vbTab & "[https://bugguide.net/node/view/" & txBugguide.Text & " bugguide.net]"
-    Else
-      s &= vbTab & ""
-    End If
-
-    matches = TaxonSearch(txTaxon.Text, False)
-    If matches.Count > 0 Then match = matches(0) ' should only be one
-
-    'ancestor.Clear()
-    'ancestor.Add(match)
-    'getancestors(ancestor, True, "arthropoda")  ' retrieve ancestors of ancestor(0). true = exclude "no taxons"
-    s1 = txTaxon.Text
-    ' wikimedia calls this overcategorization
-    'For Each taxi As taxrec In ancestor
-    '  If LCase(taxi.rank) = "family" Then s1 &= "; " & taxi.taxon
-    '  If LCase(taxi.rank) = "class" Then s1 &= "; " & taxi.taxon
-    '  If LCase(taxi.rank) = "order" Then s1 &= "; " & taxi.taxon
-    'Next taxi
-    's1 &= "; Arthropoda; Entomology"
-
-    If LCase(txCounty.Text) = "mayes" And LCase(txState.Text) = "ok" Then s1 &= "; Bugs of Mayes County, Oklahoma"
-
-    s &= vbTab & s1 ' category
-    s &= vbCrLf
-
-    File.AppendAllText("c:\tmp\uploadwiki.txt", s)
-
-    Me.Cursor = Cursors.Default
-
-  End Sub
-
 End Class
+
+
+
 
 
 
@@ -2448,7 +2221,7 @@ Public Class cWebClient
 
       With DirectCast(R, HttpWebRequest)
         .CookieContainer = cc
-        If Not lastPage Is Nothing Then
+        If lastPage IsNot Nothing Then
           .Referer = lastPage
         End If
       End With

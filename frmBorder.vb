@@ -15,7 +15,6 @@ Public Class frmBorder
 
   Dim gPath As GraphicsPath
 
-  Dim imageReduced As Boolean
   Dim xreduced As Double
   Dim qImage0 As Bitmap ' this is the source shown in pview1
 
@@ -104,18 +103,16 @@ Public Class frmBorder
 
     ' if it's too big, reduce the size and assign that.
     If qImage.Width * qImage.Height > bigMegapix / 4 Then
-      imageReduced = True
       xreduced = getSmallerImage(qImage, aView.pView1, True)
       qImage0 = aView.pView1.Bitmap.Clone
     Else
-      imageReduced = False
       aView.pView1.setBitmap(qImage)
       xreduced = 1
       qImage0 = qImage.Clone
     End If
 
     z = Min(aView.pView1.ClientSize.Width / qImage0.Width, aView.pView1.ClientSize.Height / qImage0.Height)
-    z = z * 0.8
+    z *= 0.8
     aView.ZoomViews(z)
 
     Sliding = False

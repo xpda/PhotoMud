@@ -5,7 +5,6 @@
 Imports System.IO
 Imports System.ServiceModel
 Imports System.ServiceModel.Description
-Imports vb = Microsoft.VisualBasic
 
 Public Class PicLoadService : Implements IPhotoMudPicLoad
 

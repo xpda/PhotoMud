@@ -114,12 +114,11 @@ Public Class frmConvert
     Dim namePrefix As String
     Dim overWriteList As List(Of String)
 
-    Dim s As String = ""
+    Dim s As String
     Dim commonPath As String = ""
     Dim success As Boolean
 
-    Dim msg As String = ""
-    Dim overwriteFlag As String = ""
+    Dim overwriteFlag As String
 
     Dim pView As New pViewer ' for convertfile
     Dim v(5) As Object
@@ -303,10 +302,10 @@ Public Class frmConvert
 
     Dim tSize As SizeF
     Dim textFmt As StringFormat
-    Dim isize As Integer = 45
+    Dim isize As Integer
     Dim textP As Point
 
-    Dim gBitMap As Bitmap = Nothing
+    Dim gBitMap As Bitmap
     Dim bmpFrames As New List(Of Bitmap)
 
     saver = New ImageSave
@@ -321,7 +320,7 @@ Public Class frmConvert
       Yres = nmYres.Value
     End If
 
-    picinfo = getPicinfo(sourceFile, True)
+    picinfo = getPicinfo(sourceFile)
     If picinfo.hasPages Then
       bmpFrames = readMultiframeBitmap(sourceFile, msg)
       If bmpFrames.Count > 0 Then gBitMap = bmpFrames(0) Else gBitMap = Nothing
@@ -428,7 +427,7 @@ Public Class frmConvert
 
     targetName = Path.GetFileName(sourceFile)
     s = Path.GetDirectoryName(sourceFile)
-    If s.Chars(Len(s) - 1) <> "\" Then s = s & "\"
+    If s.Chars(Len(s) - 1) <> "\" Then s &= "\"
 
     targetName = Path.ChangeExtension(targetName, targetExt)
     If eqstr(Path.GetExtension(sourceFile), ".jpeg") And eqstr(Path.GetExtension(targetName), ".jpg") Then
@@ -468,7 +467,7 @@ Public Class frmConvert
     nix = -1
     For i = 0 To fmtCommon.Count - 1
       If fmtCommon(i).isWritable Then
-        nix = nix + 1
+        nix += 1
         ixFmt(nix) = i
         cmbFiletype.Items.Insert(nix, fmtCommon(i).Description & " (" & fmtCommon(i).Ext & ")")
         If cmbFiletype.SelectedIndex < 0 Then

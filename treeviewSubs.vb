@@ -2,7 +2,6 @@
 'https://creativecommons.org/licenses/by-nc-sa/4.0/
 
 Imports System.IO
-Imports vb = Microsoft.VisualBasic
 
 Module treeviewSubs
 
@@ -49,7 +48,7 @@ Module treeviewSubs
       If String.Compare(d.Name, "a:\", True) <> 0 OrElse d.DriveType <> DriveType.Removable Then
         If d.IsReady Then
           s = d.VolumeLabel & " (" & d.Name
-          If vb.Right(s, 1) = "\" Then Mid(s, Len(s), 1) = ")" Else s = s & ")"
+          If s.EndsWith("\") Then Mid(s, Len(s), 1) = ")" Else s &= ")"
           tNode = treeView.Nodes.Add(s)
           tNode.Tag = Path.GetFullPath(d.Name)
           tNode.ImageIndex = 0
@@ -105,7 +104,7 @@ Module treeviewSubs
     Catch ex As System.IO.IOException
     End Try
 
-    If getDriveNode Is Nothing And vb.Left(fPath, 2) = "\\" Then ' add network drive
+    If getDriveNode Is Nothing And fPath.Substring(0, 2) = "\\" Then ' add network drive
       s = Path.GetPathRoot(fPath)
       tNode = treeView.Nodes.Add(s)
       tNode.Tag = Path.GetFullPath(s)
@@ -298,7 +297,7 @@ Module treeviewSubs
 
     If srchNode IsNot Nothing Then
       For Each nd In srchNode.Nodes
-        If eqstr(nd.Tag, vb.Left(fPath, Len(nd.Tag))) Then ' found the node
+        If eqstr(nd.Tag, fPath.Substring(0, Len(nd.Tag))) Then ' found the node
           If (Len(nd.Tag) < Len(fPath)) Then
             TreeViewfind = TreeViewfind(treeView, fPath, nd) ' recursive
           Else

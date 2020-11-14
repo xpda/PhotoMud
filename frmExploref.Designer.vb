@@ -249,6 +249,7 @@
     Me.mnxViewStyle = New System.Windows.Forms.ContextMenuStrip(Me.components)
     Me.mnxVThumbnails = New System.Windows.Forms.ToolStripMenuItem()
     Me.mnxVDetails = New System.Windows.Forms.ToolStripMenuItem()
+    Me.bkgThumb2 = New System.ComponentModel.BackgroundWorker()
     Me.mnu.SuspendLayout()
     Me.mnxToolStrip.SuspendLayout()
     Me.mnxListView.SuspendLayout()
@@ -272,35 +273,35 @@
     Me.mnu.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuFile, Me.mnuEdit, Me.mnuView, Me.mnuTools, Me.mnuWindow, Me.mnuHelp})
     Me.mnu.Location = New System.Drawing.Point(0, 0)
     Me.mnu.Name = "mnu"
-    Me.mnu.Size = New System.Drawing.Size(977, 28)
+    Me.mnu.Size = New System.Drawing.Size(977, 26)
     Me.mnu.TabIndex = 8
     '
     'mnuFile
     '
     Me.mnuFile.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuFileOpen, Me.mnuFileOpenCurrent, Me.mnuFileSaveAs, Me.mnuFileNew, Me.fileline3, Me.mnuFileAcquire, Me.mnufileline12, Me.mnuFilePrint, Me.mnuFilePrintTagged, Me.fileline1, Me.mnuFileSend, Me.mnuFileSendTagged, Me.mnuFileLine4, Me.mnuFileCopy, Me.mnuFileConvert, Me.fileline5, Me.mnufileedit, Me.mnuFileCloseAll, Me.fileline2, Me.mnuFileExit, Me.ToolStripSeparator1, Me.mnuFileMru1, Me.mnuFileMru2, Me.mnuFileMru3, Me.mnuFileMru4, Me.mnuFileMru5, Me.mnuFileMru6, Me.mnuFileMru7, Me.mnuFileMru8, Me.mnuFileMru9, Me.mnuLine4})
     Me.mnuFile.Name = "mnuFile"
-    Me.mnuFile.Size = New System.Drawing.Size(40, 24)
+    Me.mnuFile.Size = New System.Drawing.Size(42, 22)
     Me.mnuFile.Text = "&File"
     '
     'mnuFileOpen
     '
     Me.mnuFileOpen.Name = "mnuFileOpen"
     Me.mnuFileOpen.ShortcutKeys = CType((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.O), System.Windows.Forms.Keys)
-    Me.mnuFileOpen.Size = New System.Drawing.Size(252, 26)
+    Me.mnuFileOpen.Size = New System.Drawing.Size(260, 26)
     Me.mnuFileOpen.Text = "&Open..."
     Me.mnuFileOpen.ToolTipText = "Open a file in Photo Mud Editor."
     '
     'mnuFileOpenCurrent
     '
     Me.mnuFileOpenCurrent.Name = "mnuFileOpenCurrent"
-    Me.mnuFileOpenCurrent.Size = New System.Drawing.Size(252, 26)
+    Me.mnuFileOpenCurrent.Size = New System.Drawing.Size(260, 26)
     Me.mnuFileOpenCurrent.Text = "Edit Se&lected File(s)"
     Me.mnuFileOpenCurrent.ToolTipText = "Edit the selected file(s) in Photo Mud Editor."
     '
     'mnuFileSaveAs
     '
     Me.mnuFileSaveAs.Name = "mnuFileSaveAs"
-    Me.mnuFileSaveAs.Size = New System.Drawing.Size(252, 26)
+    Me.mnuFileSaveAs.Size = New System.Drawing.Size(260, 26)
     Me.mnuFileSaveAs.Text = "Save &As..."
     Me.mnuFileSaveAs.ToolTipText = "Save the selected photo to a specified file."
     '
@@ -308,122 +309,122 @@
     '
     Me.mnuFileNew.Name = "mnuFileNew"
     Me.mnuFileNew.ShortcutKeys = CType((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.N), System.Windows.Forms.Keys)
-    Me.mnuFileNew.Size = New System.Drawing.Size(252, 26)
+    Me.mnuFileNew.Size = New System.Drawing.Size(260, 26)
     Me.mnuFileNew.Text = "&New..."
     Me.mnuFileNew.ToolTipText = "Create a new image in Photo Mud Editor."
     '
     'fileline3
     '
     Me.fileline3.Name = "fileline3"
-    Me.fileline3.Size = New System.Drawing.Size(249, 6)
+    Me.fileline3.Size = New System.Drawing.Size(257, 6)
     '
     'mnuFileAcquire
     '
     Me.mnuFileAcquire.Name = "mnuFileAcquire"
-    Me.mnuFileAcquire.Size = New System.Drawing.Size(252, 26)
+    Me.mnuFileAcquire.Size = New System.Drawing.Size(260, 26)
     Me.mnuFileAcquire.Text = "Scan..."
     Me.mnuFileAcquire.ToolTipText = "Scan a photo or document and load it into Photo Mud Editor."
     '
     'mnufileline12
     '
     Me.mnufileline12.Name = "mnufileline12"
-    Me.mnufileline12.Size = New System.Drawing.Size(249, 6)
+    Me.mnufileline12.Size = New System.Drawing.Size(257, 6)
     '
     'mnuFilePrint
     '
     Me.mnuFilePrint.Name = "mnuFilePrint"
     Me.mnuFilePrint.ShortcutKeys = CType((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.P), System.Windows.Forms.Keys)
-    Me.mnuFilePrint.Size = New System.Drawing.Size(252, 26)
+    Me.mnuFilePrint.Size = New System.Drawing.Size(260, 26)
     Me.mnuFilePrint.Text = "&Print..."
     Me.mnuFilePrint.ToolTipText = "Print the selected photo(s)."
     '
     'mnuFilePrintTagged
     '
     Me.mnuFilePrintTagged.Name = "mnuFilePrintTagged"
-    Me.mnuFilePrintTagged.Size = New System.Drawing.Size(252, 26)
+    Me.mnuFilePrintTagged.Size = New System.Drawing.Size(260, 26)
     Me.mnuFilePrintTagged.Text = "Print &Tagged Photos..."
     Me.mnuFilePrintTagged.ToolTipText = "Print the tagged photos."
     '
     'fileline1
     '
     Me.fileline1.Name = "fileline1"
-    Me.fileline1.Size = New System.Drawing.Size(249, 6)
+    Me.fileline1.Size = New System.Drawing.Size(257, 6)
     '
     'mnuFileSend
     '
     Me.mnuFileSend.Name = "mnuFileSend"
-    Me.mnuFileSend.Size = New System.Drawing.Size(252, 26)
+    Me.mnuFileSend.Size = New System.Drawing.Size(260, 26)
     Me.mnuFileSend.Text = "E&mail Photo..."
     Me.mnuFileSend.ToolTipText = "Email the selected photo(s)."
     '
     'mnuFileSendTagged
     '
     Me.mnuFileSendTagged.Name = "mnuFileSendTagged"
-    Me.mnuFileSendTagged.Size = New System.Drawing.Size(252, 26)
+    Me.mnuFileSendTagged.Size = New System.Drawing.Size(260, 26)
     Me.mnuFileSendTagged.Text = "&Email Tagged Photos..."
     Me.mnuFileSendTagged.ToolTipText = "Email the tagged photos."
     '
     'mnuFileLine4
     '
     Me.mnuFileLine4.Name = "mnuFileLine4"
-    Me.mnuFileLine4.Size = New System.Drawing.Size(249, 6)
+    Me.mnuFileLine4.Size = New System.Drawing.Size(257, 6)
     '
     'mnuFileCopy
     '
     Me.mnuFileCopy.Name = "mnuFileCopy"
-    Me.mnuFileCopy.Size = New System.Drawing.Size(252, 26)
+    Me.mnuFileCopy.Size = New System.Drawing.Size(260, 26)
     Me.mnuFileCopy.Text = "Copy &File to Disk..."
     Me.mnuFileCopy.ToolTipText = "Copy the selected file to another location on the hard drive."
     '
     'mnuFileConvert
     '
     Me.mnuFileConvert.Name = "mnuFileConvert"
-    Me.mnuFileConvert.Size = New System.Drawing.Size(252, 26)
+    Me.mnuFileConvert.Size = New System.Drawing.Size(260, 26)
     Me.mnuFileConvert.Text = "Con&vert Tagged Photos..."
     Me.mnuFileConvert.ToolTipText = "Convert photos from one format to another, optionally resizing them."
     '
     'fileline5
     '
     Me.fileline5.Name = "fileline5"
-    Me.fileline5.Size = New System.Drawing.Size(249, 6)
+    Me.fileline5.Size = New System.Drawing.Size(257, 6)
     '
     'mnufileedit
     '
     Me.mnufileedit.Name = "mnufileedit"
     Me.mnufileedit.ShortcutKeys = System.Windows.Forms.Keys.F6
-    Me.mnufileedit.Size = New System.Drawing.Size(252, 26)
+    Me.mnufileedit.Size = New System.Drawing.Size(260, 26)
     Me.mnufileedit.Text = "Photo Mud E&ditor"
     Me.mnufileedit.ToolTipText = "Show Photo Mud Editor."
     '
     'mnuFileCloseAll
     '
     Me.mnuFileCloseAll.Name = "mnuFileCloseAll"
-    Me.mnuFileCloseAll.Size = New System.Drawing.Size(252, 26)
+    Me.mnuFileCloseAll.Size = New System.Drawing.Size(260, 26)
     Me.mnuFileCloseAll.Text = "C&lose All"
     '
     'fileline2
     '
     Me.fileline2.Name = "fileline2"
-    Me.fileline2.Size = New System.Drawing.Size(249, 6)
+    Me.fileline2.Size = New System.Drawing.Size(257, 6)
     '
     'mnuFileExit
     '
     Me.mnuFileExit.Name = "mnuFileExit"
-    Me.mnuFileExit.Size = New System.Drawing.Size(252, 26)
+    Me.mnuFileExit.Size = New System.Drawing.Size(260, 26)
     Me.mnuFileExit.Text = "E&xit"
     Me.mnuFileExit.ToolTipText = "Exit the program."
     '
     'ToolStripSeparator1
     '
     Me.ToolStripSeparator1.Name = "ToolStripSeparator1"
-    Me.ToolStripSeparator1.Size = New System.Drawing.Size(249, 6)
+    Me.ToolStripSeparator1.Size = New System.Drawing.Size(257, 6)
     '
     'mnuFileMru1
     '
     Me.mnuFileMru1.MergeAction = System.Windows.Forms.MergeAction.Insert
     Me.mnuFileMru1.MergeIndex = 151
     Me.mnuFileMru1.Name = "mnuFileMru1"
-    Me.mnuFileMru1.Size = New System.Drawing.Size(252, 26)
+    Me.mnuFileMru1.Size = New System.Drawing.Size(260, 26)
     Me.mnuFileMru1.Text = "1"
     Me.mnuFileMru1.Visible = False
     '
@@ -432,7 +433,7 @@
     Me.mnuFileMru2.MergeAction = System.Windows.Forms.MergeAction.Insert
     Me.mnuFileMru2.MergeIndex = 152
     Me.mnuFileMru2.Name = "mnuFileMru2"
-    Me.mnuFileMru2.Size = New System.Drawing.Size(252, 26)
+    Me.mnuFileMru2.Size = New System.Drawing.Size(260, 26)
     Me.mnuFileMru2.Text = "2"
     Me.mnuFileMru2.Visible = False
     '
@@ -441,7 +442,7 @@
     Me.mnuFileMru3.MergeAction = System.Windows.Forms.MergeAction.Insert
     Me.mnuFileMru3.MergeIndex = 153
     Me.mnuFileMru3.Name = "mnuFileMru3"
-    Me.mnuFileMru3.Size = New System.Drawing.Size(252, 26)
+    Me.mnuFileMru3.Size = New System.Drawing.Size(260, 26)
     Me.mnuFileMru3.Text = "3"
     Me.mnuFileMru3.Visible = False
     '
@@ -450,7 +451,7 @@
     Me.mnuFileMru4.MergeAction = System.Windows.Forms.MergeAction.Insert
     Me.mnuFileMru4.MergeIndex = 154
     Me.mnuFileMru4.Name = "mnuFileMru4"
-    Me.mnuFileMru4.Size = New System.Drawing.Size(252, 26)
+    Me.mnuFileMru4.Size = New System.Drawing.Size(260, 26)
     Me.mnuFileMru4.Text = "4"
     Me.mnuFileMru4.Visible = False
     '
@@ -459,7 +460,7 @@
     Me.mnuFileMru5.MergeAction = System.Windows.Forms.MergeAction.Insert
     Me.mnuFileMru5.MergeIndex = 155
     Me.mnuFileMru5.Name = "mnuFileMru5"
-    Me.mnuFileMru5.Size = New System.Drawing.Size(252, 26)
+    Me.mnuFileMru5.Size = New System.Drawing.Size(260, 26)
     Me.mnuFileMru5.Text = "5"
     Me.mnuFileMru5.Visible = False
     '
@@ -468,7 +469,7 @@
     Me.mnuFileMru6.MergeAction = System.Windows.Forms.MergeAction.Insert
     Me.mnuFileMru6.MergeIndex = 156
     Me.mnuFileMru6.Name = "mnuFileMru6"
-    Me.mnuFileMru6.Size = New System.Drawing.Size(252, 26)
+    Me.mnuFileMru6.Size = New System.Drawing.Size(260, 26)
     Me.mnuFileMru6.Text = "6"
     Me.mnuFileMru6.Visible = False
     '
@@ -477,7 +478,7 @@
     Me.mnuFileMru7.MergeAction = System.Windows.Forms.MergeAction.Insert
     Me.mnuFileMru7.MergeIndex = 157
     Me.mnuFileMru7.Name = "mnuFileMru7"
-    Me.mnuFileMru7.Size = New System.Drawing.Size(252, 26)
+    Me.mnuFileMru7.Size = New System.Drawing.Size(260, 26)
     Me.mnuFileMru7.Text = "7"
     Me.mnuFileMru7.Visible = False
     '
@@ -486,7 +487,7 @@
     Me.mnuFileMru8.MergeAction = System.Windows.Forms.MergeAction.Insert
     Me.mnuFileMru8.MergeIndex = 158
     Me.mnuFileMru8.Name = "mnuFileMru8"
-    Me.mnuFileMru8.Size = New System.Drawing.Size(252, 26)
+    Me.mnuFileMru8.Size = New System.Drawing.Size(260, 26)
     Me.mnuFileMru8.Text = "8"
     Me.mnuFileMru8.Visible = False
     '
@@ -495,41 +496,41 @@
     Me.mnuFileMru9.MergeAction = System.Windows.Forms.MergeAction.Insert
     Me.mnuFileMru9.MergeIndex = 159
     Me.mnuFileMru9.Name = "mnuFileMru9"
-    Me.mnuFileMru9.Size = New System.Drawing.Size(252, 26)
+    Me.mnuFileMru9.Size = New System.Drawing.Size(260, 26)
     Me.mnuFileMru9.Text = "9"
     Me.mnuFileMru9.Visible = False
     '
     'mnuLine4
     '
     Me.mnuLine4.Name = "mnuLine4"
-    Me.mnuLine4.Size = New System.Drawing.Size(249, 6)
+    Me.mnuLine4.Size = New System.Drawing.Size(257, 6)
     '
     'mnuEdit
     '
     Me.mnuEdit.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuEditCopyFile, Me.mnuEditCopyImage, Me.mnuEditCopyfilename, Me.mnuEditPaste, Me.mnuEditPasteNew, Me.editline7, Me.mnuEditDelete, Me.mnuEditRename, Me.editline3, Me.mnuEditRotateLeft, Me.mnuEditRotateRight, Me.mnuEditLine1, Me.mnuEditTagselectedfiles, Me.mnuEditSelecttagged, Me.mnuEditCleartags, Me.mnuEditTagDirMatches, Me.mnuEditTagPrevious, Me.editline2, Me.mnuEditSelectall})
     Me.mnuEdit.Name = "mnuEdit"
-    Me.mnuEdit.Size = New System.Drawing.Size(43, 24)
+    Me.mnuEdit.Size = New System.Drawing.Size(45, 22)
     Me.mnuEdit.Text = "&Edit"
     '
     'mnuEditCopyFile
     '
     Me.mnuEditCopyFile.Name = "mnuEditCopyFile"
     Me.mnuEditCopyFile.ShortcutKeys = CType((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.C), System.Windows.Forms.Keys)
-    Me.mnuEditCopyFile.Size = New System.Drawing.Size(323, 26)
+    Me.mnuEditCopyFile.Size = New System.Drawing.Size(331, 26)
     Me.mnuEditCopyFile.Text = "&Copy File to Clipboard"
     Me.mnuEditCopyFile.ToolTipText = "Copy the selected file to the Windows Clipboard."
     '
     'mnuEditCopyImage
     '
     Me.mnuEditCopyImage.Name = "mnuEditCopyImage"
-    Me.mnuEditCopyImage.Size = New System.Drawing.Size(323, 26)
+    Me.mnuEditCopyImage.Size = New System.Drawing.Size(331, 26)
     Me.mnuEditCopyImage.Text = "Copy &Image  to Clipboard"
     Me.mnuEditCopyImage.ToolTipText = "Copy the selected file's image or picture to the Windows Clipboard."
     '
     'mnuEditCopyfilename
     '
     Me.mnuEditCopyfilename.Name = "mnuEditCopyfilename"
-    Me.mnuEditCopyfilename.Size = New System.Drawing.Size(323, 26)
+    Me.mnuEditCopyfilename.Size = New System.Drawing.Size(331, 26)
     Me.mnuEditCopyfilename.Text = "Copy File &Name to Clipboard"
     Me.mnuEditCopyfilename.ToolTipText = "Copy the selected file's name to the Window Clipboard."
     '
@@ -537,7 +538,7 @@
     '
     Me.mnuEditPaste.Name = "mnuEditPaste"
     Me.mnuEditPaste.ShortcutKeys = CType((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.V), System.Windows.Forms.Keys)
-    Me.mnuEditPaste.Size = New System.Drawing.Size(323, 26)
+    Me.mnuEditPaste.Size = New System.Drawing.Size(331, 26)
     Me.mnuEditPaste.Text = "&Paste File"
     Me.mnuEditPaste.ToolTipText = "Paste the file in the clipboard to the currently selected folder."
     '
@@ -545,19 +546,19 @@
     '
     Me.mnuEditPasteNew.Name = "mnuEditPasteNew"
     Me.mnuEditPasteNew.ShortcutKeys = CType((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.Q), System.Windows.Forms.Keys)
-    Me.mnuEditPasteNew.Size = New System.Drawing.Size(323, 26)
+    Me.mnuEditPasteNew.Size = New System.Drawing.Size(331, 26)
     Me.mnuEditPasteNew.Text = "Paste Image to New &Window"
     Me.mnuEditPasteNew.ToolTipText = "Paste the image in the clipboard into a new Photo Mud Editor window."
     '
     'editline7
     '
     Me.editline7.Name = "editline7"
-    Me.editline7.Size = New System.Drawing.Size(320, 6)
+    Me.editline7.Size = New System.Drawing.Size(328, 6)
     '
     'mnuEditDelete
     '
     Me.mnuEditDelete.Name = "mnuEditDelete"
-    Me.mnuEditDelete.Size = New System.Drawing.Size(323, 26)
+    Me.mnuEditDelete.Size = New System.Drawing.Size(331, 26)
     Me.mnuEditDelete.Text = "&Delete File"
     Me.mnuEditDelete.ToolTipText = "Delete the currently selected file(s) from the hard drive."
     '
@@ -565,20 +566,20 @@
     '
     Me.mnuEditRename.Name = "mnuEditRename"
     Me.mnuEditRename.ShortcutKeys = System.Windows.Forms.Keys.F2
-    Me.mnuEditRename.Size = New System.Drawing.Size(323, 26)
+    Me.mnuEditRename.Size = New System.Drawing.Size(331, 26)
     Me.mnuEditRename.Text = "&Rename File"
     Me.mnuEditRename.ToolTipText = "Rename the selected file."
     '
     'editline3
     '
     Me.editline3.Name = "editline3"
-    Me.editline3.Size = New System.Drawing.Size(320, 6)
+    Me.editline3.Size = New System.Drawing.Size(328, 6)
     '
     'mnuEditRotateLeft
     '
     Me.mnuEditRotateLeft.Name = "mnuEditRotateLeft"
     Me.mnuEditRotateLeft.ShortcutKeys = CType((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.L), System.Windows.Forms.Keys)
-    Me.mnuEditRotateLeft.Size = New System.Drawing.Size(323, 26)
+    Me.mnuEditRotateLeft.Size = New System.Drawing.Size(331, 26)
     Me.mnuEditRotateLeft.Text = "Rotate &Left"
     Me.mnuEditRotateLeft.ToolTipText = "Rotate the selected photo 90° to the left."
     '
@@ -586,60 +587,60 @@
     '
     Me.mnuEditRotateRight.Name = "mnuEditRotateRight"
     Me.mnuEditRotateRight.ShortcutKeys = CType((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.R), System.Windows.Forms.Keys)
-    Me.mnuEditRotateRight.Size = New System.Drawing.Size(323, 26)
+    Me.mnuEditRotateRight.Size = New System.Drawing.Size(331, 26)
     Me.mnuEditRotateRight.Text = "Rotate &Right"
     Me.mnuEditRotateRight.ToolTipText = "Rotate the selected photo 90° to the right."
     '
     'mnuEditLine1
     '
     Me.mnuEditLine1.Name = "mnuEditLine1"
-    Me.mnuEditLine1.Size = New System.Drawing.Size(320, 6)
+    Me.mnuEditLine1.Size = New System.Drawing.Size(328, 6)
     '
     'mnuEditTagselectedfiles
     '
     Me.mnuEditTagselectedfiles.Name = "mnuEditTagselectedfiles"
     Me.mnuEditTagselectedfiles.ShortcutKeys = CType((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.T), System.Windows.Forms.Keys)
-    Me.mnuEditTagselectedfiles.Size = New System.Drawing.Size(323, 26)
+    Me.mnuEditTagselectedfiles.Size = New System.Drawing.Size(331, 26)
     Me.mnuEditTagselectedfiles.Text = "&Tag Selected Photos"
     Me.mnuEditTagselectedfiles.ToolTipText = "Tag all selected files in the current folder."
     '
     'mnuEditSelecttagged
     '
     Me.mnuEditSelecttagged.Name = "mnuEditSelecttagged"
-    Me.mnuEditSelecttagged.Size = New System.Drawing.Size(323, 26)
+    Me.mnuEditSelecttagged.Size = New System.Drawing.Size(331, 26)
     Me.mnuEditSelecttagged.Text = "&Select Tagged Photos"
     Me.mnuEditSelecttagged.ToolTipText = "Select all tagged files in the current folder."
     '
     'mnuEditCleartags
     '
     Me.mnuEditCleartags.Name = "mnuEditCleartags"
-    Me.mnuEditCleartags.Size = New System.Drawing.Size(323, 26)
+    Me.mnuEditCleartags.Size = New System.Drawing.Size(331, 26)
     Me.mnuEditCleartags.Text = "C&lear All Tags"
     Me.mnuEditCleartags.ToolTipText = "Clear all tagged files."
     '
     'mnuEditTagDirMatches
     '
     Me.mnuEditTagDirMatches.Name = "mnuEditTagDirMatches"
-    Me.mnuEditTagDirMatches.Size = New System.Drawing.Size(323, 26)
+    Me.mnuEditTagDirMatches.Size = New System.Drawing.Size(331, 26)
     Me.mnuEditTagDirMatches.Text = "Tag &Matching Photos"
     '
     'mnuEditTagPrevious
     '
     Me.mnuEditTagPrevious.Name = "mnuEditTagPrevious"
-    Me.mnuEditTagPrevious.Size = New System.Drawing.Size(323, 26)
+    Me.mnuEditTagPrevious.Size = New System.Drawing.Size(331, 26)
     Me.mnuEditTagPrevious.Text = "Set Previous Ta&gs"
     Me.mnuEditTagPrevious.ToolTipText = "Tag the files that were tagged before the previous operation."
     '
     'editline2
     '
     Me.editline2.Name = "editline2"
-    Me.editline2.Size = New System.Drawing.Size(320, 6)
+    Me.editline2.Size = New System.Drawing.Size(328, 6)
     '
     'mnuEditSelectall
     '
     Me.mnuEditSelectall.Name = "mnuEditSelectall"
     Me.mnuEditSelectall.ShortcutKeys = CType((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.A), System.Windows.Forms.Keys)
-    Me.mnuEditSelectall.Size = New System.Drawing.Size(323, 26)
+    Me.mnuEditSelectall.Size = New System.Drawing.Size(331, 26)
     Me.mnuEditSelectall.Text = "Select &All"
     Me.mnuEditSelectall.ToolTipText = "Select all files in the current folder."
     '
@@ -647,40 +648,40 @@
     '
     Me.mnuView.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuUpOneLevel, Me.mnuViewPrevious, Me.mnuViewNext, Me.mnuviewline3, Me.mnuViewFullscreen, Me.mnuViewToolbar, Me.mnuViewRefresh, Me.viewline1, Me.mnuViewStyleThumbnails, Me.mnuViewStyleDetails})
     Me.mnuView.Name = "mnuView"
-    Me.mnuView.Size = New System.Drawing.Size(49, 24)
+    Me.mnuView.Size = New System.Drawing.Size(51, 22)
     Me.mnuView.Text = "&View"
     '
     'mnuUpOneLevel
     '
     Me.mnuUpOneLevel.Name = "mnuUpOneLevel"
-    Me.mnuUpOneLevel.Size = New System.Drawing.Size(203, 26)
+    Me.mnuUpOneLevel.Size = New System.Drawing.Size(211, 26)
     Me.mnuUpOneLevel.Text = "&Up One Level"
     Me.mnuUpOneLevel.ToolTipText = "Move up to the next higher folder, the parent folder of the current folder."
     '
     'mnuViewPrevious
     '
     Me.mnuViewPrevious.Name = "mnuViewPrevious"
-    Me.mnuViewPrevious.Size = New System.Drawing.Size(203, 26)
+    Me.mnuViewPrevious.Size = New System.Drawing.Size(211, 26)
     Me.mnuViewPrevious.Text = "&Previous Folder"
     Me.mnuViewPrevious.ToolTipText = "Move to the previous folder."
     '
     'mnuViewNext
     '
     Me.mnuViewNext.Name = "mnuViewNext"
-    Me.mnuViewNext.Size = New System.Drawing.Size(203, 26)
+    Me.mnuViewNext.Size = New System.Drawing.Size(211, 26)
     Me.mnuViewNext.Text = "Ne&xt Folder"
     Me.mnuViewNext.ToolTipText = "Move to the next folder (after a move to the previous folder)."
     '
     'mnuviewline3
     '
     Me.mnuviewline3.Name = "mnuviewline3"
-    Me.mnuviewline3.Size = New System.Drawing.Size(200, 6)
+    Me.mnuviewline3.Size = New System.Drawing.Size(208, 6)
     '
     'mnuViewFullscreen
     '
     Me.mnuViewFullscreen.Name = "mnuViewFullscreen"
     Me.mnuViewFullscreen.ShortcutKeys = CType((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.M), System.Windows.Forms.Keys)
-    Me.mnuViewFullscreen.Size = New System.Drawing.Size(203, 26)
+    Me.mnuViewFullscreen.Size = New System.Drawing.Size(211, 26)
     Me.mnuViewFullscreen.Text = "&Full Screen"
     Me.mnuViewFullscreen.ToolTipText = "View the selected photo on the full screen."
     '
@@ -689,7 +690,7 @@
     Me.mnuViewToolbar.Checked = True
     Me.mnuViewToolbar.CheckState = System.Windows.Forms.CheckState.Checked
     Me.mnuViewToolbar.Name = "mnuViewToolbar"
-    Me.mnuViewToolbar.Size = New System.Drawing.Size(203, 26)
+    Me.mnuViewToolbar.Size = New System.Drawing.Size(211, 26)
     Me.mnuViewToolbar.Text = "&Show Toolbar"
     Me.mnuViewToolbar.ToolTipText = "Show or hide the toolbar."
     '
@@ -697,28 +698,28 @@
     '
     Me.mnuViewRefresh.Name = "mnuViewRefresh"
     Me.mnuViewRefresh.ShortcutKeys = System.Windows.Forms.Keys.F5
-    Me.mnuViewRefresh.Size = New System.Drawing.Size(203, 26)
+    Me.mnuViewRefresh.Size = New System.Drawing.Size(211, 26)
     Me.mnuViewRefresh.Text = "&Refresh"
     Me.mnuViewRefresh.ToolTipText = "Refresh the screen."
     '
     'viewline1
     '
     Me.viewline1.Name = "viewline1"
-    Me.viewline1.Size = New System.Drawing.Size(200, 6)
+    Me.viewline1.Size = New System.Drawing.Size(208, 6)
     '
     'mnuViewStyleThumbnails
     '
     Me.mnuViewStyleThumbnails.Checked = True
     Me.mnuViewStyleThumbnails.CheckState = System.Windows.Forms.CheckState.Checked
     Me.mnuViewStyleThumbnails.Name = "mnuViewStyleThumbnails"
-    Me.mnuViewStyleThumbnails.Size = New System.Drawing.Size(203, 26)
+    Me.mnuViewStyleThumbnails.Size = New System.Drawing.Size(211, 26)
     Me.mnuViewStyleThumbnails.Text = "View &Thumbnails"
     Me.mnuViewStyleThumbnails.ToolTipText = "Select the Thumbnails view style."
     '
     'mnuViewStyleDetails
     '
     Me.mnuViewStyleDetails.Name = "mnuViewStyleDetails"
-    Me.mnuViewStyleDetails.Size = New System.Drawing.Size(203, 26)
+    Me.mnuViewStyleDetails.Size = New System.Drawing.Size(211, 26)
     Me.mnuViewStyleDetails.Text = "View &Details"
     Me.mnuViewStyleDetails.ToolTipText = "Select the Details view style."
     '
@@ -726,161 +727,161 @@
     '
     Me.mnuTools.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuToolsInfo, Me.mnuToolsComment, Me.mnuToolsBatchInfoCopy, Me.mnuToolsBugseparator, Me.mnuToolsBugPhotos, Me.mnuToolsLinkBugPhotos, Me.mnuToolsBugQuery, Me.mnuToolsExportFilenames, Me.toolsline1, Me.mnuToolsWebpage, Me.mnuToolsWallpaper, Me.mnuToolsSlideshow, Me.mnuToolsMergeColor, Me.toolsline9, Me.mnuToolsSearch, Me.mnuToolsPicSearch, Me.toolsline2, Me.mnuToolsAssoc, Me.mnuToolsFileFilter, Me.ToolStripSeparator8, Me.mnuToolsCalendar, Me.ToolStripSeparator9, Me.mnuToolsToolbar, Me.mnuToolsOptions})
     Me.mnuTools.Name = "mnuTools"
-    Me.mnuTools.Size = New System.Drawing.Size(55, 24)
+    Me.mnuTools.Size = New System.Drawing.Size(57, 22)
     Me.mnuTools.Text = "&Tools"
     '
     'mnuToolsInfo
     '
     Me.mnuToolsInfo.Name = "mnuToolsInfo"
     Me.mnuToolsInfo.ShortcutKeys = CType((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.I), System.Windows.Forms.Keys)
-    Me.mnuToolsInfo.Size = New System.Drawing.Size(295, 26)
+    Me.mnuToolsInfo.Size = New System.Drawing.Size(303, 26)
     Me.mnuToolsInfo.Text = "Photo &Information..."
     Me.mnuToolsInfo.ToolTipText = "Display information about a photo, including comments and camera settings. "
     '
     'mnuToolsComment
     '
     Me.mnuToolsComment.Name = "mnuToolsComment"
-    Me.mnuToolsComment.Size = New System.Drawing.Size(295, 26)
+    Me.mnuToolsComment.Size = New System.Drawing.Size(303, 26)
     Me.mnuToolsComment.Text = "Enter Photo &Comments..."
     Me.mnuToolsComment.ToolTipText = "Enter photo comments to be saved with the file."
     '
     'mnuToolsBatchInfoCopy
     '
     Me.mnuToolsBatchInfoCopy.Name = "mnuToolsBatchInfoCopy"
-    Me.mnuToolsBatchInfoCopy.Size = New System.Drawing.Size(295, 26)
+    Me.mnuToolsBatchInfoCopy.Size = New System.Drawing.Size(303, 26)
     Me.mnuToolsBatchInfoCopy.Text = "Photo In&formation Batch Copy..."
     '
     'mnuToolsBugseparator
     '
     Me.mnuToolsBugseparator.Name = "mnuToolsBugseparator"
-    Me.mnuToolsBugseparator.Size = New System.Drawing.Size(292, 6)
+    Me.mnuToolsBugseparator.Size = New System.Drawing.Size(300, 6)
     '
     'mnuToolsBugPhotos
     '
     Me.mnuToolsBugPhotos.Name = "mnuToolsBugPhotos"
     Me.mnuToolsBugPhotos.ShortcutKeys = CType((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.G), System.Windows.Forms.Keys)
-    Me.mnuToolsBugPhotos.Size = New System.Drawing.Size(295, 26)
+    Me.mnuToolsBugPhotos.Size = New System.Drawing.Size(303, 26)
     Me.mnuToolsBugPhotos.Text = "&Bug Data Entry"
     '
     'mnuToolsLinkBugPhotos
     '
     Me.mnuToolsLinkBugPhotos.Name = "mnuToolsLinkBugPhotos"
     Me.mnuToolsLinkBugPhotos.ShortcutKeys = System.Windows.Forms.Keys.F4
-    Me.mnuToolsLinkBugPhotos.Size = New System.Drawing.Size(295, 26)
+    Me.mnuToolsLinkBugPhotos.Size = New System.Drawing.Size(303, 26)
     Me.mnuToolsLinkBugPhotos.Text = "Lin&k Tagged Bug Photos"
     '
     'mnuToolsBugQuery
     '
     Me.mnuToolsBugQuery.Name = "mnuToolsBugQuery"
     Me.mnuToolsBugQuery.ShortcutKeys = CType((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.F), System.Windows.Forms.Keys)
-    Me.mnuToolsBugQuery.Size = New System.Drawing.Size(295, 26)
+    Me.mnuToolsBugQuery.Size = New System.Drawing.Size(303, 26)
     Me.mnuToolsBugQuery.Text = "Bug &Query"
     '
     'mnuToolsExportFilenames
     '
     Me.mnuToolsExportFilenames.Name = "mnuToolsExportFilenames"
-    Me.mnuToolsExportFilenames.Size = New System.Drawing.Size(295, 26)
+    Me.mnuToolsExportFilenames.Size = New System.Drawing.Size(303, 26)
     Me.mnuToolsExportFilenames.Text = "E&xport Tagged Filenames"
     '
     'toolsline1
     '
     Me.toolsline1.Name = "toolsline1"
-    Me.toolsline1.Size = New System.Drawing.Size(292, 6)
+    Me.toolsline1.Size = New System.Drawing.Size(300, 6)
     '
     'mnuToolsWebpage
     '
     Me.mnuToolsWebpage.Name = "mnuToolsWebpage"
-    Me.mnuToolsWebpage.Size = New System.Drawing.Size(295, 26)
+    Me.mnuToolsWebpage.Size = New System.Drawing.Size(303, 26)
     Me.mnuToolsWebpage.Text = "Make Thumbnail Web &Page..."
     Me.mnuToolsWebpage.ToolTipText = "Make a web page out of selected or tagged photos."
     '
     'mnuToolsWallpaper
     '
     Me.mnuToolsWallpaper.Name = "mnuToolsWallpaper"
-    Me.mnuToolsWallpaper.Size = New System.Drawing.Size(295, 26)
+    Me.mnuToolsWallpaper.Size = New System.Drawing.Size(303, 26)
     Me.mnuToolsWallpaper.Text = "Set as &Wallpaper"
     Me.mnuToolsWallpaper.ToolTipText = "Set the current photo as Windows Wallpaper."
     '
     'mnuToolsSlideshow
     '
     Me.mnuToolsSlideshow.Name = "mnuToolsSlideshow"
-    Me.mnuToolsSlideshow.Size = New System.Drawing.Size(295, 26)
+    Me.mnuToolsSlideshow.Size = New System.Drawing.Size(303, 26)
     Me.mnuToolsSlideshow.Text = "&Slide Show..."
     Me.mnuToolsSlideshow.ToolTipText = "Show a slide show of selected or tagged photos."
     '
     'mnuToolsMergeColor
     '
     Me.mnuToolsMergeColor.Name = "mnuToolsMergeColor"
-    Me.mnuToolsMergeColor.Size = New System.Drawing.Size(295, 26)
+    Me.mnuToolsMergeColor.Size = New System.Drawing.Size(303, 26)
     Me.mnuToolsMergeColor.Text = "&Merge Color Separations..."
     Me.mnuToolsMergeColor.ToolTipText = "Merge color separations of a photo."
     '
     'toolsline9
     '
     Me.toolsline9.Name = "toolsline9"
-    Me.toolsline9.Size = New System.Drawing.Size(292, 6)
+    Me.toolsline9.Size = New System.Drawing.Size(300, 6)
     '
     'mnuToolsSearch
     '
     Me.mnuToolsSearch.Name = "mnuToolsSearch"
-    Me.mnuToolsSearch.Size = New System.Drawing.Size(295, 26)
+    Me.mnuToolsSearch.Size = New System.Drawing.Size(303, 26)
     Me.mnuToolsSearch.Text = "Search P&hoto Comments..."
     Me.mnuToolsSearch.ToolTipText = "Search Photo comments on the hard drive."
     '
     'mnuToolsPicSearch
     '
     Me.mnuToolsPicSearch.Name = "mnuToolsPicSearch"
-    Me.mnuToolsPicSearch.Size = New System.Drawing.Size(295, 26)
+    Me.mnuToolsPicSearch.Size = New System.Drawing.Size(303, 26)
     Me.mnuToolsPicSearch.Text = "Search for &Duplicates..."
     Me.mnuToolsPicSearch.ToolTipText = "Search for duplicate photos on the hard drive."
     '
     'toolsline2
     '
     Me.toolsline2.Name = "toolsline2"
-    Me.toolsline2.Size = New System.Drawing.Size(292, 6)
+    Me.toolsline2.Size = New System.Drawing.Size(300, 6)
     '
     'mnuToolsAssoc
     '
     Me.mnuToolsAssoc.Name = "mnuToolsAssoc"
-    Me.mnuToolsAssoc.Size = New System.Drawing.Size(295, 26)
+    Me.mnuToolsAssoc.Size = New System.Drawing.Size(303, 26)
     Me.mnuToolsAssoc.Text = "&Associate File Types..."
     Me.mnuToolsAssoc.ToolTipText = "Select file types to be associated with Photo Mud."
     '
     'mnuToolsFileFilter
     '
     Me.mnuToolsFileFilter.Name = "mnuToolsFileFilter"
-    Me.mnuToolsFileFilter.Size = New System.Drawing.Size(295, 26)
+    Me.mnuToolsFileFilter.Size = New System.Drawing.Size(303, 26)
     Me.mnuToolsFileFilter.Text = "Select Photo File T&ypes..."
     Me.mnuToolsFileFilter.ToolTipText = "Select file types to be displayed in Photo Mud Explorer."
     '
     'ToolStripSeparator8
     '
     Me.ToolStripSeparator8.Name = "ToolStripSeparator8"
-    Me.ToolStripSeparator8.Size = New System.Drawing.Size(292, 6)
+    Me.ToolStripSeparator8.Size = New System.Drawing.Size(300, 6)
     '
     'mnuToolsCalendar
     '
     Me.mnuToolsCalendar.Name = "mnuToolsCalendar"
-    Me.mnuToolsCalendar.Size = New System.Drawing.Size(295, 26)
+    Me.mnuToolsCalendar.Size = New System.Drawing.Size(303, 26)
     Me.mnuToolsCalendar.Text = "Print Ca&lendar..."
     Me.mnuToolsCalendar.ToolTipText = "Print a monthly calendar using selected photos."
     '
     'ToolStripSeparator9
     '
     Me.ToolStripSeparator9.Name = "ToolStripSeparator9"
-    Me.ToolStripSeparator9.Size = New System.Drawing.Size(292, 6)
+    Me.ToolStripSeparator9.Size = New System.Drawing.Size(300, 6)
     '
     'mnuToolsToolbar
     '
     Me.mnuToolsToolbar.Name = "mnuToolsToolbar"
-    Me.mnuToolsToolbar.Size = New System.Drawing.Size(295, 26)
+    Me.mnuToolsToolbar.Size = New System.Drawing.Size(303, 26)
     Me.mnuToolsToolbar.Text = "Customi&ze Toolbar..."
     Me.mnuToolsToolbar.ToolTipText = "Select tools for the toolbar, and other toolbar options."
     '
     'mnuToolsOptions
     '
     Me.mnuToolsOptions.Name = "mnuToolsOptions"
-    Me.mnuToolsOptions.Size = New System.Drawing.Size(295, 26)
+    Me.mnuToolsOptions.Size = New System.Drawing.Size(303, 26)
     Me.mnuToolsOptions.Text = "&Options..."
     Me.mnuToolsOptions.ToolTipText = "Set Photo Mud options and preferences."
     '
@@ -888,52 +889,52 @@
     '
     Me.mnuWindow.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripSeparator7})
     Me.mnuWindow.Name = "mnuWindow"
-    Me.mnuWindow.Size = New System.Drawing.Size(70, 24)
+    Me.mnuWindow.Size = New System.Drawing.Size(72, 22)
     Me.mnuWindow.Text = "&Window"
     '
     'ToolStripSeparator7
     '
     Me.ToolStripSeparator7.Name = "ToolStripSeparator7"
-    Me.ToolStripSeparator7.Size = New System.Drawing.Size(63, 6)
+    Me.ToolStripSeparator7.Size = New System.Drawing.Size(71, 6)
     '
     'mnuHelp
     '
     Me.mnuHelp.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.mnuHelpHelpTopics, Me.mnuHelpHelpIndex, Me.mnuHelpTips, Me.helpLine1, Me.mnuHelpRegister, Me.mnuHelpUpdate, Me.helpline2, Me.mnuHelpAbout})
     Me.mnuHelp.Name = "mnuHelp"
     Me.mnuHelp.ShortcutKeys = CType((System.Windows.Forms.Keys.Control Or System.Windows.Forms.Keys.F), System.Windows.Forms.Keys)
-    Me.mnuHelp.Size = New System.Drawing.Size(48, 24)
+    Me.mnuHelp.Size = New System.Drawing.Size(50, 22)
     Me.mnuHelp.Text = "&Help"
     '
     'mnuHelpHelpTopics
     '
     Me.mnuHelpHelpTopics.Name = "mnuHelpHelpTopics"
-    Me.mnuHelpHelpTopics.Size = New System.Drawing.Size(253, 26)
+    Me.mnuHelpHelpTopics.Size = New System.Drawing.Size(261, 26)
     Me.mnuHelpHelpTopics.Text = "&Help"
     Me.mnuHelpHelpTopics.ToolTipText = "Show the Help Contents."
     '
     'mnuHelpHelpIndex
     '
     Me.mnuHelpHelpIndex.Name = "mnuHelpHelpIndex"
-    Me.mnuHelpHelpIndex.Size = New System.Drawing.Size(253, 26)
+    Me.mnuHelpHelpIndex.Size = New System.Drawing.Size(261, 26)
     Me.mnuHelpHelpIndex.Text = "Help Inde&x"
     Me.mnuHelpHelpIndex.ToolTipText = "Show the Help Index."
     '
     'mnuHelpTips
     '
     Me.mnuHelpTips.Name = "mnuHelpTips"
-    Me.mnuHelpTips.Size = New System.Drawing.Size(253, 26)
+    Me.mnuHelpTips.Size = New System.Drawing.Size(261, 26)
     Me.mnuHelpTips.Text = "Show &Tips of the Day"
     Me.mnuHelpTips.ToolTipText = "Show the Photo Mud Tips."
     '
     'helpLine1
     '
     Me.helpLine1.Name = "helpLine1"
-    Me.helpLine1.Size = New System.Drawing.Size(250, 6)
+    Me.helpLine1.Size = New System.Drawing.Size(258, 6)
     '
     'mnuHelpRegister
     '
     Me.mnuHelpRegister.Name = "mnuHelpRegister"
-    Me.mnuHelpRegister.Size = New System.Drawing.Size(253, 26)
+    Me.mnuHelpRegister.Size = New System.Drawing.Size(261, 26)
     Me.mnuHelpRegister.Text = "&Register Photo Mud Online"
     Me.mnuHelpRegister.ToolTipText = "Go to the Photo Mud web site and register the program."
     Me.mnuHelpRegister.Visible = False
@@ -941,19 +942,19 @@
     'mnuHelpUpdate
     '
     Me.mnuHelpUpdate.Name = "mnuHelpUpdate"
-    Me.mnuHelpUpdate.Size = New System.Drawing.Size(253, 26)
+    Me.mnuHelpUpdate.Size = New System.Drawing.Size(261, 26)
     Me.mnuHelpUpdate.Text = "Check for &Updates Online"
     Me.mnuHelpUpdate.ToolTipText = "Go to the Photo Mud web site and check for updates."
     '
     'helpline2
     '
     Me.helpline2.Name = "helpline2"
-    Me.helpline2.Size = New System.Drawing.Size(250, 6)
+    Me.helpline2.Size = New System.Drawing.Size(258, 6)
     '
     'mnuHelpAbout
     '
     Me.mnuHelpAbout.Name = "mnuHelpAbout"
-    Me.mnuHelpAbout.Size = New System.Drawing.Size(253, 26)
+    Me.mnuHelpAbout.Size = New System.Drawing.Size(261, 26)
     Me.mnuHelpAbout.Text = "&About Photo Mud"
     '
     'mnxToolStrip
@@ -1145,7 +1146,7 @@
     Me.Toolstrip1.Font = New System.Drawing.Font("Tahoma", 8.0!)
     Me.Toolstrip1.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
     Me.Toolstrip1.ImageScalingSize = New System.Drawing.Size(24, 24)
-    Me.Toolstrip1.Location = New System.Drawing.Point(0, 28)
+    Me.Toolstrip1.Location = New System.Drawing.Point(0, 26)
     Me.Toolstrip1.Name = "Toolstrip1"
     Me.Toolstrip1.Size = New System.Drawing.Size(977, 25)
     Me.Toolstrip1.TabIndex = 2
@@ -1162,8 +1163,8 @@
     '
     Me.SplitContainer2.Panel2.Controls.Add(Me.ListView1)
     Me.SplitContainer2.Panel2.Controls.Add(Me.StatusStrip1)
-    Me.SplitContainer2.Size = New System.Drawing.Size(695, 597)
-    Me.SplitContainer2.SplitterDistance = 428
+    Me.SplitContainer2.Size = New System.Drawing.Size(695, 599)
+    Me.SplitContainer2.SplitterDistance = 429
     Me.SplitContainer2.TabIndex = 12
     Me.SplitContainer2.TabStop = False
     '
@@ -1190,7 +1191,7 @@
     Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.lbStatus})
     Me.StatusStrip1.Location = New System.Drawing.Point(0, 140)
     Me.StatusStrip1.Name = "StatusStrip1"
-    Me.StatusStrip1.Size = New System.Drawing.Size(695, 25)
+    Me.StatusStrip1.Size = New System.Drawing.Size(695, 26)
     Me.StatusStrip1.SizingGrip = False
     Me.StatusStrip1.TabIndex = 1
     Me.StatusStrip1.Text = "StatusStrip1"
@@ -1230,7 +1231,7 @@
     Me.TreeView.Margin = New System.Windows.Forms.Padding(4)
     Me.TreeView.Name = "TreeView"
     Me.TreeView.SelectedImageIndex = 0
-    Me.TreeView.Size = New System.Drawing.Size(278, 572)
+    Me.TreeView.Size = New System.Drawing.Size(278, 574)
     Me.TreeView.StateImageList = Me.imgTreeView
     Me.TreeView.TabIndex = 6
     '
@@ -1285,7 +1286,7 @@
     'SplitContainer1
     '
     Me.SplitContainer1.Dock = System.Windows.Forms.DockStyle.Fill
-    Me.SplitContainer1.Location = New System.Drawing.Point(0, 53)
+    Me.SplitContainer1.Location = New System.Drawing.Point(0, 51)
     Me.SplitContainer1.Name = "SplitContainer1"
     '
     'SplitContainer1.Panel1
@@ -1296,7 +1297,7 @@
     'SplitContainer1.Panel2
     '
     Me.SplitContainer1.Panel2.Controls.Add(Me.SplitContainer2)
-    Me.SplitContainer1.Size = New System.Drawing.Size(977, 597)
+    Me.SplitContainer1.Size = New System.Drawing.Size(977, 599)
     Me.SplitContainer1.SplitterDistance = 278
     Me.SplitContainer1.TabIndex = 10
     Me.SplitContainer1.TabStop = False
@@ -1433,5 +1434,6 @@
   Friend WithEvents mnuToolsBugQuery As System.Windows.Forms.ToolStripMenuItem
   Friend WithEvents mnxFMap As System.Windows.Forms.ToolStripMenuItem
   Friend WithEvents mnuToolsExportFilenames As System.Windows.Forms.ToolStripMenuItem
+  Friend WithEvents bkgThumb2 As System.ComponentModel.BackgroundWorker
 #End Region
 End Class

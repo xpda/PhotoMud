@@ -1,7 +1,6 @@
 'Photo Mud is licensed under Creative Commons BY-NC-SA 4.0
 'https://creativecommons.org/licenses/by-nc-sa/4.0/
 
-Imports vb = Microsoft.VisualBasic
 Imports System.Drawing.Drawing2D
 Imports System.Drawing.Imaging
 Imports System.Drawing
@@ -14,8 +13,6 @@ Public Class frmColorBatchAdjust
 
   Dim Loading As Boolean = True
   Dim Sliding As Boolean
-  Dim downx As Double
-  Dim downy As Double
   Dim iPicnum As Integer
 
   Dim WithEvents Timer1 As New Timer
@@ -31,10 +28,10 @@ Public Class frmColorBatchAdjust
   Private Sub aview_MoveNext(i As Integer) Handles aview.MoveNext
 
     If i = 1 Then
-      iPicnum = iPicnum + 1
+      iPicnum += 1
       If iPicnum > tagPath.Count Then iPicnum = 1
     ElseIf i = -1 Then ' previous
-      iPicnum = iPicnum - 1
+      iPicnum -= 1
       If iPicnum < 1 Then iPicnum = tagPath.Count
     End If
 

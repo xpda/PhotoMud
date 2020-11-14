@@ -97,7 +97,7 @@ Public Class frmFullscreen
 
   Sub Movenpic(ByVal increment As Integer)
 
-    fPic = fPic + increment
+    fPic += increment
     If callingForm Is frmExplore Then
       picpath = frmExplore.getNextPath(fPic)
     ElseIf callingForm.Name = "frmWebPage" Then

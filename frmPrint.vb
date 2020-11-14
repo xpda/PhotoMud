@@ -1,7 +1,6 @@
 'Photo Mud is licensed under Creative Commons BY-NC-SA 4.0
 'https://creativecommons.org/licenses/by-nc-sa/4.0/
 
-Imports vb = Microsoft.VisualBasic
 Imports System.Runtime.InteropServices
 Imports System.Drawing.Drawing2D
 Imports System.Drawing.Printing
@@ -339,7 +338,7 @@ Public Class frmPrint
     'p(5) = New PointF(p(2).X, p(2).Y)
     'g.DrawLines(Pens.DarkGreen, p)
 
-    pageNumber = pageNumber + 1
+    pageNumber += 1
     If pageNumber >= nPages Then
       e.HasMorePages = False
       clearBitmap(img)
@@ -371,7 +370,7 @@ Public Class frmPrint
     ' img is already converted
     e.Graphics.DrawImage(img, r)  ' actually do the printing (or at least draw to the print buffer)
 
-    pageNumber = pageNumber + 1
+    pageNumber += 1
     If pageNumber >= nx * ny Then e.HasMorePages = False Else e.HasMorePages = True
 
   End Sub
@@ -402,7 +401,7 @@ Public Class frmPrint
 
   Private Sub frmPageSetup_Load(ByVal Sender As Object, ByVal e As EventArgs) Handles MyBase.Load
 
-    Dim s As String = ""
+    Dim s As String
     Dim sp As String
 
     helpProvider1.SetHelpNavigator(Me, HelpNavigator.Topic)
@@ -947,7 +946,6 @@ Public Class frmPrint
 
     Static busy As Boolean = False
     Dim j, i, k, n As Integer
-    Dim iErr As Integer = 0
     Dim z As Double
     Dim rBox, rPic As Rectangle
     Dim pWidth, pHeight As Integer
@@ -992,11 +990,10 @@ Public Class frmPrint
         rBox.Y = j * cellHeight + paperYoff
         n = (j * nCols + i) \ nCopies
         If qImage Is Nothing Then ' qimage is a copy of the current image from the calling form
-          picInfo = getPicinfo(tagPath(n), True)
+          picInfo = getPicinfo(tagPath(n))
           If picInfo.isNull OrElse (pWidth <= 0 Or pHeight <= 0) Then
             pWidth = 800 ' just something to prevent error
             pHeight = 600
-            iErr = -1
           Else
             pWidth = picInfo.Width
             pHeight = picInfo.Height
@@ -1013,7 +1010,6 @@ Public Class frmPrint
           picWidth = rPic.Width / z
           SetText()
         End If
-        If k <> 0 Then iErr = k
 
         If qImage Is Nothing Then ' qimage is a copy of the current image from the calling form
           ' use tagpath

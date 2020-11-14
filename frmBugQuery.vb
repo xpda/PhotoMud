@@ -19,13 +19,8 @@ Public Class chk
 
   Private Sub frmBugQuery_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
 
-    Dim s As String = ""
-    Dim s1 As String = ""
-
     processing = True
-
     tvTaxon.ShowNodeToolTips = True
-
     txTaxon.Select()
 
     processing = False
@@ -36,21 +31,14 @@ Public Class chk
   Private Sub cmdTaxon_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles cmdTaxon.Click
 
     Dim match As taxrec
-    Dim matches As New List(Of taxrec)
-    Dim gmatches As New List(Of taxrec)
+    Dim matches As List(Of taxrec)
     Dim nd As TreeNode = Nothing
-    Dim ndc As TreeNode = Nothing
 
     Me.Cursor = Cursors.WaitCursor
 
     tvTaxon.Nodes.Clear()
 
     matches = queryTax("select * from taxatable where taxon = 'life' order by taxon", "")
-    If (dbAllowed And 8) Then
-      gmatches = queryTax(
-        "select * from gbif.tax where name = 'animalia' and usable <> '' and usable <> 'notinpaleo' order by name", "")
-      matches = mergeMatches(matches, gmatches)
-    End If
 
     For Each m As taxrec In matches
       nd = tvTaxon.Nodes.Add(taxaLabel(m, True, True))
@@ -59,7 +47,7 @@ Public Class chk
       populate(nd, True)  ' load Arthropoda
       nd.ExpandAll()
       ' Now get down through hexapoda
-      For Each ndc In nd.Nodes
+      For Each ndc As TreeNode In nd.Nodes
         If Mid(ndc.Text, 1, 7) = "Hexapoda" Then
           populate(ndc, True)  ' load Hexapoda
           ndc.Expand()
@@ -97,13 +85,12 @@ Public Class chk
   Sub queryExec()
 
     Dim cmd As MySqlCommand = Nothing
-    Dim imgCmd As MySqlCommand = Nothing
+    Dim imgCmd As MySqlCommand
     Dim adapt As New MySqlDataAdapter
     Dim adaptg As New MySqlDataAdapter
-    Dim matches As New List(Of taxrec)
-    Dim gmatches As New List(Of taxrec)
+    Dim matches As List(Of taxrec)
     Dim sql As String
-    Dim newNames As New List(Of String)
+    Dim newNames As List(Of String)
     Dim delNames As New List(Of String)
     Dim s, s1 As String
     Dim sTaxon() As String
@@ -129,7 +116,7 @@ Public Class chk
       Using ds As New DataSet
         sql = "select images.filename, taxatable.parentid, taxatable.rank, taxatable.taxon " &
               "  from images, taxatable where images.taxonid = taxatable.taxid "
-        cmd = queryparms(sql, "photodate", True, True, conn)
+        cmd = queryparms(sql, "photodate", True, conn)
         If cmd IsNot Nothing Then
           adapt.SelectCommand = cmd
           adapt.Fill(ds)
@@ -145,38 +132,15 @@ Public Class chk
         End If
       End Using
 
-      If (dbAllowed And 8) Then
-        Using ds As New DataSet
-          sql = "select images.filename, gbif.tax.name from images, gbif.tax where " &
-            "substring(images.taxonid, 2) = gbif.tax.taxid and substring(images.taxonid, 1, 1) = 'g' "
-          cmd = queryparms(sql, "photodate", True, True, conn)
-          If cmd IsNot Nothing Then
-            adapt.SelectCommand = cmd
-            adapt.Fill(ds)
-            For Each dr As DataRow In ds.Tables(0).Rows
-              s1 = dr("name")
-              If s = "" OrElse eqstr(s, s1) Then ' taxonkey matches
-                If Not IsDBNull(dr("filename")) Then queryNames.Add(folderPath & dr("filename"))
-              End If
-            Next dr
-          End If
-        End Using
-      End If
-
       If chkDescendants.Checked And txTaxon.Text.Trim <> "" Then
         sTaxon = Split(txTaxon.Text.Trim, " ", 2) ' separate 1st word
         matches = queryTax("select * from taxatable where taxon = @parm1", sTaxon(UBound(sTaxon)))
-        If dbAllowed And 8 Then
-          gmatches = queryTax(
-            "select * from gbif.tax where name = @parm1 and usable = 'ok'", sTaxon(UBound(sTaxon)))
-          matches = mergeMatches(matches, gmatches)
-        End If
 
         'sql = "select images.*, taxatable.parentid, taxatable.rank, taxatable.taxon " &
         '    "  from images, taxatable where images.taxonid = @id "
         'queryparms(sql, "photodate", imgCmd, False, True, conn) ' @id is set in addchildren
 
-        imgCmd = queryparms("select * from images where taxonid = @id ", "photodate", False, False, conn) ' @id is set in addchildren
+        imgCmd = queryparms("select * from images where taxonid = @id ", "photodate", False, conn) ' @id is set in addchildren
 
         s = txTaxon.Text.Trim
         For Each match As taxrec In matches
@@ -196,8 +160,8 @@ Public Class chk
           If ds Is Nothing OrElse ds.Tables(0).Rows.Count = 0 Then ' no imageset -- add file name
             s = folderPath & irec.filename
             If Not newNames.Contains(s) AndAlso
-              ((chkInat.CheckState = CheckState.Unchecked And Not inat) Or
-               (chkInat.CheckState = CheckState.Checked And inat) Or
+              ((chkInat.CheckState = CheckState.Unchecked And irec.inaturalist <= 0) Or
+               (chkInat.CheckState = CheckState.Checked And irec.inaturalist > 0) Or
                (chkInat.CheckState = CheckState.Indeterminate)) Then newNames.Add(s)
 
           Else ' add the entire imageset
@@ -254,13 +218,13 @@ Public Class chk
 
     ' process the children
     ' change to include children from both databases
-    matches = getChildren(inmatch, False, 9, True)
+    matches = getChildren(inmatch, 9, True)
 
     Using ds As New DataSet
       For Each match As taxrec In matches
         If match.childimageCounter > 0 Then
-          If itisRankID.ContainsKey(match.rank) Then rankid = itisRankID(match.rank) Else rankid = 0
-          If rankid > 0 AndAlso (rankmin = 0 Or rankmin >= rankid) AndAlso (rankmax = 0 Or rankmax <= rankid) Then
+          If itisRankID.ContainsKey(match.rank) Then rankID = itisRankID(match.rank) Else rankID = 0
+          If rankID > 0 AndAlso (rankmin = 0 Or rankmin >= rankID) AndAlso (rankmax = 0 Or rankmax <= rankID) Then
 
             ' grab filenames
             i = imgCmd.Parameters.IndexOf("@id")
@@ -283,25 +247,17 @@ Public Class chk
 
   End Sub
 
-  Function queryparms(sql As String, orderBy As String, useTaxon As Boolean, useRank As Boolean,
+  Function queryparms(sql As String, orderBy As String, useTaxon As Boolean,
                       ByRef conn As MySqlConnection) As MySqlCommand
 
     ' input sql, output cmd with all the query parameters from the text fields appended
 
     Dim qlist As New List(Of String)
     Dim s As String
-    Dim cmd As New MySqlCommand
-    Dim rankMin, rankMax As Integer
+    Dim cmd As MySqlCommand
 
-    If itisRankID.ContainsKey(txRankMin.Text) Then rankMin = itisRankID(txRankMin.Text) Else rankMin = 0
-    If itisRankID.ContainsKey(txRankMax.Text) Then rankMax = itisRankID(txRankMax.Text) Else rankMax = 0
+    If useTaxon AndAlso txTaxon.Text.Trim <> "" Then qlist.Add("taxatable.taxon = @taxon")
 
-    If sql.Contains("gbif.") Then
-      If useTaxon AndAlso txTaxon.Text.Trim <> "" Then qlist.Add("gbif.tax.name = @taxon")
-    Else
-      If useTaxon AndAlso txTaxon.Text.Trim <> "" Then qlist.Add("taxatable.taxon = @taxon")
-
-    End If
     If txLocation.Text.Trim <> "" Then qlist.Add("images.location like @location")
     If txCounty.Text.Trim <> "" Then qlist.Add("images.county like @county")
     If txState.Text.Trim <> "" Then qlist.Add("images.state like @state")
@@ -330,18 +286,14 @@ Public Class chk
     '  End If
 
     For Each s In qlist
-      sql = sql & " and " & s
+      sql &= " and " & s
     Next s
-    If orderBy <> "" Then sql = sql & " order by " & orderBy
+    If orderBy <> "" Then sql &= " order by " & orderBy
 
     cmd = New MySqlCommand(sql, conn)
     If txTaxon.Text.Trim <> "" Then
       s = txTaxon.Text.Trim
-      'i = s.LastIndexOf(" ")
-      'If i > 0 Then s = s.Substring(i + 1)
       cmd.Parameters.AddWithValue("@taxon", s)
-      's = txTaxon.Text.Trim
-      'cmd.Parameters.AddWithValue("@gname", s) ' for gbif
     End If
 
     If txLocation.Text.Trim <> "" Then cmd.Parameters.AddWithValue("@location", "%" & txLocation.Text.Trim & "%")
@@ -432,14 +384,12 @@ Public Class chk
   Private Sub getTreeviewItem()
 
     Dim taxonid As String
-    Dim match As New bugMain.taxrec
-    Dim matches As List(Of taxrec)
+    Dim match As bugMain.taxrec
 
     If processing Or tvTaxon.SelectedNode Is Nothing Then Exit Sub
 
     taxonid = tvTaxon.SelectedNode.Tag
-    matches = getTaxrecByID(taxonid)
-    If matches.Count <= 0 Then match = New taxrec Else match = matches(0)
+    match = getTaxrecByID(taxonid, False)
 
     txTaxon.Text = match.taxon
     txCommon.Text = getDescr(match, False)

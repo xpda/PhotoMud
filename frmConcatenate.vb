@@ -32,22 +32,22 @@ Public Class frmConcatenate
     pView2.Zoom(0) ' , RasterPaintDisplayModeFlags.None)
     pView3.InterpolationMode = InterpolationMode.Default
     pView3.Zoom(0) ', RasterPaintDisplayModeFlags.None)
-    ConcatPreview(True)
+    ConcatPreview()
 
     Loading = False
 
   End Sub
 
-  Sub ConcatPreview(Optional ByVal resetView As Boolean = False)
+  Sub ConcatPreview()
 
     Dim w, h As Integer
     Dim x2, y2, x3, y3 As Integer
 
     Me.Cursor = Cursors.WaitCursor
 
-    If op3topLeft.Checked And op2bottomLeft.Checked Or _
-      op3topRight.Checked And op2bottomRight.Checked Or _
-      op3bottomRight.Checked And op2topRight.Checked Or _
+    If op3topLeft.Checked And op2bottomLeft.Checked Or
+      op3topRight.Checked And op2bottomRight.Checked Or
+      op3bottomRight.Checked And op2topRight.Checked Or
       op3bottomLeft.Checked And op2topLeft.Checked Then
       ' stacked vertically
       w = Max(pView2.Bitmap.Width, pView3.Bitmap.Width)

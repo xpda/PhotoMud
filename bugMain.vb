@@ -3,7 +3,6 @@
 
 Imports System.Net
 Imports System.Net.Http
-Imports vb = Microsoft.VisualBasic
 Imports System.Collections.Generic
 Imports System.Drawing.Drawing2D
 Imports System.Drawing.Imaging
@@ -190,6 +189,7 @@ Public Module bugMain
   Public handler As HttpClientHandler
   Public qClient As HttpClient ' need these for cookies
 
+  Public commonCaps As New List(Of String)
 
   'Public QueryTaxon As String = ""  ' for shortcut -- temporary!
 
@@ -318,10 +318,18 @@ Public Module bugMain
     mainRank.Add("subspecies")
     mainRank.Add("variety")
 
+    commonCaps = New List(Of String)
+    Using ds As DataSet = getDS("select * from commoncaps order by word")
+      For Each dr As DataRow In ds.Tables(0).Rows
+        commonCaps.Add(dr("word"))
+      Next dr
+    End Using
+
     cookies = New CookieContainer
     handler = New HttpClientHandler
     handler.CookieContainer = cookies
     qClient = New HttpClient(handler) ' need this for cookies
+    ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3 Or SecurityProtocolType.Tls Or SecurityProtocolType.Tls11 Or SecurityProtocolType.Tls12
 
   End Sub
 
@@ -336,8 +344,8 @@ Public Module bugMain
     Dim result As MsgBoxResult
 
     If tagPath.Count >= 8 Then
-      result = MsgBox(tagPath.Count & " files are linked. Go ahead?", MsgBoxStyle.OkCancel)
-      If result <> MsgBoxResult.Yes Then Exit Sub
+      result = MsgBox(tagPath.Count & " files are tagged. Go ahead?", MsgBoxStyle.OkCancel)
+      If result <> MsgBoxResult.Yes And result <> MsgBoxResult.Ok Then Exit Sub
     End If
 
     setID = 0
@@ -349,7 +357,7 @@ Public Module bugMain
       End If
       If exists Then
         saveImageSet(fName, setID) ' setID is assigned in the first call, byref
-        nLinked = nLinked + 1
+        nLinked += 1
       End If
     Next i
 
@@ -463,7 +471,7 @@ Public Module bugMain
     irec.country = dr.Item("country")
 
     If irec.imageid > 0 Then ' check for imagesets
-      Dim k As Integer = getScalar("select setid from imagesets where imageid = @parm1", irec.imageid)
+      Dim k As Integer = getScalar("select setid from imagesets where imageid = @parm1 and setid > 0", irec.imageid)
       irec.imageSetID = k
     End If
 
@@ -471,42 +479,26 @@ Public Module bugMain
 
   End Function
 
-  Function getTaxrecByID(ByVal taxid As String) As List(Of taxrec)
-
-    ' gbif ids start with g: g1234, for example.
+  Function getTaxrecByID(ByVal taxid As String, addon As Boolean) As taxrec
+    ' gbif is no longer used -- taxid should never start with g. 10-2-2020
 
     Dim m As New taxrec
-    Dim matches As New List(Of taxrec)
 
-    If taxid = "" Then Return matches ' empty list
+    If Not IsNumeric(taxid) Then Return m
 
-    If eqstr(taxid.Substring(0, 1), "g") Then ' gbif database
-      Using ds As DataSet = getDS("select * from gbif.tax where taxid = @parm1 and usable <> '';",
-                 taxid.Substring(1).Trim)
-        If ds IsNot Nothing Then
-          For Each dr As DataRow In ds.Tables(0).Rows
-            m = getTaxrecg(dr, False)
-            matches.Add(m)
-          Next dr
-        End If
-      End Using
+    Using ds As DataSet = getDS("select * from taxatable where taxid = @parm1", taxid)
+      If ds IsNot Nothing Then
+        If ds.Tables(0).Rows.Count > 1 Then Stop
+        If ds.Tables(0).Rows.Count = 1 Then m = getTaxrec(ds.Tables(0).Rows(0), addon)
+      End If
+    End Using
 
-    Else ' taxatable database
-      Using ds As DataSet = getDS("select * from taxatable where taxid = @parm1", taxid)
-        If ds IsNot Nothing Then
-          For Each dr As DataRow In ds.Tables(0).Rows
-            m = getTaxrec(dr)
-            matches.Add(m)
-          Next dr
-        End If
-      End Using
-    End If
 
-    Return matches
+    Return m
 
   End Function
 
-  Function getTaxrec(ByRef dr As DataRow) As taxrec
+  Function getTaxrec(ByRef dr As DataRow, addon As Boolean) As taxrec
 
     Dim match As New taxrec
 
@@ -516,78 +508,22 @@ Public Module bugMain
     match.descr = dr("descr")
     match.taxid = dr("taxid")
     match.parentid = dr("parentid")
+    match.phylum = dr("phylum")
     match.imageCounter = dr("imagecounter")
     match.childimageCounter = dr("childimagecounter")
     match.link = dr("link")
+    match.spidercat = dr("spidercat")
+    match.bugguide = dr("bugguide")
+    match.taxlink = dr("taxlink")
+    match.authority = match.authority.Replace(" and ", " & ")
+    If eqstr(dr("extinct"), "extinct") Or eqstr(dr("extinct"), "true") Or eqstr(dr("extinct"), "1") Then match.extinct = True Else match.extinct = False
     match.authority = dr("authority")
 
-    Return match
-
-  End Function
-
-  Function getTaxrecg(ByRef dr As DataRow, addon As Boolean) As taxrec
-    ' get a taxref from gbif database
-    Dim match As New taxrec
-    Dim matches As New List(Of taxrec)
-    Dim vnames As New List(Of String)
-    Dim taxid As String
-    Dim s As String
-    Dim ss() As String
-
-    If gbifDatasets.IndexOf(dr("datasetID")) < 0 Then Return match ' invalid gbif dataset - return empty record
-
-    If IsDBNull(dr("taxid")) Then taxid = "" Else taxid = dr("taxid")
-    If taxid <> "" Then match.taxid = "g" & taxid ' gbif id prefix
-
-    ' load dr into match
-    If IsDBNull(dr("rank")) Then match.rank = "" Else match.rank = dr("rank")
-    If IsDBNull(dr("name")) Then match.taxon = "" Else match.taxon = dr("name")
-    If IsDBNull(dr("parent")) Then match.parentid = "" Else match.parentid = "g" & dr("parent")
-    If IsDBNull(dr("authority")) Then match.authority = "" Else match.authority = dr("authority")
-    match.authority = match.authority.Replace(" and ", " & ")
-    If IsDBNull(dr("usable")) Then match.gbifUsable = "" Else match.gbifUsable = dr("usable")
-    match.extinct = eqstr(match.gbifUsable.Trim, "extinct")
-
-    ' get image counters and links, if possible
-    Using ds As DataSet = getDS("select * from gbifplus where taxid = @parm1", taxid)
-      For Each dr2 As DataRow In ds.Tables(0).Rows
-        If IsDBNull(dr2("imagecounter")) Then match.imageCounter = 0 Else match.imageCounter = dr2("imagecounter")
-        If IsDBNull(dr2("childimagecounter")) Then match.childimageCounter = 0 Else match.childimageCounter = dr2("childimagecounter")
-        If IsDBNull(dr2("link")) Then match.link = "" Else match.link = dr2("link")
-      Next dr2
-    End Using
-
-    ' get common names from oddinfo
-    Using ds As DataSet = getDS("select * from oddinfo where name = @parm1", match.taxon)
-      For Each dr2 As DataRow In ds.Tables(0).Rows
-        If dr2("commonnames") <> "" Then
-          s = dr2("commonnames")
-          ss = s.Split("|")
-          If ss.Count >= 1 AndAlso ss(0) <> "" Then
-            match.commonNames = ss.ToList
-          End If
-          Exit For
-        End If
-      Next dr2
-    End Using
-
-    ' get descr from taxatable, if possible
-    Using ds As DataSet = getDS("select * from taxatable where taxon = @parm1", match.taxon)
-      For Each dr2 As DataRow In ds.Tables(0).Rows
-        If dr2("descr") <> "" Then
-          match.descr = dr2("descr")
-          Exit For
-        End If
-      Next dr2
-    End Using
-
     If addon Then taxrecAddon(match)
-
-    If match.taxlink = "" Then match.taxlink = "https://www.gbif.org/species/" & match.taxid.Substring(1) ' no "g"
-
     Return match
 
   End Function
+
 
   Function getpaleoTaxrec(dr As DataRow, addon As Boolean) As taxrec
     ' get rank, taxon, etc from spider to a taxrec
@@ -660,7 +596,7 @@ Public Module bugMain
     rm = Regex.Match(a1, "^(\(?([\p{L}]*)[^[:alpha:]]\)?.*([0-9]{4}))$")
 
 
-    s1 = Regex.Replace(a1, "^(\(?([\p{L}]+?)[^[:alpha:]]\)?.*([0-9]{4}))$", "$2=$3")
+    's1 = Regex.Replace(a1, "^(\(?([\p{L}]+?)[^[:alpha:]]\)?.*([0-9]{4}))$", "$2=$3")
 
     s1 = Regex.Replace(a1, "^(\(?([\p{L}]*)[^[:alpha:]]\)?.*([0-9]{4}))$", "$2 $3")
     s2 = Regex.Replace(a2, "^(\(?([\p{L}]*)[^[:alpha:]]\)?.*([0-9]{4}))$", "$2 $3")
@@ -706,60 +642,6 @@ Public Module bugMain
 
   End Function
 
-  Function getGbifVernacular(taxzid As String, taxon As String, toprank As String) As List(Of String)
-
-    ' returns a list of gbif vernacular names
-    ' upCount tells how far up the ancestry to go, "" for no ancestors
-
-    Dim taxid As String
-    Dim s As String
-    Dim k As Integer
-    Dim rank, parent As String
-    Dim vNames As New List(Of String)
-
-    taxid = taxzid
-
-    If Not taxid.StartsWith("g") Then ' see if there's a gbif record
-      ' get gbif taxid
-      Using ds As DataSet = getDS("select * from gbif.tax where name = @parm1 and usable <> ''", taxon)
-        If ds.Tables(0).Rows.Count >= 1 Then
-          taxid = ds.Tables(0).Rows(0)("taxid")
-        Else
-          Return New List(Of String)
-        End If
-      End Using
-    Else
-      taxid = taxid.Substring(1) ' no "g"
-    End If
-
-    Do While vNames.Count = 0 And k <= 10
-      Using ds As DataSet = getDS("select * from gbif.tax where taxid = @parm1", taxid)
-        parent = ds.Tables(0).Rows(0)("parent")
-        rank = ds.Tables(0).Rows(0)("rank")
-      End Using
-
-      Using ds As DataSet =
-        getDS("select * from gbif.vernacularname where taxonid = @parm1 and (language = 'en' or language = '') and vernacularname not like '%?%'", taxid)
-
-        If ds IsNot Nothing Then
-          For Each dr As DataRow In ds.Tables(0).Rows
-            s = dr("vernacularname")
-            If vNames.IndexOf(s) < 0 Then vNames.Add(s)
-          Next dr
-
-        End If
-      End Using
-
-      If Not itisRankID.ContainsKey(toprank) OrElse Not itisRankID.ContainsKey(rank) OrElse
-         itisRankID(rank) < itisRankID(toprank) Then Exit Do ' stop at toprank
-      taxid = parent
-      k += 1
-    Loop
-
-    Return vNames
-
-  End Function
-
   Sub taxrecAddon(ByRef m As taxrec)
 
     ' load up the non-database things into m
@@ -768,7 +650,7 @@ Public Module bugMain
     Dim k As Integer
     Dim ss() As String
     Dim dr As DataRow
-    Dim vNames As List(Of String)
+    Dim sq As List(Of String)
     Dim prec As paleorec
 
     prec = getPaleo(m, False)
@@ -796,24 +678,6 @@ Public Module bugMain
       End If
     End If
 
-    If m.gbifID = "" Or m.gbifID = "0" Then
-      m.gbifParent = ""
-      Using ds As DataSet = getDS("select * from gbif.tax where name = @parm1 and rank = @parm2 and usable <> ''",
-                 m.taxon, m.rank)
-        'ds = getDS("select * from gbif.tax join taxa.gbifplus using (taxid) where name = @parm1 and rank = @parm2 and usable <> ''",
-        '           m.taxon, m.rank) '  and status = 'accepted'
-        If ds.Tables(0).Rows.Count = 1 Then
-          dr = ds.Tables(0).Rows(0)
-          If Not IsDBNull(dr("authority")) AndAlso m.authority = "" Then m.authority = dr("authority")
-          m.authority = m.authority.Replace(" and ", " & ")
-          If Not IsDBNull(dr("taxid")) Then m.gbifID = dr("taxid")
-          If Not IsDBNull(dr("parent")) Then m.gbifParent = dr("parent")
-          If Not IsDBNull(dr("usable")) Then m.gbifUsable = dr("usable")
-          'If m.gbifUsable = "extinct" Then ' ignore extinct in gbif -- it's unreliable.
-        End If
-      End Using
-    End If
-
     m.iucnStatus = ""
     m.iucnTrend = ""
     m.iucnYear = ""
@@ -834,10 +698,6 @@ Public Module bugMain
     End Using
 
     m.commonNames = New List(Of String)
-    If m.taxid.StartsWith("g") Then ' gbif
-      vNames = getGbifVernacular(m.taxid, m.taxon, "")
-      If vNames.Count > 0 Then m.commonNames = vNames
-    End If
 
     ' get the old wikirec (now part of taxrec) from oddinfo
     If m.taxid <> "" Then
@@ -856,6 +716,9 @@ Public Module bugMain
           m.ambigLink = dr("ambiglink")
           m.unimportant = dr("unimportant")
 
+          m.synonyms = New List(Of String)
+          m.synauth = New List(Of String)
+
           m.wikipediaPageID = dr("wikipediaPageID")
           m.commonWikiLink = dr("commonwikilink")
           m.hodges = dr("hodges")
@@ -865,11 +728,14 @@ Public Module bugMain
         End If
       End Using
 
-      If m.commonNames.Count = 0 AndAlso m.descr <> "" AndAlso Not m.descr.Contains(" and ") AndAlso
-           Not m.descr.ToLower.Contains("hodges") Then m.commonNames.Add(m.descr.ToLower)
-
-      If m.commonNames.Count = 0 Then ' check gbif (for non-gbif records)
-        m.commonNames = getGbifVernacular(m.taxid, m.taxon, m.rank)
+      If m.commonNames.Count = 0 AndAlso m.descr <> "" AndAlso
+           Not m.descr.ToLower.StartsWith("hodges") Then
+        sq = m.descr.ToLower.Split(" ").ToList
+        s = ""
+        For i As Integer = 0 To sq.Count - 1
+          If commonCaps.IndexOf(sq(i)) >= 0 Then s &= StrConv(sq(i), VbStrConv.ProperCase) & " " Else s &= sq(i) & " "
+        Next i
+        m.commonNames.Add(s.Trim) ' andalso Not m.descr.Contains(" and ") 
       End If
 
     End If
@@ -888,13 +754,13 @@ Public Module bugMain
       If Not eqstr(match.rank, "species") And
         Not eqstr(match.rank, "subspecies") And
         Not eqstr(match.rank, "variety") Then
-        If Not eqstr(match.rank, "no taxon") And Not eqstr(match.rank, "stateofmatter") Then s = s & " " & match.rank
+        If Not eqstr(match.rank, "no taxon") And Not eqstr(match.rank, "stateofmatter") Then s &= " " & match.rank
       End If
     End If
 
     descr = getDescr(match, True)
-    If descr <> "" Then s = s & " (" & descr & ")"
-    If isQuery Then s = s & "  " & match.imageCounter & "/" & match.childimageCounter
+    If descr <> "" Then s &= " (" & descr & ")"
+    If isQuery Then s &= "  " & match.imageCounter & "/" & match.childimageCounter
 
     Return s
 
@@ -904,17 +770,13 @@ Public Module bugMain
 
     ' load matches from cmd query
 
-    Dim match As New taxrec
+    Dim match As taxrec
     Dim matches As New List(Of taxrec)
     '```
     Using ds As DataSet = getDS(cmd, val)
       If ds IsNot Nothing Then
         For Each dr As DataRow In ds.Tables(0).Rows
-          If cmd.Contains("gbif.") Then
-            match = getTaxrecg(dr, True) ' no common names
-          Else
-            match = getTaxrec(dr)
-          End If
+          match = getTaxrec(dr, True)
           If match.taxid <> "" Then matches.Add(match)
         Next dr
       End If
@@ -929,28 +791,15 @@ Public Module bugMain
     ' populate a single tree node from the database
 
     Dim matches As List(Of taxrec)
-    Dim childImages As Integer
 
     Dim nd As TreeNode
     Dim found As Boolean
 
     If isQuery Then
-      If node.Tag.startswith("g") Then
-        matches = queryTax("select * from gbif.tax where parent = @parm1 and usable <> '' order by name", node.Tag.substring(1))
-        For i As Integer = matches.Count - 1 To 0 Step -1
-          childImages = getScalar("select * from gbifplus where taxid = @parm1", matches(i).taxid.Substring(1)) ' omit leading g
-          If childImages <= 0 Then matches.RemoveAt(i)
-        Next i
-      Else
-        matches = queryTax("select * from taxatable where parentid = @parm1 and childimagecounter > 0 order by taxon", node.Tag)
-      End If
+      matches = queryTax("select * from taxatable where parentid = @parm1 and childimagecounter > 0 order by taxon", node.Tag)
 
     Else
-      If node.Tag.startswith("g") Then
-        matches = queryTax("select * from gbif.tax where parent = @parm1 and usable <> '' order by name", node.Tag.substring(1))
-      Else
-        matches = queryTax("select * from taxatable where parentid = @parm1 order by taxon", node.Tag)
-      End If
+      matches = queryTax("select * from taxatable where parentid = @parm1 order by taxon", node.Tag)
     End If
 
     For Each m As taxrec In matches
@@ -976,8 +825,7 @@ Public Module bugMain
     ' start at taxonkey, then ascend through the parents until a description is found.
     ' shortform is true to omit "Family: Brushfoot etc."
 
-    Dim match As New taxrec
-    Dim matches As List(Of taxrec)
+    Dim match As taxrec
     Dim parent As String
     Dim iter As Integer = 0
     Dim taxid As String
@@ -987,18 +835,16 @@ Public Module bugMain
     If inMatch.parentid = "" Then ' inmatch might only have the taxonid
       ' load everything else into inmatch
       taxid = inMatch.taxid
-      matches = getTaxrecByID(taxid)
-      If matches.Count > 0 Then inMatch = matches(0)
+      inMatch = getTaxrecByID(taxid, True)
     End If
 
     If inMatch.descr <> "" Or shortForm Then Return inMatch.descr
     parent = inMatch.parentid
 
     Do While parent > "" And iter < 25
-      iter = iter + 1
-      matches = getTaxrecByID(parent)
-      If matches.Count <= 0 OrElse matches(0).taxon = "" Then Return ""
-      match = matches(0)
+      iter += 1
+      match = getTaxrecByID(parent, True)
+      If match.taxid = "" Then Return ""
 
       If match.descr <> "" AndAlso Not eqstr(match.rank, "No Taxon") And
            (Not eqstr(match.rank, "Species") Or eqstr(inMatch.rank, "Subspecies")) And
@@ -1016,16 +862,16 @@ Public Module bugMain
   Function popuTaxon(ByVal xtaxi As String, ByRef tvTax As TreeView, ByVal isQuery As Boolean) As taxrec
     ' populate the tvTax and open it to taxi
 
-    Dim nd As TreeNode = Nothing
+    Dim nd As TreeNode
     Dim ndc As TreeNode = Nothing
-    Dim ndParent As TreeNode = Nothing
+    Dim ndParent As TreeNode
     Dim ids As New List(Of Integer)
     Dim topMatch As New taxrec
-    Dim matches As New List(Of taxrec)
-    Dim ancestor As New List(Of taxrec)
+    Dim matches As List(Of taxrec)
+    Dim ancestor As List(Of taxrec)
     Dim i As Integer
 
-    Dim ndTarget As TreeNode = Nothing
+    Dim ndTarget As TreeNode
     Dim targetLevel As Integer ' level in tvTax of the match
 
     tvTax.Visible = True
@@ -1039,7 +885,7 @@ Public Module bugMain
     populate(ndParent, isQuery)
 
     For Each match As taxrec In matches
-      ancestor = getancestors(match, False, "")  ' retrieve ancestors of ancestor(0). false = don't exclude "no taxons"
+      ancestor = getancestors(match, "")  ' retrieve ancestors of ancestor(0). false = don't exclude "no taxons"
       ndParent = tvTax.Nodes(0) ' 2/28/20
 
       For i = ancestor.Count - 2 To 0 Step -1  ' go through ancestors top down, starting at root's children
@@ -1092,9 +938,9 @@ Public Module bugMain
 
   End Function
 
-  Function getancestors(m As taxrec, excludeNoTaxon As Boolean, StopAt As String) As List(Of taxrec)
+  Function getancestors(m As taxrec, StopAt As String) As List(Of taxrec)
 
-    Dim matches As List(Of taxrec)
+    Dim match As taxrec
     Dim ancestor As New List(Of taxrec)
     Dim iter As Integer = 0
     Dim taxid As String
@@ -1103,12 +949,12 @@ Public Module bugMain
     taxid = m.parentid
 
     Do While taxid <> "" And iter < 50
-      matches = getTaxrecByID(taxid)
-      If matches.Count <= 0 Then Return ancestor
-      ancestor.Add(matches(0))
-      If eqstr(matches(0).rank, StopAt) Then Return ancestor
-      taxid = matches(0).parentid
-      iter = iter + 1
+      match = getTaxrecByID(taxid, True)
+      If match.taxid = "" Then Return ancestor
+      ancestor.Add(match)
+      If eqstr(match.rank, StopAt) Then Return ancestor
+      taxid = match.parentid
+      iter += 1
     Loop
 
     Return ancestor
@@ -1158,10 +1004,6 @@ Public Module bugMain
       mode = 1
     Else
 
-      If nd.BackColor = nodeMatchColor Then
-        done = done
-      End If
-
       If mode = 1 AndAlso nd.BackColor = nodeMatchColor Then
         tvTax.SelectedNode = nd
         nd.EnsureVisible()
@@ -1184,7 +1026,7 @@ Public Module bugMain
     ' 3 ids in this table: image, set, and unique ID
 
     Dim setid As Integer
-    Dim linktoID As Integer = 0
+    Dim linktoID As Integer
 
     ' get imageset.imageid from filenames
     linktoID = getScalar("select imageid from images where filename = @parm1 limit 1", linktoFname)
@@ -1226,7 +1068,7 @@ Public Module bugMain
 
     Dim i As Integer
     Dim newUid, oldSetid As Integer
-    Dim imageID As Integer = 0
+    Dim imageID As Integer
 
     imageID = getScalar("select imageid from images where filename = @parm1 limit 1", fName)
 
@@ -1287,7 +1129,7 @@ Public Module bugMain
   Sub deleteImageSets(ByVal fName As String)
     ' delete all imagesets for a filename
 
-    Dim imageID As Integer = 0
+    Dim imageID As Integer
     Dim i As Integer
 
     imageID = getScalar("select imageid from images where filename = @parm1 limit 1", fName)
@@ -1305,7 +1147,7 @@ Public Module bugMain
 
     ' get txfilename.text - generate or find the file name
     s1 = targetFolder
-    If vb.Right(s1, 1) <> "\" Then s1 = s1 & "\"
+    If Not s1.EndsWith("\") Then s1 &= "\"
     s = Path.GetFileNameWithoutExtension(picpath)
     ' append a-z... use a, or the last one that exists (if any do).
     c = "a"
@@ -1348,7 +1190,7 @@ Public Module bugMain
     latlonVerify(latlon, dLat, dLon)
 
     'link = "http://maps.googleapis.com/maps/api/geocode/xml?sensor=true&latlng=" & Format(dLat, "###.#####") & "," & Format(dLon, "###.#####")
-    url = "https://nominatim.openstreetmap.org/reverse?format=json&lat=" & Format(dLat, "###.#####") & "&lon=" & Format(dLon, "###.#####") &
+    url = "http://nominatim.openstreetmap.org/reverse?format=json&lat=" & Format(dLat, "###.#####") & "&lon=" & Format(dLon, "###.#####") &
            "&zoom=18&addressdetails=1&email=bob-mud@xpda.com"
 
     Try
@@ -1462,15 +1304,14 @@ Public Module bugMain
 
     ' get dataset taxatable record for taxon or common name findme
 
-    Dim cmd As String
     Dim m As New taxrec
     Dim matches As New List(Of taxrec)
-    Dim matches2 As New List(Of taxrec)
+    Dim matches2 As List(Of taxrec)
     Dim rDescr As String
-    Dim suffix, suffixg As String
-    Dim taxid As String
+    Dim suffix As String
 
     findme = findme.Trim
+    If findme = "" Then Return matches
 
     rDescr = findme.Replace("-", "`") ' accept either space or dash, so "eastern tailed blue" finds "eastern tailed-blue". Only works with rlike (mysql bug).
     rDescr = rDescr.Replace(" ", "[- ]")
@@ -1483,14 +1324,13 @@ Public Module bugMain
 
     If isQuery Then
       suffix = " and (childimagecounter > 0) order by taxon"
-      suffixg = " and usable <> '' order by name"
+      'suffixg = " and usable <> '' order by name"
     Else
       suffix = " order by taxon"
-      suffixg = "  and usable <> '' order by name"
+      'suffixg = "  and usable <> '' order by name"
     End If
 
     matches = queryTax("select * from taxatable where taxon = @parm1" & suffix, findme)
-    If matches.Count > 0 And (dbAllowed And 8) Then matches = queryTax("select * from gbif.tax where name = @parm1" & suffixg, findme)
     If matches.Count > 0 Then Return matches ' exact taxon match
 
     ' search for equal descr
@@ -1503,34 +1343,13 @@ Public Module bugMain
     If matches.Count = 0 Then matches = queryTax("select * from taxatable where (taxon like @parm1)" & suffix, findme & "%")
     If matches.Count = 0 Then
       matches = queryTax("select * from taxatable where (taxon like @parm1)" & suffix, "%" & findme & "%")
-      ' If matches.Count = 0 Then matches = queryTax("select * from gbif.tax where (name like @parm1)" & suffixg, findme & "%") ' exact search only for gbif
     End If
 
-    'If matches.Count = 0 Then  ' search descr and taxon rlike
     matches2 = queryTax("select * from oddinfo join taxatable using (taxid) where commonnames rlike @parm1 order by taxon",
                         "%" & rDescr & "%")
     matches = mergeMatches(matches, matches2)
     matches2 = queryTax("select * from taxatable where taxon rlike @parm1 or descr rlike @parm1 order by taxon", "%" & rDescr & "%")
     matches = mergeMatches(matches, matches2)
-    'End If
-
-    If matches.Count = 0 AndAlso (dbAllowed And 8) Then
-      Using ds As DataSet = getDS("select * from gbif.vernacularname where vernacularname rlike @parm1 and (language = 'en' or language = '')", rDescr)
-        'ds = getDS("select * from gbif.vernacularname where vernacularname = @parm1 and (language = 'en' or language = '')", s)
-        If ds IsNot Nothing AndAlso ds.Tables(0).Rows.Count > 0 Then
-          cmd = "select * from gbif.tax where ("
-          For Each dr As DataRow In ds.Tables(0).Rows
-            taxid = dr("taxonid")
-            If taxid <> "" AndAlso cmd.IndexOf(taxid) < 0 Then cmd &= "taxid = '" & taxid & "' or "
-          Next dr
-          If cmd.EndsWith(" or ") Then
-            cmd = cmd.Substring(0, cmd.Length - 4)
-            cmd &= ") and usable <> '' order by name"
-            matches = queryTax(cmd, "")
-          End If
-        End If
-      End Using
-    End If
 
     Return matches
 
@@ -1562,54 +1381,32 @@ Public Module bugMain
     Dim imageCounter, childImageCounter As Integer
     Dim parentID As String
     Dim m As taxrec
-    Dim matches As List(Of taxrec)
 
-    matches = getTaxrecByID(taxid)
-    If matches.Count <> 1 Then Exit Sub ' error
-    m = matches(0)
+    m = getTaxrecByID(taxid, True)
+    If m.taxid = "" Then Exit Sub ' error
 
     imageCounter = m.imageCounter
     childImageCounter = m.childimageCounter
     imageCounter += inc
     childImageCounter += inc
 
-    If taxid.StartsWith("g") Then
-      i = nonQuery("update gbifplus set imagecounter = @parm1, childimagecounter = @parm2 where taxid = @parm3",
-        imageCounter, childImageCounter, taxid.Substring(1)) ' remove "g"
-      If i = 0 Then ' gbifplus doesn't contain all the gbif records
-        i = nonQuery("insert into gbifplus (taxid, imagecounter, childimagecounter) values " &
-                      "(@parm1, @parm2, @parm3)", taxid.Substring(1), imageCounter, childImageCounter)
-      End If
-    Else
-      i = nonQuery("update taxatable set imagecounter = @parm1, childimagecounter = @parm2 where taxid = @parm3",
+    i = nonQuery("update taxatable set imagecounter = @parm1, childimagecounter = @parm2 where taxid = @parm3",
         imageCounter, childImageCounter, taxid)
-    End If
     If i <> 1 Then Stop
 
     parentID = m.parentid
     ' follow parentID up the taxon tree, incrementing childImageCounter
     For k As Integer = 1 To 200
-      If parentID = "" Or parentID = "g" Then Exit For
+      If Not IsNumeric(parentID) Then Exit For
 
-      matches = getTaxrecByID(parentID)
-      If matches.Count <> 1 Then Exit For ' error
-      m = matches(0)
+      m = getTaxrecByID(parentID, True)
+      If m.taxid = "" Then Exit For ' error
 
       childImageCounter = m.childimageCounter
       childImageCounter += inc
 
-      If parentID.StartsWith("g") Then
-        i = nonQuery("update gbifplus set childimagecounter = @parm1 where taxid = @parm2",
-                     childImageCounter, parentID.Substring(1)) ' remove "g"
-        If i = 0 Then ' gbifplus doesn't contain all the gbif records
-          i = nonQuery("insert into gbifplus (taxid, childimagecounter) values " &
-                        "(@parm1, @parm2)", parentID.Substring(1), childImageCounter)
-        End If
-        If i <> 1 Then Stop
-      Else
-        i = nonQuery("update taxatable set childimagecounter = @parm1 where taxid = @parm2", childImageCounter, parentID)
-        If i <> 1 Then Stop
-      End If
+      i = nonQuery("update taxatable set childimagecounter = @parm1 where taxid = @parm2", childImageCounter, parentID)
+      If i <> 1 Then Stop
       If i = 1 Then parentID = m.parentid
     Next k
 
@@ -1632,7 +1429,7 @@ Public Module bugMain
     If Not eqstr(pic.match.rank, "species") And
       Not eqstr(pic.match.rank, "subspecies") And
       Not eqstr(pic.match.rank, "no taxon") Then
-      s = s & " " & pic.match.rank
+      s &= " " & pic.match.rank
     End If
     s &= "<br>"
 
@@ -1666,7 +1463,7 @@ Public Module bugMain
     If Not eqstr(pic.match.rank, "species") And
       Not eqstr(pic.match.rank, "subspecies") And
       Not eqstr(pic.match.rank, "no taxon") Then
-      s = s & " " & pic.match.rank
+      s &= " " & pic.match.rank
     End If
 
     s1 = getDescr(pic.match, False) ' get next higher rank description
@@ -1674,7 +1471,6 @@ Public Module bugMain
 
     s += vbCrLf
 
-    s1 = ""
     s1 = LocationLabel(pic)
     If pic.photoDate <> Nothing Then
       If s1 <> "" Then s1 &= ", "
@@ -1718,50 +1514,22 @@ Public Module bugMain
 
   End Function
 
-  Function getChildren(tMatch As taxrec, addon As Boolean, dballowed As Integer, withPics As Boolean) As List(Of taxrec)
+  Function getChildren(tMatch As taxrec, dballowed As Integer, withPics As Boolean) As List(Of taxrec)
 
     ' get all the immediate children of tmatch, in all database tables
 
     Dim desc As New List(Of taxrec)
     Dim descg As New List(Of taxrec)
-    Dim matches As List(Of taxrec)
     Dim childNames As New List(Of String)
     Dim pics As String = ""
 
     If withPics Then pics = " and childimagecounter > 0 "
 
     If (dballowed And 1) Then
-      If tMatch.taxid.StartsWith("g") Then
-        matches = queryTax("select * from taxatable where taxon = @parm1" & pics, tMatch.taxon)
-        For Each m As taxrec In matches
-          desc = queryTax("select * from taxatable where parentid = @parm1" & pics, matches(0).taxid)
-        Next m
-      Else
-        desc = queryTax("select * from taxatable where parentid = @parm1" & pics, tMatch.taxid)
-      End If
+      desc = queryTax("select * from taxatable where parentid = @parm1" & pics, tMatch.taxid)
 
       For Each m As taxrec In desc
         childNames.Add(m.taxon)
-      Next m
-    End If
-
-    If (dballowed And 8) Then
-      If Not tMatch.taxid.StartsWith("g") Then
-        matches = queryTax("select * from gbif.tax where name = @parm1 and usable <> ''", tMatch.taxon)
-        For Each m As taxrec In matches ' should be 1
-          If (Not withPics Or m.childimageCounter > 0) Then
-            descg = queryTax("select * from gbif.tax where parent = @parm1", m.taxid.Substring(1))
-          End If
-        Next m
-      Else
-        descg = queryTax("select * from gbif.tax where parent = @parm1", tMatch.taxid.Substring(1))
-      End If
-
-      For Each m As taxrec In descg
-        If (Not withPics Or m.childimageCounter > 0) AndAlso childNames.IndexOf(m.taxon) < 0 Then
-          childNames.Add(m.taxon)
-          desc.Add(m)
-        End If
       Next m
     End If
 
@@ -1830,15 +1598,15 @@ Public Module bugMain
   Function allDescendants(tMatch As taxrec, rank As String) As List(Of taxrec)
     ' returns a sorted list of itis + bugguide descendant names, at rank (or all descendants if rank is "")
 
-    Dim children As New List(Of taxrec)
-    Dim chil As New List(Of taxrec)
+    Dim children As List(Of taxrec)
+    Dim chil As List(Of taxrec)
     Dim desc As New List(Of taxrec) ' all the descendants to return
     Dim childName As New List(Of String)
     Dim descName As New List(Of String)
     'Dim validName As String
     Dim recRank As String
 
-    children = getChildren(tMatch, True, 1, False) ' get immediate children, sources = dballowed, include with or without pics
+    children = getChildren(tMatch, 1, False) ' get immediate children, sources = dballowed, include with or without pics
 
     For i1 As Integer = children.Count - 1 To 0 Step -1
       'validName = validTaxon(children(i1))
@@ -1930,11 +1698,7 @@ Public Class pixClass
 
     s = dr("taxonid")
 
-    If s.StartsWith("g") Then
-      match = getTaxrecg(dr, False)
-    Else
-      match = getTaxrec(dr)
-    End If
+    match = getTaxrec(dr, False)
 
   End Sub
 

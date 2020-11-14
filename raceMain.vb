@@ -1,5 +1,4 @@
 ﻿Imports System.Net
-Imports vb = Microsoft.VisualBasic
 Imports System.Collections.Generic
 Imports System.Drawing.Drawing2D
 Imports System.Drawing.Imaging
@@ -55,7 +54,7 @@ Public Module raceMain
       End If
       If exists Then
         saveRaceImageset(fName, setID) ' setID is assigned in the first call, byref
-        nLinked = nLinked + 1
+        nLinked += 1
       End If
     Next i
 
@@ -65,15 +64,14 @@ Public Module raceMain
 
   Sub getcompetitorByID(ByVal id As Integer, ByRef match As competitorRec)
 
-    Dim dset As New DataSet
+    Using ds As DataSet = getDS("select * from taxatable where id = @parm1 limit 1", id)
+      If ds IsNot Nothing AndAlso ds.Tables(0).Rows.Count >= 1 Then
+        getcompetitor(ds.Tables(0).Rows(0), match)
+      Else
+        match.name = ""
+      End If
+    End Using
 
-    dset = getDS("select * from taxatable where id = @parm1 limit 1", id)
-
-    If dset IsNot Nothing AndAlso dset.Tables(0).Rows.Count >= 1 Then
-      getcompetitor(dset.Tables(0).Rows(0), match)
-    Else
-      match.name = ""
-    End If
 
   End Sub
 
@@ -216,7 +214,7 @@ Public Module raceMain
 
     ' get txfilename.text - generate or find the file name
     s1 = targetFolder
-    If vb.Right(s1, 1) <> "\" Then s1 = s1 & "\"
+    If Not s1.EndsWith("\") Then s1 = s1 & "\"
     s = Path.GetFileNameWithoutExtension(picpath)
     ' append a-z... use a, or the last one that exists (if any do).
     c = "a"

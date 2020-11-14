@@ -4,7 +4,6 @@
 ' history: military, science, math, political, US, countries, mountaineering, aerospace, astronomy, tides
 ' birthdays: major, music, math, science, political, military, aerospace, mountaineering, world peace, nobel winners, nature, etc.
 
-Imports vb = Microsoft.VisualBasic
 Imports System.Runtime.InteropServices
 Imports System.Drawing.Drawing2D
 Imports System.Drawing.Printing
@@ -72,7 +71,7 @@ Public Class clsCalendar
     n = cal.GetDaysInMonth(startDate.Year, startDate.Month)
     startDay = Weekday(New Date(startDate.Year, startDate.Month, 1)) - 1  ' day of week (0-6) of the first day of the month
     nWeeks = CInt(Ceiling((n + startDay) / 7))
-    ' If nWeeks = 4 Then nWeeks = nWeeks + 1
+    ' If nWeeks = 4 ThennWeeks +=1
 
     xSize = rBox.Width / 7
     ySize = rBox.Height /  (nWeeks + 1.5) ' add another for the title line and half for the footer
@@ -169,7 +168,7 @@ Public Class clsCalendar
           y = iy + ySize * i
           gBrush = New SolidBrush(Color.Black)
           g.DrawString(s, gFont, gBrush, CSng(x), CSng(y))
-          iday = iday + 1
+          iday += 1
 
         ElseIf iday > n Then ' add postday - next month
           s = CStr(postday)
@@ -177,7 +176,7 @@ Public Class clsCalendar
           y = iy + ySize * i
           gBrush = New SolidBrush(Color.LightGray)
           g.DrawString(s, gFont, gBrush, CSng(x), CSng(y))
-          postday = postday + 1
+          postday += 1
 
         Else ' add preday - last month
           s = CStr(preday)
@@ -185,7 +184,7 @@ Public Class clsCalendar
           y = iy + ySize * i
           gBrush = New SolidBrush(Color.LightGray)
           g.DrawString(s, gFont, gBrush, CSng(x), CSng(y))
-          preday = preday + 1
+          preday += 1
         End If
       Next j
       If iday > n Then Exit For
@@ -211,7 +210,7 @@ Public Class clsCalendar
         r = New Rectangle(CInt(x), CInt(y), CInt(xs), CInt(ys))
         g.DrawString(lunarComment(k), gFont, gBrush, r, fmt)
       End If
-      k = k + 1
+      k += 1
     Next j
 
     gFont = New Font(fontname, CSng(tsizeNotes), FontStyle.Regular, GraphicsUnit.Pixel, CharSet.Unicode)
@@ -233,7 +232,7 @@ Public Class clsCalendar
         r = New Rectangle(CInt(x), CInt(y), CInt(xs), CInt(ys))
         g.DrawString(calComment(k), gFont, gBrush, r, fmt)
       End If
-      k = k + 1
+      k += 1
     Next j
 
   End Sub
@@ -287,7 +286,7 @@ Public Class clsCalendar
           x = CSng(rBox.X + xs * (j + 0.5))
           y = CSng(rBox.Y + ys * (i + 2.5))
           g.DrawString(s, gFont, gBrush, x, y, fmt)
-          iday = iday + 1
+          iday += 1
           If iday > n Then Exit For
         End If
       Next j
@@ -307,8 +306,8 @@ Public Class clsCalendar
     Dim d As Date
     Dim s As String
     Dim itype As Integer
-    Dim bt(4) As Byte ' type
-    Dim bd(8) As Byte ' date
+    Dim bt() As Byte ' type
+    Dim bd() As Byte ' date
     Dim i64 As Long
     Dim i As Integer
     Dim bf(-1) As Byte
@@ -342,7 +341,7 @@ Public Class clsCalendar
         For i = 0 To 7
           bf(i + ipos + 4) = bd(i)
         Next i
-        ipos = ipos + 12
+        ipos += 12
 
       End If
     Next iLine
@@ -446,7 +445,7 @@ Public Class clsCalendar
         iLine = 0
         Do While iLine < UBound(ss)
           d = Nothing
-          s = ss(iLine) : iLine = iLine + 1
+          s = ss(iLine) : iLine += 1
 
           i = InStr(s, "'") ' comment marker
           If i > 0 Then s = Trim(Mid(s, 1, i - 1))
@@ -454,7 +453,7 @@ Public Class clsCalendar
           If Len(s) > 0 Then
             sn = s.Split(" ")
             If IsNumeric(sn(0)) Then i = CInt(sn(0)) Else i = 90000
-            s = ss(iLine) : iLine = iLine + 1
+            s = ss(iLine) : iLine += 1
 
             Select Case i ' get d (date) and s (description)
               Case -1 ' category
@@ -468,19 +467,19 @@ Public Class clsCalendar
                 d = CDate(sn(3) & "/1/" & iYear) ' first day of the month
                 iDay = d.DayOfWeek
                 i = CInt(sn(2)) - iDay + 1 ' day-of-month of first x-day
-                If i <= 0 Then i = i + 7
-                i = i + (CInt(sn(1)) - 1) * 7 ' add weeks 
+                If i <= 0 Then i += 7
+                i += (CInt(sn(1)) - 1) * 7 ' add weeks 
                 d = CDate(sn(3) & "/" & i & "/" & iYear)
 
               Case 3 ' general date - date and description, annually displayed
                 dOrg = CDate(s)
                 d = CDate(dOrg.Month & "/" & dOrg.Day & "/" & iYear)
-                s = ss(iLine) : iLine = iLine + 1
+                s = ss(iLine) : iLine += 1
                 processString(d, dOrg, s)
 
               Case 4 ' general date - date and description, displayed only in the year specified
                 d = CDate(s)
-                s = ss(iLine) : iLine = iLine + 1
+                s = ss(iLine) : iLine += 1
 
               Case 5 ' relative to easter
                 d = easter(iYear)
@@ -491,7 +490,7 @@ Public Class clsCalendar
                 d = CDate(sn(2) & "/1/" & iYear) ' first day of the month
                 iDay = d.DayOfWeek
                 i = CInt(sn(1)) - iDay + 1 ' day-of-month of first x-day
-                If i < 0 Then i = i + 7
+                If i < 0 Then i += 7
                 k = DateTime.DaysInMonth(iYear, d.Month)
                 k = ((k - i) \ 7) * 7 + i
                 d = CDate(sn(2) & "/" & k & "/" & iYear)
@@ -508,10 +507,10 @@ Public Class clsCalendar
                 d = CDate(sn(3) & "/1/" & iYear) ' first day of the month
                 iDay = d.DayOfWeek
                 i = CInt(sn(1)) - iDay + 1 ' day-of-month of first x-day
-                If i < 0 Then i = i + 7
+                If i < 0 Then i += 7
                 k = CInt(sn(2))
                 j = CInt(sn(1))
-                If j < k Then i = i + k - j Else i = i + k - j + 7
+                If j < k Then i += k - j Else i += k - j + 7
             End Select
 
             ' add d and s
@@ -584,10 +583,10 @@ Public Class clsCalendar
     n = y - 19 * CInt(y / 19)
     k = CInt((c - 17) / 25)
     i = c - CInt(c / 4) - CInt((c - k) / 3) + 19 * n + 15
-    i = i - 30 * CInt(i / 30)
-    i = i - CInt(i / 28) * (1 - CInt(i / 28) * CInt(29 / (i + 1)) * CInt((21 - n) / 11))
+    i -= 30 * CInt(i / 30)
+    i -= CInt(i / 28) * (1 - CInt(i / 28) * CInt(29 / (i + 1)) * CInt((21 - n) / 11))
     j = y + CInt(y / 4) + i + 2 - c + CInt(c / 4)
-    j = j - 7 * CInt(j / 7)
+    j -= 7 * CInt(j / 7)
     L = i - j
     m = 3 + CInt((L + 40) / 44)
     d = L + 28 - 31 * CInt(m / 4)

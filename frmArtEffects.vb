@@ -939,7 +939,7 @@ Public Class frmArtEffects
               bbTarget(iOff) = bbSource(sourceOffset)
               bbTarget(iOff + 1) = bbSource(sourceOffset + 1)
               bbTarget(iOff + 2) = bbSource(sourceOffset + 2)
-              iOff = iOff + 4
+              iOff += 4
             Next ix
           Next iy
 
@@ -1016,7 +1016,7 @@ Public Class frmArtEffects
           Dim cellx, celly As Integer
           Dim iSize, Density, Darkness, Thickness As Integer
           Dim ix, iy, iw, ih As Integer
-          Dim pts As New List(Of Point)
+          Dim pts As List(Of Point)
           Dim r As Rectangle
           Dim fogColor As Color
           Dim bmpq, bmpz As Bitmap

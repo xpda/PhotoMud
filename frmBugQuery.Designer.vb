@@ -42,8 +42,11 @@ Partial Class chk
     Me.txFilename = New System.Windows.Forms.TextBox()
     Me.Label2 = New System.Windows.Forms.Label()
     Me.Panel1 = New System.Windows.Forms.Panel()
+    Me.txRankMin = New System.Windows.Forms.TextBox()
+    Me.txRankMax = New System.Windows.Forms.TextBox()
     Me.Label9 = New System.Windows.Forms.Label()
     Me.txModMax = New System.Windows.Forms.TextBox()
+    Me.Label11 = New System.Windows.Forms.Label()
     Me.txModMin = New System.Windows.Forms.TextBox()
     Me.lbDate2 = New System.Windows.Forms.Label()
     Me.txElevationMax = New System.Windows.Forms.TextBox()
@@ -59,11 +62,8 @@ Partial Class chk
     Me.Label5 = New System.Windows.Forms.Label()
     Me.Label8 = New System.Windows.Forms.Label()
     Me.Label7 = New System.Windows.Forms.Label()
-    Me.Label11 = New System.Windows.Forms.Label()
     Me.chkBugguide = New System.Windows.Forms.CheckBox()
     Me.chkInat = New System.Windows.Forms.CheckBox()
-    Me.txRankMin = New System.Windows.Forms.TextBox()
-    Me.txRankMax = New System.Windows.Forms.TextBox()
     Me.Panel1.SuspendLayout()
     Me.SuspendLayout()
     '
@@ -150,6 +150,8 @@ Partial Class chk
     'chkDescendants
     '
     Me.chkDescendants.AutoSize = True
+    Me.chkDescendants.Checked = True
+    Me.chkDescendants.CheckState = System.Windows.Forms.CheckState.Checked
     Me.chkDescendants.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
     Me.chkDescendants.Location = New System.Drawing.Point(160, 83)
     Me.chkDescendants.Name = "chkDescendants"
@@ -269,6 +271,22 @@ Partial Class chk
     Me.Panel1.Size = New System.Drawing.Size(459, 274)
     Me.Panel1.TabIndex = 82
     '
+    'txRankMin
+    '
+    Me.txRankMin.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+    Me.txRankMin.Location = New System.Drawing.Point(138, 226)
+    Me.txRankMin.Name = "txRankMin"
+    Me.txRankMin.Size = New System.Drawing.Size(134, 25)
+    Me.txRankMin.TabIndex = 121
+    '
+    'txRankMax
+    '
+    Me.txRankMax.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+    Me.txRankMax.Location = New System.Drawing.Point(299, 226)
+    Me.txRankMax.Name = "txRankMax"
+    Me.txRankMax.Size = New System.Drawing.Size(142, 25)
+    Me.txRankMax.TabIndex = 122
+    '
     'Label9
     '
     Me.Label9.AutoSize = True
@@ -286,6 +304,16 @@ Partial Class chk
     Me.txModMax.Name = "txModMax"
     Me.txModMax.Size = New System.Drawing.Size(142, 25)
     Me.txModMax.TabIndex = 108
+    '
+    'Label11
+    '
+    Me.Label11.AutoSize = True
+    Me.Label11.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+    Me.Label11.Location = New System.Drawing.Point(13, 229)
+    Me.Label11.Name = "Label11"
+    Me.Label11.Size = New System.Drawing.Size(46, 17)
+    Me.Label11.TabIndex = 120
+    Me.Label11.Text = "Ran&k:"
     '
     'txModMin
     '
@@ -417,16 +445,6 @@ Partial Class chk
     Me.Label7.TabIndex = 101
     Me.Label7.Text = "minimum"
     '
-    'Label11
-    '
-    Me.Label11.AutoSize = True
-    Me.Label11.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.Label11.Location = New System.Drawing.Point(13, 229)
-    Me.Label11.Name = "Label11"
-    Me.Label11.Size = New System.Drawing.Size(46, 17)
-    Me.Label11.TabIndex = 120
-    Me.Label11.Text = "Ran&k:"
-    '
     'chkBugguide
     '
     Me.chkBugguide.AutoSize = True
@@ -452,22 +470,6 @@ Partial Class chk
     Me.chkInat.Text = "iNa&turalist"
     Me.chkInat.ThreeState = True
     Me.chkInat.UseVisualStyleBackColor = True
-    '
-    'txRankMin
-    '
-    Me.txRankMin.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.txRankMin.Location = New System.Drawing.Point(138, 226)
-    Me.txRankMin.Name = "txRankMin"
-    Me.txRankMin.Size = New System.Drawing.Size(134, 25)
-    Me.txRankMin.TabIndex = 121
-    '
-    'txRankMax
-    '
-    Me.txRankMax.Font = New System.Drawing.Font("Arial", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-    Me.txRankMax.Location = New System.Drawing.Point(299, 226)
-    Me.txRankMax.Name = "txRankMax"
-    Me.txRankMax.Size = New System.Drawing.Size(142, 25)
-    Me.txRankMax.TabIndex = 122
     '
     'chk
     '

@@ -1,7 +1,6 @@
 ﻿'Photo Mud is licensed under Creative Commons BY-NC-SA 4.0
 'https://creativecommons.org/licenses/by-nc-sa/4.0/
 
-Imports vb = Microsoft.VisualBasic
 Imports System.IO
 Imports System.Collections.Generic
 
@@ -27,7 +26,7 @@ Public Class frmTagMatches
     Next node
 
     txSourcePath.Text = iniExplorePath
-    If vb.Right(txSourcePath.Text, 1) = ":" Then txSourcePath.Text = txSourcePath.Text & "\"
+    If txSourcePath.Text.EndsWith(":") Then txSourcePath.Text &= "\"
     TreeViewInit(TreeViewSource, txSourcePath.Text) ' initialize treeview with drives, etc.
 
     If Not useQuery Then
@@ -36,7 +35,7 @@ Public Class frmTagMatches
       Else
         txDestPath.Text = tagMatchPath
       End If
-      If vb.Right(txDestPath.Text, 1) = ":" Then txDestPath.Text = txDestPath.Text & "\"
+      If txDestPath.Text.EndsWith(":") Then txDestPath.Text &= "\"
       TreeViewInit(TreeViewDest, txDestPath.Text) ' initialize treeview with drives, etc.
 
     Else ' skip dest if useQuery
@@ -104,7 +103,7 @@ Public Class frmTagMatches
     tx = Sender
     If tx Is txSourcePath Then tv = TreeViewSource Else tv = TreeViewDest
 
-    If vb.Right(tx.Text, 1) = ":" Then tx.Text = tx.Text & "\"
+    If tx.Text.EndsWith(":") Then tx.Text &= "\"
 
     s = tx.Text
     i = CheckFolder(s, True)
@@ -175,7 +174,7 @@ Public Class frmTagMatches
         i = sourceFiles.IndexOf(s)
         If i >= 0 Then
           tagPath.Add(fName)
-          nTagged = nTagged + 1
+          nTagged += 1
         End If
       Next fName
 
@@ -215,7 +214,7 @@ Public Class frmTagMatches
               Next s
               If Not alreadyTagged Then
                 tagPath.Add(txDestPath.Text & "\" & destFiles(ixDest(j)))
-                nTagged = nTagged + 1
+                nTagged += 1
               End If
             Case -1 ' source < dest)
               Exit For

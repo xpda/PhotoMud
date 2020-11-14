@@ -1,7 +1,6 @@
 'Photo Mud is licensed under Creative Commons BY-NC-SA 4.0
 'https://creativecommons.org/licenses/by-nc-sa/4.0/
 
-Imports vb = Microsoft.VisualBasic
 Imports System.Collections.Generic
 Imports System.Drawing.Drawing2D
 Imports System.Drawing.Imaging
@@ -65,7 +64,7 @@ Public Class frmRotate
 
     Dim pComments As List(Of PropertyItem)
     Dim uComments As uExif
-    Dim picInfo As pictureInfo = Nothing
+    Dim picInfo As pictureInfo
     Dim s As String = ""
     Dim s1 As String
     Dim i, i1 As Integer
@@ -90,14 +89,14 @@ Public Class frmRotate
     trkAngle_ValueChanged(Sender, e)
 
     ' get the camera roll angle for auto align
-    picInfo = getPicinfo(currentpicPath, True)
+    picInfo = getPicinfo(currentpicPath)
     If picInfo.ErrMessage <> "" Then
       uComments = readComments(currentpicPath, True, True)
       pComments = readPropertyItems(currentpicPath)
       formatExifComments(True, False, False, False, s, uComments, picInfo, pComments) ' s has the answer
       i = InStr(s, "Camera Roll Angle:")
       If i > 0 Then
-        i = i + 19
+        i += 19
         i1 = InStr(i, s, "°")
         s1 = Mid(s, i, i1 - i)
         If IsNumeric(s1) Then
@@ -155,9 +154,9 @@ Public Class frmRotate
     Else
       rAngle = CDbl(txAngle.Text)
       rAngle = rAngle Mod 360
-      If rAngle < 180 Then rAngle = rAngle + 360
-      If rAngle > 180 Then rAngle = rAngle - 360
-      rAngle = rAngle * 10
+      If rAngle < 180 Then rAngle += 360
+      If rAngle > 180 Then rAngle -= 360
+      rAngle *= 10
       trkAngle.Value = rAngle
     End If
 
@@ -232,7 +231,7 @@ Public Class frmRotate
 
     ' set rAngle between 0 and 360
     rAngle = rAngle Mod 360
-    If rAngle < 0 Then rAngle = rAngle + 360
+    If rAngle < 0 Then rAngle += 360
 
     ' adjust the angle so we only have to consider one intersection case.
     If 0 <= rAngle And rAngle < 90 Then

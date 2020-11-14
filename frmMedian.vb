@@ -1,7 +1,6 @@
 'Photo Mud is licensed under Creative Commons BY-NC-SA 4.0
 'https://creativecommons.org/licenses/by-nc-sa/4.0/
 
-Imports vb = Microsoft.VisualBasic
 Imports System.Drawing.Drawing2D
 Imports System.Drawing.Imaging
 Imports System.Drawing
@@ -11,12 +10,10 @@ Imports ImageMagick
 Public Class frmMedian
   Inherits Form
 
-  Dim Loading As Boolean = True
   Dim sliding As Boolean = False
 
   Dim gpath As GraphicsPath = Nothing
 
-  Dim imageReduced As Boolean
   Dim xReduced As Double
 
   Dim WithEvents Timer1 As New Timer
@@ -60,8 +57,6 @@ Public Class frmMedian
     helpProvider1.SetHelpNavigator(Me, HelpNavigator.Topic)
     helpProvider1.SetHelpKeyword(Me, Me.Name & ".html")
 
-    Loading = True
-
     trkSample.Value = 3
     nmSample.Value = 3
 
@@ -69,11 +64,9 @@ Public Class frmMedian
 
     ' if it's too big, reduce the size and assign that.
     If qImage.Width * qImage.Height > bigMegapix Then
-      imageReduced = True
       xReduced = getSmallerImage(qImage, aview.pView0)
       aview.pView1.setBitmap(aview.pView0.Bitmap)
     Else
-      imageReduced = False
       aview.pView0.setBitmap(qImage)
       aview.pView1.setBitmap(qImage)
       xReduced = 1
@@ -81,7 +74,6 @@ Public Class frmMedian
 
     aview.ZoomViews(0.5)
 
-    Loading = False
     sliding = False
 
   End Sub

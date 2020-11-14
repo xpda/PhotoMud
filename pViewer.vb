@@ -390,8 +390,8 @@ Public Class pViewer
     If uBitmap Is Nothing Then Exit Sub
     fitPicImage()
 
-    uCenterPoint.X = uCenterPoint.X - dx / ZoomFactor
-    uCenterPoint.Y = uCenterPoint.Y - dy / ZoomFactor
+    uCenterPoint.X -= dx / ZoomFactor
+    uCenterPoint.Y -= dy / ZoomFactor
 
     vw = MyBase.ClientSize.Width / uZoomFactor
     vh = MyBase.ClientSize.Height / uZoomFactor
@@ -555,15 +555,7 @@ Public Class pViewer
   End Sub
 
   Public Sub MakeSepia()
-    MakeSepia(uBitmap, uBitmap) ' default source and target to mview.bitmap
-  End Sub
-
-  Public Sub MakeSepia(SourceBitmap As Bitmap)
-    MakeSepia(SourceBitmap, uBitmap) ' default target to mview.bitmap
-  End Sub
-
-  Public Sub MakeSepia(SourceBitmap As Bitmap, ByRef TargetBitmap As Bitmap)
-    Dim mx As ColorMatrix = New ColorMatrix( _
+    Dim mx As ColorMatrix = New ColorMatrix(
        {New Single() {0.393, 0.349, 0.272, 0, 0},
         New Single() {0.769, 0.686, 0.534, 0, 0},
         New Single() {0.189, 0.168, 0.131, 0, 0},
@@ -574,14 +566,6 @@ Public Class pViewer
   End Sub
 
   Public Sub HueRotate(Degrees As Double)
-    HueRotate(Degrees, uBitmap, uBitmap) ' default source and target to mview.bitmap
-  End Sub
-
-  Public Sub HueRotate(Degrees As Double, SourceBitmap As Bitmap)
-    HueRotate(Degrees, SourceBitmap, uBitmap) ' default target to mview.bitmap
-  End Sub
-
-  Public Sub HueRotate(Degrees As Double, SourceBitmap As Bitmap, ByRef TargetBitmap As Bitmap)
 
     Dim a As Double
     Dim sine, cosine As Double
@@ -594,15 +578,15 @@ Public Class pViewer
     cosine = Cos(a)
     sine = Sin(a)
 
-    Dim mx As ColorMatrix = New ColorMatrix( _
-       {New Single() {lumR + cosine * (1 - lumR) + sine * (-lumR), _
-                      lumG + cosine * (-lumG) + sine * (-lumG), _
+    Dim mx As ColorMatrix = New ColorMatrix(
+       {New Single() {lumR + cosine * (1 - lumR) + sine * (-lumR),
+                      lumG + cosine * (-lumG) + sine * (-lumG),
                       lumB + cosine * (-lumB) + sine * (1 - lumB), 0, 0},
-        New Single() {lumR + cosine * (-lumR) + sine * (0.143), _
-                      lumG + cosine * (1 - lumG) + sine * (0.14), _
+        New Single() {lumR + cosine * (-lumR) + sine * (0.143),
+                      lumG + cosine * (1 - lumG) + sine * (0.14),
                       lumB + cosine * (-lumB) + sine * (-0.283), 0, 0},
-        New Single() {lumR + cosine * (-lumR) + sine * (-(1 - lumR)), _
-                      lumG + cosine * (-lumG) + sine * (lumG), _
+        New Single() {lumR + cosine * (-lumR) + sine * (-(1 - lumR)),
+                      lumG + cosine * (-lumG) + sine * (lumG),
                       lumB + cosine * (1 - lumB) + sine * (lumB), 0, 0},
         New Single() {0, 0, 0, 1, 0},
         New Single() {0, 0, 0, 0, 1}})
@@ -611,22 +595,14 @@ Public Class pViewer
 
   End Sub
 
-  Public Sub MakeBlackAndWhite()
-    MakeBlackAndWhite(uBitmap, uBitmap) ' default source and target to mview.bitmap
-  End Sub
+  Public Sub MakeBlackAndWhite(Threshold As Integer)
 
-  Public Sub MakeBlackAndWhite(SourceBitmap As Bitmap)
-    MakeBlackAndWhite(SourceBitmap, uBitmap) ' default target to mview.bitmap
-  End Sub
-
-  Public Sub MakeBlackAndWhite(SourceBitmap As Bitmap, ByRef TargetBitmap As Bitmap, Optional Threshold As Integer = 0)
-
-    ' threshold goes from -50 to 50, mapped to x at .5 to 10
+    ' threshold goes from -50 to 50, mapped to x at .5 to 10, zero for normal
     Dim x As Double
 
     x = 0.00001228 * Threshold ^ 3 + 0.0015 * Threshold ^ 2 + 0.0643 * Threshold + 1.5
 
-    Dim mx As ColorMatrix = New ColorMatrix( _
+    Dim mx As ColorMatrix = New ColorMatrix(
        {New Single() {x, x, x, 0, 0},
         New Single() {x, x, x, 0, 0},
         New Single() {x, x, x, 0, 0},
@@ -638,17 +614,9 @@ Public Class pViewer
   End Sub
 
   Public Sub MakeGrayscale()
-    MakeGrayscale(uBitmap, uBitmap) ' default source and target to mview.bitmap
-  End Sub
-
-  Public Sub MakeGrayscale(SourceBitmap As Bitmap)
-    MakeGrayscale(SourceBitmap, uBitmap) ' default target to mview.bitmap
-  End Sub
-
-  Public Sub MakeGrayscale(SourceBitmap As Bitmap, ByRef TargetBitmap As Bitmap)
 
     ' grayscale ColorMatrix
-    Dim mxColor As ColorMatrix = New ColorMatrix( _
+    Dim mxColor As ColorMatrix = New ColorMatrix(
       {New Single() {0.3F, 0.3F, 0.3F, 0, 0},
         New Single() {0.59F, 0.59F, 0.59F, 0, 0},
         New Single() {0.11F, 0.11F, 0.11F, 0, 0},
@@ -660,17 +628,9 @@ Public Class pViewer
   End Sub
 
   Public Sub Invert()
-    Invert(uBitmap, uBitmap) ' default source and target to mview.bitmap
-  End Sub
-
-  Public Sub Invert(SourceBitmap As Bitmap)
-    Invert(SourceBitmap, uBitmap) ' default target to mview.bitmap
-  End Sub
-
-  Public Sub Invert(SourceBitmap As Bitmap, ByRef TargetBitmap As Bitmap)
 
     ' inversion matrix
-    Dim mxColor As ColorMatrix = New ColorMatrix( _
+    Dim mxColor As ColorMatrix = New ColorMatrix(
        {New Single() {-1, 0, 0, 0, 0},
         New Single() {0, -1, 0, 0, 0},
         New Single() {0, 0, -1, 0, 0},
@@ -772,8 +732,6 @@ Public Class pViewer
   End Sub
 
   Public Sub Fill(FillColor As Color, TargetBitmap As Bitmap, Optional gPath As GraphicsPath = Nothing)
-
-    Dim disposeSource As Boolean = False
 
     If TargetBitmap Is Nothing Then Exit Sub
 
@@ -1073,15 +1031,13 @@ Public Class pViewer
 
   End Sub
 
-  Sub DrawLine(pp As List(Of Point), LineColor As Color, _
-    Optional LineWidth As Double = 1, Optional Quality As SmoothingMode = Drawing2D.SmoothingMode.HighQuality,
-    Optional endCap As LineCap = LineCap.Flat)
+  Sub DrawLine(pp As List(Of Point), LineColor As Color,
+    Optional LineWidth As Double = 1, Optional Quality As SmoothingMode = Drawing2D.SmoothingMode.HighQuality)
     DrawLine(pp.ToArray, LineColor, LineWidth, Quality)
   End Sub
 
-  Sub DrawLine(pp() As Point, LineColor As Color, _
-    Optional LineWidth As Double = 1, Optional Quality As SmoothingMode = Drawing2D.SmoothingMode.HighQuality,
-    Optional endCap As LineCap = LineCap.Flat)
+  Sub DrawLine(pp() As Point, LineColor As Color,
+    Optional LineWidth As Double = 1, Optional Quality As SmoothingMode = Drawing2D.SmoothingMode.HighQuality)
     ' Public sub to draw line to bitmap
     Using _
         g As Graphics = Graphics.FromImage(uBitmap),

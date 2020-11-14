@@ -7,8 +7,6 @@ Imports ImageMagick
 Imports System.Collections.Generic
 Imports System.Drawing.Imaging
 
-Imports vb = Microsoft.VisualBasic
-
 Public Class frmSaveAs
   Inherits Form
 
@@ -65,10 +63,10 @@ Public Class frmSaveAs
     EnableOptions()
 
     fName = Trim(txFileName.Text)
-    If fName <> "" And vb.Right(fName, 1) <> "\" Then
+    If fName <> "" And Not fName.EndsWith("\") Then
       i = InStr(fName, ".") - 1
       If i > 0 Then
-        txFileName.Text = vb.Left(fName, i) & fmtCommon(ixFmt(cmbFiletype.SelectedIndex)).ID
+        txFileName.Text = fName.Substring(0, i) & fmtCommon(ixFmt(cmbFiletype.SelectedIndex)).ID
       Else
         txFileName.Text = fName & fmtCommon(ixFmt(cmbFiletype.SelectedIndex)).ID
       End If
@@ -96,7 +94,7 @@ Public Class frmSaveAs
 
     sFilter = "All Files|*.*"  ' if no extension on current file
     For i = 0 To fmtCommon.Count - 1
-      sFilter = sFilter & "|" & fmtCommon(i).Description & "|*" & fmtCommon(i).Ext
+      sFilter &= "|" & fmtCommon(i).Description & "|*" & fmtCommon(i).Ext
       If (ext = ".jpg" Or ext = ".jpeg") And fmtCommon(i).ID = ".jpg" Or _
          (ext = ".tif" Or ext = ".tiff") And fmtCommon(i).ID = ".tif" Then
         saveDialog1.FilterIndex = i + 2
@@ -104,7 +102,9 @@ Public Class frmSaveAs
     Next i
 
     saveDialog1.Filter = sFilter
-    If eqstr(vb.Right(fName, Len(ext)), ext) Then fName = vb.Left(fName, Len(fName) - Len(ext))
+    'If eqstr(vb.Right(fName, Len(ext)), ext) Then fName = vb.Left(fName, Len(fName) - Len(ext))
+
+    If fName.ToLower.EndsWith(ext.ToLower) Then fName = fName.Substring(0, Len(fName) - Len(ext))
     saveDialog1.FileName = fName
     saveDialog1.DefaultExt = ext
     If dirName <> "" Then
@@ -143,7 +143,7 @@ Public Class frmSaveAs
     CheckExt()
     fName = Trim(txFileName.Text)
     If fName = "" Then Exit Sub
-    If vb.Right(fName, 1) = "\" Then
+    If fName.EndsWith("\") Then
       MsgBox(fName & " could not be saved.")
       Exit Sub
     End If
@@ -236,7 +236,7 @@ Public Class frmSaveAs
       Exit Sub ' don't overwrite
     End If
 
-    picinfo = getPicinfo(currentpicPath, True)
+    picinfo = getPicinfo(currentpicPath)
 
     If Not picinfo.hasPages Then
       Using bmp As Bitmap = readBitmap(currentpicPath, msg)
@@ -338,7 +338,7 @@ Public Class frmSaveAs
     nix = -1
     For i = 0 To fmtCommon.Count - 1
       If fmtCommon(i).isWritable Then
-        nix = nix + 1
+        nix += 1
         ixFmt(nix) = i
         cmbFiletype.Items.Insert(nix, fmtCommon(i).Description & " (" & fmtCommon(i).Ext & ")")
         If cmbFiletype.SelectedIndex < 0 Then
@@ -350,8 +350,8 @@ Public Class frmSaveAs
 
     If cmbFiletype.SelectedIndex < 0 Then cmbFiletype.SelectedIndex = k
 
-    Me.Height = Me.Height - ((fmPng.Location.Y + fmPng.Size.Height) - (fmResize.Location.Y + fmResize.Size.Height))
-    If callingForm IsNot frmExplore Then Me.Height = Me.Height - ((fmResize.Location.Y + fmResize.Size.Height) - (cmdCancel.Location.Y + cmdCancel.Size.Height))
+    Me.Height -= ((fmPng.Location.Y + fmPng.Size.Height) - (fmResize.Location.Y + fmResize.Size.Height))
+    If callingForm IsNot frmExplore Then Me.Height -= ((fmResize.Location.Y + fmResize.Size.Height) - (cmdCancel.Location.Y + cmdCancel.Size.Height))
     fmPng.Left = fmJpg.Left : fmPng.Top = fmJpg.Top
 
     EnableOptions()
@@ -366,7 +366,7 @@ Public Class frmSaveAs
 
     If callingForm Is frmExplore Then ' called from Explorer -- allow resize
       If qImage Is Nothing Then ' have not read the file yet
-        picinfo = getPicinfo(currentpicPath, False)
+        picinfo = getPicinfo(currentpicPath)
         OriginalXres = picinfo.Width
         OriginalYres = picinfo.Height
       Else
@@ -409,14 +409,14 @@ Public Class frmSaveAs
     If OriginalFName <> "" Then strName = Path.GetFileName(OriginalFName) Else strName = ""
     i = InStr(strName, ".")
     If i <= 0 Then i = Len(strName) + 1
-    If strName <> "" Then strName = vb.Left(strName, i - 1) & fmtCommon(ixFmt(cmbFiletype.SelectedIndex)).ID
+    If strName <> "" Then strName = strName.Substring(0, i - 1) & fmtCommon(ixFmt(cmbFiletype.SelectedIndex)).ID
 
     If iniSavePath = "" Then
       strpath = iniExplorePath
     Else
       strpath = iniSavePath
     End If
-    If strpath <> "" Then If vb.Right(strpath, 1) <> "\" Then strpath = strpath & "\"
+    If strpath <> "" Then If Not strpath.EndsWith("\") Then strpath &= "\"
     txFileName.Text = strpath & strName
 
     Loading = False
@@ -441,7 +441,7 @@ Public Class frmSaveAs
       s = Path.GetDirectoryName(txFileName.Text)
       i = CheckFolder(s, True)
     Catch ex As Exception
-      s = ""
+      MsgBox("Invalid file name: " & txFileName.Text)
     End Try
 
   End Sub
@@ -478,7 +478,7 @@ Public Class frmSaveAs
 
     i = InStr(txPct.Text, "%")
     If i > 0 Then
-      strTmp = vb.Left(txPct.Text, i - 1)
+      strTmp = txPct.Text.Substring(0, i - 1)
     Else
       strTmp = txPct.Text
     End If
@@ -538,9 +538,9 @@ Public Class frmSaveAs
 
     ext = Path.GetExtension(fName)
 
-    If fName <> "" And vb.Right(fName, 1) <> "\" Then
+    If fName <> "" And Not fName.EndsWith("\") Then
       If ext = "" Then
-        txFileName.Text = txFileName.Text & fmtCommon(ixFmt(cmbFiletype.SelectedIndex)).ID
+        txFileName.Text &= fmtCommon(ixFmt(cmbFiletype.SelectedIndex)).ID
       Else
         If ext.ToLower <> fmtCommon(ixFmt(cmbFiletype.SelectedIndex)).ID Then
           For i = 0 To cmbFiletype.Items.Count

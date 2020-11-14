@@ -328,9 +328,9 @@ Public Class frmExploref
 
   Private Sub mnuToolsWallpaper_Click(ByVal Sender As Object, ByVal e As EventArgs) Handles mnuToolsWallpaper.Click
 
-    Dim fName As String = ""
-    Dim fPath As String = ""
-    Dim msg As String = ""
+    Dim fName As String
+    Dim fPath As String
+    Dim msg As String
 
     If (ListView1.SelectedItems.Count = 1) Then
 
@@ -357,7 +357,7 @@ Public Class frmExploref
 
     If pathPos >= 1 Then
       pathPrevious = True
-      pathPos = pathPos - 1
+      pathPos -= 1
       Success = TreeViewSelectPath(TreeView, pathList(pathPos), dirWatch)
     End If
 
@@ -369,7 +369,7 @@ Public Class frmExploref
 
     If pathPos < pathTop Then
       pathNext = True
-      pathPos = pathPos + 1
+      pathPos += 1
       Success = TreeViewSelectPath(TreeView, pathList(pathPos), dirWatch)
     End If
 
@@ -524,7 +524,7 @@ Public Class frmExploref
       mnuWindow.Enabled = True
       For Each mv In mViews
         q = New ToolStripMenuItem
-        i = i + 1
+        i += 1
         q.Text = "&" & i & " " & mv.Caption
         RemoveHandler q.Click, AddressOf mdiWindow_click
         AddHandler q.Click, AddressOf mdiWindow_click
@@ -730,7 +730,7 @@ Public Class frmExploref
 
     s = "*." & iniFileType(0)
     For i = 1 To iniFileType.Count - 1
-      s = s & ";*." & iniFileType(i)
+      s &= ";*." & iniFileType(i)
     Next i
 
     ListView1.ShowItemToolTips = True
@@ -1181,7 +1181,7 @@ Public Class frmExploref
     For Each Item In ListView1.SelectedItems
       If Not (Item.Checked) Then
         Item.Checked = True
-        locTagPaths = locTagPaths + 1
+        locTagPaths += 1
         tagPath.Add(Item.Tag)
       End If
     Next Item
@@ -1321,7 +1321,6 @@ Public Class frmExploref
 
   Sub setViewStyle()
 
-    Dim item As ListViewItem = Nothing
     Dim s As String
     Dim selectedPath As String
     Dim Ascend As String = "  " & ChrW(&H25B2)
@@ -1681,7 +1680,7 @@ Public Class frmExploref
     dirWatch.EnableRaisingEvents = False
     Me.Cursor = Cursors.WaitCursor
 
-    picinfo = getPicinfo(currentpicPath, False)
+    picinfo = getPicinfo(currentpicPath)
 
     If picinfo.FormatID = MagickFormat.Jpg Or picinfo.FormatID = MagickFormat.Jpeg Then
       ' rotate jpg files without loss on disk, other formats in memory only.
@@ -1965,12 +1964,11 @@ Public Class frmExploref
       ixItem.Add(i)
       sItem.Add(ListView1.Items(i).Tag)
     Next i
-    MergeSort(sItem, ixItem, 0, sItem.Count - 1)
-
-    For i = 0 To tagPath.Count - 1
-      ixTag.Add(i)
-    Next i
-    MergeSort(tagPath, ixTag, 0, tagPath.Count - 1)
+        MergeSort(sItem, ixItem, 0, sItem.Count - 1)
+        For i = 0 To tagPath.Count - 1
+            ixTag.Add(i)
+        Next i
+        MergeSort(tagPath, ixTag, 0, tagPath.Count - 1)
 
     ' merge two sorted lists because .find is too slow.
     ' sitem is 0 based, tagpaths is 1 based
@@ -1984,13 +1982,13 @@ Public Class frmExploref
           Case 0 ' found a match
             ListView1.Items(ixItem(i)).Checked = True
             Tagged = True
-            locTagPaths = locTagPaths + 1
-            kTag = kTag + 1
+            locTagPaths += 1
+            kTag += 1
             Exit Do
           Case -1 ' item < tag -- go to next item
             Exit Do
           Case 1 ' item > tag -- go to next tag
-            kTag = kTag + 1
+            kTag += 1
         End Select
 
       Loop
@@ -2020,7 +2018,7 @@ Public Class frmExploref
       If (rview.Bitmap IsNot Nothing) Then
         s = "File: " & Path.GetFileName(currentpicPath) & ",  " & rview.Bitmap.Width & " x " & rview.Bitmap.Height & ".     "
       Else
-        If currentpicPath <> "" Then picinfo = getPicinfo(currentpicPath, True)
+        If currentpicPath <> "" Then picinfo = getPicinfo(currentpicPath)
         If picinfo IsNot Nothing AndAlso Not picinfo.isNull AndAlso (picinfo.Width > 0 And picinfo.Height > 0) Then
           s = "File: " & Path.GetFileName(currentpicPath) & ",  " & picinfo.Width & " x " & picinfo.Height & ".     "
         End If
@@ -2028,15 +2026,15 @@ Public Class frmExploref
     End If
 
     If tagPath.Count > 0 Then ' And ListView1.View <> View.LargeIcon Then
-      s = s & tagPath.Count & " photos tagged"
-      If tagPath.Count <> locTagPaths Then s = s & ", " & locTagPaths & " here"
-      s = s & ".     "
+      s &= tagPath.Count & " photos tagged"
+      If tagPath.Count <> locTagPaths Then s &= ", " & locTagPaths & " here"
+      s &= ".     "
     End If
 
     If ListView1.Items.Count = 1 Then
-      s = s & "1 photo in folder.     "
+      s &= "1 photo in folder.     "
     Else
-      s = s & ListView1.Items.Count & " photos in folder.     "
+      s &= ListView1.Items.Count & " photos in folder.     "
     End If
 
     If lbStatus.Visible Then lbStatus.Text = s
@@ -2093,7 +2091,7 @@ Public Class frmExploref
 
     If tagPath.IndexOf(fPath) >= 0 Then
       tagPath.Remove(fPath)
-      locTagPaths = locTagPaths - 1
+      locTagPaths -= 1
     End If
 
   End Sub
@@ -2135,7 +2133,7 @@ Public Class frmExploref
     txFolder.Text = e.Node.Tag
 
     If (Not pathPrevious) And (Not pathNext) Then
-      pathPos = pathPos + 1
+      pathPos += 1
       pathList.Add(e.Node.Tag)
       pathTop = pathPos
     End If
@@ -2183,7 +2181,6 @@ Public Class frmExploref
     If Not txFolderChanged Then Exit Sub
     If processing Then Exit Sub
 
-    Success = False
     Success = TreeViewSelectPath(TreeView, txFolder.Text, dirWatch)
 
     If Not Success And TreeView.SelectedNode IsNot Nothing Then
@@ -2267,9 +2264,8 @@ Public Class frmExploref
         End If
       End If
     End If
-    If Not useQuery Then
-      i = getFilePaths(fPath, fileNames, False)
-    End If
+
+    If Not useQuery Then i = getFilePaths(fPath, fileNames, False)
 
     For i = 0 To fileNames.Count - 1 : ix.Add(i) : Next
     If Not useQuery Then MergeSort(fileNames, ix, 0, fileNames.Count - 1)
@@ -2373,6 +2369,7 @@ Public Class frmExploref
     Dim items As New List(Of ListViewItem)
     Dim iconSize As Point
     Dim v(2) As Object
+    Dim v2(2) As Object
 
     If useQuery Then
       getQueryPaths(fileNames, initialize)
@@ -2386,9 +2383,8 @@ Public Class frmExploref
       '  dirWatch.EnableRaisingEvents = True
       '  End If
     End If
-    If Not useQuery Then
-      i = getFilePaths(fPath, fileNames, False)
-    End If
+
+    If Not useQuery Then i = getFilePaths(fPath, fileNames, False)
 
     For i = 0 To fileNames.Count - 1 : ix.Add(i) : Next
     If Not useQuery Then MergeSort(fileNames, ix, 0, fileNames.Count - 1)
@@ -2422,11 +2418,11 @@ Public Class frmExploref
 
     End If
 
+    thumbPause.Set()
+
     v(0) = fileNames
     v(1) = ix
     v(2) = iconSize
-
-    thumbPause.Set()
     bkgThumb.RunWorkerAsync(v)
 
   End Sub
@@ -2491,14 +2487,14 @@ Public Class frmExploref
     ix = e.Argument(1)
     iconsize = e.Argument(2)
 
-    If fileNames.Count = 0 Then Exit Sub
+    If ix.Count = 0 Then Exit Sub
 
     ' get thumbnail stamps and tooltips from the image file
     lastTop = -1
-    setLoopStuff(loopFrom, loopTo, lastTop, fileNames.Count)
+    setLoopStuff(loopFrom, loopTo, lastTop, ix.Count)
     Do While True
       i = loopFrom
-      If bkgThumb.CancellationPending Then
+      If Sender.CancellationPending Then
         e.Cancel = True
         Exit Do
       End If
@@ -2509,12 +2505,12 @@ Public Class frmExploref
         imageKey = Path.GetFileName(fileNames(ix(i)))
         ' EXIF, CMP, JFIF and FlashPix can have thumbnail stamps
         s = LCase(Path.GetExtension(imageKey))
-        If Not (imgThumbnails.Images.ContainsKey(imageKey)) And _
+        If Not (imgThumbnails.Images.ContainsKey(imageKey)) And
           (s = ".jpg" Or s = ".jpeg" Or s = ".tiff" Or s = ".tif" Or s = ".cmp") Then
           gImage = readThumbnail(iniThumbX, iniThumbY, fileNames(ix(i)), msg, True)
 
           If gImage IsNot Nothing And msg = "" Then
-            picInfo = getPicinfo(fileNames(ix(i)), True, 1)
+            picInfo = getPicinfo(fileNames(ix(i)))
             tip = getImageTip(fileNames(ix(i)), picInfo)
             Me.Invoke(tooltipDelegate, fileNames(ix(i)), imageKey, tip) ' Sub tooltipAdd
             img = getShadow(gImage, iniShadowSize, ListView1.BackColor, iniThumbX, iniThumbY) ' add shadow
@@ -2529,18 +2525,18 @@ Public Class frmExploref
         End If
       End If
       If loopFrom = loopTo Then Exit Do
-      loopFrom = loopFrom + 1
-      If loopFrom > fileNames.Count - 1 Then loopFrom = 0
+      loopFrom += 1
+      If loopFrom > ix.Count - 1 Then loopFrom = 0
 
-      setLoopStuff(loopFrom, loopTo, lastTop, fileNames.Count)
+      setLoopStuff(loopFrom, loopTo, lastTop, ix.Count)
     Loop
 
     ' if necessary, get non-stamp thumbnails from images
     lastTop = -1
-    setLoopStuff(loopFrom, loopTo, lastTop, fileNames.Count)
+    setLoopStuff(loopFrom, loopTo, lastTop, ix.Count)
     Do While True
       i = loopFrom
-      If bkgThumb.CancellationPending Then
+      If Sender.CancellationPending Then
         e.Cancel = True
         Exit Do
       End If
@@ -2552,7 +2548,7 @@ Public Class frmExploref
         gImage = readThumbnail(iniThumbX, iniThumbY, fileNames(ix(i)), msg, False, InterpolationMode.High)
 
         If gImage IsNot Nothing Or Len(msg) <> 0 Then
-          picInfo = getPicinfo(fileNames(ix(i)), True, 1)
+          picInfo = getPicinfo(fileNames(ix(i)))
           If Not picInfo.isNull Then tip = getImageTip(fileNames(ix(i)), picInfo) Else tip = ""
           img = getShadow(gImage, iniShadowSize, ListView1.BackColor, iniThumbX, iniThumbY) ' add shadow
           Try
@@ -2568,9 +2564,9 @@ Public Class frmExploref
       End If
 
       If loopFrom = loopTo Then Exit Do
-      loopFrom = loopFrom + 1
-      If loopFrom > fileNames.Count - 1 Then loopFrom = 0
-      setLoopStuff(loopFrom, loopTo, lastTop, fileNames.Count)
+      loopFrom += 1
+      If loopFrom > ix.Count - 1 Then loopFrom = 0
+      setLoopStuff(loopFrom, loopTo, lastTop, ix.Count)
     Loop
 
     clearBitmap(gImage)
@@ -2603,31 +2599,6 @@ Public Class frmExploref
 
   End Sub
 
-  Sub trimThumb(ByRef gimage As Bitmap, ByRef picInfo As pictureInfo)
-    ' crop the thumbnail from tAspect to picinfo.Aspect, because leadtools always reads a 160x120 jpg thumbnail
-
-    Dim ix1, iy1 As Integer
-    Dim ih, iw As Integer
-    Dim tAspect As Double
-
-    If picInfo.Aspect > 0 And gimage.Width > 0 Then
-      tAspect = gimage.Height / gimage.Width
-
-      If Abs(tAspect - picInfo.Aspect) * gimage.Width > 2 Then ' trim it
-        ix1 = 0 : iy1 = 0 : ih = gimage.Height : iw = gimage.Width
-        If tAspect > picInfo.Aspect Then ' thumbnail is too tall -- trim the height
-          ih = gimage.Width * picInfo.Aspect
-          iy1 = (gimage.Height - ih) / 2
-        Else ' trim sides
-          iw = gimage.Height / picInfo.Aspect
-          ix1 = (gimage.Width - iw) / 2
-        End If
-
-      End If
-    End If
-
-  End Sub
-
   Function getListviewTop() As Integer
     ' get the top item in listview (thumbnail mode only)
     getListviewTop = 0
@@ -2635,7 +2606,7 @@ Public Class frmExploref
 
     Try
       getListviewTop = ListView1.FindNearestItem(SearchDirectionHint.Right, New Point(20, 20)).Index
-      If getListviewTop > 0 Then getListviewTop = getListviewTop - 1
+      If getListviewTop > 0 Then getListviewTop -= 1
     Catch ex As Exception
     End Try
 
@@ -2643,26 +2614,26 @@ Public Class frmExploref
 
   Function getImageTip(ByVal fName As String, ByRef picinfo As pictureInfo) As String
 
-    Dim s As String
+    Dim s, s1 As String
     Dim k As Integer
 
     If picinfo Is Nothing Then Return ""
 
     s = "File name: " & Path.GetFileName(fName)
     If picinfo.Width > 0 And picinfo.Height > 0 Then
-      s = s & crlf & "Resolution: " & picinfo.Width & " x " & picinfo.Height
+      s &= crlf & "Resolution: " & picinfo.Width & " x " & picinfo.Height
     End If
     If picinfo.fileSize > 0 Then
       k = Round(picinfo.fileSize) / 1000
       If k = 0 Then k = 1
-      s = s & crlf & "File size: " & Format(k, "#,##0") & " KB"
+      s &= crlf & "File size: " & Format(k, "#,##0") & " KB"
     End If
-    If picinfo.colorDepth > 0 Then s = s & crlf & "Color depth: " & picinfo.colorDepth
-    If picinfo.FormatDescription.Trim <> "" Then s = s & crlf & "Format: " & picinfo.FormatDescription
-    s = s & crlf & "Multipage: " & picinfo.hasPages
+    If picinfo.colorDepth > 0 Then s &= crlf & "Color depth: " & picinfo.colorDepth
+    If picinfo.FormatDescription.Trim <> "" Then s &= crlf & "Format: " & picinfo.FormatDescription
+    s &= crlf & "Multipage: " & picinfo.hasPages
 
-    s = readPhotoDate(fName)
-    If s <> Nothing Then s = s & crlf & "Photo date: " & s
+    s1 = readPhotoDate(fName)
+    If s <> Nothing Then s &= crlf & "Photo date: " & s1
 
     Return s
 
@@ -3113,10 +3084,10 @@ Public Class frmExploref
         If nDir > 1 Then s = "There are " & nDir & " folders "
         If nDir = 1 Then s = "There is 1 folder "
       Else
-        If nDir > 1 Then s = s & "and " & nDir & " folders "
-        If nDir = 1 Then s = s & "and 1 folder "
+        If nDir > 1 Then s &= "and " & nDir & " folders "
+        If nDir = 1 Then s &= "and 1 folder "
       End If
-      s = s & "in " & contextMenuNode.Tag & ". Photo Mud will only delete an empty folder."
+      s &= "in " & contextMenuNode.Tag & ". Photo Mud will only delete an empty folder."
       mResult = MsgBox(s, MsgBoxStyle.OkOnly)
 
     Else
@@ -3315,7 +3286,7 @@ Public Class frmExploref
         End If
       Next i
       If k = 0 Then
-        locTagPaths = locTagPaths + 1
+        locTagPaths += 1
         tagPath.Add(item.Tag)
       End If
 
@@ -3355,7 +3326,7 @@ Public Class frmExploref
   End Sub
 
   Private Sub mnuToolsBatchInfoCopy_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles mnuToolsBatchInfoCopy.Click
-    If bkgThumb.IsBusy Then thumbPause.Reset()
+    If bkgThumb.IsBusy Or bkgThumb.IsBusy Then thumbPause.Reset()
     If bkgPhotoDates.IsBusy Then photoDatesPause.Reset()
     Using frm As New frmBatchInfoCopy
       dResult = frm.ShowDialog()
@@ -3433,7 +3404,7 @@ Public Class frmExploref
     Else ' images
       sFilter = "All Files|*.*"  ' if no extension on current file
       For i As Integer = 0 To fmtCommon.Count - 1
-        sFilter = sFilter & "|" & fmtCommon(i).Description & "|*" & fmtCommon(i).Ext
+        sFilter &= "|" & fmtCommon(i).Description & "|*" & fmtCommon(i).Ext
         If (ext = ".jpg" Or ext = ".jpeg") And fmtCommon(i).ID = ".jpg" Or _
            (ext = ".tif" Or ext = ".tiff") And fmtCommon(i).ID = ".tif" Then
           saveDialog1.FilterIndex = i + 2

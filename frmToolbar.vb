@@ -23,7 +23,7 @@ Public Class frmToolbar
 
     If k > 0 Then
       List1.Items.RemoveAt(List1.SelectedIndex) ' keep separator
-      If k >= List1.Items.Count Then k = k - 1
+      If k >= List1.Items.Count Then k -= 1
       List1.SelectedIndex = k
     End If
 
@@ -81,7 +81,7 @@ Public Class frmToolbar
     nToolButtons = 0
     ' assign New Icons
     For i = 0 To List2.Items.Count - 1
-      nToolButtons = nToolButtons + 1
+      nToolButtons += 1
       If List2.Items(i) = Separator Then
         ToolButton(nToolButtons) = "---"
       Else
@@ -123,7 +123,7 @@ Public Class frmToolbar
     End If
 
     List2.Items.RemoveAt(k) ' keep separator
-    If k >= List2.Items.Count Then k = k - 1
+    If k >= List2.Items.Count Then k -= 1
     List2.SelectedIndex = k
 
   End Sub

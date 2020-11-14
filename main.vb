@@ -456,12 +456,13 @@ Public Module main
     frmMain = New frmMainf
     frmExplore = New frmExploref
 
+
     ProgramInit()
-    buginit()
     setDefaults()
     getini()
-
     iniDBConnStr = getConnStr(iniDBhost, iniDBdatabase, iniDBuser, iniDBpassword)
+
+    buginit() ' needs iniDBConnStr
 
     ' set the initial form sizes before loading
     If iniWindowSizeX = 0 Then
@@ -502,7 +503,7 @@ Public Module main
     For i = 0 To 360 Step 30
       fuzCircle(k) = New PointF(Sin(i * piOver180), Cos(i * piOver180))
       fuzType(k) = 1
-      k = k + 1
+      k += 1
     Next i
     fuzType(0) = 0
 
@@ -630,7 +631,7 @@ Public Module main
 
     If Directory.Exists(System.Windows.Forms.Application.StartupPath) Then
       exePath = System.Windows.Forms.Application.StartupPath
-      If Right(exePath, 1) <> "\" Then exePath = exePath & "\"
+      If Right(exePath, 1) <> "\" Then exePath &= "\"
     Else
       exePath = ""
     End If
@@ -641,8 +642,8 @@ Public Module main
     iniToolbarText = False
 
     UndoPath = Path.GetTempPath
-    If Right(UndoPath, 1) <> "\" Then UndoPath = UndoPath & "\"
-    UndoPath = UndoPath & AppName & "\"
+    If Right(UndoPath, 1) <> "\" Then UndoPath &= "\"
+    UndoPath &= AppName & "\"
 
     ' make undo directory in temp files if possible, otherwise use program files\photomud\tmp
     If Not Directory.Exists(UndoPath) Then
@@ -669,7 +670,7 @@ Public Module main
 
     ' dataPath = Application.UserAppDataPath ' user application data
     If dataPath = "" Then dataPath = exePath
-    If Right(dataPath, 1) <> "\" Then dataPath = dataPath & "\"
+    If Right(dataPath, 1) <> "\" Then dataPath &= "\"
 
     If Not Directory.Exists(dataPath) Then
       Try
@@ -1027,7 +1028,7 @@ Public Module main
                 For i = 1 To n
                   iniFileType.Add(ss(iLine + i).Trim.ToLower)
                 Next i
-                iLine = iLine + n
+                iLine += n
               End If
             End If
           Case "savepath"
@@ -1164,7 +1165,7 @@ Public Module main
               For i = 1 To nmru
                 mru(i) = ss(iLine + i)
               Next i
-              iLine = iLine + nmru
+              iLine += nmru
             End If
 
           Case "askassociate"
@@ -1185,7 +1186,7 @@ Public Module main
               For i = 1 To nToolButtons
                 iniToolButton(i) = ss(i + iLine)
               Next i
-              iLine = iLine + nToolButtons
+              iLine += nToolButtons
             End If
 
           Case "nvtoolbuttons"
@@ -1194,7 +1195,7 @@ Public Module main
               For i = 1 To nVToolButtons
                 iniVToolButton(i) = ss(i + iLine)
               Next i
-              iLine = iLine + nVToolButtons
+              iLine += nVToolButtons
             End If
 
             For i = nVToolButtons To 1 Step -1
@@ -1206,7 +1207,7 @@ Public Module main
                 End If
               Next b
               If k = 0 Then ' remove button - invalid
-                nVToolButtons = nVToolButtons - 1
+                nVToolButtons -= 1
                 For j = i To nVToolButtons
                   iniVToolButton(j) = iniVToolButton(j + 1)
                 Next j
@@ -1233,7 +1234,7 @@ Public Module main
 
     sf.Add("savepath=" & iniSavePath)
     s = Path.GetTempPath
-    If Right(s, 1) <> "\" And Right(iniExplorePath, 1) = "\" Then s = s & "\"
+    If Right(s, 1) <> "\" And Right(iniExplorePath, 1) = "\" Then s &= "\"
     If Right(s, 1) = "\" And Right(iniExplorePath, 1) <> "\" Then s = Left(s, Len(s) - 1)
     If String.Compare(s, iniExplorePath, True) <> 0 Then ' skip if it's on the temp folder, from email reading
       sf.Add("explorepath=" & iniExplorePath)
@@ -1439,7 +1440,6 @@ Public Module main
   Function loadNew(ByRef fName As String) As mudViewer
     ' load a file into a new tab page
 
-    Dim ext As String = ""
     Dim s As String
     Dim msg As String = ""
     Dim picInfo As pictureInfo
@@ -1456,7 +1456,7 @@ Public Module main
     rview = New mudViewer
     rview.Caption = Path.GetFileName(fName)
 
-    picInfo = getPicinfo(fName, True)
+    picInfo = getPicinfo(fName)
 
     frmMain.Cursor = Cursors.WaitCursor
     frmMain.Refresh()
@@ -1577,7 +1577,7 @@ Public Module main
           End If
         End If
 
-        picInfo = getPicinfo(fName, True, 1)
+        picInfo = getPicinfo(fName)
         If picInfo IsNot Nothing Then
           Select Case picInfo.Orientation
             Case ImageMagick.OrientationType.BottomRight
@@ -1750,7 +1750,7 @@ Public Module main
 
 
 
-  Function getPicinfo(ByVal fName As String, ByVal totalPages As Boolean, Optional ByVal pageNo As Integer = 1) As pictureInfo
+  Function getPicinfo(ByVal fName As String) As pictureInfo
 
     Dim picInfo As New pictureInfo
 
@@ -1978,15 +1978,16 @@ Public Module main
 
   End Function
 
-  Function InputFilename(ByRef MultiFile As Boolean) As String()
+  Function InputFilename() As List(Of String)
 
     ' returns n=count, and filenames 0-based
 
     Dim i As Integer
     Dim result As DialogResult
-    Dim filter As String = Nothing
+    Dim filter As String
     Dim openDlg As New OpenFileDialog
     Dim s As String
+    Dim fnames As New List(Of String)
 
     filter = "All Files|*.*"
     s = ""
@@ -2013,11 +2014,8 @@ Public Module main
       result = DialogResult.Abort
     End Try
 
-    If result = DialogResult.OK Then
-      Return openDlg.FileNames
-    Else
-      Return Nothing
-    End If
+    If result = DialogResult.OK Then fnames = openDlg.FileNames.ToList
+    Return fnames
 
   End Function
 
@@ -2026,22 +2024,19 @@ Public Module main
     ' this is called by mnuFileOpen_click in parent and child forms
 
     Dim n As Integer
-    Dim i As Integer
-    Dim filenames() As String
-    Dim rview As mudViewer = Nothing
-    Dim tab As TabPage = Nothing
+    Dim filenames As List(Of String)
+    Dim rview As mudViewer
 
-    filenames = InputFilename(True) ' get files to open
-    If filenames Is Nothing Then Exit Sub
+    filenames = InputFilename() ' get files to open
 
-    For i = 0 To UBound(filenames)
-      rview = FileIsOpen(filenames(i))
-      If rview Is Nothing Then
-        rview = loadNew(filenames(i))
-      Else
-        If i = n Then rview.Activate(Nothing, Nothing)
-      End If
-    Next i
+    For i As Integer = 0 To filenames.Count - 1
+        rview = FileIsOpen(filenames(i))
+        If rview Is Nothing Then
+          rview = loadNew(filenames(i))
+        Else
+          If i = n Then rview.Activate(Nothing, Nothing)
+        End If
+      Next i
 
   End Sub
   Sub LoadMruFile(ByVal index As Integer)
@@ -3047,7 +3042,7 @@ Public Module main
     If n >= 3 Then
       iKnot = 1
       For x = xd(1) + xInc To xd(n) - xInc Step xInc
-        If x > xd(iKnot + 1) Then iKnot = iKnot + 1
+        If x > xd(iKnot + 1) Then iKnot += 1
         ix = spline(x, xd, xk, sx, iKnot)
         iy = spline(x, xd, yk, sy, iKnot)
         xP.Add(New Point(ix, iy))
@@ -3079,21 +3074,21 @@ Public Module main
       ' now merge the two sorted halves
       i = min : j = half + 1 : k = min - 1
       Do While i <= half Or j <= max
-        k = k + 1
+        k += 1
         If j > max Then
           ix(k) = tix(i)
-          i = i + 1
+          i += 1
         ElseIf i > half Then
           ix(k) = tix(j)
-          j = j + 1
+          j += 1
           ' ignore case when comparing strings 
         ElseIf (isString AndAlso String.Compare(v(tix(i)), v(tix(j)), True) <= 0) OrElse _
           (Not isString AndAlso v(tix(i)) <= v(tix(j))) Then
           ix(k) = tix(i)
-          i = i + 1
+          i += 1
         Else
           ix(k) = tix(j)
-          j = j + 1
+          j += 1
         End If
       Loop
     Else ' 1 or 2 elements -- do by hand
@@ -3114,8 +3109,8 @@ Public Module main
     ' returns -1 for error
 
     Dim i1 As Integer
-    Dim fNames As New List(Of String)
-    Dim dirNames As New List(Of String)
+    Dim fNames As List(Of String)
+    Dim dirNames As List(Of String)
 
     If Not Directory.Exists(fPath) Then Return -1
 
@@ -3128,9 +3123,9 @@ Public Module main
       Try
         dirNames = Directory.GetDirectories(fPath).ToList
       Catch
-        dirNames = Nothing
         Return -1
       End Try
+
       If dirNames IsNot Nothing Then
         For Each s As String In dirNames
           i1 = getFilePaths(s, fileNames, subFolders)
@@ -3396,7 +3391,7 @@ Public Module main
     ' sets qBmp to nothing
     ' npts is the number of points set by the user
 
-    Dim i, j As Integer
+    Dim j As Integer
     Dim k1, k2 As Integer
     Dim x, y As Double
     Dim ix, iy As Integer
@@ -3411,8 +3406,8 @@ Public Module main
 
     Dim z As Double
 
-    Dim v1() As Byte = Nothing ' destination
-    Dim v2() As Byte = Nothing ' source
+    Dim v1() As Byte ' destination
+    Dim v2() As Byte ' source
 
     ''If qBmp.HasRegion Then
     'hasRegion = True
@@ -3452,7 +3447,7 @@ Public Module main
     If d / regionHeight > z Then z = d / regionHeight
     distance(destX(1), destY(1), destX(3), destY(3), dx, dy, d)
     If d / regionHeight > z Then z = d / regionHeight
-    If destY(0) <> destY(1) Or destY(2) <> destY(3) Then z = z * 1.4
+    If destY(0) <> destY(1) Or destY(2) <> destY(3) Then z *= 1.4
 
     mView.ResizeBitmap(New Size(qBmp.Width * z, qBmp.Height * z), qBmp, qBmp)
 
@@ -3485,8 +3480,6 @@ Public Module main
     dx2 = (destX(1) - destX(3)) / regionHeight
     dy2 = (destY(1) - destY(3)) / regionHeight
 
-    i = 0
-
     v1 = getBmpBytes(mView.Bitmap) ' destination
     v2 = getBmpBytes(qBmp)
 
@@ -3495,14 +3488,14 @@ Public Module main
     x2 = destX(3) : y2 = destY(3)
 
     ' move the bits over from v2 to v1
-    For i = regionTop To regionTop + regionHeight - 1
+    For i As Integer = regionTop To regionTop + regionHeight - 1
 
       'ProgressBar1.Value = (i - regionTop) * 100 / (regionHeight - 1)
 
-      x1 = x1 + dx1
-      y1 = y1 + dy1
-      x2 = x2 + dx2
-      y2 = y2 + dy2
+      x1 += dx1
+      y1 += dy1
+      x2 += dx2
+      y2 += dy2
 
       dx = (x2 - x1) / regionWidth
       dy = (y2 - y1) / regionWidth
@@ -3510,8 +3503,8 @@ Public Module main
       y = y1
       k1 = (i * qBmp.Width + regionLeft) * 4 ' source address.
       For j = regionLeft To regionLeft + regionWidth - 1
-        x = x + dx
-        y = y + dy
+        x += dx
+        y += dy
         ix = x  ' destination coordinates ix, iy
         iy = y
 
@@ -3535,15 +3528,12 @@ Public Module main
           End If
         End If
 
-        k1 = k1 + 4
+        k1 += 4
       Next j
     Next i
 
-    v2 = Nothing
     setBmpBytes(mView.Bitmap, v1)
-    v1 = Nothing
     mView.Zoom()
-    'ProgressBar1.Visible = False
 
   End Sub
 
@@ -3830,7 +3820,7 @@ Public Module main
     ' directory.getfiles strange searching for things like *.tif - don't use the second parameter
 
     Dim s, sx As String
-    Dim fNames As New List(Of String)
+    Dim fNames As List(Of String)
     Dim outNames As New List(Of String)
 
     Try
@@ -3989,17 +3979,12 @@ Public Module main
 
     ' get the gps location and altitude from ux.
 
-    Dim v1 As Object = Nothing
-    Dim v2 As Object = Nothing
-    Dim v3 As Object = Nothing
-    Dim v4 As Object = Nothing
     Dim k As Integer
-    Dim msg As String = ""
+    Dim msg As String
     Dim v As Object
     Dim x As Double
 
     Location = ""
-    Altitude = ""
 
     If pComments IsNot Nothing Then
 
@@ -4008,7 +3993,7 @@ Public Module main
         If uuBound(v) >= 2 Then
           xLat = v(0) + v(1) / 60 + v(2) / 3600
           Location = v(0) & "°" & v(1) & "'"
-          If v(2) <> 0 Then Location = Location & v(2) & """"
+          If v(2) <> 0 Then Location &= v(2) & """"
           v = getBmpComment(propID.GpsLatitudeRef, pComments)
           If LCase(v(0)) = "s" Then xLat = -xLat
           Location &= v(0)
@@ -4017,7 +4002,7 @@ Public Module main
         If uuBound(v) >= 2 Then
           xLon = v(0) + v(1) / 60 + v(2) / 3600
           Location &= " " & v(0) & "°" & v(1) & "'"
-          If v(2) <> 0 Then Location = Location & v(2) & """"
+          If v(2) <> 0 Then Location &= v(2) & """"
           v = getBmpComment(propID.GpsLongitudeRef, pComments)
           Location &= v(0)
           If LCase(v(0)) = "w" Then xLon = -xLon
@@ -4136,7 +4121,7 @@ Public Module main
           Case -1 ' number
             Try
               gVal(nVal + 1) = Val(s.Substring(lpos, ipos - lpos + 1))
-              nVal = nVal + 1
+              nVal += 1
             Catch
               msg = "Invalid number."
               Exit Do
@@ -4144,7 +4129,7 @@ Public Module main
 
           Case -2 ' N S E W
             c = s.Chars(lpos)
-            nHemi = nHemi + 1
+            nHemi += 1
             If nHemi > 1 Then
               msg = "Please use N or S and E or W."
               Exit Do
@@ -4160,13 +4145,13 @@ Public Module main
           Case -5 ' space
 
           Case Else ' get more stuff
-            ipos = ipos + 1
+            ipos += 1
         End Select
         iState = 0
         lpos = ipos
 
       Else
-        ipos = ipos + 1
+        ipos += 1
       End If
     Loop
 
@@ -4199,14 +4184,14 @@ Public Module main
           For i = 0 To k
             x1 = gpsVal(gVal(i), sym(i), hemi(0), i)
             If x1 = -1000 Then Return "Invalid location"
-            x = x + x1
+            x += x1
           Next i
           If hemi(0) = "N" Or hemi(0) = "S" Then xLat = x Else xLon = x
           x = 0
           For i = k + 1 To nVal
             x1 = gpsVal(gVal(i), sym(i), hemi(1), i - (k + 1))
             If x1 = -1000 Then Return "Invalid location"
-            x = x + x1
+            x += x1
           Next i
           If hemi(1) = "N" Or hemi(1) = "S" Then xLat = x Else xLon = x
 
@@ -4335,7 +4320,7 @@ Public Module main
           msg = ex.Message
         End Try
 
-        bmpTarget.Dispose()
+        If bmpTarget IsNot Nothing Then bmpTarget.Dispose()
         bmpTarget = bmp.Clone
       End Using
     End Using
@@ -4617,7 +4602,7 @@ Public Module main
       k = colorPlane - 1
       For i As Integer = 0 To (nBytes - 1) \ 4
         rgb(i) = rgb(k)
-        k = k + 4
+        k += 4
       Next i
       ReDim Preserve rgb(nBytes \ 4)
     End If
@@ -4642,7 +4627,7 @@ Public Module main
       k = colorPlane - 1
       For i As Integer = 0 To UBound(bb) \ 4 ' assign color plane bytes
         bb(k) = rgb(i)
-        k = k + 4
+        k += 4
       Next i
     End If
 
@@ -4722,7 +4707,7 @@ Public Module main
 
     Function write(bmp As Bitmap, fName As String, overWrite As Boolean, Optional frames As List(Of Bitmap) = Nothing) As String
 
-      Dim sourcePropertyitems As New List(Of PropertyItem)
+      Dim sourcePropertyitems As List(Of PropertyItem)
       Dim bmpsized As Bitmap = Nothing ' resized bitmap
       Dim bmpq As Bitmap ' either bmp or bmpsized, name for the bitmap assigned properties and saved.
       Dim mExif As ExifProfile
@@ -5145,7 +5130,7 @@ Public Module main
     i = 0
 
     Do While i <= Len(s)
-      i = i + 1
+      i += 1
       If i > Len(s) Then
         k = 4
       Else
@@ -5156,14 +5141,14 @@ Public Module main
           k = 3
         ElseIf InStr("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890~-!$%^*-_=+[]{}|<>", c) > 0 Then
           k = 1 ' alpha
-          c = ".:"
+          'c = ".:"
         End If
       End If
       state = it(k, state)
       If state <= 0 Then Exit Do
     Loop
 
-    If state = -1 Then validemail = True Else validemail = False
+    If state = -1 Then Return True Else Return False
 
   End Function
 
@@ -5217,7 +5202,7 @@ Public Module main
 
   Sub SendFinished(ByVal sender As Object, ByVal e As AsyncCompletedEventArgs)
 
-    Dim msg As String = ""
+    Dim msg As String
 
     If e.Error IsNot Nothing Then
       msg = "Email Error: " & e.Error.Message
@@ -5423,7 +5408,7 @@ Public Module main
   Function getRational(value As Object) As Integer()
     ' returns an array of numerators and denominators that match the double(s) "value".
     Dim rational() As Integer
-    Dim ii(1) As Integer
+    Dim ii() As Integer
 
     If IsArray(value) Then
       ReDim rational(UBound(value) * 2 + 1)
@@ -5549,7 +5534,7 @@ Public Module main
             ii2 = getDWordSigned(bb, i * 8 + 4, intel)
           Else
             ii1 = getDWord(bb, i * 8, intel)
-            If ii1 > 2 ^ 31 + 2 ^ 30 Then ii1 = ii1 - 2 ^ 32 '  this is probably because someone (like GPSStamp) got the signs wrong. It's technically incorrect.
+            If ii1 > 2 ^ 31 + 2 ^ 30 Then ii1 -= 2 ^ 32 '  this is probably because someone (like GPSStamp) got the signs wrong. It's technically incorrect.
             ii2 = getDWord(bb, i * 8 + 4, intel)
           End If
           If ii2 <> 0 Then vx(i) = ii1 / ii2 Else vx(i) = 0
@@ -5572,7 +5557,7 @@ Public Module main
       k = b(i)
       For j As Integer = 1 To 3
         k = k << 8
-        k = k + b(i + j)
+        k += b(i + j)
       Next j
       Return k
     End If
@@ -5589,7 +5574,7 @@ Public Module main
       k = b(i)
       For j As Integer = 1 To 3
         k = k << 8
-        k = k + b(i + j)
+        k += b(i + j)
       Next j
       Return k
     End If
@@ -5598,7 +5583,7 @@ Public Module main
 
   Function getWordSigned(ByRef b() As Byte, ByRef i As Integer, ByRef intel As Boolean) As Short
 
-    Dim k As Integer = 0
+    Dim k As Integer
 
     If intel Then
       k = b(i + 1)
@@ -5606,11 +5591,11 @@ Public Module main
       Return k
     Else
       k = b(i) * 256
-      k = k + b(i + 1)
+      k += b(i + 1)
       Return k
     End If
 
-    'If k >= 32768 Then k = k - 65536
+    'If k >= 32768 Then k -=65536
 
   End Function
 
@@ -5689,7 +5674,6 @@ Public Module main
     Dim qbyte As Integer
     Dim count As Integer = 0
 
-    neighbors = 0
     qbyte = p.Y * w + p.X
 
     neighbors = 0
@@ -5779,7 +5763,7 @@ Public Module main
     Dim n As Integer
     Dim pp As New List(Of Point)
     Dim p As Point
-    Dim deletedPrevious As Boolean
+    Dim deletedPrevious As Boolean ' not used, but left in
 
     n = get8Neighbor(bb, p1, w, h, neighbors)
     If n = 0 Then

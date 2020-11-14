@@ -1,7 +1,6 @@
 'Photo Mud is licensed under Creative Commons BY-NC-SA 4.0
 'https://creativecommons.org/licenses/by-nc-sa/4.0/
 
-Imports vb = Microsoft.VisualBasic
 Imports System.Drawing.Drawing2D
 Imports System.Drawing.Imaging
 Imports System.Drawing
@@ -18,8 +17,6 @@ Public Class frmPicturize3
   Dim gImage1 As Bitmap
   Dim gImage2 As Bitmap
   Dim cellImages As New List(Of Bitmap)
-
-  Dim clock As New Stopwatch
 
   Private Sub cmdHelp_Click(ByVal Sender As Object, ByVal e As EventArgs) Handles cmdHelp.Click
     Try
@@ -76,7 +73,7 @@ Public Class frmPicturize3
     Dim quad(5, 5, 2) As Integer
     Dim fPath As String
     Dim fName As String
-    Dim fNames As New List(Of String)
+    Dim fNames As List(Of String)
     Dim ext As New List(Of String)
 
     Dim cellXres As Integer
@@ -145,7 +142,7 @@ Public Class frmPicturize3
       pView.ResizeBitmap(New Size(cellXres, cellYres), gImage2, gImage2)
 
       If gImage2 IsNot Nothing Then
-        nFiles = nFiles + 1
+        nFiles += 1
         ProgressBar1.Value = nFiles
         picUsed(nFiles) = 0
 
@@ -198,7 +195,7 @@ Public Class frmPicturize3
             k = 0
             For i = 0 To CellDivX - 1
               For j = 0 To CellDivY - 1
-                k = k + Abs(quad(i, j, 0) - pcolor(i2, i, j, 0)) ^ 2 + Abs(quad(i, j, 1) - pcolor(i2, i, j, 1)) ^ 2 + _
+                k += Abs(quad(i, j, 0) - pcolor(i2, i, j, 0)) ^ 2 + Abs(quad(i, j, 1) - pcolor(i2, i, j, 1)) ^ 2 +
                   Abs(quad(i, j, 2) - pcolor(i2, i, j, 2)) ^ 2
               Next j
             Next i
@@ -209,7 +206,7 @@ Public Class frmPicturize3
           End If
         Next i2
         picUsed(MatchPos) += 1
-        nMatches = nMatches + 1
+        nMatches += 1
         If nMatches >= nFiles - 1 Then ' reset single-use flags -- too few files
           For i2 As Integer = 0 To nFiles - 1 : picUsed(i2) = 0 : Next i2
           nMatches = 0
@@ -222,8 +219,8 @@ Public Class frmPicturize3
             k2 = 0
             For i = 0 To CellDivX - 1
               For j = 0 To CellDivY - 1
-                k = k + pcolor(MatchPos, i, j, i2)
-                k2 = k2 + quad(i, j, i2)
+                k += pcolor(MatchPos, i, j, i2)
+                k2 += quad(i, j, i2)
               Next j
             Next i
 

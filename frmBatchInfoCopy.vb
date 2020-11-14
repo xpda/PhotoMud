@@ -1,7 +1,6 @@
 ﻿'Photo Mud is licensed under Creative Commons BY-NC-SA 4.0
 'https://creativecommons.org/licenses/by-nc-sa/4.0/
 
-Imports vb = Microsoft.VisualBasic
 Imports System.Collections.Generic
 Imports System.ComponentModel
 Imports System.Threading
@@ -40,12 +39,12 @@ Public Class frmBatchInfoCopy
 
     ' source path default
     txSourcePath.Text = iniExplorePath ' dest default = current folder 
-    If vb.Right(txSourcePath.Text, 1) = ":" Then txSourcePath.Text = txDestPath.Text & "\"
+    If txSourcePath.Text.EndsWith(":") Then txSourcePath.Text &= "\"
     TreeViewInit(TreeViewSource, txSourcePath.Text) ' initialize treeview with drives, etc.
 
     ' dest default = current folder 
     txDestPath.Text = iniExplorePath ' dest default = current folder 
-    If vb.Right(txDestPath.Text, 1) = ":" Then txDestPath.Text = txDestPath.Text & "\"
+    If txDestPath.Text.EndsWith(":") Then txDestPath.Text &= "\"
     TreeViewInit(TreeViewDest, txDestPath.Text) ' initialize treeview with drives, etc.
 
     chkCommentOnly.Checked = False
@@ -113,7 +112,7 @@ Public Class frmBatchInfoCopy
     tx = Sender
     If tx Is txSourcePath Then tv = TreeViewSource Else tv = TreeViewDest
 
-    If vb.Right(tx.Text, 1) = ":" Then tx.Text = tx.Text & "\"
+    If tx.Text.EndsWith(":") Then tx.Text &= "\"
 
     s = tx.Text
     i = CheckFolder(s, True)
@@ -231,7 +230,7 @@ Public Class frmBatchInfoCopy
   Function moveComments(sourceFile As String, destFile As String, ByRef nMoved As Integer) As Integer
     ' copies the comments from sourceFile to destFile
 
-    Dim pComments As New List(Of PropertyItem)
+    Dim pComments As List(Of PropertyItem)
     Dim destComments As New List(Of PropertyItem)
     Dim saver As New ImageSave
     Dim msg As String = ""

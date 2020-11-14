@@ -177,7 +177,7 @@ Public Class frmMainf
           msg = ex.Message
           s = "error"
         End Try
-        If s = appTag Then k = k + 1
+        If s = appTag Then k += 1
       Next i
 
       If k = 0 And iniAskAssociate Then
@@ -274,12 +274,12 @@ Public Class frmMainf
           gMsg = mView.picName & " has been changed. Do you want to save it?"
         End If
         mResult = MsgBox(gMsg, MsgBoxStyle.YesNoCancel)
-        closeTab = mResult
 
         If mResult = MsgBoxResult.Cancel Then
           Me.Select()
           Processing = False
           Return True ' abort closing
+
         ElseIf mResult = MsgBoxResult.Yes Then
           If mView.picName = "" OrElse mView.picPage <> "" Then
             FileSaveAs(0) ' save image
@@ -314,7 +314,7 @@ Public Class frmMainf
   End Function
 
   Private Sub mView_DoubleClick(sender As Object, e As EventArgs) Handles mView.DoubleClick
-    If DrawingStretch > 0 And DrawingStretch < 10 And npts > 1 Then npts = npts - 1 ' point added by second click
+    If DrawingStretch > 0 And DrawingStretch < 10 And npts > 1 Then npts -= 1 ' point added by second click
     If DrawingLine = 2 And zP.Count > 0 Then zP.RemoveAt(zP.Count - 1) ' point added by second click
     CompleteCommand()
   End Sub
@@ -355,7 +355,7 @@ Public Class frmMainf
 
       Case Keys.Escape ' Esc
         If DrawingStretch > 0 And npts > 0 Then
-          npts = npts - 1
+          npts -= 1
           If npts = 0 Then
             ClearProcesses(True)
             mnuEditPasteV_click(Nothing, Nothing)
@@ -373,7 +373,7 @@ Public Class frmMainf
       Case Keys.Left ' left arrow
         If drawingMode > 0 Then ' move cursor left
           p = Cursor.Position
-          If e.Shift Then p.X = p.X - 1 Else p.X = p.X - 10
+          If e.Shift Then p.X -= 1 Else p.X -= 10
           Cursor.Position = p
           e.Handled = True
         ElseIf e.Alt Then
@@ -400,7 +400,7 @@ Public Class frmMainf
       Case Keys.Right ' right arrow
         If drawingMode > 0 Then ' move cursor right
           p = Cursor.Position
-          If e.Shift Then p.X = p.X + 1 Else p.X = p.X + 10
+          If e.Shift Then p.X += 1 Else p.X += 10
           Cursor.Position = p
         ElseIf e.Alt Then
           mnuEditRedo_click(Nothing, Nothing)
@@ -423,7 +423,7 @@ Public Class frmMainf
       Case Keys.Up ' up arrow
         If drawingMode > 0 Then ' move cursor left
           p = Cursor.Position
-          If e.Shift Then p.Y = p.Y - 1 Else p.Y = p.Y - 10
+          If e.Shift Then p.Y -= 1 Else p.Y -= 10
           Cursor.Position = p
           e.Handled = True
         ElseIf e.Control Then
@@ -442,7 +442,7 @@ Public Class frmMainf
       Case Keys.Down ' down arrow
         If drawingMode > 0 Then ' move cursor left
           p = Cursor.Position
-          If e.Shift Then p.Y = p.Y + 1 Else p.Y = p.Y + 10
+          If e.Shift Then p.Y += 1 Else p.Y += 10
           Cursor.Position = p
           e.Handled = True
         ElseIf e.Control Then
@@ -462,14 +462,14 @@ Public Class frmMainf
         If drawingMode > 0 Then ' move cursor up right
           p = Cursor.Position
           If e.Shift Then
-            p.X = p.X + 1 : p.Y = p.Y + 1
+            p.X += 1 : p.Y += 1
           Else
-            p.X = p.X - 10 : p.Y = p.Y - 10
+            p.X -= 10 : p.Y -= 10
           End If
           Cursor.Position = p
 
         ElseIf panelPage.Visible Then
-          If nmPage.Value > nmPage.Minimum Then nmPage.Value = nmPage.Value - 1
+          If nmPage.Value > nmPage.Minimum Then nmPage.Value -= 1
           e.Handled = True
         End If
 
@@ -477,15 +477,15 @@ Public Class frmMainf
         If drawingMode > 0 Then ' move cursor down right
           p = Cursor.Position
           If e.Shift Then
-            p.X = p.X + 1 : p.Y = p.Y + 1
+            p.X += 1 : p.Y += 1
           Else
-            p.X = p.X + 10 : p.Y = p.Y + 10
+            p.X += 10 : p.Y += 10
           End If
           Cursor.Position = p
           e.Handled = True
 
         ElseIf panelPage.Visible Then
-          If nmPage.Value < nmPage.Maximum Then nmPage.Value = nmPage.Value + 1
+          If nmPage.Value < nmPage.Maximum Then nmPage.Value += 1
           e.Handled = True
         End If
 
@@ -493,9 +493,9 @@ Public Class frmMainf
         If drawingMode > 0 Then ' move cursor down left
           p = Cursor.Position
           If e.Shift Then
-            p.X = p.X - 1 : p.Y = p.Y + 1
+            p.X -= 1 : p.Y += 1
           Else
-            p.X = p.X - 10 : p.Y = p.Y + 10
+            p.X -= 10 : p.Y += 10
           End If
           Cursor.Position = p
           e.Handled = True
@@ -505,9 +505,9 @@ Public Class frmMainf
         If drawingMode > 0 Then ' move cursor up left
           p = Cursor.Position
           If e.Shift Then
-            p.X = p.X - 1 : p.Y = p.Y - 1
+            p.X -= 1 : p.Y -= 1
           Else
-            p.X = p.X - 10 : p.Y = p.Y - 10
+            p.X -= 10 : p.Y -= 10
           End If
           Cursor.Position = p
           e.Handled = True
@@ -585,7 +585,6 @@ Public Class frmMainf
     Dim i As Integer
     Dim fName As String
     Dim ofn As Object
-    Dim tab As TabPage = Nothing
 
     strFileName = ""
 
@@ -733,6 +732,15 @@ Public Class frmMainf
     CommandPrep(AddressOf mnuColorGrayscale_click)
     SaveUndo()
     mView.MakeGrayscale()
+    mView.Zoom()
+    Me.Cursor = Cursors.Default
+  End Sub
+
+  Private Sub mnuColorBlackandWhite_click(sender As Object, e As EventArgs) Handles mnuColorBlackandWhite.Click
+    Me.Cursor = Cursors.WaitCursor
+    CommandPrep(AddressOf mnuColorBlackandWhite_click)
+    SaveUndo()
+    mView.MakeBlackAndWhite(0)
     mView.Zoom()
     Me.Cursor = Cursors.Default
   End Sub
@@ -1324,7 +1332,7 @@ Public Class frmMainf
       ' look for other open photos
       If mv IsNot mView Then
         combineRview = mv
-        n = n + 1
+        n += 1
       End If
     Next mv
 
@@ -1368,7 +1376,7 @@ Public Class frmMainf
       ' look for other open photos
       If mv IsNot mView Then
         combineRview = mv
-        n = n + 1
+        n += 1
       End If
     Next mv
 
@@ -2007,7 +2015,7 @@ Public Class frmMainf
           DrawingStretch = 3
         Else
           If npts < 4 Then
-            npts = npts + 1
+            npts += 1
             rX(npts - 1) = e.X
             rY(npts - 1) = e.Y
             If npts >= 4 Then DrawingStretch = 3 ' got all 4 points, now drag mode
@@ -2160,7 +2168,7 @@ Public Class frmMainf
 
       Case cmd.Crop
         If rBoxMode <> rbMode.readyMouseDown And e.Button = MouseButtons.Left And rBoxMode <> rbMode.none Then
-          dragBox(e.Location, False)
+          dragBox(e.Location)
 
         ElseIf rBoxMode = rbMode.readyBoxDrag And e.Button = MouseButtons.None Then
           ' check edge
@@ -2258,7 +2266,7 @@ Public Class frmMainf
 
       Case cmd.DrawText
         Dragging = False
-        textPoint = textPoint + (e.Location - dragPoint)
+        textPoint += (e.Location - dragPoint)
         mView.RubberPoints = New List(Of Point)
         mView.RubberPoints.Add(textPoint)
         mView.Invalidate()
@@ -2376,7 +2384,7 @@ Public Class frmMainf
     tmpCursor = mView.Cursor
     mView.Cursor = Cursors.WaitCursor
 
-    mView.nUndo = mView.nUndo + 1
+    mView.nUndo += 1
     mView.picModified = True
 
     If Not iniMultiUndo Then ' only copy to mview.bitmapundo
@@ -2411,7 +2419,7 @@ Public Class frmMainf
 
 
     If k <> 0 Then
-      mView.nUndo = mView.nUndo - 1 ' unsuccessful
+      mView.nUndo -= 1 ' unsuccessful
     Else
       ' erase redo files
       For i = mView.nUndo + 1 To mView.nRedo
@@ -2431,7 +2439,7 @@ Public Class frmMainf
         Catch ex As Exception
           MsgBox(ex.Message)
         End Try
-        mView.firstUndo = mView.firstUndo + 1
+        mView.firstUndo += 1
       End If
     End If
 
@@ -2525,7 +2533,7 @@ Public Class frmMainf
     If mView.nUndo > mView.firstUndo Then mView.bitmapUndo = readUndoFile(fName)
     saveUndoFile(fName, imageTmp) ' save current bitmap for redo
 
-    mView.nUndo = mView.nUndo - 1
+    mView.nUndo -= 1
     If k <> 0 Then mView.nRedo = mView.nUndo
 
     redraw(mView, center)
@@ -2564,7 +2572,7 @@ Public Class frmMainf
       End If
     End If
 
-    If k = 0 Then mView.nUndo = mView.nUndo + 1
+    If k = 0 Then mView.nUndo += 1
 
     redraw(mView, center)
     setUndoTools()
@@ -2635,7 +2643,7 @@ Public Class frmMainf
       Exit Sub
     End If
 
-    dragBox(pCursor, True)
+    dragBox(pCursor)
     rBoxMode = rbMode.readyBoxDrag ' rBoxMode section done
     rboxleft = rbX
     rBoxTop = rbY
@@ -2654,10 +2662,10 @@ Public Class frmMainf
     ' 16 = inside
 
     getBoxEdge = 0
-    If Abs(pCursor.X - r.X) < 5 Then getBoxEdge = getBoxEdge + 1 ' mouse on left edge
-    If Abs(pCursor.X - (r.X + r.Width - 1)) < 5 Then getBoxEdge = getBoxEdge + 2 ' right
-    If Abs(pCursor.Y - r.Y) < 5 Then getBoxEdge = getBoxEdge + 4 ' top
-    If Abs(pCursor.Y - (r.Y + r.Height - 1)) < 5 Then getBoxEdge = getBoxEdge + 8 ' bottom edge
+    If Abs(pCursor.X - r.X) < 5 Then getBoxEdge += 1 ' mouse on left edge
+    If Abs(pCursor.X - (r.X + r.Width - 1)) < 5 Then getBoxEdge += 2 ' right
+    If Abs(pCursor.Y - r.Y) < 5 Then getBoxEdge += 4 ' top
+    If Abs(pCursor.Y - (r.Y + r.Height - 1)) < 5 Then getBoxEdge += 8 ' bottom edge
 
     If getBoxEdge = 0 And pCursor.X >= r.X And pCursor.X < r.X + r.Width And _
       pCursor.Y >= r.Y And pCursor.Y < r.Y + r.Height Then
@@ -2667,7 +2675,7 @@ Public Class frmMainf
 
   End Function
 
-  Sub dragBox(pCursor As Point, ByVal mouseUp As Boolean)
+  Sub dragBox(pCursor As Point)
 
     ' drag a box already on the screen for crop and other(?) commands
 
@@ -2710,11 +2718,11 @@ Public Class frmMainf
           If z > 1 Then
             ' too tall -- make it wider
             q = rbWidth * z
-            If x < rBoxX Then rbX = rbX - (q - rbWidth)
+            If x < rBoxX Then rbX -= (q - rbWidth)
             rbWidth = q
           Else
             q = rbHeight / z
-            If y < rBoxY Then rbY = rbY - (q - rbHeight)
+            If y < rBoxY Then rbY -= (q - rbHeight)
             rbHeight = q
           End If
         End If
@@ -3134,13 +3142,13 @@ Public Class frmMainf
     k = 0
     ' count the number of intersections above x
     i = Yintercept(x, rX(0), rY(0), rX(1), rY(1), y2)
-    If i > 0 And y2 > y Then k = k + 1
+    If i > 0 And y2 > y Then k += 1
     i = Yintercept(x, rX(1), rY(1), rX(3), rY(3), y2)
-    If i > 0 And y2 > y Then k = k + 1
+    If i > 0 And y2 > y Then k += 1
     i = Yintercept(x, rX(3), rY(3), rX(2), rY(2), y2)
-    If i > 0 And y2 > y Then k = k + 1
+    If i > 0 And y2 > y Then k += 1
     i = Yintercept(x, rX(2), rY(2), rX(0), rY(0), y2)
-    If i > 0 And y2 > y Then k = k + 1
+    If i > 0 And y2 > y Then k += 1
 
     If k Mod 2 <> 0 Then
       GetStretchEdge = 16
@@ -3908,7 +3916,8 @@ Public Class frmMainf
   End Sub
 
   Private Sub mView_ctlbrightOK() Handles mView.ctlBrightOK
-    Dim gImage As Bitmap = Nothing
+
+    Dim gImage As Bitmap
 
     mView.Cursor = Cursors.WaitCursor
     drawBright()
@@ -4518,7 +4527,7 @@ Public Class frmMainf
       mView.RemovePage(mView.CurrentPage)
       nmPage.Maximum = mView.PageCount
       lbPage.Text = "Page (of " & mView.PageCount & "): "
-      If i >= mView.PageCount Then i = i - 1
+      If i >= mView.PageCount Then i -= 1
       setPage(i)
     End If
 
@@ -4601,7 +4610,7 @@ Public Class frmMainf
     Dim i As Integer
 
     i = mainTabs.SelectedIndex
-    i = i + 1
+    i += 1
     If i > mainTabs.TabPages.Count - 1 Then i = 0
     mView = getMuddViewer(mainTabs.TabPages(i))
     mView.Activate(sender, e) ' sets mView

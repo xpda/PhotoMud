@@ -1,7 +1,6 @@
 'Photo Mud is licensed under Creative Commons BY-NC-SA 4.0
 'https://creativecommons.org/licenses/by-nc-sa/4.0/
 
-Imports vb = Microsoft.VisualBasic
 Imports System.Drawing.Drawing2D
 Imports System.Drawing.Imaging
 Imports System.Drawing
@@ -44,8 +43,8 @@ Public Module ImageInfo
     Dim tg As uTag
     Dim exifTags, gpsTags As Collection
     Dim ux As uExif = Nothing
-    Dim ux1 As uExif ' exif ifd
-    Dim ux2 As uExif ' gps ifd
+    Dim ux1 As uExif = Nothing ' exif ifd
+    Dim ux2 As uExif = Nothing ' gps ifd
     Dim ux4 As uExif = Nothing ' makernote ifd -- temporary
     Dim s As String
 
@@ -113,9 +112,10 @@ Public Module ImageInfo
 
     '----------------------------------------------------------------------------------
 
-    ux1 = Nothing
-    ux2 = Nothing
-    ux = New uExif
+    If ux IsNot Nothing Then ux.Dispose()
+    If ux1 IsNot Nothing Then ux1.Dispose()
+    If ux2 IsNot Nothing Then ux2.Dispose()
+    If ux4 IsNot Nothing Then ux4.Dispose()
 
     Return Nothing
 
@@ -147,11 +147,11 @@ Public Module ImageInfo
       parm = Format(picinfo.ResolutionX, "###,##0") & " x " & Format(picinfo.ResolutionY, "###,##0")
       Select Case picinfo.resolutionUnit
         Case 1
-          parm = parm & " dots per centimeter"
+          parm &= " dots per centimeter"
         Case 2
-          parm = parm & " dots per inch"
+          parm &= " dots per inch"
         Case Else
-          parm = parm & " dots per inch" ' default
+          parm &= " dots per inch" ' default
       End Select
       strInfo &= "Output resolution: " & tb & parm & "\par "
 
@@ -174,8 +174,8 @@ Public Module ImageInfo
 
   End Sub
 
-  Public Sub formatExifComments(ByVal ShowMakernote As Boolean, ByVal ShowJPEGDetails As Boolean, _
-    ByVal showXmp As Boolean, ByVal ShowAllTags As Boolean, _
+  Public Sub formatExifComments(ByVal ShowMakernote As Boolean, ByVal ShowJPEGDetails As Boolean,
+    ByVal showXmp As Boolean, ByVal ShowAllTags As Boolean,
     ByRef sText As String, ByRef ux As uExif, ByRef picinfo As pictureInfo, pComments As List(Of PropertyItem))
 
     Dim v As Object
@@ -198,7 +198,7 @@ Public Module ImageInfo
       parm = ux.TagValue(uExif.TagID.description, 0)
       If parm Is Nothing Then parm = ""
       parm = splitString(parm)
-      If Len(parm) > 0 Then strInfo &= "Description:  " & parm & "\par " & "\par " ' String ' 3
+      If parm <> "" Then strInfo &= "Description:  " & parm & "\par " & "\par " ' String ' 3
     End If
 
     formatPicinfo(picinfo, strInfo)
@@ -239,7 +239,7 @@ Public Module ImageInfo
           tg = uz.Tags.Item(sTag(uExif.TagID.makernote))
           If ux.IntelNumbers Then i = 1 Else i = 0
           getMakernote(ux, parm, i, True)
-          If Len(parm) > 0 Then strInfo &= "\par " & "{\b Maker Note Tags\b0 } " & "\par " & parm & "\par "
+          If parm <> "" Then strInfo &= "\par " & "{\b Maker Note Tags\b0 } " & "\par " & parm & "\par "
         End If
       End If
       sText = strInfo
@@ -250,7 +250,7 @@ Public Module ImageInfo
     If ux.iptcTagExists(120) Then ' caption
       parm = ux.iptcTags(sTag(120)).singlevalue
       parm = Trim(parm)
-      If Len(parm) > 0 Then strInfo &= "IPTC Caption: " & tb & parm & "\par "
+      If parm <> "" Then strInfo &= "IPTC Caption: " & tb & parm & "\par "
     End If
 
     If ux.tagExists(uExif.TagID.xpComment) Then
@@ -261,13 +261,13 @@ Public Module ImageInfo
       Else ' double bytes
         If IsArray(v) Then
           For i = 0 To UBound(v) - 1 Step 2
-            parm = parm & ChrW(word(v, i, True)) ' 2-byte characters
+            parm &= ChrW(word(v, i, True)) ' 2-byte characters
           Next i
           parm = splitString(parm)
         End If
       End If
 
-      If Len(parm) > 0 Then strInfo &= "Windows Comment: " & tb & parm & "\par "
+      If parm <> "" Then strInfo &= "Windows Comment: " & tb & parm & "\par "
     End If
 
     If ux.tagExists(uExif.TagID.xpKeywords) Then
@@ -278,12 +278,12 @@ Public Module ImageInfo
       Else ' double bytes
         If IsArray(v) Then
           For i = 0 To UBound(v) - 1 Step 2
-            parm = parm & ChrW(word(v, i, True)) ' 2-byte characters
+            parm &= ChrW(word(v, i, True)) ' 2-byte characters
           Next i
           parm = splitString(parm)
         End If
       End If
-      If Len(parm) > 0 Then strInfo &= "Windows Keywords: " & tb & parm & "\par "
+      If parm <> "" Then strInfo &= "Windows Keywords: " & tb & parm & "\par "
     End If
 
     If ux.tagExists(uExif.TagID.xpTitle) Then
@@ -294,12 +294,12 @@ Public Module ImageInfo
       Else ' double bytes
         If IsArray(v) Then
           For i = 0 To UBound(v) - 1 Step 2
-            parm = parm & ChrW(word(v, i, True)) ' 2-byte characters
+            parm &= ChrW(word(v, i, True)) ' 2-byte characters
           Next i
           parm = splitString(parm)
         End If
       End If
-      If Len(parm) > 0 Then strInfo &= "Windows Title: " & tb & parm & "\par "
+      If parm <> "" Then strInfo &= "Windows Title: " & tb & parm & "\par "
     End If
 
     If ux.tagExists(uExif.TagID.xpSubject) Then
@@ -310,12 +310,12 @@ Public Module ImageInfo
       Else ' double bytes
         If IsArray(v) Then
           For i = 0 To UBound(v) - 1 Step 2
-            parm = parm & ChrW(word(v, i, True)) ' 2-byte characters
+            parm &= ChrW(word(v, i, True)) ' 2-byte characters
           Next i
           parm = splitString(parm)
         End If
       End If
-      If Len(parm) > 0 Then strInfo &= "Windows Subject: " & tb & parm & "\par "
+      If parm <> "" Then strInfo &= "Windows Subject: " & tb & parm & "\par "
     End If
 
     If ux.tagExists(uExif.TagID.xpAuthor) Then
@@ -326,12 +326,12 @@ Public Module ImageInfo
       Else ' double bytes
         If IsArray(v) Then
           For i = 0 To UBound(v) - 1 Step 2
-            parm = parm & ChrW(word(v, i, True)) ' 2-byte characters
+            parm &= ChrW(word(v, i, True)) ' 2-byte characters
           Next i
           parm = splitString(parm)
         End If
       End If
-      If Len(parm) > 0 Then strInfo &= "Windows Author: " & tb & parm & "\par "
+      If parm <> "" Then strInfo &= "Windows Author: " & tb & parm & "\par "
     End If
 
     '-----------------------
@@ -361,7 +361,7 @@ Public Module ImageInfo
         If ux.tagExists(uExif.TagID.exifpointer) Then
           uz = ux.tagIFD(uExif.TagID.exifpointer)
           If uz IsNot Nothing AndAlso uz.tagExists(uExif.TagID.subsectime) Then
-            parm = parm & "." & uz.TagValue(uExif.TagID.subsectime, 0)
+            parm &= "." & uz.TagValue(uExif.TagID.subsectime, 0)
           End If
         End If
         strInfo &= "Date and Time: " & tb & parm & "\par "
@@ -379,7 +379,7 @@ Public Module ImageInfo
             'parm = Mid(parm, 6, 2) & "/" & Mid(parm, 9, 2) & "/" & Left(parm, 4) & Right(parm, 9)
           End If
           If uz.tagExists(uExif.TagID.subsectimeoriginal) Then
-            parm = parm & "." & uz.TagValue(uExif.TagID.subsectimeoriginal, 0)
+            parm &= "." & uz.TagValue(uExif.TagID.subsectimeoriginal, 0)
           End If
           strInfo &= "Original Date and Time: " & tb & parm & "\par "
         End If
@@ -394,7 +394,7 @@ Public Module ImageInfo
             'parm = Mid(parm, 6, 2) & "/" & Mid(parm, 9, 2) & "/" & Left(parm, 4) & Right(parm, 9)
           End If
           If uz.tagExists(uExif.TagID.subsectimedigitized) Then
-            parm = parm & "." & uz.TagValue(uExif.TagID.subsectimedigitized, 0)
+            parm &= "." & uz.TagValue(uExif.TagID.subsectimedigitized, 0)
           End If
           strInfo &= "Date and Time Digitized: " & tb & parm & "\par "
         End If
@@ -418,11 +418,11 @@ Public Module ImageInfo
     '    If ux.tagexists(ResolutionUnit) Then
     '      Select Case ux.TagValue(ResolutionUnit, 0)
     '        Case 2
-    '          parm = parm & " dots per inch"
+    '          parm &= " dots per inch"
     '        Case 3
-    '          parm = parm & " dots per centimeter"
+    '          parm &= " dots per centimeter"
     '        Case Else
-    '          parm = parm & " units: " & ux.TagValue(ResolutionUnit, 0)
+    '          parm &= " units: " & ux.TagValue(ResolutionUnit, 0)
     '          end Select
     '      parm = parm
     '        end If
@@ -456,7 +456,7 @@ Public Module ImageInfo
         parm = ""
         If uuBound(v) >= 0 Then
           For i = 0 To UBound(v)
-            parm = parm & v(i)
+            parm &= v(i)
           Next i
         Else
           parm = v
@@ -468,12 +468,12 @@ Public Module ImageInfo
         v = uz.TagValue(uExif.TagID.usercomment)
         parm = ""
         For j = 8 To UBound(v)
-          parm = parm & ChrW(v(j))
+          parm &= ChrW(v(j))
         Next j
 
         parm = parm.Trim(whiteSpace)
         parm = splitString(parm)
-        If Len(parm) > 0 Then strInfo &= "User Comment: " & tb & parm & "\par "
+        If parm <> "" Then strInfo &= "User Comment: " & tb & parm & "\par "
       End If
 
       If Right(strInfo, 10) <> "\par \par " Then strInfo &= "\par "
@@ -869,15 +869,15 @@ Public Module ImageInfo
         x = uz.TagValue(uExif.TagID.focalplaneXresolution, 0)
         parm = Format(x, "###,##0")
         x = uz.TagValue(uExif.TagID.focalplaneYresolution, 0)
-        parm = parm & " x " & Format(x, "###,##0")
+        parm &= " x " & Format(x, "###,##0")
         If uz.tagExists(uExif.TagID.focalPlaneResolutionUnit) Then
           Select Case uz.TagValue(uExif.TagID.focalPlaneResolutionUnit, 0)
             Case 2
-              parm = parm & " pixels per inch"
+              parm &= " pixels per inch"
             Case 3
-              parm = parm & " pixels per centimeter"
+              parm &= " pixels per centimeter"
             Case Else
-              parm = parm & " units: " & uz.TagValue(uExif.TagID.focalPlaneResolutionUnit, 0)
+              parm &= " units: " & uz.TagValue(uExif.TagID.focalPlaneResolutionUnit, 0)
           End Select
         End If
         strInfo &= "Focal Plane Resolution: " & tb & parm & "\par "
@@ -900,7 +900,7 @@ Public Module ImageInfo
             parm = "Center " & Format(v(0), "#####") & "," & Format(v(1), "#####") & ", Width " & Format(v(2), "#####") & ", Height " & Format(v(3), "#####")
           Case Else
             For i = 0 To UBound(v)
-              parm = parm & v(i) & " "
+              parm &= v(i) & " "
             Next i
         End Select
         strInfo &= "Subject Area: " & tb & parm & "\par "
@@ -1026,13 +1026,13 @@ Public Module ImageInfo
             parm = ""
             k = 4 ' add the data
             For j = 1 To nrows
-              parm = parm & tb
+              parm &= tb
               For i2 = 1 To nCols
-                parm = parm & v(k)
-                If i2 <> nCols Then parm = parm & ",  "
-                k = k + 1
+                parm &= v(k)
+                If i2 <> nCols Then parm &= ",  "
+                k += 1
               Next i2
-              parm = parm & "\par "
+              parm &= "\par "
             Next j
             strInfo &= parm
           End If
@@ -1045,7 +1045,7 @@ Public Module ImageInfo
           If UBound(v) >= 1 Then
             parm = ""
             For i = 0 To UBound(v)
-              parm = parm & ChrW(v(i))
+              parm &= ChrW(v(i))
             Next i
           ElseIf UBound(v) >= 0 Then
             parm = v(0)
@@ -1070,7 +1070,7 @@ Public Module ImageInfo
 
       If uz.tagExists(uExif.TagID.relatedsoundfile) Then
         parm = Trim(uz.TagValue(uExif.TagID.relatedsoundfile, 0))
-        If Len(parm) > 0 Then strInfo &= "Related Audio File: " & tb & parm & "\par " ' String ' 164
+        If parm <> "" Then strInfo &= "Related Audio File: " & tb & parm & "\par " ' String ' 164
       End If
 
       strInfo &= "Related Audio File: " & tb & parm & "\par " ' String ' 164
@@ -1142,11 +1142,11 @@ Public Module ImageInfo
           If uz.tagExists(uExif.TagID.GPSspeedref) Then
             Select Case UCase(uz.TagValue(uExif.TagID.GPSspeedref, 0))
               Case "K"
-                parm = parm & " kph"
+                parm &= " kph"
               Case "M"
-                parm = parm & " mph"
+                parm &= " mph"
               Case "N"
-                parm = parm & " knots"
+                parm &= " knots"
             End Select
           End If
           strInfo &= "GPS Speed: " & tb & parm & "\par "
@@ -1156,7 +1156,7 @@ Public Module ImageInfo
           x = uz.TagValue(uExif.TagID.GPStrack, 0)
           parm = Format(x, "##0.0") & "°"
           If uz.tagExists(uExif.TagID.GPStrackref) Then
-            If uz.TagValue(uExif.TagID.GPStrackref, 0) = "T" Then parm = parm & " true" Else parm = parm & " magnetic"
+            If uz.TagValue(uExif.TagID.GPStrackref, 0) = "T" Then parm &= " true" Else parm &= " magnetic"
           End If
           strInfo &= "GPS Track: " & tb & parm & "\par "
         End If
@@ -1165,7 +1165,7 @@ Public Module ImageInfo
           x = uz.TagValue(uExif.TagID.GPSimgdirection, 0)
           parm = Format(x, "##0.0") & "°"
           If uz.tagExists(uExif.TagID.GPSimgdirectionref) Then
-            If uz.TagValue(uExif.TagID.GPSimgdirectionref, 0) = "T" Then parm = parm & " true" Else parm = parm & " magnetic"
+            If uz.TagValue(uExif.TagID.GPSimgdirectionref, 0) = "T" Then parm &= " true" Else parm &= " magnetic"
           End If
           strInfo &= "GPS Image Direction Reference: " & tb & parm & "\par "
         End If
@@ -1192,7 +1192,7 @@ Public Module ImageInfo
           x = uz.TagValue(uExif.TagID.GPSdestbearing, 0)
           parm = Format(x, "##0.0") & "°"
           If uz.tagExists(uExif.TagID.GPSdestbearingref) Then
-            If uz.TagValue(uExif.TagID.GPSdestbearingref, 0) = "T" Then parm = parm & " true" Else parm = parm & " magnetic"
+            If uz.TagValue(uExif.TagID.GPSdestbearingref, 0) = "T" Then parm &= " true" Else parm &= " magnetic"
           End If
           strInfo &= "GPS Destination Bearing: " & tb & parm & "\par "
         End If
@@ -1203,11 +1203,11 @@ Public Module ImageInfo
           If uz.tagExists(uExif.TagID.GPSdestdistanceref) Then
             Select Case UCase(uz.TagValue(uExif.TagID.GPSdestdistanceref, 0))
               Case "K"
-                parm = parm & " km."
+                parm &= " km."
               Case "M"
-                parm = parm & " mi."
+                parm &= " mi."
               Case "N"
-                parm = parm & " nm."
+                parm &= " nm."
             End Select
           End If
           strInfo &= "GPS Destination Distance: " & tb & parm & "\par "
@@ -1217,10 +1217,10 @@ Public Module ImageInfo
           v = uz.TagValue(uExif.TagID.GPSareaInformation)
           parm = ""
           For j = 1 To UBound(v) ' skip first byte
-            If v(j) >= 9 Then parm = parm & ChrW(v(j))
+            If v(j) >= 9 Then parm &= ChrW(v(j))
           Next j
           parm = splitString(parm)
-          If Len(parm) > 0 Then strInfo &= "GPS Area Information: " & tb & parm & "\par "
+          If parm <> "" Then strInfo &= "GPS Area Information: " & tb & parm & "\par "
         End If
 
         parm = ""
@@ -1230,9 +1230,9 @@ Public Module ImageInfo
         End If
         If uz.tagExists(uExif.TagID.GPStimestamp) Then
           v = uz.TagValue(uExif.TagID.GPStimestamp)
-          parm = parm & Format(v(0), "00") & ":" & Format(v(1), "00") & ":" & Format(v(2), "00")
+          parm &= Format(v(0), "00") & ":" & Format(v(1), "00") & ":" & Format(v(2), "00")
         End If
-        If Len(parm) > 0 Then
+        If parm <> "" Then
           strInfo &= "GPS Time Stamp: " & tb & parm & "\par "
         End If
 
@@ -1245,7 +1245,7 @@ Public Module ImageInfo
             Case Else
               parm = ""
           End Select
-          If Len(parm) > 0 Then strInfo &= "Differential Correction:" & tb & parm & "\par "
+          If parm <> "" Then strInfo &= "Differential Correction:" & tb & parm & "\par "
         End If
 
         If uz.tagExists(uExif.TagID.GPShPositioningError) Then
@@ -1260,10 +1260,10 @@ Public Module ImageInfo
           v = uz.TagValue(uExif.TagID.GPSprocessingMethod)
           parm = ""
           For j = 1 To UBound(v) ' skip first byte
-            If v(j) >= 9 Then parm = parm & ChrW(v(j))
+            If v(j) >= 9 Then parm &= ChrW(v(j))
           Next j
           parm = splitString(parm)
-          If Len(parm) > 0 Then strInfo &= "GPS Processing Method: " & tb & parm & "\par "
+          If parm <> "" Then strInfo &= "GPS Processing Method: " & tb & parm & "\par "
         End If
 
         If uz.tagExists(uExif.TagID.GPSversionid) Then
@@ -1271,8 +1271,8 @@ Public Module ImageInfo
           parm = ""
           If UBound(v) >= 3 Then
             If v(0) <> 0 Or v(1) <> 0 Then parm = v(0) & "." & v(1)
-            If v(2) <> 0 Or v(3) <> 0 Then parm = parm & "." & v(2)
-            If v(3) <> 0 Then parm = parm & "." & v(3)
+            If v(2) <> 0 Or v(3) <> 0 Then parm &= "." & v(2)
+            If v(3) <> 0 Then parm &= "." & v(3)
           End If
           If uuBound(v) >= 3 Then strInfo &= "GPS Version: " & tb & parm & "\par "
         End If
@@ -1292,7 +1292,7 @@ Public Module ImageInfo
         If tg.Link > 0 Then
           getMakernote(ux, parm, i, False) ' send the exif.makernote string, receive parm, exif.szmake is the make of the camera
         End If
-        If Len(parm) > 0 Then strInfo &= "\par " & "{\b Maker Note\b0 } " & "\par " & parm
+        If parm <> "" Then strInfo &= "\par " & "{\b Maker Note\b0 } " & "\par " & parm
       End If
     End If
     '--------------------------
@@ -1326,19 +1326,19 @@ Public Module ImageInfo
         For i = 0 To UBound(v)
           Select Case v(i)
             Case 1
-              parm = parm & "Y" & " "
+              parm &= "Y" & " "
             Case 2
-              parm = parm & "Cb" & " "
+              parm &= "Cb" & " "
             Case 3
-              parm = parm & "Cr" & " "
+              parm &= "Cr" & " "
             Case 4
-              parm = parm & "R" & " "
+              parm &= "R" & " "
             Case 5
-              parm = parm & "G" & " "
+              parm &= "G" & " "
             Case 6
-              parm = parm & "B" & " "
+              parm &= "B" & " "
             Case Else
-              parm = parm & v(i) & " "
+              parm &= v(i) & " "
           End Select
         Next i
         strInfo &= parm & "\par "
@@ -1400,7 +1400,7 @@ Public Module ImageInfo
         v = ux.TagValue(uExif.TagID.primaryChromaticities)
         parm = ""
         For i = 0 To UBound(v)
-          parm = parm & Format(v(i), "##,##0.0# ")
+          parm &= Format(v(i), "##,##0.0# ")
         Next i
         strInfo &= "Primary Chromaticities: " & tb & parm & "\par "
       End If
@@ -1409,7 +1409,7 @@ Public Module ImageInfo
         v = ux.TagValue(uExif.TagID.referenceBlackWhite)
         parm = ""
         For i = 0 To UBound(v)
-          parm = parm & Format(v(i), "##0.0# ")
+          parm &= Format(v(i), "##0.0# ")
         Next i
         strInfo &= "Reference Black and White: " & tb & parm & "\par "
       End If
@@ -1427,8 +1427,8 @@ Public Module ImageInfo
         v = ux.TagValue(uExif.TagID.stripByteCounts)
         parm = ""
         For i = 0 To UBound(v)
-          parm = parm & Format(v(i), "###,###,###") & " "
-          If (i + 1) Mod 20 = 0 Then parm = parm & "\par " & tb
+          parm &= Format(v(i), "###,###,###") & " "
+          If (i + 1) Mod 20 = 0 Then parm &= "\par " & tb
         Next i
         strInfo &= parm & "\par "
       End If
@@ -1438,8 +1438,8 @@ Public Module ImageInfo
         v = ux.TagValue(uExif.TagID.stripOffsets)
         parm = ""
         For i = 0 To UBound(v)
-          parm = parm & Format(v(i), "###,###,###") & " "
-          If (i + 1) Mod 20 = 0 Then parm = parm & "\par " & tb
+          parm &= Format(v(i), "###,###,###") & " "
+          If (i + 1) Mod 20 = 0 Then parm &= "\par " & tb
         Next i
         strInfo &= parm & "\par "
       End If
@@ -1449,8 +1449,8 @@ Public Module ImageInfo
         v = ux.TagValue(uExif.TagID.transferFunction)
         parm = ""
         For i = 0 To UBound(v)
-          parm = parm & v(i) & " "
-          If (i + 1) Mod 48 = 0 Then parm = parm & "\par " & tb
+          parm &= v(i) & " "
+          If (i + 1) Mod 48 = 0 Then parm &= "\par " & tb
         Next i
         strInfo &= parm & "\par "
       End If
@@ -1460,7 +1460,7 @@ Public Module ImageInfo
         v = ux.TagValue(uExif.TagID.whitePoint)
         parm = ""
         For i = 0 To UBound(v)
-          parm = parm & v(i) & " "
+          parm &= v(i) & " "
         Next i
         strInfo &= parm & "\par "
       End If
@@ -1470,7 +1470,7 @@ Public Module ImageInfo
         v = ux.TagValue(uExif.TagID.yCbCrCoefficients)
         parm = ""
         For i = 0 To UBound(v)
-          parm = parm & v(i) & " "
+          parm &= v(i) & " "
         Next i
         strInfo &= parm & "\par "
       End If
@@ -1497,7 +1497,7 @@ Public Module ImageInfo
         Else
           parm = ""
           For i = 0 To UBound(v)
-            parm = parm & v(i) & " "
+            parm &= v(i) & " "
           Next i
           strInfo &= parm & "\par "
         End If
@@ -1509,7 +1509,7 @@ Public Module ImageInfo
 
   End Sub
 
-  Sub getMakernote(ByRef uz As uExif, ByRef note As String, ByVal iintel As Short, _
+  Sub getMakernote(ByRef uz As uExif, ByRef note As String, ByVal iintel As Short,
     ByRef DumpAll As Boolean)
 
     Dim i As Integer
@@ -1518,7 +1518,6 @@ Public Module ImageInfo
     Dim makerTags As Collection
 
     make = uz.TagValue(uExif.TagID.make, 0)
-    note = ""
 
     ' get the makernote tags into makertags
     ' the tags are stored in the uExif under uComments (uz) - Exif - Makernote
@@ -1577,13 +1576,13 @@ Public Module ImageInfo
       Case "panasonic"
         panasonicMakernote(makerTags, note)
       Case "sony"
-        sonyMakernote(makerTags, note, intel)
+        sonyMakernote(makerTags, note)
 
     End Select
 
   End Sub ' getmakernote
 
-  Sub readMakernoteIFD(ByRef ux As uExif, ByVal mTag As uTag, ByRef fdata As Byte(), ByVal voffset As Integer, _
+  Sub readMakernoteIFD(ByRef ux As uExif, ByVal mTag As uTag, ByRef fdata As Byte(), ByVal voffset As Integer,
     ByVal iintel As Short, ByRef intel As Boolean, ByVal relativelinks As Short)
 
     ' ux will contain the ifd
@@ -1596,7 +1595,7 @@ Public Module ImageInfo
     ' nikon and fuji use links relative to the makernote data, the others use absolute file links
 
     Dim i, j As Integer
-    iintel = 2
+    iintel = 2 ' was a parameter
     ux = New uExif
     mTag.IFD = ux
     'k = mTag.Link + voffset
@@ -1610,7 +1609,7 @@ Public Module ImageInfo
   End Sub ' readMakernoteIFD
 
   ' for i = 0 to 49: print "' " & i * 50 & " -  ";: for j = 0 to 49: print v(i*50 + j);: next j: print: next i
-  Sub readMakernote(ByRef fdata() As Byte, ByRef mTag As uTag, ByVal iintel As Short, _
+  Sub readMakernote(ByRef fdata() As Byte, ByRef mTag As uTag, ByVal iintel As Short,
     ByVal relativeLinks As Short, ByVal make As String, ByVal model As String)
 
     ' iintel: 0 - false, 1 - true, 2 - unknown
@@ -1736,7 +1735,7 @@ Public Module ImageInfo
             k = 0
             For i = vOffset - 8 To UBound(v)
               b(k) = v(i)
-              k = k + 1
+              k += 1
             Next i
             readMakernoteIFD(ux, mTag, b, 8, iintel, intel, relativeLinks)
           Else
@@ -1901,7 +1900,7 @@ Public Module ImageInfo
           k = 0
           For i = 0 To UBound(v)
             b(k) = v(i)
-            k = k + 1
+            k += 1
           Next i
           readMakernoteIFD(ux, mTag, b, vOffset, iintel, intel, 1) ' always relative links
         End If
@@ -1970,7 +1969,7 @@ Public Module ImageInfo
 
         k = mTag.Link
         If eqstr(UTF8bare.GetString(fdata, k, 3), "kdk") Then
-          k = k + 8
+          k += 8
           If word(fdata, k + 16, intel, False) > 2200 Then intel = Not intel ' some kodak cameras have different numeric format than the rest of the exif tags
 
           i = fdata(k + 9)
@@ -2056,7 +2055,7 @@ Public Module ImageInfo
           End If
 
           'Exposure Time
-          i = DWord(fdata, k + 32, intel, False)
+          i = DWord(fdata, k + 32, intel)
           tg = New uTag
           tg.dataType = 8
           tg.tag = 32
@@ -2210,11 +2209,11 @@ Public Module ImageInfo
     Else
       word = v(i + 1) + v(i) * 256
     End If
-    If dSigned AndAlso word >= 32768 Then word = word - 65536
+    If dSigned AndAlso word >= 32768 Then word -= 65536
 
   End Function
 
-  Function DWord(ByRef v As Object, ByVal i As Integer, ByRef intel As Boolean, Optional ByRef dSigned As Boolean = False) As Integer
+  Function DWord(ByRef v As Object, ByVal i As Integer, ByRef intel As Boolean) As Integer
 
     Dim x As Double
 
@@ -2223,7 +2222,7 @@ Public Module ImageInfo
     Else
       x = v(i + 3) + v(i + 2) * 256 + v(i + 1) * 65536 + v(i) * 65535 * 256
     End If
-    If x > 2 ^ 31 Then x = x - 2 ^ 32 ' always signed (prevents overflows)
+    If x > 2 ^ 31 Then x -= 2 ^ 32 ' always signed (prevents overflows)
     DWord = x
 
   End Function
@@ -2241,32 +2240,32 @@ Public Module ImageInfo
     nCols = v(0) + v(1) * 256
     nrows = v(2) + v(3) * 256
     k = 3
-    parm = parm & tb
+    parm &= tb
 
     For i2 = 1 To nCols
-      k = k + 1
+      k += 1
       s = ""
       Do While v(k) <> 0 And k < UBound(v)
-        s = s & ChrW(v(k))
-        k = k + 1
+        s &= ChrW(v(k))
+        k += 1
       Loop
-      parm = parm & s
-      If i2 <> nCols Then parm = parm & ",  "
+      parm &= s
+      If i2 <> nCols Then parm &= ",  "
     Next i2
-    parm = parm & "\par "
+    parm &= "\par "
 
-    k = k + 1 ' add the data
+    k += 1 ' add the data
     If k + nrows * nCols * 8 <= UBound(v) Then
       For j = 1 To nrows
-        parm = parm & tb
+        parm &= tb
         For i2 = 1 To nCols
           i1 = DWord(v, k + 4, True)
           If i1 <> 0 Then x = DWord(v, k, True) / i1 Else x = 0
-          parm = parm & Format(x, "##,###0.0#")
-          If i2 <> nCols Then parm = parm & ",  "
-          k = k + 8
+          parm &= Format(x, "##,###0.0#")
+          If i2 <> nCols Then parm &= ",  "
+          k += 8
         Next i2
-        parm = parm & "\par "
+        parm &= "\par "
       Next j
     End If
 
@@ -2305,19 +2304,19 @@ Public Module ImageInfo
 
     For Each ut In Tags
 
-      s = s & sTag(ut.tag) & tb
+      s &= sTag(ut.tag) & tb
       v = ut.Value
       n = uuBound(v)
       If n < 0 Then
-        If Not IsArray(v) Then s = s & v
+        If Not IsArray(v) Then s &= v
       Else
         If n > 500 Then n = 500
         For i = 0 To n
-          s = s & v(i) & " "
+          s &= v(i) & " "
         Next i
       End If
-      If uuBound(v) > 200 Then s = s & "... (" & uuBound(v) & " total bytes)"
-      s = s & "\par "
+      If uuBound(v) > 200 Then s &= "... (" & uuBound(v) & " total bytes)"
+      s &= "\par "
       s = s.Replace(ChrW(0), " ")
     Next ut
 
@@ -2977,35 +2976,35 @@ Public Module ImageInfo
     If makertags.Contains(sTag(0)) Then
       v = makertags.Item(sTag(0)).Value
       If IsArray(v) AndAlso UBound(v) = 3 Then parm = v(0) & v(1) & v(2) & v(3) Else parm = ""
-      If Trim(parm) <> "" Then note = note & "Pentax Version:" & tb & parm & "\par "
+      If Trim(parm) <> "" Then note &= "Pentax Version:" & tb & parm & "\par "
     End If
 
     If makertags.Contains(sTag(1)) Then
       i = makertags.Item(sTag(1)).singleValue
-      If i > 0 Then note = note & "Pentax Model Type:" & tb & i & "\par "
+      If i > 0 Then note &= "Pentax Model Type:" & tb & i & "\par "
     End If
 
     If makertags.Contains(sTag(2)) Then
       v = makertags.Item(sTag(2)).Value
       If IsArray(v) AndAlso UBound(v) >= 1 Then parm = v(0) & " x " & v(1) Else parm = ""
-      If Trim(parm) <> "" Then note = note & "Preview Image Size:" & tb & parm & "\par "
+      If Trim(parm) <> "" Then note &= "Preview Image Size:" & tb & parm & "\par "
     End If
 
     If makertags.Contains(sTag(5)) Then
       i = makertags.Item(sTag(5)).singleValue
-      note = note & "Pentax Model ID:" & tb & i & " (" & Format(i, "X") & ")\par "
+      note &= "Pentax Model ID:" & tb & i & " (" & Format(i, "X") & ")\par "
     End If
 
     If makertags.Contains(sTag(6)) Then
       v = makertags.Item(sTag(6)).Value
       parm = Format(v(2), "00") & "/" & Format(v(3), "00") & "/" & Format(v(1) + v(0) * 256, "0000") ' date
-      If Trim(parm) <> "" Then note = note & "Date:" & tb & parm & "\par "
+      If Trim(parm) <> "" Then note &= "Date:" & tb & parm & "\par "
     End If
 
     If makertags.Contains(sTag(7)) Then
       v = makertags.Item(sTag(7)).Value
       parm = Format(v(0), "00") & ":" & Format(v(1), "00") & ":" & Format(v(2), "00") ' time
-      If Trim(parm) <> "" Then note = note & "Time:" & tb & parm & "\par "
+      If Trim(parm) <> "" Then note &= "Time:" & tb & parm & "\par "
     End If
 
     If makertags.Contains(sTag(8)) Then
@@ -3026,12 +3025,12 @@ Public Module ImageInfo
         Case Else
           parm = ""
       End Select
-      If Len(parm) > 0 Then note = note & "Quality:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Quality:" & tb & parm & "\par "
     End If
 
     If makertags.Contains(sTag(9)) Then
       i = makertags.Item(sTag(9)).singleValue
-      note = note & "Pentax Image Size Code:" & tb & i & "\par "
+      note &= "Pentax Image Size Code:" & tb & i & "\par "
     End If
 
     If makertags.Contains(sTag(11)) Then
@@ -3072,7 +3071,7 @@ Public Module ImageInfo
         Case 255 : parm = "Digital Filter"
         Case Else : parm = ""
       End Select
-      If Len(parm) > 0 Then note = note & "Picture Mode:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Picture Mode:" & tb & parm & "\par "
     End If
 
     If makertags.Contains(sTag(12)) Then
@@ -3097,17 +3096,17 @@ Public Module ImageInfo
         End Select
 
         Select Case v(1)
-          Case &H3F : parm = parm & ", Internal"
-          Case &H100 : parm = parm & ", External Auto "
-          Case &H23F : parm = parm & ", External, Flash Problem"
-          Case &H300 : parm = parm & ", External Manual "
-          Case &H304 : parm = parm & ", External P-TTL Auto "
-          Case &H305 : parm = parm & ", External Contrast-control Sync "
-          Case &H306 : parm = parm & ", External High-speed Sync "
-          Case &H30C : parm = parm & ", External Wireless "
-          Case &H30D : parm = parm & ", External Wireless High-speed Sync"
+          Case &H3F : parm &= ", Internal"
+          Case &H100 : parm &= ", External Auto "
+          Case &H23F : parm &= ", External, Flash Problem"
+          Case &H300 : parm &= ", External Manual "
+          Case &H304 : parm &= ", External P-TTL Auto "
+          Case &H305 : parm &= ", External Contrast-control Sync "
+          Case &H306 : parm &= ", External High-speed Sync "
+          Case &H30C : parm &= ", External Wireless "
+          Case &H30D : parm &= ", External Wireless High-speed Sync"
         End Select
-        If Len(parm) > 0 Then note = note & "Flash Mode:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Flash Mode:" & tb & parm & "\par "
       End If
 
       If makertags.Contains(sTag(13)) Then
@@ -3125,7 +3124,7 @@ Public Module ImageInfo
           Case 18 : parm = "AF-A"
           Case Else : parm = ""
         End Select
-        If Len(parm) > 0 Then note = note & "Focus Mode:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Focus Mode:" & tb & parm & "\par "
       End If
 
       If makertags.Contains(sTag(14)) Then
@@ -3148,60 +3147,60 @@ Public Module ImageInfo
           Case 65535 : parm = "Auto"
           Case Else : parm = ""
         End Select
-        If Len(parm) > 0 Then note = note & "AF Point Selected:" & tb & parm & "\par "
+        If parm <> "" Then note &= "AF Point Selected:" & tb & parm & "\par "
       End If
 
       If makertags.Contains(sTag(15)) Then
         i = makertags.Item(sTag(15)).singleValue
         parm = ""
-        If i And 1 Then parm = parm & " Fixed Center or Multiple"
-        If i And 2 Then parm = parm & " top-left"
-        If i And 4 Then parm = parm & " top-center"
-        If i And 8 Then parm = parm & " top-right"
-        If i And 16 Then parm = parm & " mid-left"
-        If i And 32 Then parm = parm & " mid-center"
-        If i And 64 Then parm = parm & " mid-right"
-        If i And 128 Then parm = parm & " bottom-left"
-        If i And 256 Then parm = parm & " bottom-center"
-        If i And 512 Then parm = parm & " bottom-right"
+        If i And 1 Then parm &= " Fixed Center or Multiple"
+        If i And 2 Then parm &= " top-left"
+        If i And 4 Then parm &= " top-center"
+        If i And 8 Then parm &= " top-right"
+        If i And 16 Then parm &= " mid-left"
+        If i And 32 Then parm &= " mid-center"
+        If i And 64 Then parm &= " mid-right"
+        If i And 128 Then parm &= " bottom-left"
+        If i And 256 Then parm &= " bottom-center"
+        If i And 512 Then parm &= " bottom-right"
         If i = 65535 Then parm = "(none)"
-        If Len(parm) > 0 Then note = note & "AF Points in Focus:" & tb & parm & "\par "
+        If parm <> "" Then note &= "AF Points in Focus:" & tb & parm & "\par "
       End If
 
       If makertags.Contains(sTag(16)) Then
         i = makertags.Item(sTag(16)).singleValue
-        note = note & "Focus Position:" & tb & i & "\par "
+        note &= "Focus Position:" & tb & i & "\par "
       End If
 
       If makertags.Contains(sTag(18)) Then
         x = uz.TagValue(uExif.TagID.exposuretime, 0) / 100000
         If x > 0.00000000001 Then
           If x < 1 And x <> 0 Then
-            note = note & "Exposure Time:" & tb & Format(x, "##0.0###") & " (1/" & Format(1 / x, "##,###") & ") sec." & "\par "
+            note &= "Exposure Time:" & tb & Format(x, "##0.0###") & " (1/" & Format(1 / x, "##,###") & ") sec." & "\par "
           ElseIf x <> 0 Then
-            note = note & "Exposure Time:" & tb & Format(x, "##0.0") & " sec." & "\par "
+            note &= "Exposure Time:" & tb & Format(x, "##0.0") & " sec." & "\par "
           End If
         End If
       End If
 
       If makertags.Contains(sTag(19)) Then
         i = makertags.Item(sTag(19)).singleValue
-        note = note & "F-Number:" & tb & i / 10 & "\par "
+        note &= "F-Number:" & tb & i / 10 & "\par "
       End If
 
       If makertags.Contains(sTag(20)) Then
         i = makertags.Item(sTag(20)).singleValue
-        note = note & "ISO Code:" & tb & i & "\par "
+        note &= "ISO Code:" & tb & i & "\par "
       End If
 
       If makertags.Contains(sTag(21)) Then
         i = makertags.Item(sTag(21)).singleValue
-        note = note & "Light Reading:" & tb & i & "\par "
+        note &= "Light Reading:" & tb & i & "\par "
       End If
 
       If makertags.Contains(sTag(22)) Then
         i = makertags.Item(sTag(22)).singleValue
-        note = note & "Exposure Compensation:" & tb & Format(i / 10 - 5, "##0.#") & "\par "
+        note &= "Exposure Compensation:" & tb & Format(i / 10 - 5, "##0.#") & "\par "
       End If
 
       If makertags.Contains(sTag(23)) Then
@@ -3216,16 +3215,16 @@ Public Module ImageInfo
           Case Else
             parm = ""
         End Select
-        If Len(parm) > 0 Then note = note & "Metering Mode:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Metering Mode:" & tb & parm & "\par "
       End If
 
       If makertags.Contains(sTag(24)) Then
         v = makertags.Item(sTag(24)).Value
         parm = ""
         For i = 0 To UBound(v)
-          parm = parm & " " & v(i)
+          parm &= " " & v(i)
         Next i
-        If Len(parm) > 0 Then note = note & "Auto Bracketing:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Auto Bracketing:" & tb & parm & "\par "
       End If
 
       If makertags.Contains(sTag(25)) Then
@@ -3247,7 +3246,7 @@ Public Module ImageInfo
           Case 65535 : parm = "User-selected"
           Case Else : parm = ""
         End Select
-        If Len(parm) > 0 Then note = note & "White Balance:" & tb & parm & "\par "
+        If parm <> "" Then note &= "White Balance:" & tb & parm & "\par "
       End If
 
       If makertags.Contains(sTag(26)) Then
@@ -3269,27 +3268,27 @@ Public Module ImageInfo
           Case Else
             parm = ""
         End Select
-        note = note & "White Balance Mode:" & tb & parm & "\par "
+        note &= "White Balance Mode:" & tb & parm & "\par "
       End If
 
       If makertags.Contains(sTag(27)) Then
         i = makertags.Item(sTag(27)).singleValue
-        note = note & "Blue Balance:" & tb & i & "\par "
+        note &= "Blue Balance:" & tb & i & "\par "
       End If
 
       If makertags.Contains(sTag(28)) Then
         i = makertags.Item(sTag(28)).singleValue
-        note = note & "Red Balance:" & tb & i & "\par "
+        note &= "Red Balance:" & tb & i & "\par "
       End If
 
       If makertags.Contains(sTag(29)) Then
         i = makertags.Item(sTag(29)).singleValue
-        note = note & "Focal Length:" & tb & i / 100 & " mm\par "
+        note &= "Focal Length:" & tb & i / 100 & " mm\par "
       End If
 
       If makertags.Contains(sTag(30)) Then
         i = makertags.Item(sTag(30)).singleValue
-        note = note & "Digital Zoom:" & tb & i & "\par "
+        note &= "Digital Zoom:" & tb & i & "\par "
       End If
 
       If makertags.Contains(sTag(31)) Then
@@ -3305,7 +3304,7 @@ Public Module ImageInfo
           Case 65535 : parm = "(none)"
           Case Else : parm = ""
         End Select
-        If Len(parm) > 0 Then note = note & "Saturation:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Saturation:" & tb & parm & "\par "
       End If
 
       If makertags.Contains(sTag(32)) Then
@@ -3320,7 +3319,7 @@ Public Module ImageInfo
           Case 6 : parm = "Very High"
           Case Else : parm = ""
         End Select
-        If Len(parm) > 0 Then note = note & "Contrast:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Contrast:" & tb & parm & "\par "
       End If
 
       If makertags.Contains(sTag(33)) Then
@@ -3335,7 +3334,7 @@ Public Module ImageInfo
           Case 6 : parm = "Very Hard"
           Case Else : parm = ""
         End Select
-        If Len(parm) > 0 Then note = note & "Sharpness:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Sharpness:" & tb & parm & "\par "
       End If
 
       If makertags.Contains(sTag(34)) Then
@@ -3345,7 +3344,7 @@ Public Module ImageInfo
           Case 1 : parm = "Destination"
           Case Else : parm = ""
         End Select
-        If Len(parm) > 0 Then note = note & "World Time Location:" & tb & parm & "\par "
+        If parm <> "" Then note &= "World Time Location:" & tb & parm & "\par "
       End If
 
       pentaxCity(0) = "Pago Pago" : pentaxCity(1) = "Honolulu" : pentaxCity(2) = "Anchorage" : pentaxCity(3) = "Vancouver"
@@ -3368,48 +3367,48 @@ Public Module ImageInfo
 
       If makertags.Contains(sTag(35)) Then
         i = makertags.Item(sTag(35)).singleValue
-        note = note & "Home City Code:" & tb & pentaxCity(i) & "\par "
+        note &= "Home City Code:" & tb & pentaxCity(i) & "\par "
       End If
 
       If makertags.Contains(sTag(36)) Then
         i = makertags.Item(sTag(36)).singleValue
-        note = note & "Destination City Code:" & tb & pentaxCity(i) & "\par "
+        note &= "Destination City Code:" & tb & pentaxCity(i) & "\par "
       End If
 
       If makertags.Contains(sTag(37)) Then
         i = makertags.Item(sTag(37)).singleValue
         If i = 0 Then parm = "No" Else parm = "Yes"
-        If Trim(parm) <> "" Then note = note & "Home Daylight Savings Time:" & tb & parm & "\par "
+        If Trim(parm) <> "" Then note &= "Home Daylight Savings Time:" & tb & parm & "\par "
       End If
 
       If makertags.Contains(sTag(38)) Then
         i = makertags.Item(sTag(38)).singleValue
         If i = 0 Then parm = "No" Else parm = "Yes"
-        If Trim(parm) <> "" Then note = note & "Dest. Daylight Savings Time:" & tb & parm & "\par "
+        If Trim(parm) <> "" Then note &= "Dest. Daylight Savings Time:" & tb & parm & "\par "
       End If
 
       If makertags.Contains(sTag(39)) Then
         v = makertags.Item(sTag(39)).Value
         parm = ""
-        For i = 0 To UBound(v) : parm = parm & 255 - v(i) : Next i
-        If Trim(parm) <> "" Then note = note & "DSP Firmware Version:" & tb & parm & "\par "
+        For i = 0 To UBound(v) : parm &= 255 - v(i) : Next i
+        If Trim(parm) <> "" Then note &= "DSP Firmware Version:" & tb & parm & "\par "
       End If
 
       If makertags.Contains(sTag(40)) Then
         v = makertags.Item(sTag(40)).Value
         parm = ""
-        For i = 0 To UBound(v) : parm = parm & 255 - v(i) : Next i
-        If Trim(parm) <> "" Then note = note & "CPU Firmware Version:" & tb & parm & "\par "
+        For i = 0 To UBound(v) : parm &= 255 - v(i) : Next i
+        If Trim(parm) <> "" Then note &= "CPU Firmware Version:" & tb & parm & "\par "
       End If
 
       If makertags.Contains(sTag(41)) Then
         i = makertags.Item(sTag(41)).singlevalue
-        If i > 0 Then note = note & "Frame Number:" & tb & i & "\par "
+        If i > 0 Then note &= "Frame Number:" & tb & i & "\par "
       End If
 
       If makertags.Contains(sTag(45)) Then
         i = makertags.Item(sTag(45)).singlevalue
-        If i > 0 Then note = note & "Effective LV:" & tb & i & "\par "
+        If i > 0 Then note &= "Effective LV:" & tb & i & "\par "
       End If
 
       If makertags.Contains(sTag(50)) Then
@@ -3423,7 +3422,7 @@ Public Module ImageInfo
           If v(0) = 4 Then parm = "Color Filter"
           If v(0) = 16 Then parm = "Frame Synthesis"
         End If
-        If Len(parm) > 0 Then note = note & "Image Processing:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Image Processing:" & tb & parm & "\par "
       End If
 
       If makertags.Contains(sTag(51)) Then
@@ -3476,10 +3475,10 @@ Public Module ImageInfo
           If v(0) = 16 And v(1) = 0 Then parm = "Flash X-Sync Speed AE"
         End If
         If UBound(v) >= 2 And Len(parm) <> 0 Then
-          If v(2) = 0 Then parm = parm & ", 1/2 EV steps"
-          If v(2) = 1 Then parm = parm & ", 1/3 EV steps"
+          If v(2) = 0 Then parm &= ", 1/2 EV steps"
+          If v(2) = 1 Then parm &= ", 1/3 EV steps"
         End If
-        If Len(parm) > 0 Then note = note & "Picture Mode:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Picture Mode:" & tb & parm & "\par "
       End If
 
       If makertags.Contains(sTag(52)) Then
@@ -3508,74 +3507,74 @@ Public Module ImageInfo
         End If
 
         If Left(parm, 2) = ", " Then parm = Mid(parm, 3)
-        If Len(parm) > 0 Then note = note & "Drive Mode:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Drive Mode:" & tb & parm & "\par "
       End If
 
       If makertags.Contains(sTag(55)) Then
         i = makertags.Item(sTag(55)).singleValue
         If i = 0 Then parm = "sRGB" Else If i = 1 Then parm = "Adobe RGB" Else parm = ""
-        If Len(parm) > 0 Then note = note & "Color Space:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Color Space:" & tb & parm & "\par "
       End If
 
       If makertags.Contains(sTag(60)) Then
         i = makertags.Item(sTag(60)).singleValue
         parm = ""
-        If i And 1 Then parm = parm & " Upper-left"
-        If i And 2 Then parm = parm & " Top"
-        If i And 4 Then parm = parm & " Upper-right"
-        If i And 8 Then parm = parm & " Left"
-        If i And 16 Then parm = parm & " Mid-left"
-        If i And 32 Then parm = parm & " Center"
-        If i And 64 Then parm = parm & " Mid-right"
-        If i And 128 Then parm = parm & " Right"
-        If i And 256 Then parm = parm & " Lower-left"
-        If i And 512 Then parm = parm & " Bottom"
-        If i And 1024 Then parm = parm & " Lower-right"
-        If Len(parm) > 0 Then note = note & "AF Points in Focus:" & tb & parm & "\par "
+        If i And 1 Then parm &= " Upper-left"
+        If i And 2 Then parm &= " Top"
+        If i And 4 Then parm &= " Upper-right"
+        If i And 8 Then parm &= " Left"
+        If i And 16 Then parm &= " Mid-left"
+        If i And 32 Then parm &= " Center"
+        If i And 64 Then parm &= " Mid-right"
+        If i And 128 Then parm &= " Right"
+        If i And 256 Then parm &= " Lower-left"
+        If i And 512 Then parm &= " Bottom"
+        If i And 1024 Then parm &= " Lower-right"
+        If parm <> "" Then note &= "AF Points in Focus:" & tb & parm & "\par "
       End If
 
       If makertags.Contains(sTag(62)) Then
         v = makertags.Item(sTag(62)).Value
         If UBound(v) >= 3 Then parm = v(0) & " " & v(1) & " " & v(2) & " " & v(3)
-        If Len(parm) > 0 Then note = note & "Preview Image Borders:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Preview Image Borders:" & tb & parm & "\par "
       End If
 
       If makertags.Contains(sTag(63)) Then
         v = makertags.Item(sTag(63)).Value
         If UBound(v) >= 1 Then parm = v(0) & " " & v(1)
-        If Len(parm) > 0 Then note = note & "Pentax Lens ID:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Pentax Lens ID:" & tb & parm & "\par "
       End If
 
       If makertags.Contains(sTag(64)) Then
         i = makertags.Item(sTag(64)).singleValue
-        note = note & "Sensitivity Adjust:" & tb & i & "\par "
+        note &= "Sensitivity Adjust:" & tb & i & "\par "
       End If
 
       If makertags.Contains(sTag(65)) Then
         i = makertags.Item(sTag(65)).singleValue
-        note = note & "Image Processing Count:" & tb & i & "\par "
+        note &= "Image Processing Count:" & tb & i & "\par "
       End If
 
       If makertags.Contains(sTag(71)) Then
         i = makertags.Item(sTag(71)).singleValue
-        note = note & "Camera Temperature:" & tb & i & "\par "
+        note &= "Camera Temperature:" & tb & i & "\par "
       End If
 
       If makertags.Contains(sTag(72)) Then
         i = makertags.Item(sTag(72)).singleValue
         If i = 0 Then parm = "Off" Else If i = 1 Then parm = "On" Else parm = ""
-        If Len(parm) > 0 Then note = note & "AE Lock:" & tb & parm & "\par "
+        If parm <> "" Then note &= "AE Lock:" & tb & parm & "\par "
       End If
 
       If makertags.Contains(sTag(73)) Then
         i = makertags.Item(sTag(73)).singleValue
         If i = 0 Then parm = "Off" Else If i = 1 Then parm = "On" Else parm = ""
-        If Len(parm) > 0 Then note = note & "Noise Reduction:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Noise Reduction:" & tb & parm & "\par "
       End If
 
       If makertags.Contains(sTag(77)) Then
         i = makertags.Item(sTag(77)).singleValue
-        note = note & "Flash Exposure Compensation:" & tb & i & "\par "
+        note &= "Flash Exposure Compensation:" & tb & i & "\par "
       End If
 
       If makertags.Contains(sTag(79)) Then
@@ -3596,12 +3595,12 @@ Public Module ImageInfo
           Case Else
             parm = ""
         End Select
-        If Len(parm) > 0 Then note = note & "Image Tone:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Image Tone:" & tb & parm & "\par "
       End If
 
       If makertags.Contains(sTag(80)) Then
         i = makertags.Item(sTag(80)).singleValue
-        note = note & "Color Temperature:" & tb & i & "\par "
+        note &= "Color Temperature:" & tb & i & "\par "
       End If
 
       If makertags.Contains(sTag(92)) Then
@@ -3609,7 +3608,7 @@ Public Module ImageInfo
         i = v(0)
         If v(0) = 0 Then parm = "Not Stabilized"
         If i And 1 Then parm = "Stabilized"
-        If i And 64 Then parm = parm & ", Not Ready"
+        If i And 64 Then parm &= ", Not Ready"
         If UBound(v) >= 1 Then
           Select Case v(1)
             Case 0
@@ -3622,25 +3621,27 @@ Public Module ImageInfo
               parm = "On (5), " & parm
             Case 7
               parm = "On (7), " & parm
+            Case Else
+              parm = i
           End Select
         End If
-        note = note & "Shake Reduction:" & tb & i & "\par "
+        note &= "Shake Reduction:" & tb & parm & "\par "
 
-        If UBound(v) >= 2 Then note = note & "Half Press Time:" & tb & v(2) & "\par "
-        If UBound(v) >= 3 Then note = note & "SR Focal Length:" & tb & v(3) & "\par "
+        If UBound(v) >= 2 Then note &= "Half Press Time:" & tb & v(2) & "\par "
+        If UBound(v) >= 3 Then note &= "SR Focal Length:" & tb & v(3) & "\par "
       End If
 
       If makertags.Contains(sTag(93)) Then
         v = makertags.Item(sTag(93)).Value
         parm = ""
-        For i = 0 To UBound(v) : parm = parm & v(i) & " " : Next
-        If Len(parm) > 0 Then note = note & "Shutter Count:" & tb & parm & "\par "
+        For i = 0 To UBound(v) : parm &= v(i) & " " : Next
+        If parm <> "" Then note &= "Shutter Count:" & tb & parm & "\par "
       End If
 
       If makertags.Contains(sTag(105)) Then
         v = makertags.Item(sTag(105)).Value
         If v(0) = 0 Then parm = "Off" Else If v(0) = 1 Then parm = "On" Else parm = ""
-        If Len(parm) > 0 Then note = note & "Dynamic Range Expansion:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Dynamic Range Expansion:" & tb & parm & "\par "
       End If
 
       If makertags.Contains(sTag(&H71)) Then
@@ -3657,38 +3658,38 @@ Public Module ImageInfo
           Case Else
             parm = ""
         End Select
-        If Len(parm) > 0 Then note = note & "High ISO Noise Reduction:" & tb & parm & "\par "
+        If parm <> "" Then note &= "High ISO Noise Reduction:" & tb & parm & "\par "
       End If
 
       If makertags.Contains(sTag(&H72)) Then
         i = makertags.Item(sTag(&H72)).singleValue
-        note = note & "Autofocus Adjustment:" & tb & i & "\par "
+        note &= "Autofocus Adjustment:" & tb & i & "\par "
       End If
 
       If makertags.Contains(sTag(&H200)) Then
         v = makertags.Item(sTag(&H200)).Value
         If UBound(v) >= 3 Then parm = v(0) & " " & v(1) & " " & v(2) & " " & v(3) Else parm = ""
-        If Len(parm) > 0 Then note = note & "Black Point:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Black Point:" & tb & parm & "\par "
       End If
 
       If makertags.Contains(sTag(&H201)) Then
         v = makertags.Item(sTag(&H201)).Value
         If UBound(v) >= 3 Then parm = v(0) & " " & v(1) & " " & v(2) & " " & v(3) Else parm = ""
-        If Len(parm) > 0 Then note = note & "White Point:" & tb & parm & "\par "
+        If parm <> "" Then note &= "White Point:" & tb & parm & "\par "
       End If
 
       If makertags.Contains(sTag(&H203)) Then
         v = makertags.Item(sTag(&H203)).Value
         parm = ""
         If UBound(v) >= 8 Then parm = v(0) & " " & v(1) & " " & v(2) & crlf & tb & v(3) & " " & v(4) & " " & v(5) & crlf & tb & v(6) & " " & v(7) & " " & v(8)
-        If Len(parm) > 0 Then note = note & "Color Matrix A:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Color Matrix A:" & tb & parm & "\par "
       End If
 
       If makertags.Contains(sTag(&H204)) Then
         v = makertags.Item(sTag(&H204)).Value
         parm = ""
         If UBound(v) >= 8 Then parm = v(0) & " " & v(1) & " " & v(2) & crlf & tb & v(3) & " " & v(4) & " " & v(5) & crlf & tb & v(6) & " " & v(7) & " " & v(8)
-        If Len(parm) > 0 Then note = note & "Color Matrix B:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Color Matrix B:" & tb & parm & "\par "
       End If
 
       If makertags.Contains(sTag(&H205)) Then
@@ -3713,7 +3714,7 @@ Public Module ImageInfo
             Case 16 : parm = "Flash X-Sync Speed AE "
             Case Else : parm = ""
           End Select
-          If Len(parm) > 0 Then note = note & "Picture Mode:" & tb & parm & "\par "
+          If parm <> "" Then note &= "Picture Mode:" & tb & parm & "\par "
 
           i = v(1)
           Select Case (i And 3)
@@ -3723,16 +3724,16 @@ Public Module ImageInfo
             Case 3 : parm = "MTF"
             Case Else : parm = ""
           End Select
-          If Len(parm) > 0 Then note = note & "Program Line:" & tb & parm & "\par "
+          If parm <> "" Then note &= "Program Line:" & tb & parm & "\par "
 
           If i And &H20 Then parm = "1/3 Step" Else parm = "1/2 Step"
-          If Len(parm) > 0 Then note = note & "EV Steps:" & tb & parm & "\par "
+          If parm <> "" Then note &= "EV Steps:" & tb & parm & "\par "
 
           If i And &H40 Then parm = "P Shift" Else parm = "Tv or Av"
-          If Len(parm) > 0 Then note = note & "E-Dial-In Program:" & tb & parm & "\par "
+          If parm <> "" Then note &= "E-Dial-In Program:" & tb & parm & "\par "
 
           If i And &H80 Then parm = "Permitted" Else parm = "Prohibited"
-          If Len(parm) > 0 Then note = note & "Aparture Ring Use:" & tb & parm & "\par "
+          If parm <> "" Then note &= "Aparture Ring Use:" & tb & parm & "\par "
 
           i = v(2)
           Select Case (i And 15)
@@ -3747,7 +3748,7 @@ Public Module ImageInfo
             Case 15 : parm = "Trailing-curtain Sync"
             Case Else : parm = ""
           End Select
-          If Len(parm) > 0 Then note = note & "Flash Options:" & tb & parm & "\par "
+          If parm <> "" Then note &= "Flash Options:" & tb & parm & "\par "
 
           i = v(3)
           parm = ""
@@ -3758,7 +3759,7 @@ Public Module ImageInfo
           ElseIf (i And &H20) Then
             parm = "Fixed Center"
           End If
-          If Len(parm) > 0 Then note = note & "AF Point Mode:" & tb & parm & "\par "
+          If parm <> "" Then note &= "AF Point Mode:" & tb & parm & "\par "
 
           i = v(3)
           Select Case (i And 15)
@@ -3768,35 +3769,35 @@ Public Module ImageInfo
             Case 3 : parm = "AF-A"
             Case Else : parm = ""
           End Select
-          If Len(parm) > 0 Then note = note & "Focus Mode:" & tb & parm & "\par "
+          If parm <> "" Then note &= "Focus Mode:" & tb & parm & "\par "
 
           i = v(4)
           If i = 0 Then parm = "Auto" Else parm = ""
-          If i And 1 Then parm = parm & " Upper-left"
-          If i And 2 Then parm = parm & " Top"
-          If i And 4 Then parm = parm & " Upper-right"
-          If i And 8 Then parm = parm & " Left"
-          If i And 16 Then parm = parm & " Mid-left"
-          If i And 32 Then parm = parm & " Center"
-          If i And 64 Then parm = parm & " Mid-right"
-          If i And 128 Then parm = parm & " Right"
-          If i And 256 Then parm = parm & " Lower-left"
-          If i And 512 Then parm = parm & " Bottom"
-          If i And 1024 Then parm = parm & " Lower-right"
-          If Len(parm) > 0 Then note = note & "AF Points Selected:" & tb & parm & "\par "
+          If i And 1 Then parm &= " Upper-left"
+          If i And 2 Then parm &= " Top"
+          If i And 4 Then parm &= " Upper-right"
+          If i And 8 Then parm &= " Left"
+          If i And 16 Then parm &= " Mid-left"
+          If i And 32 Then parm &= " Center"
+          If i And 64 Then parm &= " Mid-right"
+          If i And 128 Then parm &= " Right"
+          If i And 256 Then parm &= " Lower-left"
+          If i And 512 Then parm &= " Bottom"
+          If i And 1024 Then parm &= " Lower-right"
+          If parm <> "" Then note &= "AF Points Selected:" & tb & parm & "\par "
 
-          note = note & "ISO Floor:" & tb & v(6) & "\par "
+          note &= "ISO Floor:" & tb & v(6) & "\par "
 
           i = v(7)
           If i = 0 Then parm = "Single-frame" Else parm = ""
-          If i And 1 Then parm = parm & " Continuous"
-          If i And 4 Then parm = parm & " Self-timer (12 s)"
-          If i And 8 Then parm = parm & " Self-timer (2 s)"
-          If i And 16 Then parm = parm & " Remote Control (3 s delay)"
-          If i And 32 Then parm = parm & " Remote Control"
-          If i And 64 Then parm = parm & " Exposure Bracket"
-          If i And 128 Then parm = parm & " Multiple Exposure"
-          If Len(parm) > 0 Then note = note & "Drive Mode:" & tb & parm & "\par "
+          If i And 1 Then parm &= " Continuous"
+          If i And 4 Then parm &= " Self-timer (12 s)"
+          If i And 8 Then parm &= " Self-timer (2 s)"
+          If i And 16 Then parm &= " Remote Control (3 s delay)"
+          If i And 32 Then parm &= " Remote Control"
+          If i And 64 Then parm &= " Exposure Bracket"
+          If i And 128 Then parm &= " Multiple Exposure"
+          If parm <> "" Then note &= "Drive Mode:" & tb & parm & "\par "
 
           Select Case v(8)
             Case 3 : parm = "0.3"
@@ -3809,7 +3810,7 @@ Public Module ImageInfo
             Case 16 : parm = "2.0"
             Case Else : parm = ""
           End Select
-          If Len(parm) > 0 Then note = note & "Exposure Bracket Step Size:" & tb & parm & "\par "
+          If parm <> "" Then note &= "Exposure Bracket Step Size:" & tb & parm & "\par "
 
           Select Case v(9)
             Case &H0 : parm = "n/a"
@@ -3823,7 +3824,7 @@ Public Module ImageInfo
             Case &H45 : parm = "5 of 5"
             Case Else : parm = ""
           End Select
-          If Len(parm) > 0 Then note = note & "Bracket Shot Number:" & tb & parm & "\par "
+          If parm <> "" Then note &= "Bracket Shot Number:" & tb & parm & "\par "
 
           i = v(10)
           Select Case (i And &HF0)
@@ -3842,9 +3843,9 @@ Public Module ImageInfo
             Case &HE0 : parm = "Set Color Temperature 3"
             Case Else : parm = ""
           End Select
-          If Len(parm) > 0 Then note = note & "White Balance Set:" & tb & parm & "\par "
+          If parm <> "" Then note &= "White Balance Set:" & tb & parm & "\par "
           If (i And 1) Then parm = "On" Else parm = "Off"
-          If Len(parm) > 0 Then note = note & "Multiple Exposure Set:" & tb & parm & "\par "
+          If parm <> "" Then note &= "Multiple Exposure Set:" & tb & parm & "\par "
         End If ' ubound(v) >= 10
 
         If UBound(v) >= 21 Then
@@ -3866,7 +3867,7 @@ Public Module ImageInfo
             Case 73 : parm = "RAW+JPEG (DNG, Good)"
             Case Else : parm = ""
           End Select
-          If Len(parm) > 0 Then note = note & "Raw and JPG Recording:" & tb & parm & "\par "
+          If parm <> "" Then note &= "Raw and JPG Recording:" & tb & parm & "\par "
         End If ' ubound(10)
 
         If UBound(v) >= 21 Then
@@ -3876,7 +3877,7 @@ Public Module ImageInfo
             Case 2 : parm = "2 MP"
             Case Else : parm = ""
           End Select
-          If Len(parm) > 0 Then note = note & "JPG Recorded Pixels:" & tb & parm & "\par "
+          If parm <> "" Then note &= "JPG Recorded Pixels:" & tb & parm & "\par "
 
           i = v(16)
           Select Case (i And &HF0)
@@ -3891,7 +3892,7 @@ Public Module ImageInfo
             Case &HA0 : parm = "Trailing-curtain Sync"
             Case Else : parm = ""
           End Select
-          If Len(parm) > 0 Then note = note & "Flash Options:" & tb & parm & "\par "
+          If parm <> "" Then note &= "Flash Options:" & tb & parm & "\par "
 
           Select Case (i And 15)
             Case 0 : parm = "Multi-segment"
@@ -3899,11 +3900,11 @@ Public Module ImageInfo
             Case 2 : parm = "Spot"
             Case Else : parm = ""
           End Select
-          If Len(parm) > 0 Then note = note & "Metering Mode:" & tb & parm & "\par "
+          If parm <> "" Then note &= "Metering Mode:" & tb & parm & "\par "
 
           i = v(17)
           If i And &H80 Then parm = "Yes" Else parm = "No"
-          If Len(parm) > 0 Then note = note & "Shake Reduction Active:" & tb & parm & "\par "
+          If parm <> "" Then note &= "Shake Reduction Active:" & tb & parm & "\par "
 
           Select Case (i And &H60)
             Case 0 : parm = "Upright"
@@ -3912,18 +3913,18 @@ Public Module ImageInfo
             Case &H60 : parm = "Rotated Left"
             Case Else : parm = ""
           End Select
-          If Len(parm) > 0 Then note = note & "Rotation:" & tb & parm & "\par "
+          If parm <> "" Then note &= "Rotation:" & tb & parm & "\par "
 
           If i And 4 Then parm = "Auto" Else parm = "Manual"
-          If Len(parm) > 0 Then note = note & "ISO Setting:" & tb & parm & "\par "
+          If parm <> "" Then note &= "ISO Setting:" & tb & parm & "\par "
 
           If i And 2 Then parm = "As EV Steps" Else parm = "1 EV Step"
-          If Len(parm) > 0 Then note = note & "Sensitivity Steps:" & tb & parm & "\par "
+          If parm <> "" Then note &= "Sensitivity Steps:" & tb & parm & "\par "
 
-          note = note & "TV Exposure Time Setting:" & tb & v(18) & "\par "
-          note = note & "AV Aperture Setting:" & tb & v(19) & "\par "
-          note = note & "SV ISO Setting:" & tb & v(20) & "\par "
-          note = note & "Base Exposure Compensation:" & tb & v(21) & "\par "
+          note &= "TV Exposure Time Setting:" & tb & v(18) & "\par "
+          note &= "AV Aperture Setting:" & tb & v(19) & "\par "
+          note &= "SV ISO Setting:" & tb & v(20) & "\par "
+          note &= "Base Exposure Compensation:" & tb & v(21) & "\par "
         End If ' ubound(21)
 
       End If ' pentax tag 205
@@ -3932,22 +3933,22 @@ Public Module ImageInfo
         v = makertags.Item(sTag(&H206)).Value
         If UBound(v) >= 14 Then
           x = 24 * 2 ^ ((32 - v(0)) / 8)
-          note = note & "AV Exposure Time:" & tb & Format(x, "###,##0.###") & "\par "
+          note &= "AV Exposure Time:" & tb & Format(x, "###,##0.###") & "\par "
 
           x = 2 ^ ((v(1) - 68) / 16)
-          note = note & "AE Aperture:" & tb & Format(x, "###,##0.###") & "\par "
+          note &= "AE Aperture:" & tb & Format(x, "###,##0.###") & "\par "
 
           x = 100 * 2 ^ ((v(2) - 32) / 8)
-          note = note & "AE ISO:" & tb & Format(x, "###,##0.###") & "\par "
+          note &= "AE ISO:" & tb & Format(x, "###,##0.###") & "\par "
 
           x = (v(3) - 64) / 8
-          note = note & "AEXv:" & tb & Format(x, "###,##0.###") & "\par "
+          note &= "AEXv:" & tb & Format(x, "###,##0.###") & "\par "
 
           x = v(4) / 8
-          note = note & "AEBXv:" & tb & Format(x, "###,##0.###") & "\par "
+          note &= "AEBXv:" & tb & Format(x, "###,##0.###") & "\par "
 
           x = 24 * 2 ^ ((32 - v(5)) / 8)
-          note = note & "AE Minimum Exposure Time:" & tb & Format(x, "###,##0.###") & "\par "
+          note &= "AE Minimum Exposure Time:" & tb & Format(x, "###,##0.###") & "\par "
 
           Select Case v(6)
             Case 0 : parm = "M, P or TAv"
@@ -3977,20 +3978,20 @@ Public Module ImageInfo
             Case 147 : parm = "Museum"
             Case Else : parm = ""
           End Select
-          If Len(parm) > 0 Then note = note & "AE Program Mode:" & tb & parm & "\par "
+          If parm <> "" Then note &= "AE Program Mode:" & tb & parm & "\par "
 
           x = 2 ^ ((v(9) - 68) / 16)
-          note = note & "AE Maximum Aperture:" & tb & Format(x, "###,##0.###") & "\par "
+          note &= "AE Maximum Aperture:" & tb & Format(x, "###,##0.###") & "\par "
           x = 2 ^ ((v(10) - 68) / 16)
-          note = note & "AE Maximum Aperture 2:" & tb & Format(x, "###,##0.###") & "\par "
+          note &= "AE Maximum Aperture 2:" & tb & Format(x, "###,##0.###") & "\par "
           x = 2 ^ ((v(11) - 68) / 16)
-          note = note & "AE Minimum Aperture:" & tb & Format(x, "###,##0.###") & "\par "
+          note &= "AE Minimum Aperture:" & tb & Format(x, "###,##0.###") & "\par "
 
           i = v(12)
           If i = 0 Then parm = "Multi-segment" Else If i And 16 Then parm = "Center-weighted average" Else If i And 32 Then parm = "Spot" Else parm = ""
-          If Len(parm) > 0 Then note = note & "AE Metering Mode:" & tb & parm & "\par "
+          If parm <> "" Then note &= "AE Metering Mode:" & tb & parm & "\par "
 
-          note = note & "AE Flash Exp Comp Set:" & tb & v(14) & "\par "
+          note &= "AE Flash Exp Comp Set:" & tb & v(14) & "\par "
         End If ' ubound 14
 
       End If ' pentax tag 206
@@ -4007,19 +4008,19 @@ Public Module ImageInfo
 
     If makerTags.Contains(sTag(1)) Then
       parm = makerTags.Item(sTag(1)).singleValue
-      If Trim(parm) <> "" Then note = note & "Maker Note Type:" & tb & parm & "\par "
+      If Trim(parm) <> "" Then note &= "Maker Note Type:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(2)) Then
       parm = makerTags.Item(sTag(2)).singleValue
-      If Trim(parm) <> "" Then note = note & "Maker Note Version:" & tb & parm & "\par "
+      If Trim(parm) <> "" Then note &= "Maker Note Version:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H1001)) Then
       v = makerTags.Item(sTag(&H1001)).value
       i = word(v, 0, intel, False)
       j = word(v, 2, intel, False)
-      If i > 0 And j > 0 Then note = note & "Image Size:" & tb & i & " x " & j & "\par "
+      If i > 0 And j > 0 Then note &= "Image Size:" & tb & i & " x " & j & "\par "
 
       If uuBound(v) >= 32 Then
         Select Case v(32)
@@ -4032,7 +4033,7 @@ Public Module ImageInfo
           Case Else
             parm = ""
         End Select
-        If Len(parm) > 0 Then note = note & "Flash Mode:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Flash Mode:" & tb & parm & "\par "
       End If
 
       If uuBound(v) >= 33 Then
@@ -4044,7 +4045,7 @@ Public Module ImageInfo
           Case Else
             parm = ""
         End Select
-        If Len(parm) > 0 Then note = note & "Macro:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Macro:" & tb & parm & "\par "
       End If
 
       If uuBound(v) >= 34 Then
@@ -4058,7 +4059,7 @@ Public Module ImageInfo
           Case Else
             parm = ""
         End Select
-        If Len(parm) > 0 Then note = note & "Sharpness:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Sharpness:" & tb & parm & "\par "
       End If
 
       If uuBound(v) >= 38 Then
@@ -4076,7 +4077,7 @@ Public Module ImageInfo
           Case Else
             parm = ""
         End Select
-        If Len(parm) > 0 Then note = note & "White Balance:" & tb & parm & "\par "
+        If parm <> "" Then note &= "White Balance:" & tb & parm & "\par "
       End If
 
       If uuBound(v) >= 39 Then
@@ -4098,7 +4099,7 @@ Public Module ImageInfo
           Case Else
             parm = ""
         End Select
-        If Len(parm) > 0 Then note = note & "ISO Setting:" & tb & parm & "\par "
+        If parm <> "" Then note &= "ISO Setting:" & tb & parm & "\par "
       End If
 
       If uuBound(v) >= 40 Then
@@ -4114,7 +4115,7 @@ Public Module ImageInfo
           Case Else
             parm = ""
         End Select
-        If Len(parm) > 0 Then note = note & "Saturation:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Saturation:" & tb & parm & "\par "
       End If
     End If ' 1001
 
@@ -4128,7 +4129,7 @@ Public Module ImageInfo
         Case 2
           parm = "Soft"
       End Select
-      If Len(parm) > 0 Then note = note & "Sharpness:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Sharpness:" & tb & parm & "\par "
     End If
   End Sub ' ricohMakernote
 
@@ -4148,9 +4149,9 @@ Public Module ImageInfo
       v = makerTags.Item(sTag(1)).Value
       If uuBound(v) >= 17 Then
 
-        If v(1) = 1 Then note = note & "Macro Mode: " & tb & "On" & "\par "
+        If v(1) = 1 Then note &= "Macro Mode: " & tb & "On" & "\par "
 
-        note = note & "Self Timer: " & tb & v(2) & "\par "
+        note &= "Self Timer: " & tb & v(2) & "\par "
 
         Select Case v(3)
           Case 1 : parm = "Economy"
@@ -4161,7 +4162,7 @@ Public Module ImageInfo
           Case 130 : parm = "Normal Movie"
           Case Else : parm = ""
         End Select
-        If Len(parm) > 0 Then note = note & "Image Quality:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Image Quality:" & tb & parm & "\par "
 
         Select Case v(4)
           Case 0 : parm = "Off"
@@ -4174,7 +4175,7 @@ Public Module ImageInfo
           Case 16 : parm = "External Flash"
           Case Else : parm = ""
         End Select
-        If Len(parm) > 0 Then note = note & "Flash Mode:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Flash Mode:" & tb & parm & "\par "
 
         Select Case v(5)
           Case 0 : parm = "Single"
@@ -4185,7 +4186,7 @@ Public Module ImageInfo
           Case 5 : parm = "Continuous, High"
           Case Else : parm = ""
         End Select
-        If Len(parm) > 0 Then note = note & "Continuous Drive:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Continuous Drive:" & tb & parm & "\par "
 
         Select Case v(7)
           Case 0 : parm = "One-shot AF"
@@ -4197,7 +4198,7 @@ Public Module ImageInfo
           Case 16 : parm = "Pan Focus"
           Case Else : parm = ""
         End Select
-        If Len(parm) > 0 Then note = note & "Focus Mode:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Focus Mode:" & tb & parm & "\par "
 
         Select Case v(9)
           Case 1 : parm = "JPEG"
@@ -4209,7 +4210,7 @@ Public Module ImageInfo
           Case 7 : parm = "CR2+JPEG"
           Case Else : parm = ""
         End Select
-        If Len(parm) > 0 Then note = note & "Record Mode:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Record Mode:" & tb & parm & "\par "
 
         Select Case v(10)
           Case 0 : parm = "Large"
@@ -4225,7 +4226,7 @@ Public Module ImageInfo
           Case 130 : parm = "Small Movie"
           Case Else : parm = ""
         End Select
-        If Trim(parm) <> "" Then note = note & "Image Size:" & tb & parm & "\par "
+        If Trim(parm) <> "" Then note &= "Image Size:" & tb & parm & "\par "
 
         Select Case v(11)
           Case 0 : parm = "Auto"
@@ -4263,7 +4264,7 @@ Public Module ImageInfo
           Case 33 : parm = "ISO 3200"
           Case Else : parm = ""
         End Select
-        If Trim(parm) <> "" Then note = note & "Shooting Mode:" & tb & parm & "\par "
+        If Trim(parm) <> "" Then note &= "Shooting Mode:" & tb & parm & "\par "
 
         Select Case v(12)
           Case 0 : parm = "(none)"
@@ -4271,7 +4272,7 @@ Public Module ImageInfo
           Case 2 : parm = "4x"
           Case Else : parm = ""
         End Select
-        If Len(parm) > 0 Then note = note & "Digital Zoom:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Digital Zoom:" & tb & parm & "\par "
 
         Select Case v(13)
           Case -1 : parm = "Low"
@@ -4279,7 +4280,7 @@ Public Module ImageInfo
           Case 1 : parm = "High"
           Case Else : parm = ""
         End Select
-        If Len(parm) > 0 Then note = note & "Contrast:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Contrast:" & tb & parm & "\par "
 
         Select Case v(14)
           Case -1 : parm = "Low"
@@ -4287,7 +4288,7 @@ Public Module ImageInfo
           Case 1 : parm = "High"
           Case Else : parm = ""
         End Select
-        If Len(parm) > 0 Then note = note & "Saturation:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Saturation:" & tb & parm & "\par "
 
         Select Case v(15)
           Case -1 : parm = "Low"
@@ -4295,7 +4296,7 @@ Public Module ImageInfo
           Case 1 : parm = "High"
           Case Else : parm = ""
         End Select
-        If Len(parm) > 0 Then note = note & "Sharpness:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Sharpness:" & tb & parm & "\par "
 
         Select Case v(16)
           Case 15 : parm = "Auto"
@@ -4305,7 +4306,7 @@ Public Module ImageInfo
           Case 19 : parm = "400"
           Case Else : parm = ""
         End Select
-        If Len(parm) > 0 And parm <> "0" Then note = note & "ISO Speed:" & tb & parm & "\par "
+        If parm <> "" And parm <> "0" Then note &= "ISO Speed:" & tb & parm & "\par "
 
         Select Case v(17)
           Case 0 : parm = "Default"
@@ -4316,7 +4317,7 @@ Public Module ImageInfo
           Case 5 : parm = "Center Weighted Average"
           Case Else : parm = ""
         End Select
-        If Len(parm) > 0 Then note = note & "Metering Mode:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Metering Mode:" & tb & parm & "\par "
 
         If UBound(v) >= 18 Then
           Select Case v(18)
@@ -4333,7 +4334,7 @@ Public Module ImageInfo
             Case 10 : parm = "Infinity"
             Case Else : parm = ""
           End Select
-          If Len(parm) > 0 Then note = note & "Focus Range:" & tb & parm & "\par "
+          If parm <> "" Then note &= "Focus Range:" & tb & parm & "\par "
         End If
 
         If UBound(v) >= 19 Then
@@ -4348,7 +4349,7 @@ Public Module ImageInfo
             Case &H4006 : parm = "Face Detect"
             Case Else : parm = ""
           End Select
-          If Len(parm) > 0 Then note = note & "Autofocus Point:" & tb & parm & "\par "
+          If parm <> "" Then note &= "Autofocus Point:" & tb & parm & "\par "
         End If
 
         If UBound(v) >= 20 Then
@@ -4363,29 +4364,29 @@ Public Module ImageInfo
             Case 7 : parm = "Bulb"
             Case Else : parm = ""
           End Select
-          If Len(parm) > 0 Then note = note & "Exposure Mode:" & tb & parm & "\par "
+          If parm <> "" Then note &= "Exposure Mode:" & tb & parm & "\par "
         End If
 
-        If UBound(v) >= 22 AndAlso v(22) <> 65535 AndAlso v(22) <> 0 Then note = note & "Lens Type: " & tb & v(22) & "\par "
-        If UBound(v) >= 23 AndAlso v(23) <> 65535 AndAlso v(23) <> 0 Then note = note & "Long Focal Length: " & tb & v(23) & "\par "
-        If UBound(v) >= 24 AndAlso v(24) <> 65535 AndAlso v(24) <> 0 Then note = note & "Short Focal Length: " & tb & v(24) & "\par "
-        If UBound(v) >= 25 AndAlso v(25) <> 65535 AndAlso v(25) <> 0 Then note = note & "Focal Units: " & tb & v(25) & "\par "
-        If UBound(v) >= 26 AndAlso v(26) <> 65535 AndAlso v(26) <> 0 Then note = note & "Max Aperture: " & tb & v(26) & "\par "
-        If UBound(v) >= 27 AndAlso v(27) <> 65535 AndAlso v(27) <> 0 Then note = note & "Min Aperture: " & tb & v(27) & "\par "
-        If UBound(v) >= 28 AndAlso v(28) <> 65535 Then note = note & "Flash Activity: " & tb & v(28) & "\par "
+        If UBound(v) >= 22 AndAlso v(22) <> 65535 AndAlso v(22) <> 0 Then note &= "Lens Type: " & tb & v(22) & "\par "
+        If UBound(v) >= 23 AndAlso v(23) <> 65535 AndAlso v(23) <> 0 Then note &= "Long Focal Length: " & tb & v(23) & "\par "
+        If UBound(v) >= 24 AndAlso v(24) <> 65535 AndAlso v(24) <> 0 Then note &= "Short Focal Length: " & tb & v(24) & "\par "
+        If UBound(v) >= 25 AndAlso v(25) <> 65535 AndAlso v(25) <> 0 Then note &= "Focal Units: " & tb & v(25) & "\par "
+        If UBound(v) >= 26 AndAlso v(26) <> 65535 AndAlso v(26) <> 0 Then note &= "Max Aperture: " & tb & v(26) & "\par "
+        If UBound(v) >= 27 AndAlso v(27) <> 65535 AndAlso v(27) <> 0 Then note &= "Min Aperture: " & tb & v(27) & "\par "
+        If UBound(v) >= 28 AndAlso v(28) <> 65535 Then note &= "Flash Activity: " & tb & v(28) & "\par "
 
         If UBound(v) >= 29 Then
           i = v(29)
-          If i And 1 Then parm = parm & "Manual "
-          If i And 2 Then parm = parm & "TTL "
-          If i And 4 Then parm = parm & "A-TTL "
-          If i And 8 Then parm = parm & "E-TTL "
-          If i And 16 Then parm = parm & "FP sync enabled "
-          If i And 128 Then parm = parm & "2nd-curtain sync used "
-          If i And 2048 Then parm = parm & "FP sync used "
-          If i And 8192 Then parm = parm & "Built-in "
-          If i And 16384 Then parm = parm & "External "
-          If Trim(parm) <> "" Then note = note & "Flash:" & tb & Trim(parm) & "\par "
+          If i And 1 Then parm &= "Manual "
+          If i And 2 Then parm &= "TTL "
+          If i And 4 Then parm &= "A-TTL "
+          If i And 8 Then parm &= "E-TTL "
+          If i And 16 Then parm &= "FP sync enabled "
+          If i And 128 Then parm &= "2nd-curtain sync used "
+          If i And 2048 Then parm &= "FP sync used "
+          If i And 8192 Then parm &= "Built-in "
+          If i And 16384 Then parm &= "External "
+          If Trim(parm) <> "" Then note &= "Flash:" & tb & Trim(parm) & "\par "
         End If
 
         If UBound(v) >= 32 Then
@@ -4395,7 +4396,7 @@ Public Module ImageInfo
             Case 8 : parm = "Manual"
             Case Else : parm = ""
           End Select
-          If Len(parm) > 0 Then note = note & "Focus Continuous:" & tb & parm & "\par "
+          If parm <> "" Then note &= "Focus Continuous:" & tb & parm & "\par "
         End If
 
         If UBound(v) >= 32 Then
@@ -4407,7 +4408,7 @@ Public Module ImageInfo
             Case 4 : parm = "No AE"
             Case Else : parm = ""
           End Select
-          If Len(parm) > 0 Then note = note & "AE Setting:" & tb & parm & "\par "
+          If parm <> "" Then note &= "AE Setting:" & tb & parm & "\par "
         End If
 
 
@@ -4419,12 +4420,12 @@ Public Module ImageInfo
             Case 3 : parm = "On, Panning"
             Case Else : parm = ""
           End Select
-          If Len(parm) > 0 Then note = note & "Image Stabilization:" & tb & parm & "\par "
+          If parm <> "" Then note &= "Image Stabilization:" & tb & parm & "\par "
         End If
 
-        If UBound(v) >= 35 AndAlso v(35) > 0 Then note = note & "Display Aperture: " & tb & v(35) & "\par "
-        If UBound(v) >= 36 AndAlso v(36) > 0 Then note = note & "Zoom Source Width: " & tb & v(36) & "\par "
-        If UBound(v) >= 37 AndAlso v(37) > 0 Then note = note & "Zoom Target Width: " & tb & v(37) & "\par "
+        If UBound(v) >= 35 AndAlso v(35) > 0 Then note &= "Display Aperture: " & tb & v(35) & "\par "
+        If UBound(v) >= 36 AndAlso v(36) > 0 Then note &= "Zoom Source Width: " & tb & v(36) & "\par "
+        If UBound(v) >= 37 AndAlso v(37) > 0 Then note &= "Zoom Target Width: " & tb & v(37) & "\par "
 
         If UBound(v) >= 39 Then
           Select Case v(39)
@@ -4432,7 +4433,7 @@ Public Module ImageInfo
             Case 1 : parm = "AF Point"
             Case Else : parm = ""
           End Select
-          If Len(parm) > 0 Then note = note & "Spot Metering Mode:" & tb & parm & "\par "
+          If parm <> "" Then note &= "Spot Metering Mode:" & tb & parm & "\par "
         End If
 
         If UBound(v) >= 40 Then
@@ -4447,7 +4448,7 @@ Public Module ImageInfo
             Case 100 : parm = "My Color Data"
             Case Else : parm = ""
           End Select
-          If Len(parm) > 0 Then note = note & "Photo Effect:" & tb & parm & "\par "
+          If parm <> "" Then note &= "Photo Effect:" & tb & parm & "\par "
         End If
 
         If UBound(v) >= 41 Then
@@ -4457,10 +4458,10 @@ Public Module ImageInfo
             Case &H504 : parm = "Low"
             Case Else : parm = ""
           End Select
-          If Len(parm) > 0 Then note = note & "Manual Flash Output:" & tb & parm & "\par "
+          If parm <> "" Then note &= "Manual Flash Output:" & tb & parm & "\par "
         End If
 
-        If UBound(v) >= 42 AndAlso v(42) <> 32767 Then note = note & "Color Tone: " & tb & v(42) & "\par "
+        If UBound(v) >= 42 AndAlso v(42) <> 32767 Then note &= "Color Tone: " & tb & v(42) & "\par "
 
       End If ' tag 1 for canon
     End If ' tag 1 for canon
@@ -4469,20 +4470,20 @@ Public Module ImageInfo
       v = makerTags.Item(sTag(2)).Value
       If UBound(v) >= 1 Then
         If v(0) = 1 Then parm = "Fixed" Else If v(0) = 2 Then parm = "Zoom" Else parm = ""
-        If Len(parm) > 0 Then note = note & "Focal Type:" & tb & parm & "\par "
-        note = note & "Focal length:" & tb & v(1) & "\par "
+        If parm <> "" Then note &= "Focal Type:" & tb & parm & "\par "
+        note &= "Focal length:" & tb & v(1) & "\par "
       End If
     End If
 
     If makerTags.Contains(sTag(4)) Then
       v = makerTags.Item(sTag(4)).Value
 
-      If v(1) < 60000 Then note = note & "Auto ISO:" & tb & v(1) & "\par "
-      If v(2) < 60000 Then note = note & "Base ISO:" & tb & v(2) & "\par "
-      note = note & "Measured EV:" & tb & v(3) & "\par "
-      note = note & "Target Aperture:" & tb & v(4) & "\par "
-      note = note & "Target Exposure Time:" & tb & v(5) & "\par "
-      note = note & "Exposure Compensation:" & tb & v(6) & "\par "
+      If v(1) < 60000 Then note &= "Auto ISO:" & tb & v(1) & "\par "
+      If v(2) < 60000 Then note &= "Base ISO:" & tb & v(2) & "\par "
+      note &= "Measured EV:" & tb & v(3) & "\par "
+      note &= "Target Aperture:" & tb & v(4) & "\par "
+      note &= "Target Exposure Time:" & tb & v(5) & "\par "
+      note &= "Exposure Compensation:" & tb & v(6) & "\par "
 
       Select Case v(7)
         Case 0 : parm = "Auto"
@@ -4494,7 +4495,7 @@ Public Module ImageInfo
         Case 6 : parm = "Custom"
         Case Else : parm = ""
       End Select
-      If Len(parm) > 0 Then note = note & "White Balance:" & tb & parm & "\par "
+      If parm <> "" Then note &= "White Balance:" & tb & parm & "\par "
 
       Select Case v(8)
         Case 0 : parm = "Off"
@@ -4504,11 +4505,11 @@ Public Module ImageInfo
         Case Else
           parm = ""
       End Select
-      If Len(parm) > 0 Then note = note & "Slow Shutter:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Slow Shutter:" & tb & parm & "\par "
 
-      If UBound(v) >= 9 AndAlso v(9) > 0 Then note = note & "Sequence Number:" & tb & v(9) & "\par "
-      If UBound(v) >= 10 Then note = note & "Optical Zoom Code:" & tb & v(10) & "\par "
-      If UBound(v) >= 13 Then note = note & "Flash Guide Number:" & tb & v(13) & "\par "
+      If UBound(v) >= 9 AndAlso v(9) > 0 Then note &= "Sequence Number:" & tb & v(9) & "\par "
+      If UBound(v) >= 10 Then note &= "Optical Zoom Code:" & tb & v(10) & "\par "
+      If UBound(v) >= 13 Then note &= "Flash Guide Number:" & tb & v(13) & "\par "
 
       If UBound(v) >= 14 Then
         Select Case v(14)
@@ -4522,11 +4523,11 @@ Public Module ImageInfo
           Case &H3007 : parm = "All"
           Case Else : parm = ""
         End Select
-        If Len(parm) > 0 Then note = note & "AF Points in Focus:" & tb & parm & "\par "
+        If parm <> "" Then note &= "AF Points in Focus:" & tb & parm & "\par "
       End If
 
-      If UBound(v) >= 16 Then note = note & "Flash Exposure Compensation:" & tb & v(16) & "\par "
-      If UBound(v) >= 17 Then note = note & "AEB Bracket Value:" & tb & v(17) & "\par "
+      If UBound(v) >= 16 Then note &= "Flash Exposure Compensation:" & tb & v(16) & "\par "
+      If UBound(v) >= 17 Then note &= "AEB Bracket Value:" & tb & v(17) & "\par "
 
       If UBound(v) >= 18 Then
         Select Case v(18)
@@ -4535,12 +4536,12 @@ Public Module ImageInfo
           Case Else
             parm = ""
         End Select
-        If Len(parm) > 0 Then note = note & "Control Mode:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Control Mode:" & tb & parm & "\par "
       End If
 
-      If UBound(v) >= 19 AndAlso v(19) > 0 Then note = note & "Upper Focus Distance:" & tb & Format(v(19) / 100, "####,##0.##") & " m\par "
-      If UBound(v) >= 20 AndAlso v(20) > 0 Then note = note & "Lower Focus Distance:" & tb & Format(v(20) / 100, "####,##0.##") & " m\par "
-      If UBound(v) >= 21 AndAlso v(21) > 0 Then note = note & "F-Number Code:" & tb & v(21) & "\par "
+      If UBound(v) >= 19 AndAlso v(19) > 0 Then note &= "Upper Focus Distance:" & tb & Format(v(19) / 100, "####,##0.##") & " m\par "
+      If UBound(v) >= 20 AndAlso v(20) > 0 Then note &= "Lower Focus Distance:" & tb & Format(v(20) / 100, "####,##0.##") & " m\par "
+      If UBound(v) >= 21 AndAlso v(21) > 0 Then note &= "F-Number Code:" & tb & v(21) & "\par "
       If UBound(v) >= 22 AndAlso v(22) > 0 Then
         x = Exp(-(v(22) / 32) * Log(2))
         If x > 0.00000000001 Then
@@ -4549,10 +4550,10 @@ Public Module ImageInfo
           Else
             parm = Format(x, "##0.0") & " sec."
           End If
-          note = note & "Exposure Time:" & tb & parm & "\par "
+          note &= "Exposure Time:" & tb & parm & "\par "
         End If
       End If
-      If UBound(v) >= 24 AndAlso v(24) > 0 Then note = note & "Bulb Duration:" & tb & v(24) & "\par "
+      If UBound(v) >= 24 AndAlso v(24) > 0 Then note &= "Bulb Duration:" & tb & v(24) & "\par "
 
       If UBound(v) >= 26 Then
         Select Case v(26)
@@ -4562,7 +4563,7 @@ Public Module ImageInfo
           Case 255 : parm = "DV Camera"
           Case Else : parm = ""
         End Select
-        If Len(parm) > 0 Then note = note & "Camera Type:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Camera Type:" & tb & parm & "\par "
       End If
 
       If UBound(v) >= 27 Then
@@ -4573,7 +4574,7 @@ Public Module ImageInfo
           Case 3 : parm = "Rotated Left"
           Case Else : parm = ""
         End Select
-        If Len(parm) > 0 Then note = note & "Auto Rotate:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Auto Rotate:" & tb & parm & "\par "
       End If
 
       If UBound(v) >= 28 Then
@@ -4582,11 +4583,11 @@ Public Module ImageInfo
           Case 1 : parm = "On"
           Case Else : parm = ""
         End Select
-        If Len(parm) > 0 Then note = note & "ND Filter:" & tb & parm & "\par "
+        If parm <> "" Then note &= "ND Filter:" & tb & parm & "\par "
       End If
 
-      If UBound(v) >= 29 AndAlso v(29) <> 65535 Then note = note & "Self Timer:" & tb & v(29) & "\par "
-      If UBound(v) >= 33 AndAlso v(33) <> 65535 Then note = note & "Flash Output:" & tb & v(33) & "\par "
+      If UBound(v) >= 29 AndAlso v(29) <> 65535 Then note &= "Self Timer:" & tb & v(29) & "\par "
+      If UBound(v) >= 33 AndAlso v(33) <> 65535 Then note &= "Flash Output:" & tb & v(33) & "\par "
 
     End If ' tag 4 for canon
 
@@ -4594,7 +4595,7 @@ Public Module ImageInfo
       parm = makerTags.Item(sTag(6)).singleValue
       If InStr(parm, ChrW(0)) > 0 Then parm = Trim(Mid(parm, 1, InStr(parm, ChrW(0)) - 1))
       'parm = splitString(parm)
-      If Trim(parm) <> "" Then note = note & "Image Type:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note &= "Image Type:" & tb & Trim(parm) & "\par "
     End If ' tag 6 for Canon
 
     If makerTags.Contains(sTag(7)) Then
@@ -4602,7 +4603,7 @@ Public Module ImageInfo
       If InStr(parm, ChrW(0)) > 0 Then parm = Trim(Mid(parm, 1, InStr(parm, ChrW(0)) - 1))
       ' parm = splitString(parm)
       If Trim(parm) <> "" Then
-        note = note & "Firmware:" & tb & Trim(parm) & "\par "
+        note &= "Firmware:" & tb & Trim(parm) & "\par "
         canonFirmware = Trim(parm)
       End If
     End If
@@ -4610,20 +4611,20 @@ Public Module ImageInfo
     If makerTags.Contains(sTag(8)) Then
       k = makerTags.Item(sTag(8)).singleValue
       i = Int(k / 10000)
-      note = note & "Image Number:" & tb & Format(i, "0000") & "-" & Format(k - i * 10000, "0000") & "\par "
+      note &= "Image Number:" & tb & Format(i, "0000") & "-" & Format(k - i * 10000, "0000") & "\par "
     End If ' tag 8 for Canon
 
     If makerTags.Contains(sTag(9)) Then
       parm = makerTags.Item(sTag(9)).singleValue
       If InStr(parm, ChrW(0)) > 0 Then parm = Mid(parm, 1, InStr(parm, ChrW(0)) - 1)
-      If Trim(parm) <> "" Then note = note & "Owner Name:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note &= "Owner Name:" & tb & Trim(parm) & "\par "
     End If ' tag 9 for Canon
 
     If makerTags.Contains(sTag(12)) Then
       kw = makerTags.Item(sTag(12)).singleValue
       i = kw Mod 65536
       kw = kw / 65536
-      If kw <> 0 Then note = note & "Camera Serial Number:" & tb & Right("000" & Hex(kw), 4) & Format(i, "0000") & "\par "
+      If kw <> 0 Then note &= "Camera Serial Number:" & tb & Right("000" & Hex(kw), 4) & Format(i, "0000") & "\par "
     End If ' tag 12 for Canon
 
     If makerTags.Contains(sTag(13)) Then
@@ -4639,7 +4640,7 @@ Public Module ImageInfo
       Select Case canonModel And &HFFFF
         Case &H1, &H167  ' EOS-1D, 1DS
           If UBound(v) >= 81 Then
-            note = note & "{\b Canon EOS-1D information\b0 }" & "\par "
+            note &= "{\b Canon EOS-1D information\b0 }" & "\par "
             x = Exp(4 * Log(2) * (1 - (b(4) - 24) / 32))
             If x > 0.00000000001 Then
               If x < 1 And x <> 0 Then
@@ -4647,12 +4648,12 @@ Public Module ImageInfo
               Else
                 parm = Format(x, "##0.0") & " sec."
               End If
-              note = note & "Exposure Time:" & tb & parm & "\par "
+              note &= "Exposure Time:" & tb & parm & "\par "
             End If
-            note = note & "Focal Length:" & tb & word(b, 10, intel) & " mm\par "
-            note = note & "Lens Type:" & tb & canonDescr(4, b(13)) & "\par "
-            note = note & "Short Focal:" & tb & word(b, 14, intel) & " mm\par "
-            note = note & "Long Focal:" & tb & word(b, 16, intel) & " mm\par "
+            note &= "Focal Length:" & tb & word(b, 10, intel) & " mm\par "
+            note &= "Lens Type:" & tb & canonDescr(4, b(13)) & "\par "
+            note &= "Short Focal:" & tb & word(b, 14, intel) & " mm\par "
+            note &= "Long Focal:" & tb & word(b, 16, intel) & " mm\par "
             If k = &H1 Then ' 1D
               Select Case b(65)
                 Case 1 : parm = "Lowest"
@@ -4662,13 +4663,13 @@ Public Module ImageInfo
                 Case 5 : parm = "Highest"
                 Case Else : parm = ""
               End Select
-              If Len(parm) > 0 Then note = note & "Sharpness Frequency:" & tb & parm & "\par "
-              note = note & "Sharpness:" & tb & b(66) & "\par "
+              If parm <> "" Then note &= "Sharpness Frequency:" & tb & parm & "\par "
+              note &= "Sharpness:" & tb & b(66) & "\par "
               parm = canonDescr(1, b(68))
-              If Len(parm) > 0 Then note = note & "White Balance:" & tb & parm & "\par "
-              note = note & "Color Temperature:" & tb & word(b, 72, intel) & "\par "
+              If parm <> "" Then note &= "White Balance:" & tb & parm & "\par "
+              note &= "Color Temperature:" & tb & word(b, 72, intel) & "\par "
               parm = canonDescr(1, b(75))
-              If Len(parm) > 0 Then note = note & "Picture Style:" & tb & parm & "\par "
+              If parm <> "" Then note &= "Picture Style:" & tb & parm & "\par "
             ElseIf k = &H167 Then ' 1DS
               Select Case b(71)
                 Case 1 : parm = "Lowest"
@@ -4678,19 +4679,19 @@ Public Module ImageInfo
                 Case 5 : parm = "Highest"
                 Case Else : parm = ""
               End Select
-              If Len(parm) > 0 Then note = note & "Sharpness Frequency:" & tb & parm & "\par "
-              note = note & "Sharpness:" & tb & b(72) & "\par "
+              If parm <> "" Then note &= "Sharpness Frequency:" & tb & parm & "\par "
+              note &= "Sharpness:" & tb & b(72) & "\par "
               parm = canonDescr(1, b(74))
-              If Len(parm) > 0 Then note = note & "White Balance:" & tb & parm & "\par "
-              note = note & "Color Temperature:" & tb & word(b, 78, intel) & "\par "
+              If parm <> "" Then note &= "White Balance:" & tb & parm & "\par "
+              note &= "Color Temperature:" & tb & word(b, 78, intel) & "\par "
               parm = canonDescr(2, b(81))
-              If Len(parm) > 0 Then note = note & "Picture Style:" & tb & parm & "\par "
+              If parm <> "" Then note &= "Picture Style:" & tb & parm & "\par "
             End If
           End If ' EOS-1D, 1DS
 
         Case &H174, &H188  ' EOS-1D Mark II, EOS-1Ds Mark II
           If UBound(v) >= 117 Then
-            note = note & "{\b Canon EOS-1D Mark II information\b0 }" & "\par "
+            note &= "{\b Canon EOS-1D Mark II information\b0 }" & "\par "
             x = Exp(4 * Log(2) * (1 - (b(4) - 24) / 32))
             If x > 0.00000000001 Then
               If x < 1 And x <> 0 Then
@@ -4698,17 +4699,17 @@ Public Module ImageInfo
               Else
                 parm = Format(x, "##0.0") & " sec."
               End If
-              note = note & "Exposure Time:" & tb & parm & "\par "
+              note &= "Exposure Time:" & tb & parm & "\par "
             End If
-            note = note & "Focal Length:" & tb & word(b, 9, False) & " mm\par "
-            note = note & "Lens Type:" & tb & canonDescr(4, b(13)) & "\par "
-            note = note & "Short Focal:" & tb & word(b, 17, intel) & " mm\par "
-            note = note & "Long Focal:" & tb & word(b, 19, intel) & " mm\par "
+            note &= "Focal Length:" & tb & word(b, 9, False) & " mm\par "
+            note &= "Lens Type:" & tb & canonDescr(4, b(13)) & "\par "
+            note &= "Short Focal:" & tb & word(b, 17, intel) & " mm\par "
+            note &= "Long Focal:" & tb & word(b, 19, intel) & " mm\par "
             If b(45) = 0 Then parm = "Fixed" Else If b(45) = 2 Then parm = "Zoom" Else parm = ""
-            If Len(parm) > 0 Then note = note & "Focal Type:" & tb & parm & "\par "
+            If parm <> "" Then note &= "Focal Type:" & tb & parm & "\par "
             parm = canonDescr(1, b(54))
-            If Len(parm) > 0 Then note = note & "White Balance:" & tb & parm & "\par "
-            note = note & "Color Temperature:" & tb & word(b, 55, intel) & "\par "
+            If parm <> "" Then note &= "White Balance:" & tb & parm & "\par "
+            note &= "Color Temperature:" & tb & word(b, 55, intel) & "\par "
             Select Case b(57)
               Case 1 : parm = "Large"
               Case 2, 5, 6, 7 : parm = "Medium"
@@ -4719,22 +4720,22 @@ Public Module ImageInfo
               Case 130 : parm = "Small Movie"
               Case Else : parm = ""
             End Select
-            If Len(parm) > 0 Then note = note & "Image Size:" & tb & parm & "\par "
-            note = note & "Jpeg Quality:" & tb & b(102) & "\par "
+            If parm <> "" Then note &= "Image Size:" & tb & parm & "\par "
+            note &= "Jpeg Quality:" & tb & b(102) & "\par "
             parm = canonDescr(2, b(108))
-            If Len(parm) > 0 Then note = note & "Picture Style:" & tb & parm & "\par "
-            note = note & "Saturation:" & tb & b(110) & "\par "
-            note = note & "Color Tone:" & tb & b(111) & "\par "
-            note = note & "Sharpness:" & tb & b(114) & "\par "
-            note = note & "Contrast:" & tb & b(115) & "\par "
+            If parm <> "" Then note &= "Picture Style:" & tb & parm & "\par "
+            note &= "Saturation:" & tb & b(110) & "\par "
+            note &= "Color Tone:" & tb & b(111) & "\par "
+            note &= "Sharpness:" & tb & b(114) & "\par "
+            note &= "Contrast:" & tb & b(115) & "\par "
             parm = UTF8bare.GetString(b, 117, 5)
             If InStr(parm, ChrW(0)) > 0 Then parm = Mid(parm, 1, InStr(parm, ChrW(0)) - 1)
-            If Len(parm) > 0 Then note = note & "ISO:" & tb & parm & "\par "
+            If parm <> "" Then note &= "ISO:" & tb & parm & "\par "
           End If ' EOS-1D Mark II, EOS-1Ds Mark II
 
         Case &H232 ' EOS-1D Mark II N
           If UBound(v) >= 117 Then
-            note = note & "{\b Canon EOS-1D Mark II N information\b0 }" & "\par "
+            note &= "{\b Canon EOS-1D Mark II N information\b0 }" & "\par "
             x = Exp(4 * Log(2) * (1 - (b(4) - 24) / 32))
             If x > 0.00000000001 Then
               If x < 1 And x <> 0 Then
@@ -4742,31 +4743,31 @@ Public Module ImageInfo
               Else
                 parm = Format(x, "##0.0") & " sec."
               End If
-              note = note & "Exposure Time:" & tb & parm & "\par "
+              note &= "Exposure Time:" & tb & parm & "\par "
             End If
-            note = note & "Focal Length:" & tb & word(b, 9, False) & " mm\par "
-            note = note & "Lens Type:" & tb & canonDescr(4, b(13)) & "\par "
-            note = note & "Short Focal:" & tb & word(b, 17, intel) & " mm\par "
-            note = note & "Long Focal:" & tb & word(b, 19, intel) & " mm\par "
+            note &= "Focal Length:" & tb & word(b, 9, False) & " mm\par "
+            note &= "Lens Type:" & tb & canonDescr(4, b(13)) & "\par "
+            note &= "Short Focal:" & tb & word(b, 17, intel) & " mm\par "
+            note &= "Long Focal:" & tb & word(b, 19, intel) & " mm\par "
             parm = canonDescr(1, b(54))
-            If Len(parm) > 0 Then note = note & "White Balance:" & tb & parm & "\par "
-            note = note & "Color Temperature:" & tb & word(b, 55, intel) & "\par "
+            If parm <> "" Then note &= "White Balance:" & tb & parm & "\par "
+            note &= "Color Temperature:" & tb & word(b, 55, intel) & "\par "
             parm = canonDescr(2, v(115))
-            If Len(parm) > 0 Then note = note & "Picture Style:" & tb & parm & "\par "
-            note = note & "Sharpness:" & tb & b(116) & "\par "
-            note = note & "Contrast:" & tb & b(117) & "\par "
-            note = note & "Saturation:" & tb & b(118) & "\par "
-            note = note & "Color Tone:" & tb & b(119) & "\par "
+            If parm <> "" Then note &= "Picture Style:" & tb & parm & "\par "
+            note &= "Sharpness:" & tb & b(116) & "\par "
+            note &= "Contrast:" & tb & b(117) & "\par "
+            note &= "Saturation:" & tb & b(118) & "\par "
+            note &= "Color Tone:" & tb & b(119) & "\par "
             parm = UTF8bare.GetString(b, 121, 5)
             If InStr(parm, ChrW(0)) > 0 Then parm = Mid(parm, 1, InStr(parm, ChrW(0)) - 1)
-            If Len(parm) > 0 Then note = note & "ISO:" & tb & parm & "\par "
+            If parm <> "" Then note &= "ISO:" & tb & parm & "\par "
           End If ' EOS-1D Mark II N
 
         Case &H169, &H215 ' EOS-1D Mark III, EOS-1Ds Mark III
           If UBound(v) >= 382 Then
-            note = note & "{\b Canon EOS-1D Mark III information\b0 }" & "\par "
+            note &= "{\b Canon EOS-1D Mark III information\b0 }" & "\par "
             x = Exp((b(3) - 8) / 16 * Log(2))
-            note = note & "F-Number:" & tb & Format(x, "#,##0.0") & "\par "
+            note &= "F-Number:" & tb & Format(x, "#,##0.0") & "\par "
             x = Exp(4 * Log(2) * (1 - (b(4) - 24) / 32))
             If x > 0.00000000001 Then
               If x < 1 And x <> 0 Then
@@ -4774,34 +4775,34 @@ Public Module ImageInfo
               Else
                 parm = Format(x, "##0.0") & " sec."
               End If
-              note = note & "Exposure Time:" & tb & parm & "\par "
+              note &= "Exposure Time:" & tb & parm & "\par "
             End If
             x = 100 * Exp((b(6) / 8 - 9) * Log(2))
-            note = note & "ISO:" & tb & Format(x, "######") & "\par "
-            note = note & "Camera Temperature:" & tb & word(b, 24, intel) & "\par "
-            note = note & "Focal Length:" & tb & word(b, 29, intel) & " mm\par "
-            note = note & "Upper Focal Distance:" & tb & word(b, 67, intel) / 100 & " m\par "
-            note = note & "Lower Focal Distance:" & tb & word(b, 79, intel) / 100 & " m\par "
+            note &= "ISO:" & tb & Format(x, "######") & "\par "
+            note &= "Camera Temperature:" & tb & word(b, 24, intel) & "\par "
+            note &= "Focal Length:" & tb & word(b, 29, intel) & " mm\par "
+            note &= "Upper Focal Distance:" & tb & word(b, 67, intel) / 100 & " m\par "
+            note &= "Lower Focal Distance:" & tb & word(b, 79, intel) / 100 & " m\par "
             parm = canonDescr(1, word(b, 94, intel))
-            If Len(parm) > 0 Then note = note & "White Balance:" & tb & parm & "\par "
-            note = note & "Color Temperature:" & tb & word(b, 98, intel) & "\par "
+            If parm <> "" Then note &= "White Balance:" & tb & parm & "\par "
+            note &= "Color Temperature:" & tb & word(b, 98, intel) & "\par "
             parm = canonDescr(2, b(134))
-            If Len(parm) > 0 Then note = note & "Picture Style:" & tb & parm & "\par "
-            note = note & "Lens Type:" & tb & canonDescr(4, b(274)) & "\par "
-            note = note & "Short Focal:" & tb & word(b, 274, intel) & " mm\par "
-            note = note & "Long Focal:" & tb & word(b, 277, intel) & " mm\par "
+            If parm <> "" Then note &= "Picture Style:" & tb & parm & "\par "
+            note &= "Lens Type:" & tb & canonDescr(4, b(274)) & "\par "
+            note &= "Short Focal:" & tb & word(b, 274, intel) & " mm\par "
+            note &= "Long Focal:" & tb & word(b, 277, intel) & " mm\par "
             parm = UTF8bare.GetString(b, 310, 6)
             If InStr(parm, ChrW(0)) > 0 Then parm = Mid(parm, 1, InStr(parm, ChrW(0)) - 1)
-            If Len(parm) > 0 Then note = note & "Firmware Version:" & tb & parm & "\par "
-            note = note & "File Index:" & tb & DWord(b, 370, intel) & "\par "
-            note = note & "Directory Index:" & tb & DWord(b, 382, intel) & "\par "
+            If parm <> "" Then note &= "Firmware Version:" & tb & parm & "\par "
+            note &= "File Index:" & tb & DWord(b, 370, intel) & "\par "
+            note &= "Directory Index:" & tb & DWord(b, 382, intel) & "\par "
           End If ' EOS-1D Mark III, EOS-1Ds Mark III
 
         Case &H213 ' eos 5D
           If UBound(v) >= 382 Then
-            note = note & "{\b Canon EOS 5D information\b0 }" & "\par "
+            note &= "{\b Canon EOS 5D information\b0 }" & "\par "
             x = Exp((b(3) - 8) / 16 * Log(2))
-            note = note & "F-Number:" & tb & Format(x, "#,##0.0") & "\par "
+            note &= "F-Number:" & tb & Format(x, "#,##0.0") & "\par "
             x = Exp(4 * Log(2) * (1 - (b(4) - 24) / 32))
             If x > 0.00000000001 Then
               If x < 1 And x <> 0 Then
@@ -4809,61 +4810,61 @@ Public Module ImageInfo
               Else
                 parm = Format(x, "##0.0") & " sec."
               End If
-              note = note & "Exposure Time:" & tb & parm & "\par "
+              note &= "Exposure Time:" & tb & parm & "\par "
             End If
             x = 100 * Exp((b(6) / 8 - 9) * Log(2))
-            note = note & "ISO:" & tb & Format(x, "######") & "\par "
+            note &= "ISO:" & tb & Format(x, "######") & "\par "
             Select Case b(39)
               Case 0 : parm = "Upright"
               Case 1 : parm = "Rotated Right"
               Case 2 : parm = "Rotated Left"
               Case Else : parm = ""
             End Select
-            If Len(parm) > 0 Then note = note & "Camera Orientation:" & tb & parm & "\par "
-            note = note & "Focal Length:" & tb & Format(word(b, 40, intel), "###,###,###") & " mm\par "
-            note = note & "Short Focal:" & tb & Format(word(b, 147, intel), "###,###,###") & " mm\par "
-            note = note & "Long Focal:" & tb & Format(word(b, 149, intel), "###,###,###") & " mm\par "
+            If parm <> "" Then note &= "Camera Orientation:" & tb & parm & "\par "
+            note &= "Focal Length:" & tb & Format(word(b, 40, intel), "###,###,###") & " mm\par "
+            note &= "Short Focal:" & tb & Format(word(b, 147, intel), "###,###,###") & " mm\par "
+            note &= "Long Focal:" & tb & Format(word(b, 149, intel), "###,###,###") & " mm\par "
             i = word(b, 56, intel, False)
             parm = ""
-            If i And 2 ^ 0 Then parm = parm & " Center"
-            If i And 2 ^ 1 Then parm = parm & " Top"
-            If i And 2 ^ 2 Then parm = parm & " Bottom"
-            If i And 2 ^ 3 Then parm = parm & " Upper-left"
-            If i And 2 ^ 4 Then parm = parm & " Upper-right"
-            If i And 2 ^ 5 Then parm = parm & " Lower-left"
-            If i And 2 ^ 6 Then parm = parm & " Lower-right"
-            If i And 2 ^ 7 Then parm = parm & " Left"
-            If i And 2 ^ 8 Then parm = parm & " Right"
-            If i And 2 ^ 9 Then parm = parm & " AI Servo1"
-            If i And 2 ^ 10 Then parm = parm & " AI Servo2"
-            If i And 2 ^ 11 Then parm = parm & " AI Servo3"
-            If i And 2 ^ 12 Then parm = parm & " AI Servo4"
-            If i And 2 ^ 13 Then parm = parm & " AI Servo5"
-            If i And 2 ^ 14 Then parm = parm & " AI Servo6"
-            If Len(parm) > 0 Then note = note & "AF Points in Focus:" & tb & parm & "\par "
+            If i And 2 ^ 0 Then parm &= " Center"
+            If i And 2 ^ 1 Then parm &= " Top"
+            If i And 2 ^ 2 Then parm &= " Bottom"
+            If i And 2 ^ 3 Then parm &= " Upper-left"
+            If i And 2 ^ 4 Then parm &= " Upper-right"
+            If i And 2 ^ 5 Then parm &= " Lower-left"
+            If i And 2 ^ 6 Then parm &= " Lower-right"
+            If i And 2 ^ 7 Then parm &= " Left"
+            If i And 2 ^ 8 Then parm &= " Right"
+            If i And 2 ^ 9 Then parm &= " AI Servo1"
+            If i And 2 ^ 10 Then parm &= " AI Servo2"
+            If i And 2 ^ 11 Then parm &= " AI Servo3"
+            If i And 2 ^ 12 Then parm &= " AI Servo4"
+            If i And 2 ^ 13 Then parm &= " AI Servo5"
+            If i And 2 ^ 14 Then parm &= " AI Servo6"
+            If parm <> "" Then note &= "AF Points in Focus:" & tb & parm & "\par "
             parm = canonDescr(1, word(b, 84, intel))
-            If Len(parm) > 0 Then note = note & "White Balance:" & tb & parm & "\par "
-            note = note & "Color Temperature:" & tb & word(b, 88, intel) & "\par "
+            If parm <> "" Then note &= "White Balance:" & tb & parm & "\par "
+            note &= "Color Temperature:" & tb & word(b, 88, intel) & "\par "
             parm = canonDescr(2, b(108))
-            If Len(parm) > 0 Then note = note & "Picture Style:" & tb & parm & "\par "
-            note = note & "Lens Type:" & tb & canonDescr(4, b(152)) & "\par "
+            If parm <> "" Then note &= "Picture Style:" & tb & parm & "\par "
+            note &= "Lens Type:" & tb & canonDescr(4, b(152)) & "\par "
             parm = UTF8bare.GetString(b, 164, 8)
             If InStr(parm, ChrW(0)) > 0 Then parm = Mid(parm, 1, InStr(parm, ChrW(0)) - 1)
-            If Len(parm) > 0 Then note = note & "Firmware Version:" & tb & parm & "\par "
+            If parm <> "" Then note &= "Firmware Version:" & tb & parm & "\par "
             parm = UTF8bare.GetString(b, 72, 16)
             If InStr(parm, ChrW(0)) > 0 Then parm = Mid(parm, 1, InStr(parm, ChrW(0)) - 1)
-            If Len(parm) > 0 Then note = note & "Short Owner Name:" & tb & parm & "\par "
-            note = note & "Image Number:" & tb & word(b, 208, intel, False) & "\par "
+            If parm <> "" Then note &= "Short Owner Name:" & tb & parm & "\par "
+            note &= "Image Number:" & tb & word(b, 208, intel, False) & "\par "
             parm = ""
-            For i = 232 To 240 : parm = parm & b(i) & " " : Next i
-            note = note & "Contrast Settings:" & tb & Trim(parm) & "\par "
+            For i = 232 To 240 : parm &= b(i) & " " : Next i
+            note &= "Contrast Settings:" & tb & Trim(parm) & "\par "
             parm = ""
-            For i = 241 To 249 : parm = parm & b(i) & " " : Next i
-            note = note & "Sharpness Settings:" & tb & parm & "\par "
+            For i = 241 To 249 : parm &= b(i) & " " : Next i
+            note &= "Sharpness Settings:" & tb & parm & "\par "
             parm = ""
-            For i = 250 To 254 : parm = parm & b(i) & " " : Next i
-            For i = 256 To 258 : parm = parm & b(i) & " " : Next i
-            note = note & "Sharpness Settings:" & tb & Trim(parm) & "\par "
+            For i = 250 To 254 : parm &= b(i) & " " : Next i
+            For i = 256 To 258 : parm &= b(i) & " " : Next i
+            note &= "Sharpness Settings:" & tb & Trim(parm) & "\par "
             Select Case b(255)
               Case 0 : parm = "(none)"
               Case 1 : parm = "Yellow"
@@ -4872,11 +4873,11 @@ Public Module ImageInfo
               Case 4 : parm = "Green"
               Case Else : parm = ""
             End Select
-            If Len(parm) > 0 Then note = note & "Filter Effect Monochrome:" & tb & parm & "\par "
+            If parm <> "" Then note &= "Filter Effect Monochrome:" & tb & parm & "\par "
             parm = ""
-            For i = 259 To 263 : parm = parm & b(i) & " " : Next i
-            For i = 265 To 267 : parm = parm & b(i) & " " : Next i
-            note = note & "Color Tone Settings:" & tb & Trim(parm) & "\par "
+            For i = 259 To 263 : parm &= b(i) & " " : Next i
+            For i = 265 To 267 : parm &= b(i) & " " : Next i
+            note &= "Color Tone Settings:" & tb & Trim(parm) & "\par "
             Select Case b(264)
               Case 0 : parm = "(none)"
               Case 1 : parm = "Sepia"
@@ -4885,26 +4886,26 @@ Public Module ImageInfo
               Case 4 : parm = "Green"
               Case Else : parm = ""
             End Select
-            If Len(parm) > 0 Then note = note & "Toning Effect Monochrome:" & tb & parm & "\par "
+            If parm <> "" Then note &= "Toning Effect Monochrome:" & tb & parm & "\par "
             parm = canonDescr(3, word(b, 268, intel))
-            If Len(parm) > 0 Then note = note & "User Picture Style 1:" & tb & parm & "\par "
+            If parm <> "" Then note &= "User Picture Style 1:" & tb & parm & "\par "
             parm = canonDescr(3, word(b, 270, intel))
-            If Len(parm) > 0 Then note = note & "User Picture Style 2:" & tb & parm & "\par "
+            If parm <> "" Then note &= "User Picture Style 2:" & tb & parm & "\par "
             parm = canonDescr(3, word(b, 272, intel))
-            If Len(parm) > 0 Then note = note & "User Picture Style 3:" & tb & parm & "\par "
+            If parm <> "" Then note &= "User Picture Style 3:" & tb & parm & "\par "
             x = DWord(b, 274, intel)
             If x > 0 Then
               dt = New DateTime(1970, 1, 1)
               parm = Format(dt.AddSeconds(x), "G")
-              note = note & "Time Stamp:" & tb & parm & "\par "
+              note &= "Time Stamp:" & tb & parm & "\par "
             End If
           End If ' EOS 5D
 
         Case &H213 ' eos 5D Mark II
           If UBound(v) >= 382 Then
-            note = note & "{\b Canon EOS 5D Mark II information\b0 }" & "\par "
+            note &= "{\b Canon EOS 5D Mark II information\b0 }" & "\par "
             x = Exp((b(3) - 8) / 16 * Log(2))
-            note = note & "F-Number:" & tb & Format(x, "#,##0.0") & "\par "
+            note &= "F-Number:" & tb & Format(x, "#,##0.0") & "\par "
             x = Exp(4 * Log(2) * (1 - (b(4) - 24) / 32))
             If x > 0.00000000001 Then
               If x < 1 And x <> 0 Then
@@ -4912,32 +4913,32 @@ Public Module ImageInfo
               Else
                 parm = Format(x, "##0.0") & " sec."
               End If
-              note = note & "Exposure Time:" & tb & parm & "\par "
+              note &= "Exposure Time:" & tb & parm & "\par "
             End If
             x = 100 * Exp((b(6) / 8 - 9) * Log(2))
-            note = note & "ISO:" & tb & Format(x, "######") & "\par "
+            note &= "ISO:" & tb & Format(x, "######") & "\par "
 
             If b(7) = 0 Then parm = "Off" Else If b(7) = 1 Then parm = "On" Else parm = ""
-            If Len(parm) > 0 Then note = note & "Highlight Tone Priority:" & tb & parm & "\par "
+            If parm <> "" Then note &= "Highlight Tone Priority:" & tb & parm & "\par "
 
-            note = note & "Camera Temperature:" & tb & b(25) & "\par "
-            note = note & "Focal Length:" & tb & Format(word(b, 30, intel), "###,###,###") & " mm\par "
-            note = note & "Upper Focus Distance:" & tb & Format(word(b, 80, intel), "###,##0.##") / 100 & " m\par "
-            note = note & "Lower Focus Distance:" & tb & Format(word(b, 82, intel), "###,##0.##") / 100 & " m\par "
-            note = note & "Short Focal:" & tb & Format(word(b, 232, intel), "###,###,###") & " mm\par "
-            note = note & "Long Focal:" & tb & Format(word(b, 234, intel), "###,###,###") & " mm\par "
+            note &= "Camera Temperature:" & tb & b(25) & "\par "
+            note &= "Focal Length:" & tb & Format(word(b, 30, intel), "###,###,###") & " mm\par "
+            note &= "Upper Focus Distance:" & tb & Format(word(b, 80, intel), "###,##0.##") / 100 & " m\par "
+            note &= "Lower Focus Distance:" & tb & Format(word(b, 82, intel), "###,##0.##") / 100 & " m\par "
+            note &= "Short Focal:" & tb & Format(word(b, 232, intel), "###,###,###") & " mm\par "
+            note &= "Long Focal:" & tb & Format(word(b, 234, intel), "###,###,###") & " mm\par "
             Select Case b(49)
               Case 0 : parm = "Upright"
               Case 1 : parm = "Rotated Right"
               Case 2 : parm = "Rotated Left"
               Case Else : parm = ""
             End Select
-            If Len(parm) > 0 Then note = note & "Camera Orientation:" & tb & parm & "\par "
+            If parm <> "" Then note &= "Camera Orientation:" & tb & parm & "\par "
             parm = canonDescr(1, word(b, 111, intel))
-            If Len(parm) > 0 Then note = note & "White Balance:" & tb & parm & "\par "
-            note = note & "Color Temperature:" & tb & word(b, 115, intel) & "\par "
+            If parm <> "" Then note &= "White Balance:" & tb & parm & "\par "
+            note &= "Color Temperature:" & tb & word(b, 115, intel) & "\par "
             parm = canonDescr(2, b(167))
-            If Len(parm) > 0 Then note = note & "Picture Style:" & tb & parm & "\par "
+            If parm <> "" Then note &= "Picture Style:" & tb & parm & "\par "
             Select Case b(189)
               Case 0 : parm = "Standard"
               Case 1 : parm = "Low"
@@ -4945,7 +4946,7 @@ Public Module ImageInfo
               Case 3 : parm = "Off"
               Case Else : parm = ""
             End Select
-            If Len(parm) > 0 Then note = note & "High ISO Noise Reduction:" & tb & parm & "\par "
+            If parm <> "" Then note &= "High ISO Noise Reduction:" & tb & parm & "\par "
             Select Case b(191)
               Case 0 : parm = "Standard"
               Case 1 : parm = "Low"
@@ -4953,27 +4954,27 @@ Public Module ImageInfo
               Case 3 : parm = "Off"
               Case Else : parm = ""
             End Select
-            If Len(parm) > 0 Then note = note & "Auto Lighting Optimizer:" & tb & parm & "\par "
-            note = note & "Lens Type:" & tb & canonDescr(4, b(231)) & "\par "
+            If parm <> "" Then note &= "Auto Lighting Optimizer:" & tb & parm & "\par "
+            note &= "Lens Type:" & tb & canonDescr(4, b(231)) & "\par "
             parm = UTF8bare.GetString(b, 346, 5)
             If AscW(parm.Chars(0)) < 32 Then parm = ""
             If InStr(parm, ChrW(0)) > 0 Then parm = Mid(parm, 1, InStr(parm, ChrW(0)) - 1)
-            If Len(parm) > 0 Then note = note & "Firmware Version:" & tb & parm & "\par " : k = 0
+            If parm <> "" Then note &= "Firmware Version:" & tb & parm & "\par " : k = 0
             parm = UTF8bare.GetString(b, 382, 5)
             If AscW(parm.Chars(0)) < 32 Then parm = ""
             If InStr(parm, ChrW(0)) > 0 Then parm = Mid(parm, 1, InStr(parm, ChrW(0)) - 1)
-            If Len(parm) > 0 Then note = note & "Firmware Version:" & tb & parm & "\par " : k = 36
+            If parm <> "" Then note &= "Firmware Version:" & tb & parm & "\par " : k = 36
             x = DWord(b, 407 + k, intel)
-            If x > 0 Then note = note & "File Index:" & tb & Format(x, "###,###,###") & "\par "
+            If x > 0 Then note &= "File Index:" & tb & Format(x, "###,###,###") & "\par "
             x = DWord(b, 419 + k, intel)
-            If x > 0 Then note = note & "Directory Index:" & tb & Format(x, "###,###,###") & "\par "
+            If x > 0 Then note &= "Directory Index:" & tb & Format(x, "###,###,###") & "\par "
           End If ' EOS 5D Mark II
 
         Case &H190 ' EOS 40D
           If UBound(v) >= 382 Then
-            note = note & "{\b Canon EOS 40D information\b0 }" & "\par "
+            note &= "{\b Canon EOS 40D information\b0 }" & "\par "
             x = Exp((b(3) - 8) / 16 * Log(2))
-            note = note & "F-Number:" & tb & Format(x, "#,##0.0") & "\par "
+            note &= "F-Number:" & tb & Format(x, "#,##0.0") & "\par "
             x = Exp(4 * Log(2) * (1 - (b(4) - 24) / 32))
             If x > 0.00000000001 Then
               If x < 1 And x <> 0 Then
@@ -4981,44 +4982,44 @@ Public Module ImageInfo
               Else
                 parm = Format(x, "##0.0") & " sec."
               End If
-              note = note & "Exposure Time:" & tb & parm & "\par "
+              note &= "Exposure Time:" & tb & parm & "\par "
             End If
             x = 100 * Exp((b(6) / 8 - 9) * Log(2))
-            note = note & "ISO:" & tb & Format(x, "######") & "\par "
-            note = note & "Camera Temperature:" & tb & b(24) & "\par "
-            note = note & "Focal Length:" & tb & Format(word(b, 29, intel), "###,###,###") & " mm\par "
-            note = note & "Short Focal:" & tb & Format(word(b, 216, intel), "###,###,###") & " mm\par "
-            note = note & "Long Focal:" & tb & Format(word(b, 218, intel), "###,###,###") & " mm\par "
-            note = note & "Upper Focus Distance:" & tb & Format(word(b, 67, intel) / 100, "###,##0.##") & " m\par "
-            note = note & "Lower Focus Distance:" & tb & Format(word(b, 69, intel) / 100, "###,##0.##") & " m\par "
+            note &= "ISO:" & tb & Format(x, "######") & "\par "
+            note &= "Camera Temperature:" & tb & b(24) & "\par "
+            note &= "Focal Length:" & tb & Format(word(b, 29, intel), "###,###,###") & " mm\par "
+            note &= "Short Focal:" & tb & Format(word(b, 216, intel), "###,###,###") & " mm\par "
+            note &= "Long Focal:" & tb & Format(word(b, 218, intel), "###,###,###") & " mm\par "
+            note &= "Upper Focus Distance:" & tb & Format(word(b, 67, intel) / 100, "###,##0.##") & " m\par "
+            note &= "Lower Focus Distance:" & tb & Format(word(b, 69, intel) / 100, "###,##0.##") & " m\par "
             Select Case b(48)
               Case 0 : parm = "Upright"
               Case 1 : parm = "Rotated Right"
               Case 2 : parm = "Rotated Left"
               Case Else : parm = ""
             End Select
-            If Len(parm) > 0 Then note = note & "Camera Orientation:" & tb & parm & "\par "
+            If parm <> "" Then note &= "Camera Orientation:" & tb & parm & "\par "
             parm = canonDescr(1, word(b, 111, intel))
-            If Len(parm) > 0 Then note = note & "White Balance:" & tb & parm & "\par "
-            note = note & "Color Temperature:" & tb & word(b, 115, intel) & "\par "
+            If parm <> "" Then note &= "White Balance:" & tb & parm & "\par "
+            note &= "Color Temperature:" & tb & word(b, 115, intel) & "\par "
             parm = UTF8bare.GetString(b, 255, 5)
             If InStr(parm, ChrW(0)) > 0 Then parm = Mid(parm, 1, InStr(parm, ChrW(0)) - 1)
-            If Len(parm) > 0 Then note = note & "Firmware Version:" & tb & parm & "\par "
+            If parm <> "" Then note &= "Firmware Version:" & tb & parm & "\par "
             x = DWord(b, 407, intel)
-            If x > 0 Then note = note & "File Index:" & tb & Format(x, "###,###,###") & "\par "
+            If x > 0 Then note &= "File Index:" & tb & Format(x, "###,###,###") & "\par "
             x = DWord(b, 419, intel)
-            If x > 0 Then note = note & "Directory Index:" & tb & Format(x, "###,###,###") & "\par "
-            note = note & "Lens Type:" & tb & canonDescr(4, b(215)) & "\par "
+            If x > 0 Then note &= "Directory Index:" & tb & Format(x, "###,###,###") & "\par "
+            note &= "Lens Type:" & tb & canonDescr(4, b(215)) & "\par "
             parm = UTF8bare.GetString(b, 2347, 64)
             If InStr(parm, ChrW(0)) > 0 Then parm = Mid(parm, 1, InStr(parm, ChrW(0)) - 1)
-            If Len(parm) > 0 Then note = note & "Lens Model:" & tb & parm & "\par "
+            If parm <> "" Then note &= "Lens Model:" & tb & parm & "\par "
           End If ' EOS 40D
 
         Case &H261 ' EOS 50D
           If UBound(v) >= 382 Then
-            note = note & "{\b Canon EOS 50D information\b0 }" & "\par "
+            note &= "{\b Canon EOS 50D information\b0 }" & "\par "
             x = Exp((b(3) - 8) / 16 * Log(2))
-            note = note & "F-Number:" & tb & Format(x, "#,##0.0") & "\par "
+            note &= "F-Number:" & tb & Format(x, "#,##0.0") & "\par "
             x = Exp(4 * Log(2) * (1 - (b(4) - 24) / 32))
             If x > 0.00000000001 Then
               If x < 1 And x <> 0 Then
@@ -5026,32 +5027,32 @@ Public Module ImageInfo
               Else
                 parm = Format(x, "##0.0") & " sec."
               End If
-              note = note & "Exposure Time:" & tb & parm & "\par "
+              note &= "Exposure Time:" & tb & parm & "\par "
             End If
             x = 100 * Exp((b(6) / 8 - 9) * Log(2))
-            note = note & "ISO:" & tb & Format(x, "######") & "\par "
+            note &= "ISO:" & tb & Format(x, "######") & "\par "
             If b(7) = 0 Then parm = "Off" Else If b(7) = 1 Then parm = "On" Else parm = ""
-            If Len(parm) > 0 Then note = note & "Highlight Tone Priority:" & tb & parm & "\par "
-            note = note & "Camera Temperature:" & tb & b(25) & "\par "
-            note = note & "Focal Length:" & tb & Format(word(b, 30, intel), "###,###,##0") & " mm\par "
-            note = note & "Short Focal:" & tb & Format(word(b, 236, intel), "###,###,##0") & " mm\par "
-            note = note & "Long Focal:" & tb & Format(word(b, 238, intel), "###,###,##0") & " mm\par "
+            If parm <> "" Then note &= "Highlight Tone Priority:" & tb & parm & "\par "
+            note &= "Camera Temperature:" & tb & b(25) & "\par "
+            note &= "Focal Length:" & tb & Format(word(b, 30, intel), "###,###,##0") & " mm\par "
+            note &= "Short Focal:" & tb & Format(word(b, 236, intel), "###,###,##0") & " mm\par "
+            note &= "Long Focal:" & tb & Format(word(b, 238, intel), "###,###,##0") & " mm\par "
             x = word(b, 80, intel) / 100
-            If x > 0 Then note = note & "Upper Focus Distance:" & tb & Format(x, "###,##0.##") & " m\par "
+            If x > 0 Then note &= "Upper Focus Distance:" & tb & Format(x, "###,##0.##") & " m\par "
             x = word(b, 82, intel) / 100
-            If x > 0 Then note = note & "Lower Focus Distance:" & tb & Format(x, "###,##0.##") & " m\par "
+            If x > 0 Then note &= "Lower Focus Distance:" & tb & Format(x, "###,##0.##") & " m\par "
             Select Case b(49)
               Case 0 : parm = "Upright"
               Case 1 : parm = "Rotated Right"
               Case 2 : parm = "Rotated Left"
               Case Else : parm = ""
             End Select
-            If Len(parm) > 0 Then note = note & "Camera Orientation:" & tb & parm & "\par "
+            If parm <> "" Then note &= "Camera Orientation:" & tb & parm & "\par "
             parm = canonDescr(1, word(b, 111, intel))
-            If Len(parm) > 0 Then note = note & "White Balance:" & tb & parm & "\par "
-            note = note & "Color Temperature:" & tb & word(b, 115, intel) & "\par "
+            If parm <> "" Then note &= "White Balance:" & tb & parm & "\par "
+            note &= "Color Temperature:" & tb & word(b, 115, intel) & "\par "
             parm = canonDescr(2, b(167))
-            If Len(parm) > 0 Then note = note & "Picture Style:" & tb & parm & "\par "
+            If parm <> "" Then note &= "Picture Style:" & tb & parm & "\par "
             Select Case b(189)
               Case 0 : parm = "Standard"
               Case 1 : parm = "Low"
@@ -5059,7 +5060,7 @@ Public Module ImageInfo
               Case 3 : parm = "Off"
               Case Else : parm = ""
             End Select
-            If Len(parm) > 0 Then note = note & "High ISO Noise Reduction:" & tb & parm & "\par "
+            If parm <> "" Then note &= "High ISO Noise Reduction:" & tb & parm & "\par "
             Select Case b(191)
               Case 0 : parm = "Standard"
               Case 1 : parm = "Low"
@@ -5067,31 +5068,31 @@ Public Module ImageInfo
               Case 3 : parm = "Off"
               Case Else : parm = ""
             End Select
-            If Len(parm) > 0 Then note = note & "Auto Lighting Optimizer:" & tb & parm & "\par "
-            note = note & "Lens Type:" & tb & canonDescr(4, b(235)) & "\par "
+            If parm <> "" Then note &= "Auto Lighting Optimizer:" & tb & parm & "\par "
+            note &= "Lens Type:" & tb & canonDescr(4, b(235)) & "\par "
             parm = UTF8bare.GetString(b, 346, 5)
             If AscW(parm.Chars(0)) < 32 Then parm = ""
             If InStr(parm, ChrW(0)) > 0 Then parm = Mid(parm, 1, InStr(parm, ChrW(0)) - 1)
-            If Len(parm) > 0 Then note = note & "Firmware Version:" & tb & parm & "\par " : k = 0
+            If parm <> "" Then note &= "Firmware Version:" & tb & parm & "\par " : k = 0
             parm = UTF8bare.GetString(b, 350, 5)
             If AscW(parm.Chars(0)) < 32 Then parm = ""
             If InStr(parm, ChrW(0)) > 0 Then parm = Mid(parm, 1, InStr(parm, ChrW(0)) - 1)
-            If Len(parm) > 0 Then note = note & "Firmware Version:" & tb & parm & "\par " : k = 4
+            If parm <> "" Then note &= "Firmware Version:" & tb & parm & "\par " : k = 4
             x = DWord(b, 407 + k, intel)
-            If x > 0 Then note = note & "File Index:" & tb & Format(x, "###,###,###") & "\par "
+            If x > 0 Then note &= "File Index:" & tb & Format(x, "###,###,###") & "\par "
             x = DWord(b, 419 + k, intel)
-            If x > 0 Then note = note & "Directory Index:" & tb & Format(x, "###,###,###") & "\par "
+            If x > 0 Then note &= "Directory Index:" & tb & Format(x, "###,###,###") & "\par "
           End If ' EOS 50D
 
         Case &H176, &H254  ' EOS Digital Rebel XSi / 450D / Kiss X2,  EOS Rebel XS / 1000D / Kiss F
           If UBound(v) >= 382 Then
             If canonModel And &HFFFF = &H176 Then
-              note = note & "{\b Canon EOS 450D information\b0 }" & "\par "
+              note &= "{\b Canon EOS 450D information\b0 }" & "\par "
             Else
-              note = note & "{\b Canon EOS 1000D information\b0 }" & "\par "
+              note &= "{\b Canon EOS 1000D information\b0 }" & "\par "
             End If
             x = Exp((b(3) - 8) / 16 * Log(2))
-            note = note & "F-Number:" & tb & Format(x, "#,##0.0") & "\par "
+            note &= "F-Number:" & tb & Format(x, "#,##0.0") & "\par "
             x = Exp(4 * Log(2) * (1 - (b(4) - 24) / 32))
             If x > 0.00000000001 Then
               If x < 1 And x <> 0 Then
@@ -5099,45 +5100,45 @@ Public Module ImageInfo
               Else
                 parm = Format(x, "##0.0") & " sec."
               End If
-              note = note & "Exposure Time:" & tb & parm & "\par "
+              note &= "Exposure Time:" & tb & parm & "\par "
             End If
             x = 100 * Exp((b(6) / 8 - 9) * Log(2))
-            note = note & "ISO:" & tb & Format(x, "######") & "\par "
-            note = note & "Camera Temperature:" & tb & b(24) & "\par "
-            note = note & "Focal Length:" & tb & Format(word(b, 29, intel), "###,###,##0") & " mm\par "
+            note &= "ISO:" & tb & Format(x, "######") & "\par "
+            note &= "Camera Temperature:" & tb & b(24) & "\par "
+            note &= "Focal Length:" & tb & Format(word(b, 29, intel), "###,###,##0") & " mm\par "
             x = word(b, 67, intel) / 100
-            If x > 0 Then note = note & "Upper Focus Distance:" & tb & Format(x, "###,##0.##") & " m\par "
+            If x > 0 Then note &= "Upper Focus Distance:" & tb & Format(x, "###,##0.##") & " m\par "
             x = word(b, 69, intel) / 100
-            If x > 0 Then note = note & "Lower Focus Distance:" & tb & Format(x, "###,##0.##") & " m\par "
+            If x > 0 Then note &= "Lower Focus Distance:" & tb & Format(x, "###,##0.##") & " m\par "
             Select Case b(48)
               Case 0 : parm = "Upright"
               Case 1 : parm = "Rotated Right"
               Case 2 : parm = "Rotated Left"
               Case Else : parm = ""
             End Select
-            If Len(parm) > 0 Then note = note & "Camera Orientation:" & tb & parm & "\par "
+            If parm <> "" Then note &= "Camera Orientation:" & tb & parm & "\par "
             parm = canonDescr(1, word(b, 111, intel))
-            If Len(parm) > 0 Then note = note & "White Balance:" & tb & parm & "\par "
-            note = note & "Color Temperature:" & tb & word(b, 115, intel) & "\par "
-            note = note & "Lens Type:" & tb & canonDescr(4, b(227)) & "\par "
+            If parm <> "" Then note &= "White Balance:" & tb & parm & "\par "
+            note &= "Color Temperature:" & tb & word(b, 115, intel) & "\par "
+            note &= "Lens Type:" & tb & canonDescr(4, b(227)) & "\par "
             parm = UTF8bare.GetString(b, 267, 5)
             If AscW(parm.Chars(0)) < 32 Then parm = ""
             If InStr(parm, ChrW(0)) > 0 Then parm = Mid(parm, 1, InStr(parm, ChrW(0)) - 1)
-            If Len(parm) > 0 Then note = note & "Firmware Version:" & tb & parm & "\par " : k = 0
+            If parm <> "" Then note &= "Firmware Version:" & tb & parm & "\par "
             x = DWord(b, 311, intel)
-            If x > 0 Then note = note & "Directory Index:" & tb & Format(x, "###,###,###") & "\par "
+            If x > 0 Then note &= "Directory Index:" & tb & Format(x, "###,###,###") & "\par "
             x = DWord(b, 323, intel)
-            If x > 0 Then note = note & "File Index:" & tb & Format(x, "###,###,###") & "\par "
+            If x > 0 Then note &= "File Index:" & tb & Format(x, "###,###,###") & "\par "
             parm = UTF8bare.GetString(b, 2359, 64)
             If InStr(parm, ChrW(0)) > 0 Then parm = Mid(parm, 1, InStr(parm, ChrW(0)) - 1)
-            If Len(parm) > 0 Then note = note & "Lens Model:" & tb & parm & "\par "
+            If parm <> "" Then note &= "Lens Model:" & tb & parm & "\par "
           End If ' EOS 450D, 1000D
 
         Case &H250 ' canon 7D
           If UBound(v) >= 503 Then
-            note = note & "{\b Canon EOS 7D information\b0 }" & "\par "
+            note &= "{\b Canon EOS 7D information\b0 }" & "\par "
             x = Exp((b(3) - 8) / 16 * Log(2))
-            note = note & "F-Number:" & tb & Format(x, "#,##0.0") & "\par "
+            note &= "F-Number:" & tb & Format(x, "#,##0.0") & "\par "
             x = Exp(4 * Log(2) * (1 - (b(4) - 24) / 32))
             If x > 0.00000000001 Then
               If x < 1 And x <> 0 Then
@@ -5145,12 +5146,12 @@ Public Module ImageInfo
               Else
                 parm = Format(x, "##0.0") & " sec."
               End If
-              note = note & "Exposure Time:" & tb & parm & "\par "
+              note &= "Exposure Time:" & tb & parm & "\par "
             End If
             x = 100 * Exp((b(6) / 8 - 9) * Log(2))
-            note = note & "ISO:" & tb & Format(x, "######") & "\par "
+            note &= "ISO:" & tb & Format(x, "######") & "\par "
             If b(7) = 0 Then parm = "Off" Else If b(7) = 1 Then parm = "On" Else parm = ""
-            If Len(parm) > 0 Then note = note & "Highlight Tone Priority:" & tb & parm & "\par "
+            If parm <> "" Then note &= "Highlight Tone Priority:" & tb & parm & "\par "
             Select Case b(21)
               Case 0 : parm = "E-TTL"
               Case 3 : parm = "TTL"
@@ -5159,9 +5160,9 @@ Public Module ImageInfo
               Case 6 : parm = "Off"
               Case Else : parm = ""
             End Select
-            If Len(parm) > 0 Then note = note & "Flash Metering Mode:" & tb & parm & "\par "
-            note = note & "Camera Temperature:" & tb & b(25) & "\par "
-            note = note & "Focal Length:" & tb & Format(word(b, 30, intel), "###,###,###") & " mm\par "
+            If parm <> "" Then note &= "Flash Metering Mode:" & tb & parm & "\par "
+            note &= "Camera Temperature:" & tb & b(25) & "\par "
+            note &= "Focal Length:" & tb & Format(word(b, 30, intel), "###,###,###") & " mm\par "
 
             If InStr(canonFirmware, "3.7.5") > 0 Then k = 32 Else k = 36
             Select Case b(k + 17)
@@ -5170,17 +5171,17 @@ Public Module ImageInfo
               Case 2 : parm = "90 Degrees Left"
               Case Else : parm = ""
             End Select
-            If Len(parm) > 0 Then note = note & "Camera Orientation:" & tb & parm & "\par "
+            If parm <> "" Then note &= "Camera Orientation:" & tb & parm & "\par "
             i = word(b, k + 48, intel)
-            If i > 0 Then note = note & "Upper Focus Distance:" & tb & Format(i, "###,##0.##") / 100 & " m\par "
+            If i > 0 Then note &= "Upper Focus Distance:" & tb & Format(i, "###,##0.##") / 100 & " m\par "
             i = word(b, k + 50, intel)
-            If i > 0 Then note = note & "Lower Focus Distance:" & tb & Format(i, "###,##0.##") / 100 & " m\par "
-            note = note & "Short Focal:" & tb & Format(word(b, k + 240, intel), "###,###,###") & " mm\par "
-            note = note & "Long Focal:" & tb & Format(word(b, k + 242, intel), "###,###,###") & " mm\par "
+            If i > 0 Then note &= "Lower Focus Distance:" & tb & Format(i, "###,##0.##") / 100 & " m\par "
+            note &= "Short Focal:" & tb & Format(word(b, k + 240, intel), "###,###,###") & " mm\par "
+            note &= "Long Focal:" & tb & Format(word(b, k + 242, intel), "###,###,###") & " mm\par "
             parm = canonDescr(1, word(b, k + 83, intel))
-            If Len(parm) > 0 Then note = note & "White Balance:" & tb & parm & "\par "
+            If parm <> "" Then note &= "White Balance:" & tb & parm & "\par "
 
-            note = note & "Color Temperature:" & tb & word(b, k + 87, intel) & "\par "
+            note &= "Color Temperature:" & tb & word(b, k + 87, intel) & "\par "
             Select Case b(k + 165)
               Case 0 : parm = "Standard"
               Case 1 : parm = "Low"
@@ -5188,25 +5189,25 @@ Public Module ImageInfo
               Case 3 : parm = "Off"
               Case Else : parm = ""
             End Select
-            If Len(parm) > 0 Then note = note & "High ISO Noise Reduction:" & tb & parm & "\par "
-            note = note & "Lens Type:" & tb & canonDescr(4, b(k + 239)) & "\par "
+            If parm <> "" Then note &= "High ISO Noise Reduction:" & tb & parm & "\par "
+            note &= "Lens Type:" & tb & canonDescr(4, b(k + 239)) & "\par "
             If InStr(parm, ChrW(0)) > 0 Then parm = Mid(parm, 1, InStr(parm, ChrW(0)) - 1)
-            If Len(parm) > 0 Then note = note & "Firmware Version:" & tb & parm & "\par " : k = 0
+            If parm <> "" Then note &= "Firmware Version:" & tb & parm & "\par " : k = 0
             parm = UTF8bare.GetString(b, k + 392, 35)
             If AscW(parm.Chars(0)) < 32 Then parm = ""
             If InStr(parm, ChrW(0)) > 0 Then parm = Mid(parm, 1, InStr(parm, ChrW(0)) - 1)
-            If Len(parm) > 0 Then note = note & "Firmware Version:" & tb & parm & "\par " : k = 0
+            If parm <> "" Then note &= "Firmware Version:" & tb & parm & "\par " : k = 0
             x = DWord(b, k + 455 + k, intel)
-            If x > 0 Then note = note & "File Index:" & tb & Format(x, "###,###,###") & "\par "
+            If x > 0 Then note &= "File Index:" & tb & Format(x, "###,###,###") & "\par "
             x = DWord(b, k + 467 + k, intel)
-            If x > 0 Then note = note & "Directory Index:" & tb & Format(x, "###,###,###") & "\par "
+            If x > 0 Then note &= "Directory Index:" & tb & Format(x, "###,###,###") & "\par "
           End If ' EOS 7D
 
         Case &H252 ' canon 500D
           If UBound(v) >= 482 Then
-            note = note & "{\b Canon EOS 500D information\b0 }" & "\par "
+            note &= "{\b Canon EOS 500D information\b0 }" & "\par "
             x = Exp((b(3) - 8) / 16 * Log(2))
-            note = note & "F-Number:" & tb & Format(x, "#,##0.0") & "\par "
+            note &= "F-Number:" & tb & Format(x, "#,##0.0") & "\par "
             x = Exp(4 * Log(2) * (1 - (b(4) - 24) / 32))
             If x > 0.00000000001 Then
               If x < 1 And x <> 0 Then
@@ -5214,12 +5215,12 @@ Public Module ImageInfo
               Else
                 parm = Format(x, "##0.0") & " sec."
               End If
-              note = note & "Exposure Time:" & tb & parm & "\par "
+              note &= "Exposure Time:" & tb & parm & "\par "
             End If
             x = 100 * Exp((b(6) / 8 - 9) * Log(2))
-            note = note & "ISO:" & tb & Format(x, "######") & "\par "
+            note &= "ISO:" & tb & Format(x, "######") & "\par "
             If b(7) = 0 Then parm = "Off" Else If b(7) = 1 Then parm = "On" Else parm = ""
-            If Len(parm) > 0 Then note = note & "Highlight Tone Priority:" & tb & parm & "\par "
+            If parm <> "" Then note &= "Highlight Tone Priority:" & tb & parm & "\par "
             Select Case b(21)
               Case 0 : parm = "E-TTL"
               Case 3 : parm = "TTL"
@@ -5228,27 +5229,27 @@ Public Module ImageInfo
               Case 6 : parm = "Off"
               Case Else : parm = ""
             End Select
-            If Len(parm) > 0 Then note = note & "Flash Metering Mode:" & tb & parm & "\par "
-            note = note & "Camera Temperature:" & tb & b(25) & "\par "
-            note = note & "Focal Length:" & tb & Format(word(b, 30, intel), "###,###,###") & " mm\par "
+            If parm <> "" Then note &= "Flash Metering Mode:" & tb & parm & "\par "
+            note &= "Camera Temperature:" & tb & b(25) & "\par "
+            note &= "Focal Length:" & tb & Format(word(b, 30, intel), "###,###,###") & " mm\par "
             Select Case b(49)
               Case 0 : parm = "Horizontal"
               Case 1 : parm = "90 Degrees Right"
               Case 2 : parm = "90 Degrees Left"
               Case Else : parm = ""
             End Select
-            If Len(parm) > 0 Then note = note & "Camera Orientation:" & tb & parm & "\par "
+            If parm <> "" Then note &= "Camera Orientation:" & tb & parm & "\par "
             i = word(b, 80, intel)
-            If i > 0 Then note = note & "Upper Focus Distance:" & tb & Format(i, "###,##0.##") / 100 & " m\par "
+            If i > 0 Then note &= "Upper Focus Distance:" & tb & Format(i, "###,##0.##") / 100 & " m\par "
             i = word(b, 82, intel)
-            If i > 0 Then note = note & "Lower Focus Distance:" & tb & Format(i, "###,##0.##") / 100 & " m\par "
-            note = note & "Short Focal:" & tb & Format(word(b, 248, intel), "###,###,###") & " mm\par "
-            note = note & "Long Focal:" & tb & Format(word(b, 250, intel), "###,###,###") & " mm\par "
+            If i > 0 Then note &= "Lower Focus Distance:" & tb & Format(i, "###,##0.##") / 100 & " m\par "
+            note &= "Short Focal:" & tb & Format(word(b, 248, intel), "###,###,###") & " mm\par "
+            note &= "Long Focal:" & tb & Format(word(b, 250, intel), "###,###,###") & " mm\par "
             parm = canonDescr(1, word(b, 115, intel))
-            If Len(parm) > 0 Then note = note & "White Balance:" & tb & parm & "\par "
-            note = note & "Color Temperature:" & tb & word(b, 119, intel) & "\par "
+            If parm <> "" Then note &= "White Balance:" & tb & parm & "\par "
+            note &= "Color Temperature:" & tb & word(b, 119, intel) & "\par "
             parm = canonDescr(2, b(171))
-            If Len(parm) > 0 Then note = note & "Picture Style:" & tb & parm & "\par "
+            If parm <> "" Then note &= "Picture Style:" & tb & parm & "\par "
             Select Case b(188)
               Case 0 : parm = "Standard"
               Case 1 : parm = "Low"
@@ -5256,7 +5257,7 @@ Public Module ImageInfo
               Case 3 : parm = "Off"
               Case Else : parm = ""
             End Select
-            If Len(parm) > 0 Then note = note & "High ISO Noise Reduction:" & tb & parm & "\par "
+            If parm <> "" Then note &= "High ISO Noise Reduction:" & tb & parm & "\par "
             Select Case b(190)
               Case 0 : parm = "Standard"
               Case 1 : parm = "Low"
@@ -5264,16 +5265,16 @@ Public Module ImageInfo
               Case 3 : parm = "Off"
               Case Else : parm = ""
             End Select
-            If Len(parm) > 0 Then note = note & "Auto Lighting Optimizer:" & tb & parm & "\par "
-            note = note & "Lens Type:" & tb & canonDescr(4, b(247)) & "\par "
+            If parm <> "" Then note &= "Auto Lighting Optimizer:" & tb & parm & "\par "
+            note &= "Lens Type:" & tb & canonDescr(4, b(247)) & "\par "
             parm = UTF8bare.GetString(b, 400, 35)
             If AscW(parm.Chars(0)) < 32 Then parm = ""
             If InStr(parm, ChrW(0)) > 0 Then parm = Mid(parm, 1, InStr(parm, ChrW(0)) - 1)
-            If Len(parm) > 0 Then note = note & "Firmware Version:" & tb & parm & "\par " : k = 0
+            If parm <> "" Then note &= "Firmware Version:" & tb & parm & "\par " : k = 0
             x = DWord(b, k + 467 + k, intel)
-            If x > 0 Then note = note & "File Index:" & tb & Format(x, "###,###,###") & "\par "
+            If x > 0 Then note &= "File Index:" & tb & Format(x, "###,###,###") & "\par "
             x = DWord(b, k + 479 + k, intel)
-            If x > 0 Then note = note & "Directory Index:" & tb & Format(x, "###,###,###") & "\par "
+            If x > 0 Then note &= "Directory Index:" & tb & Format(x, "###,###,###") & "\par "
           End If ' EOS 500D
 
       End Select
@@ -5283,7 +5284,7 @@ Public Module ImageInfo
     If makerTags.Contains(sTag(&H95)) Then
       parm = makerTags.Item(sTag(&H95)).singleValue
       If InStr(parm, ChrW(0)) > 0 Then parm = Mid(parm, 1, InStr(parm, ChrW(0)) - 1)
-      If Trim(parm) <> "" Then note = note & "Lens Model:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note &= "Lens Model:" & tb & Trim(parm) & "\par "
     End If ' tag 95 for Canon
 
   End Sub ' canonMakernote
@@ -5301,27 +5302,27 @@ Public Module ImageInfo
       parm = ""
       For i = 0 To k
         If v(i) >= 32 Then
-          parm = parm & ChrW(v(i))
+          parm &= ChrW(v(i))
         Else
-          parm = parm & v(i)
+          parm &= v(i)
         End If
       Next i
-      If Trim(parm) <> "" Then note = note & "Makernote Version:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note &= "Makernote Version:" & tb & Trim(parm) & "\par "
     End If ' tag 1 for nikon
 
     If makerTags.Contains(sTag(15)) Then
       parm = makerTags.Item(sTag(15)).singleValue
-      If Trim(parm) <> "" Then note = note & "ISO Selection:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note &= "ISO Selection:" & tb & Trim(parm) & "\par "
     End If ' tag 15 for nikon
 
     If makerTags.Contains(sTag(19)) Then
       v = makerTags.Item(sTag(19)).Value
       If IsArray(v) AndAlso UBound(v) >= 1 Then
-        note = note & "ISO Setting:" & tb
+        note &= "ISO Setting:" & tb
         For i = 0 To 1
-          If IsNumeric(v(i)) Then note = note & Format(v(i), " ##,##0")
+          If IsNumeric(v(i)) Then note &= Format(v(i), " ##,##0")
         Next i
-        note = note & "\par "
+        note &= "\par "
       End If
     End If ' tag 19 for nikon
 
@@ -5333,57 +5334,57 @@ Public Module ImageInfo
       Else
         k = v
       End If
-      If k > 0 Then note = note & "ISO:" & tb & k & "\par "
+      If k > 0 Then note &= "ISO:" & tb & k & "\par "
     End If
 
     If makerTags.Contains(sTag(3)) Then
       parm = makerTags.Item(sTag(3)).singleValue
-      If Trim(parm) <> "" Then note = note & "Color Mode:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note &= "Color Mode:" & tb & Trim(parm) & "\par "
     End If
 
     If makerTags.Contains(sTag(4)) Then
       parm = makerTags.Item(sTag(4)).singleValue
-      If Trim(parm) <> "" Then note = note & "Quality:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note &= "Quality:" & tb & Trim(parm) & "\par "
     End If ' tag 4 for nikon
 
     If makerTags.Contains(sTag(5)) Then
       parm = makerTags.Item(sTag(5)).singleValue
-      If Trim(parm) <> "" Then note = note & "White Balance:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note &= "White Balance:" & tb & Trim(parm) & "\par "
     End If ' tag 5 for nikon
 
     If makerTags.Contains(sTag(6)) Then
       parm = makerTags.Item(sTag(6)).singleValue
-      If Trim(parm) <> "" Then note = note & "Image Sharpening:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note &= "Image Sharpening:" & tb & Trim(parm) & "\par "
     End If ' tag 6 for nikon
 
     If makerTags.Contains(sTag(7)) Then
       parm = makerTags.Item(sTag(7)).singleValue
-      If Trim(parm) <> "" Then note = note & "Focus Mode:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note &= "Focus Mode:" & tb & Trim(parm) & "\par "
     End If ' tag 7 for nikon
 
     If makerTags.Contains(sTag(8)) Then
       parm = makerTags.Item(sTag(8)).singleValue
-      If Trim(parm) <> "" Then note = note & "Flash Setting:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note &= "Flash Setting:" & tb & Trim(parm) & "\par "
     End If ' tag 8 for nikon
 
     If makerTags.Contains(sTag(9)) Then
       parm = makerTags.Item(sTag(9)).singleValue
-      If Trim(parm) <> "" Then note = note & "Flash Type:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note &= "Flash Type:" & tb & Trim(parm) & "\par "
     End If ' tag 9 for nikon
 
     If makerTags.Contains(sTag(11)) Then
       x = makerTags.Item(sTag(11)).singleValue
-      note = note & "White Balance Fine Tune:" & tb & Format(x, "###,##0") & "\par "
+      note &= "White Balance Fine Tune:" & tb & Format(x, "###,##0") & "\par "
     End If ' tag 11 for nikon
 
     If makerTags.Contains(sTag(12)) Then
       v = makerTags.Item(sTag(12)).Value
       If IsArray(v) AndAlso UBound(v) >= 3 Then
-        note = note & "Color Balance 1:" & tb
+        note &= "Color Balance 1:" & tb
         For i = 0 To 3
-          If IsNumeric(v(i)) Then note = note & Format(v(i), " #0.0###")
+          If IsNumeric(v(i)) Then note &= Format(v(i), " #0.0###")
         Next i
-        note = note & "\par "
+        note &= "\par "
       End If
     End If ' tag 12 for nikon
 
@@ -5392,9 +5393,9 @@ Public Module ImageInfo
       k = UBound(v)
       parm = ""
       For i = 0 To k
-        parm = parm & v(i)
+        parm &= v(i)
       Next i
-      If Trim(parm) <> "" Then note = note & "Program Shift:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note &= "Program Shift:" & tb & Trim(parm) & "\par "
     End If ' tag 13 for nikon
 
     If makerTags.Contains(sTag(14)) Then
@@ -5402,9 +5403,9 @@ Public Module ImageInfo
       k = UBound(v)
       parm = ""
       For i = 0 To k
-        parm = parm & v(i)
+        parm &= v(i)
       Next i
-      If Trim(parm) <> "" Then note = note & "Exposure Difference:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note &= "Exposure Difference:" & tb & Trim(parm) & "\par "
     End If ' tag 14 for nikon
 
     If makerTags.Contains(sTag(18)) Then
@@ -5412,19 +5413,19 @@ Public Module ImageInfo
       k = UBound(v)
       parm = ""
       For i = 0 To k
-        parm = parm & v(i)
+        parm &= v(i)
       Next i
-      If Trim(parm) <> "" Then note = note & "Flash Exposure Compensation:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note &= "Flash Exposure Compensation:" & tb & Trim(parm) & "\par "
     End If ' tag 18 for nikon
 
     If makerTags.Contains(sTag(22)) Then
       v = makerTags.Item(sTag(22)).Value
       If IsArray(v) AndAlso UBound(v) >= 3 Then
-        note = note & "Image Boundary:" & tb
+        note &= "Image Boundary:" & tb
         For i = 0 To 3
-          If IsNumeric(v(i)) Then note = note & Format(v(i), " ###,##0")
+          If IsNumeric(v(i)) Then note &= Format(v(i), " ###,##0")
         Next i
-        note = note & "\par "
+        note &= "\par "
       End If
     End If ' tag 22 for nikon
 
@@ -5433,9 +5434,9 @@ Public Module ImageInfo
       k = UBound(v)
       parm = ""
       For i = 0 To k
-        parm = parm & v(i)
+        parm &= v(i)
       Next i
-      If Trim(parm) <> "" Then note = note & "Flash Exposure Bracket:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note &= "Flash Exposure Bracket:" & tb & Trim(parm) & "\par "
     End If ' tag 23 for nikon
 
     If makerTags.Contains(sTag(24)) Then
@@ -5443,62 +5444,62 @@ Public Module ImageInfo
       k = UBound(v)
       parm = ""
       For i = 0 To k
-        parm = parm & " " & v(i)
+        parm &= " " & v(i)
       Next i
-      If Trim(parm) <> "" Then note = note & "Flash Exposure Bracket:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note &= "Flash Exposure Bracket:" & tb & Trim(parm) & "\par "
     End If ' tag 24 for nikon
 
     If makerTags.Contains(sTag(25)) Then
       x = makerTags.Item(sTag(25)).singleValue
-      note = note & "Exposure Bracket Value:" & tb & Format(x, "###,##0.####") & "\par "
+      note &= "Exposure Bracket Value:" & tb & Format(x, "###,##0.####") & "\par "
     End If ' tag 25 for nikon
 
     If makerTags.Contains(sTag(26)) Then
       parm = makerTags.Item(sTag(26)).singleValue
-      If Trim(parm) <> "" Then note = note & "Image Processing:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note &= "Image Processing:" & tb & Trim(parm) & "\par "
     End If ' tag 26 for nikon
 
     If makerTags.Contains(sTag(27)) Then
       v = makerTags.Item(sTag(27)).Value
       If IsArray(v) Then
-        note = note & "Crop High Speed:" & tb
+        note &= "Crop High Speed:" & tb
         For i = 0 To UBound(v)
-          If IsNumeric(v(i)) Then note = note & Format(v(i), " ###,##0")
+          If IsNumeric(v(i)) Then note &= Format(v(i), " ###,##0")
         Next i
-        note = note & "\par "
+        note &= "\par "
       End If
     End If ' tag 27 for nikon
 
     If makerTags.Contains(sTag(29)) Then ' used for decryption
       parm = makerTags.Item(sTag(29)).singleValue
-      note = note & "Internal Serial Number:" & tb & parm & "\par "
+      note &= "Internal Serial Number:" & tb & parm & "\par "
     End If ' tag 29 for nikon
 
     If makerTags.Contains(sTag(30)) Then
       v = makerTags.Item(sTag(30)).singleValue
       If v = 2 Then parm = "Adobe RGB" Else parm = "sRGB"
-      If IsNumeric(v) Then note = note & "Color Space:" & tb & parm & "\par "
+      If IsNumeric(v) Then note &= "Color Space:" & tb & parm & "\par "
     End If ' tag 30 for nikon
 
     If makerTags.Contains(sTag(31)) Then
       v = makerTags.Item(sTag(31)).Value
       If IsArray(v) AndAlso UBound(v) >= 4 Then
         parm = ""
-        For i = 0 To 3 : parm = parm & ChrW(v(i)) : Next i
-        note = note & "Vibration Reduction Version:" & tb & parm & "\par "
+        For i = 0 To 3 : parm &= ChrW(v(i)) : Next i
+        note &= "Vibration Reduction Version:" & tb & parm & "\par "
         Select Case v(4)
           Case 1 : parm = "on"
           Case 2 : parm = "off"
           Case Else : parm = ""
         End Select
-        If Len(parm) > 0 Then note = note & "Vibration Reduction:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Vibration Reduction:" & tb & parm & "\par "
       End If
     End If ' tag 31 for nikon
 
     If makerTags.Contains(sTag(32)) Then
       v = makerTags.Item(sTag(32)).singleValue
       If v = 1 Then parm = "On" Else parm = "Off"
-      If IsNumeric(v) Then note = note & "Image Authentication:" & tb & parm & "\par "
+      If IsNumeric(v) Then note &= "Image Authentication:" & tb & parm & "\par "
     End If ' tag 32 for nikon
 
     If makerTags.Contains(sTag(34)) Then
@@ -5511,35 +5512,35 @@ Public Module ImageInfo
         Case 7 : parm = "extra high"
         Case Else : parm = ""
       End Select
-      If Len(parm) > 0 Then note = note & "Active D-Lighting:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Active D-Lighting:" & tb & parm & "\par "
     End If ' tag 34 for nikon
 
     If makerTags.Contains(sTag(35)) Then
       v = makerTags.Item(sTag(35)).Value
       If IsArray(v) AndAlso UBound(v) >= 57 Then
         parm = ""
-        For i = 0 To 3 : parm = parm & ChrW(v(i)) : Next i
-        If InStr(parm, ChrW(0)) > 0 Then parm = vb.Left(parm, InStr(parm, ChrW(0)) - 1)
-        If Len(parm) > 0 Then note = note & "Picture Control Version:" & tb & parm & "\par "
+        For i = 0 To 3 : parm &= ChrW(v(i)) : Next i
+        If InStr(parm, ChrW(0)) > 0 Then parm = parm.Substring(0, InStr(parm, ChrW(0)) - 1)
+        If parm <> "" Then note &= "Picture Control Version:" & tb & parm & "\par "
         parm = ""
-        For i = 4 To 23 : parm = parm & ChrW(v(i)) : Next i
-        If InStr(parm, ChrW(0)) > 0 Then parm = vb.Left(parm, InStr(parm, ChrW(0)) - 1)
-        If Len(parm) > 0 Then note = note & "Picture Control Name:" & tb & parm & "\par "
-        For i = 24 To 43 : parm = parm & ChrW(v(i)) : Next i
-        If InStr(parm, ChrW(0)) > 0 Then parm = vb.Left(parm, InStr(parm, ChrW(0)) - 1)
-        If Len(parm) > 0 Then note = note & "Picture Control Base:" & tb & parm & "\par "
+        For i = 4 To 23 : parm &= ChrW(v(i)) : Next i
+        If InStr(parm, ChrW(0)) > 0 Then parm = parm.Substring(0, InStr(parm, ChrW(0)) - 1)
+        If parm <> "" Then note &= "Picture Control Name:" & tb & parm & "\par "
+        For i = 24 To 43 : parm &= ChrW(v(i)) : Next i
+        If InStr(parm, ChrW(0)) > 0 Then parm = parm.Substring(0, InStr(parm, ChrW(0)) - 1)
+        If parm <> "" Then note &= "Picture Control Base:" & tb & parm & "\par "
         Select Case v(48)
           Case 0 : parm = "Default Settings"
           Case 1 : parm = "Quick Adjust"
           Case 2 : parm = "Full Control"
           Case Else : parm = ""
         End Select
-        If Len(parm) > 0 Then note = note & "Picture Control Adjust:" & tb & parm & "\par "
-        note = note & "Picture Control Sharpness:" & tb & v(50) & "\par "
-        note = note & "Picture Control Contrast:" & tb & v(51) & "\par "
-        note = note & "Picture Control Brightness:" & tb & v(52) & "\par "
-        note = note & "Picture Control Saturation:" & tb & v(53) & "\par "
-        note = note & "Picture Control Hue Adjustment:" & tb & v(54) & "\par "
+        If parm <> "" Then note &= "Picture Control Adjust:" & tb & parm & "\par "
+        note &= "Picture Control Sharpness:" & tb & v(50) & "\par "
+        note &= "Picture Control Contrast:" & tb & v(51) & "\par "
+        note &= "Picture Control Brightness:" & tb & v(52) & "\par "
+        note &= "Picture Control Saturation:" & tb & v(53) & "\par "
+        note &= "Picture Control Hue Adjustment:" & tb & v(54) & "\par "
         Select Case v(48)
           Case 128 : parm = "Off"
           Case 129 : parm = "Yellow"
@@ -5548,7 +5549,7 @@ Public Module ImageInfo
           Case 132 : parm = "Green"
           Case Else : parm = ""
         End Select
-        If Len(parm) > 0 Then note = note & "Filter Effect:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Filter Effect:" & tb & parm & "\par "
         Select Case v(48)
           Case 128 : parm = "Black and White"
           Case 129 : parm = "Sepia"
@@ -5562,26 +5563,26 @@ Public Module ImageInfo
           Case 137 : parm = "Red-Purple"
           Case Else : parm = ""
         End Select
-        If Len(parm) > 0 Then note = note & "Toning Effect:" & tb & parm & "\par "
-        note = note & "Picture Control Toning Saturation:" & tb & v(57) & "\par "
+        If parm <> "" Then note &= "Toning Effect:" & tb & parm & "\par "
+        note &= "Picture Control Toning Saturation:" & tb & v(57) & "\par "
       End If
     End If ' Nikon tag 35
 
     If makerTags.Contains(sTag(36)) Then
       v = makerTags.Item(sTag(36)).Value
       If IsArray(v) AndAlso UBound(v) >= 3 Then
-        note = note & "Time Zone:" & tb & word(v, 0, intel) & "\par "
+        note &= "Time Zone:" & tb & word(v, 0, intel) & "\par "
         Select Case v(2)
           Case 0 : parm = "No"
           Case 1 : parm = "Yes"
         End Select
-        If Len(parm) > 0 Then note = note & "Daylight Savings:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Daylight Savings:" & tb & parm & "\par "
         Select Case v(3)
           Case 0 : parm = "Y/M/D"
           Case 1 : parm = "M/D/Y"
           Case 2 : parm = "D/M/Y"
         End Select
-        If Len(parm) > 0 Then note = note & "Date Display Format:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Date Display Format:" & tb & parm & "\par "
       End If
     End If ' tag 36
 
@@ -5598,52 +5599,52 @@ Public Module ImageInfo
         Case 5
           parm = "high"
       End Select
-      If Trim(parm) <> "" Then note = note & "Vignette Control:" & tb & parm & "\par "
+      If Trim(parm) <> "" Then note &= "Vignette Control:" & tb & parm & "\par "
     End If ' tag 42 for nikon
 
     If makerTags.Contains(sTag(128)) Then
       parm = makerTags.Item(sTag(128)).singleValue
-      If Trim(parm) <> "" Then note = note & "Image Adjustment:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note &= "Image Adjustment:" & tb & Trim(parm) & "\par "
     End If ' tag 128 for nikon
 
     If makerTags.Contains(sTag(129)) Then
       parm = makerTags.Item(sTag(129)).singleValue
-      If Trim(parm) <> "" Then note = note & "Tone Component:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note &= "Tone Component:" & tb & Trim(parm) & "\par "
     End If ' tag 129 for nikon
 
     If makerTags.Contains(sTag(130)) Then
       parm = makerTags.Item(sTag(130)).singleValue
-      If Trim(parm) <> "" Then note = note & "Auxiliary Lens:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note &= "Auxiliary Lens:" & tb & Trim(parm) & "\par "
     End If ' tag 130 for nikon
 
     If makerTags.Contains(sTag(131)) Then
       i = makerTags.Item(sTag(131)).singleValue
       parm = ""
-      If i And 8 Then parm = parm & "VR "
-      If i And 4 Then parm = parm & "G "
-      If i And 2 Then parm = parm & "D "
-      If i And 1 Then parm = parm & "MF "
-      If Trim(parm) <> "" Then note = note & "Lens Type:" & tb & Trim(parm) & "\par "
+      If i And 8 Then parm &= "VR "
+      If i And 4 Then parm &= "G "
+      If i And 2 Then parm &= "D "
+      If i And 1 Then parm &= "MF "
+      If Trim(parm) <> "" Then note &= "Lens Type:" & tb & Trim(parm) & "\par "
     End If ' tag 131 for nikon
 
     If makerTags.Contains(sTag(132)) Then
       v = makerTags.Item(sTag(132)).Value
       If IsArray(v) AndAlso UBound(v) >= 3 Then
-        note = note & "Lens Minimum Focal Length:" & tb & Format(v(0), " ####0") & " mm\par "
-        note = note & "Maximum Aperture at " & Format(v(0), " ####0") & " mm:" & tb & Format(v(2), " ####0.##") & "\par "
-        note = note & "Lens Maximum Focal Length:" & tb & Format(v(1), " ####0") & " mm\par "
-        note = note & "Maximum Aperture at " & Format(v(1), " ####0") & " mm:" & tb & Format(v(3), " ####0.##") & "\par "
+        note &= "Lens Minimum Focal Length:" & tb & Format(v(0), " ####0") & " mm\par "
+        note &= "Maximum Aperture at " & Format(v(0), " ####0") & " mm:" & tb & Format(v(2), " ####0.##") & "\par "
+        note &= "Lens Maximum Focal Length:" & tb & Format(v(1), " ####0") & " mm\par "
+        note &= "Maximum Aperture at " & Format(v(1), " ####0") & " mm:" & tb & Format(v(3), " ####0.##") & "\par "
       End If
     End If ' tag 132 for nikon
 
     If makerTags.Contains(sTag(133)) Then
       x = makerTags.Item(sTag(133)).singleValue
-      If x <> 0 Then note = note & "Manual Focus Distance:" & tb & Format(x, "###,##0") & "\par "
+      If x <> 0 Then note &= "Manual Focus Distance:" & tb & Format(x, "###,##0") & "\par "
     End If ' tag 133 for nikon
 
     If makerTags.Contains(sTag(134)) Then
       x = makerTags.Item(sTag(134)).singleValue
-      note = note & "Digital Zoom:" & tb & Format(x, "##0.0#") & "\par "
+      note &= "Digital Zoom:" & tb & Format(x, "##0.0#") & "\par "
     End If ' tag 134 for nikon
 
     If makerTags.Contains(sTag(135)) Then
@@ -5656,7 +5657,7 @@ Public Module ImageInfo
         Case 9 : parm = "Fired, TTL Mode"
         Case Else : parm = ""
       End Select
-      If Trim(parm) <> "" Then note = note & "Flash Mode:" & tb & parm & "\par "
+      If Trim(parm) <> "" Then note &= "Flash Mode:" & tb & parm & "\par "
     End If ' tag 135 for nikon
 
     If makerTags.Contains(sTag(136)) Then
@@ -5671,7 +5672,7 @@ Public Module ImageInfo
           Case 5 : parm = "Dynamic Area (Wide)"
           Case Else : parm = ""
         End Select
-        If Len(parm) > 0 Then note = note & "Autofocus Area Mode:" & tb & Trim(parm) & "\par "
+        If parm <> "" Then note &= "Autofocus Area Mode:" & tb & Trim(parm) & "\par "
         Select Case v(1)
           Case 0 : parm = "Center"
           Case 1 : parm = "Top"
@@ -5686,33 +5687,33 @@ Public Module ImageInfo
           Case 10 : parm = "Far-right"
           Case Else : parm = ""
         End Select
-        If Len(parm) > 0 Then note = note & "Autofocus Point:" & tb & Trim(parm) & "\par "
+        If parm <> "" Then note &= "Autofocus Point:" & tb & Trim(parm) & "\par "
         i = word(v, 2, intel)
-        If i And 2 ^ 0 Then note = note & "Point in Focus:" & tb & "Center" & "\par "
-        If i And 2 ^ 1 Then note = note & "Point in Focus:" & tb & "Top" & "\par "
-        If i And 2 ^ 2 Then note = note & "Point in Focus:" & tb & "Bottom" & "\par "
-        If i And 2 ^ 3 Then note = note & "Point in Focus:" & tb & "Mid-left" & "\par "
-        If i And 2 ^ 4 Then note = note & "Point in Focus:" & tb & "Mid-right" & "\par "
-        If i And 2 ^ 5 Then note = note & "Point in Focus:" & tb & "Upper-left" & "\par "
-        If i And 2 ^ 6 Then note = note & "Point in Focus:" & tb & "Upper-right" & "\par "
-        If i And 2 ^ 7 Then note = note & "Point in Focus:" & tb & "Lower-left" & "\par "
-        If i And 2 ^ 8 Then note = note & "Point in Focus:" & tb & "Lower-right" & "\par "
-        If i And 2 ^ 9 Then note = note & "Point in Focus:" & tb & "Far-left" & "\par "
-        If i And 2 ^ 10 Then note = note & "Point in Focus:" & tb & "Far-right" & "\par "
+        If i And 2 ^ 0 Then note &= "Point in Focus:" & tb & "Center" & "\par "
+        If i And 2 ^ 1 Then note &= "Point in Focus:" & tb & "Top" & "\par "
+        If i And 2 ^ 2 Then note &= "Point in Focus:" & tb & "Bottom" & "\par "
+        If i And 2 ^ 3 Then note &= "Point in Focus:" & tb & "Mid-left" & "\par "
+        If i And 2 ^ 4 Then note &= "Point in Focus:" & tb & "Mid-right" & "\par "
+        If i And 2 ^ 5 Then note &= "Point in Focus:" & tb & "Upper-left" & "\par "
+        If i And 2 ^ 6 Then note &= "Point in Focus:" & tb & "Upper-right" & "\par "
+        If i And 2 ^ 7 Then note &= "Point in Focus:" & tb & "Lower-left" & "\par "
+        If i And 2 ^ 8 Then note &= "Point in Focus:" & tb & "Lower-right" & "\par "
+        If i And 2 ^ 9 Then note &= "Point in Focus:" & tb & "Far-left" & "\par "
+        If i And 2 ^ 10 Then note &= "Point in Focus:" & tb & "Far-right" & "\par "
       End If
     End If ' tag 136 for nikon
 
     If makerTags.Contains(sTag(137)) Then
       i = makerTags.Item(sTag(137)).singleValue
       parm = ""
-      If i And 64 Then parm = parm & "IR Control "
-      If i And 32 Then parm = parm & "White Balance Bracketing "
-      If i And 16 Then parm = parm & "Auto ISO "
-      If i And 8 Then parm = parm & "Exposure Bracketing "
-      If i And 4 Then parm = parm & "PC Control "
-      If i And 2 Then parm = parm & "Delay "
-      If i And 1 Then parm = parm & "Continuous "
-      If Trim(parm) <> "" Then note = note & "Shooting Mode:" & tb & Trim(parm) & "\par "
+      If i And 64 Then parm &= "IR Control "
+      If i And 32 Then parm &= "White Balance Bracketing "
+      If i And 16 Then parm &= "Auto ISO "
+      If i And 8 Then parm &= "Exposure Bracketing "
+      If i And 4 Then parm &= "PC Control "
+      If i And 2 Then parm &= "Delay "
+      If i And 1 Then parm &= "Continuous "
+      If Trim(parm) <> "" Then note &= "Shooting Mode:" & tb & Trim(parm) & "\par "
     End If ' tag 137 for nikon
 
     If makerTags.Contains(sTag(138)) Then
@@ -5726,7 +5727,7 @@ Public Module ImageInfo
         Case 2
           parm = "Manual Release"
       End Select
-      If Trim(parm) <> "" Then note = note & "Autobracket Release:" & tb & parm & "\par "
+      If Trim(parm) <> "" Then note &= "Autobracket Release:" & tb & parm & "\par "
     End If ' tag 138 for nikon
 
     If makerTags.Contains(sTag(139)) Then
@@ -5735,30 +5736,30 @@ Public Module ImageInfo
         k = UBound(v)
         parm = ""
         For i = 0 To k
-          parm = parm & " " & v(i)
+          parm &= " " & v(i)
         Next i
-        If Trim(parm) <> "" Then note = note & "Lens F-Stops:" & tb & Trim(parm) & "\par "
+        If Trim(parm) <> "" Then note &= "Lens F-Stops:" & tb & Trim(parm) & "\par "
       End If
     End If ' tag 139 for nikon
 
     If makerTags.Contains(sTag(141)) Then
       parm = makerTags.Item(sTag(141)).singleValue
-      If Trim(parm) <> "" Then note = note & "Color Hue:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note &= "Color Hue:" & tb & Trim(parm) & "\par "
     End If ' tag 141 for nikon
 
     If makerTags.Contains(sTag(143)) Then
       parm = makerTags.Item(sTag(143)).singleValue
-      If Trim(parm) <> "" Then note = note & "Scene Mode:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note &= "Scene Mode:" & tb & Trim(parm) & "\par "
     End If ' tag 143 for nikon
 
     If makerTags.Contains(sTag(144)) Then
       parm = makerTags.Item(sTag(144)).singleValue
-      If Trim(parm) <> "" Then note = note & "Light Source:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note &= "Light Source:" & tb & Trim(parm) & "\par "
     End If ' tag 144 for nikon
 
     If makerTags.Contains(sTag(146)) Then
       x = makerTags.Item(sTag(146)).singleValue
-      note = note & "Hue Adjustment:" & tb & Format(x, "###,##0.0###") & " degrees\par "
+      note &= "Hue Adjustment:" & tb & Format(x, "###,##0.0###") & " degrees\par "
     End If ' tag 146 for nikon
 
     If makerTags.Contains(sTag(147)) Then
@@ -5774,27 +5775,27 @@ Public Module ImageInfo
         Case 4
           parm = "Lossy (type 2)"
       End Select
-      If Trim(parm) <> "" Then note = note & "NEF Compression:" & tb & parm & "\par "
+      If Trim(parm) <> "" Then note &= "NEF Compression:" & tb & parm & "\par "
     End If ' tag 147 for nikon
 
     If makerTags.Contains(sTag(148)) Then
       x = makerTags.Item(sTag(148)).singleValue
-      note = note & "Saturation:" & tb & Format(x, "###,##0.####") & "\par "
+      note &= "Saturation:" & tb & Format(x, "###,##0.####") & "\par "
     End If ' tag 148 for nikon
 
     If makerTags.Contains(sTag(149)) Then
       parm = makerTags.Item(sTag(149)).singleValue
-      If Trim(parm) <> "" Then note = note & "Noise Reduction:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note &= "Noise Reduction:" & tb & Trim(parm) & "\par "
     End If ' tag 149 for nikon
 
     If makerTags.Contains(sTag(154)) Then
       x = makerTags.Item(sTag(154)).singleValue
-      note = note & "Sensor Pixel Size:" & tb & Format(x, "###,##0.####") & "\par "
+      note &= "Sensor Pixel Size:" & tb & Format(x, "###,##0.####") & "\par "
     End If ' tag 154 for nikon
 
     If makerTags.Contains(sTag(156)) Then
       parm = makerTags.Item(sTag(156)).singleValue
-      If Trim(parm) <> "" Then note = note & "Scene Assist:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note &= "Scene Assist:" & tb & Trim(parm) & "\par "
     End If ' tag 156 for nikon
 
     If makerTags.Contains(sTag(158)) Then
@@ -5804,104 +5805,104 @@ Public Module ImageInfo
         For i = 0 To UBound(v)
           Select Case v(i)
             Case 3
-              parm = parm & " B & W"
+              parm &= " B & W"
             Case 4
-              parm = parm & " Sepia"
+              parm &= " Sepia"
             Case 5
-              parm = parm & " Trim"
+              parm &= " Trim"
             Case 6
-              parm = parm & " Small Picture"
+              parm &= " Small Picture"
             Case 7
-              parm = parm & " D-Lighting"
+              parm &= " D-Lighting"
             Case 8
-              parm = parm & " Red-Eye"
+              parm &= " Red-Eye"
             Case 9
-              parm = parm & " Cyanotype"
+              parm &= " Cyanotype"
             Case 10
-              parm = parm & " SkyLight"
+              parm &= " SkyLight"
             Case 11
-              parm = parm & " WarmTone"
+              parm &= " WarmTone"
             Case 12
-              parm = parm & " ColorCustom"
+              parm &= " ColorCustom"
             Case 13
-              parm = parm & " ImageOverlay"
+              parm &= " ImageOverlay"
             Case 14
-              parm = parm & " Red Intensifier"
+              parm &= " Red Intensifier"
             Case 15
-              parm = parm & " Green Intensifier"
+              parm &= " Green Intensifier"
             Case 16
-              parm = parm & " Blue Intensifier"
+              parm &= " Blue Intensifier"
             Case 17
-              parm = parm & " Cross Screen"
+              parm &= " Cross Screen"
             Case 18
-              parm = parm & " Quick Retouch"
+              parm &= " Quick Retouch"
             Case 19
-              parm = parm & " NEF Processing"
+              parm &= " NEF Processing"
             Case 23
-              parm = parm & " Distortion Control"
+              parm &= " Distortion Control"
             Case 25
-              parm = parm & " Fisheye"
+              parm &= " Fisheye"
             Case 26
-              parm = parm & " Straighten"
+              parm &= " Straighten"
             Case 29
-              parm = parm & " Perspective Control"
+              parm &= " Perspective Control"
             Case 30
-              parm = parm & " Color Outline"
+              parm &= " Color Outline"
             Case 31
-              parm = parm & " Soft Filter"
+              parm &= " Soft Filter"
             Case 33
-              parm = parm & " Miniature Effect"
+              parm &= " Miniature Effect"
             Case Else
           End Select
         Next i
-        If Trim(parm) <> "" Then note = note & "Retouch History:" & tb & parm & "\par "
+        If Trim(parm) <> "" Then note &= "Retouch History:" & tb & parm & "\par "
       End If
     End If ' tag 158 for nikon
 
     If makerTags.Contains(sTag(160)) Then
       parm = makerTags.Item(sTag(160)).singleValue
-      If Trim(parm) <> "" Then note = note & "Serial Number:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note &= "Serial Number:" & tb & Trim(parm) & "\par "
     End If ' tag 160 for nikon
 
     If makerTags.Contains(sTag(162)) Then
       x = makerTags.Item(sTag(162)).singleValue
-      note = note & "Image Data Size:" & tb & Format(x, "######,##0") & "\par "
+      note &= "Image Data Size:" & tb & Format(x, "######,##0") & "\par "
     End If ' tag 162 for nikon
 
     If makerTags.Contains(sTag(165)) Then
       x = makerTags.Item(sTag(165)).singleValue
-      note = note & "Image Count:" & tb & Format(x, "######,##0") & "\par "
+      note &= "Image Count:" & tb & Format(x, "######,##0") & "\par "
     End If ' tag 165 for nikon
 
     If makerTags.Contains(sTag(166)) Then
       x = makerTags.Item(sTag(166)).singleValue
-      note = note & "Deleted Image Count:" & tb & Format(x, "######,##0") & "\par "
+      note &= "Deleted Image Count:" & tb & Format(x, "######,##0") & "\par "
     End If ' tag 166 for nikon
 
     If makerTags.Contains(sTag(169)) Then
       v = makerTags.Item(sTag(169)).singleValue
       parm = v
-      If Trim(parm) <> "" Then note = note & "Image Optimization:" & tb & parm & "\par "
+      If Trim(parm) <> "" Then note &= "Image Optimization:" & tb & parm & "\par "
     End If ' tag 169 for nikon
 
     If makerTags.Contains(sTag(170)) Then
       parm = makerTags.Item(sTag(170)).singleValue
-      If Trim(parm) <> "" Then note = note & "Saturation:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note &= "Saturation:" & tb & Trim(parm) & "\par "
     End If ' tag 170 for nikon
 
     If makerTags.Contains(sTag(171)) Then
       parm = makerTags.Item(sTag(171)).singleValue
-      If Trim(parm) <> "" Then note = note & "Vari Program:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note &= "Vari Program:" & tb & Trim(parm) & "\par "
     End If ' tag 171 for nikon
 
     If makerTags.Contains(sTag(172)) Then
       parm = makerTags.Item(sTag(172)).singleValue
-      If Trim(parm) <> "" Then note = note & "Image Stabilization:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note &= "Image Stabilization:" & tb & Trim(parm) & "\par "
     End If ' tag 172 for nikon
 
     If makerTags.Contains(sTag(173)) Then
       parm = makerTags.Item(sTag(173)).singleValue
-      If Trim(parm) <> "" Then note = note & "Autofocus Response:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note &= "Autofocus Response:" & tb & Trim(parm) & "\par "
     End If ' tag 173 for nikon
 
     If makerTags.Contains(sTag(177)) Then
@@ -5919,12 +5920,12 @@ Public Module ImageInfo
         Case 6
           parm = "High"
       End Select
-      If Trim(parm) <> "" Then note = note & "High ISO Noise Reduction:" & tb & parm & "\par "
+      If Trim(parm) <> "" Then note &= "High ISO Noise Reduction:" & tb & parm & "\par "
     End If ' tag 177 for nikon
 
     If makerTags.Contains(sTag(179)) Then
       parm = makerTags.Item(sTag(179)).singleValue
-      If Trim(parm) <> "" Then note = note & "Toning Effect:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note &= "Toning Effect:" & tb & Trim(parm) & "\par "
     End If ' tag 179 for nikon
 
   End Sub ' nikonMakernote
@@ -5960,7 +5961,7 @@ Public Module ImageInfo
         Case 6 : parm = "Program Shift S"
         Case Else : parm = CStr(i)
       End Select
-      note = note & "Exposure Mode:" & tb & parm & "\par "
+      note &= "Exposure Mode:" & tb & parm & "\par "
 
       i = DWord(v, 2 * 4, False) '  Flash mode
       Select Case i
@@ -5971,7 +5972,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Flash Mode:" & tb & parm & "\par "
+      note &= "Flash Mode:" & tb & parm & "\par "
 
       Select Case i
         Case 0, &H800000 : parm = "Auto"
@@ -5987,7 +5988,7 @@ Public Module ImageInfo
         Case 12, &H9800000 : parm = "Custom 3"
         Case Else : parm = ""
       End Select
-      If Len(parm) > 0 Then note = note & "White Balance:" & tb & parm & "\par "
+      If parm <> "" Then note &= "White Balance:" & tb & parm & "\par "
 
       i = DWord(v, 4 * 4, False) '  Image Size
       Select Case i
@@ -6001,7 +6002,7 @@ Public Module ImageInfo
         Case 8 : parm = "3264x2176"
         Case Else : parm = CStr(i)
       End Select
-      note = note & "Image Size:" & tb & parm & "\par "
+      note &= "Image Size:" & tb & parm & "\par "
 
       i = DWord(v, 5 * 4, False) '  Image Quality
       Select Case i
@@ -6013,7 +6014,7 @@ Public Module ImageInfo
         Case 5 : parm = "Extra Fine"
         Case Else : parm = CStr(i)
       End Select
-      note = note & "Image Quality:" & tb & parm & "\par "
+      note &= "Image Quality:" & tb & parm & "\par "
 
       i = DWord(v, 6 * 4, False) '  Drive Mode
       Select Case i
@@ -6023,10 +6024,10 @@ Public Module ImageInfo
         Case 4 : parm = "Bracketing"
         Case 5 : parm = "Interval"
         Case 6 : parm = "UHS Continuous"
-          parm = "HS Continuous"
+        Case 7 : parm = "HS Continuous"
         Case Else : parm = CStr(i)
       End Select
-      note = note & "Drive Mode:" & tb & parm & "\par "
+      note &= "Drive Mode:" & tb & parm & "\par "
 
       i = DWord(v, 7 * 4, False) '  Metering Mode
       Select Case i
@@ -6036,27 +6037,27 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Metering Mode:" & tb & parm & "\par "
+      note &= "Metering Mode:" & tb & parm & "\par "
 
       i = DWord(v, 8 * 4, False) '  Film Speed
       If Abs(i) <= 500 Then
         i = (2 ^ (i / 8 - 1)) * 3.125
         If eqstr(model, "dimage 7") Then i = (2 ^ (i / 8 - 1)) * 3.125
-        note = note & "Film Speed:" & tb & "ISO " & i & "\par "
+        note &= "Film Speed:" & tb & "ISO " & i & "\par "
       End If
 
       i = DWord(v, 9 * 4, False) '  Shutter Speed
       If Abs(i) < 1000 Then x = 2 ^ ((48 - i) / 8) Else x = 0
       If x < 1 And x > 0 Then
-        note = note & "Shutter Speed:" & tb & Format(x, "##0.0###") & " (1/" & Format(1 / x, "##,###") & ") sec." & "\par "
+        note &= "Shutter Speed:" & tb & Format(x, "##0.0###") & " (1/" & Format(1 / x, "##,###") & ") sec." & "\par "
       Else
-        note = note & "Shutter Speed:" & tb & Format(x, "##0.0") & " sec." & "\par "
+        note &= "Shutter Speed:" & tb & Format(x, "##0.0") & " sec." & "\par "
       End If
 
       i = DWord(v, 10 * 4, False) '  Aperture Value
       If Abs(i) < 10000 Then
         x = 2 ^ (i / 16 - 0.5)
-        note = note & "Aperture Value:" & tb & Format(x, "#0.0") & "\par "
+        note &= "Aperture Value:" & tb & Format(x, "#0.0") & "\par "
       End If
 
       i = DWord(v, 11 * 4, False) '  Macro Mode
@@ -6068,7 +6069,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Macro Mode:" & tb & parm & "\par "
+      note &= "Macro Mode:" & tb & parm & "\par "
 
       i = DWord(v, 12 * 4, False) '  Digital Zoom
       Select Case i
@@ -6081,10 +6082,10 @@ Public Module ImageInfo
         Case Else
           parm = "Unknown"
       End Select
-      note = note & "Digital Zoom:" & tb & parm & "\par "
+      note &= "Digital Zoom:" & tb & parm & "\par "
 
       i = DWord(v, 13 * 4, False) '  Exposure Compensation
-      note = note & "Exposure Compensation:" & tb & Format(i / 3 - 2, "##0.0#") & "\par "
+      note &= "Exposure Compensation:" & tb & Format(i / 3 - 2, "##0.0#") & "\par "
 
       i = DWord(v, 14 * 4, False) '  Bracket Step
       Select Case i
@@ -6097,68 +6098,68 @@ Public Module ImageInfo
         Case Else
           parm = "Unknown"
       End Select
-      note = note & "Bracket Step:" & tb & parm & "\par "
+      note &= "Bracket Step:" & tb & parm & "\par "
 
       i = DWord(v, 16 * 4, False) '  Interval Length
-      note = note & "Interval Length:" & tb & i + 1 & "\par "
+      note &= "Interval Length:" & tb & i + 1 & "\par "
 
       i = DWord(v, 17 * 4, False) '  Interval Number
-      note = note & "Interval Number:" & tb & i & "\par "
+      note &= "Interval Number:" & tb & i & "\par "
 
       i = DWord(v, 18 * 4, False) '  Focal Length
-      note = note & "Focal Length :" & tb & Format(i / 256, "###0.0") & " mm" & "\par "
+      note &= "Focal Length :" & tb & Format(i / 256, "###0.0") & " mm" & "\par "
 
       i = DWord(v, 19 * 4, False) '  Focus Distance
       If i <> 0 Then parm = Format(i / 1000, "####0.0##") & " m" Else parm = "Infinity"
-      note = note & "Focus Distance:" & tb & parm & "\par "
+      note &= "Focus Distance:" & tb & parm & "\par "
 
       i = DWord(v, 20 * 4, False) '  Flash Fired
       If i = 1 Then parm = "Yes" Else parm = "No"
-      note = note & "Flash Fired:" & tb & parm & "\par "
+      note &= "Flash Fired:" & tb & parm & "\par "
 
       i = word(v, 21 * 4, False) '  Date
       parm = v(21 * 4 + 2) & "/" & v(21 * 4 + 3) & "/" & i
-      note = note & "Date:        " & tb & parm & "\par "
+      note &= "Date:        " & tb & parm & "\par "
 
       i = word(v, 22 * 4, False) '  Time
       parm = Format(i, "00") & ":" & Format(v(22 * 4 + 2), "00") & ":" & Format(v(22 * 4 + 3), "00")
-      note = note & "Time:        " & tb & parm & "\par "
+      note &= "Time:        " & tb & parm & "\par "
 
       i = DWord(v, 23 * 4, False) '  Max Aperture
       If Abs(i) < 10000 Then
-        note = note & "Max. Aperture:" & tb & Format(2 ^ (i / 16 - 0.5), "##0.0") & " mm" & "\par "
+        note &= "Max. Aperture:" & tb & Format(2 ^ (i / 16 - 0.5), "##0.0") & " mm" & "\par "
       End If
 
       i = DWord(v, 26 * 4, False) '  File Number Memory
       If i = 1 Then parm = "On" Else parm = "Off"
-      note = note & "File Number Memory:" & tb & parm & "\par "
+      note &= "File Number Memory:" & tb & parm & "\par "
 
       If i = 1 Then
         i = DWord(v, 27 * 4, False) '  Last File Number
-        note = note & "Last File Number:" & tb & i & "\par "
+        note &= "Last File Number:" & tb & i & "\par "
       End If
 
       i = DWord(v, 28 * 4, False) '  White Balance Red
-      note = note & "White Balance Red:" & tb & Format(i / 256, "##0.0#") & "\par "
+      note &= "White Balance Red:" & tb & Format(i / 256, "##0.0#") & "\par "
       i = DWord(v, 29 * 4, False) '  White Balance Green
-      note = note & "White Balance Green:" & tb & Format(i / 256, "##0.0#") & "\par "
+      note &= "White Balance Green:" & tb & Format(i / 256, "##0.0#") & "\par "
       i = DWord(v, 30 * 4, False) '  White Balance Blue
-      note = note & "White Balance Blue:" & tb & Format(i / 256, "##0.0#") & "\par "
+      note &= "White Balance Blue:" & tb & Format(i / 256, "##0.0#") & "\par "
 
       i = DWord(v, 31 * 4, False) '  Saturation
       If eqstr(model, "dimage a1") Then k = 5 Else k = 3
       If i > k Then
-        note = note & "Saturation (0=normal):" & tb & "+" & i - k & "\par "
+        note &= "Saturation (0=normal):" & tb & "+" & i - k & "\par "
       Else
-        note = note & "Saturation (0=normal):" & tb & i - k & "\par "
+        note &= "Saturation (0=normal):" & tb & i - k & "\par "
       End If
 
       i = DWord(v, 32 * 4, False) '  Contrast
       If eqstr(model, "dimage a1") Then k = 5 Else k = 3
       If i > k Then
-        note = note & "Contrast (0=normal):" & tb & "+" & i - k & "\par "
+        note &= "Contrast (0=normal):" & tb & "+" & i - k & "\par "
       Else
-        note = note & "Contrast (0=normal):" & tb & i - k & "\par "
+        note &= "Contrast (0=normal):" & tb & i - k & "\par "
       End If
 
       i = DWord(v, 33 * 4, False) '  Sharpness
@@ -6172,7 +6173,7 @@ Public Module ImageInfo
         Case Else
           parm = ""
       End Select
-      If Len(parm) > 0 Then note = note & "Sharpness:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Sharpness:" & tb & parm & "\par "
 
       i = DWord(v, 34 * 4, False) '  Subject Program
       Select Case i
@@ -6191,10 +6192,10 @@ Public Module ImageInfo
         Case Else
           parm = ""
       End Select
-      If Len(parm) > 0 Then note = note & "Subject Program:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Subject Program:" & tb & parm & "\par "
 
       i = DWord(v, 35 * 4, False) '  Flash Compensation
-      If i >= -50 And i <= 50 Then note = note & "Flash Compensation (0-12):" & tb & (i - 6) / 3 & "\par "
+      If i >= -50 And i <= 50 Then note &= "Flash Compensation (0-12):" & tb & (i - 6) / 3 & "\par "
 
       i = DWord(v, 36 * 4, False) '  ISO Setting
       Select Case i
@@ -6211,7 +6212,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "ISO Setting:" & tb & parm & "\par "
+      note &= "ISO Setting:" & tb & parm & "\par "
 
       i = DWord(v, 37 * 4, False) '  Camera Model
       Select Case i
@@ -6232,11 +6233,11 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Camera Model:" & tb & parm & "\par "
+      note &= "Camera Model:" & tb & parm & "\par "
 
       i = DWord(v, 39 * 4, False) '  Folder Name
       If i = 1 Then parm = "Data Mode" Else parm = "Standard Mode"
-      note = note & "Folder Name:" & tb & parm & "\par "
+      note &= "Folder Name:" & tb & parm & "\par "
 
       i = DWord(v, 40 * 4, False) '  Color Mode
       Select Case i
@@ -6253,30 +6254,30 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Color Mode:" & tb & parm & "\par "
+      note &= "Color Mode:" & tb & parm & "\par "
 
       i = DWord(v, 41 * 4, False) '  Color Filter
       If eqstr(model, "dimage a1") Then k = 5 Else k = 3
       If i > k Then
-        note = note & "Color Filter (0=normal):" & tb & "+" & i - k & "\par "
+        note &= "Color Filter (0=normal):" & tb & "+" & i - k & "\par "
       Else
-        note = note & "Color Filter (0=normal):" & tb & i - k & "\par "
+        note &= "Color Filter (0=normal):" & tb & i - k & "\par "
       End If
 
       If UBound(v) >= 203 Then
         i = DWord(v, 42 * 4, False) '  Black and White Filter
-        note = note & "Black and White Filter (0-10):" & tb & i & "\par "
+        note &= "Black and White Filter (0-10):" & tb & i & "\par "
 
         i = DWord(v, 43 * 4, False) '  Internal Flash
         If i = 1 Then parm = "Fired" Else parm = "Not Fired"
-        note = note & "Internal Flash:" & tb & parm & "\par "
+        note &= "Internal Flash:" & tb & parm & "\par "
 
         i = DWord(v, 44 * 4, False) '  Brightness Value
-        note = note & "APEX Brightness Value:" & tb & Format(i / 8 - 6, "##0.0#") & "\par "
+        note &= "APEX Brightness Value:" & tb & Format(i / 8 - 6, "##0.0#") & "\par "
 
         x = DWord(v, 45 * 4, False) '  Spot Focus Point
         i = DWord(v, 46 * 4, False) '  Spot Focus Point
-        note = note & "Spot Focus Point:" & tb & "(" & x & ", " & i & ")" & "\par "
+        note &= "Spot Focus Point:" & tb & "(" & x & ", " & i & ")" & "\par "
 
         i = DWord(v, 47 * 4, False) '  Wide Focus Zone
         Select Case i
@@ -6293,15 +6294,15 @@ Public Module ImageInfo
           Case Else
             parm = CStr(i)
         End Select
-        note = note & "Wide Focus Zone:" & tb & parm & "\par "
+        note &= "Wide Focus Zone:" & tb & parm & "\par "
 
         i = DWord(v, 48 * 4, False) '  Focus Mode
         If i = 1 Then parm = "MF" Else parm = "AF"
-        note = note & "Focus Mode:" & tb & parm & "\par "
+        note &= "Focus Mode:" & tb & parm & "\par "
 
         i = DWord(v, 49 * 4, False) '  Focus Area
         If i = 1 Then parm = "Spot Focus" Else parm = "Wide Focus"
-        note = note & "Focus Area:" & tb & parm & "\par "
+        note &= "Focus Area:" & tb & parm & "\par "
 
         i = DWord(v, 50 * 4, False) '  DEC Position
         Select Case i
@@ -6316,7 +6317,7 @@ Public Module ImageInfo
           Case Else
             parm = CStr(i)
         End Select
-        note = note & "DEC Position:" & tb & parm & "\par "
+        note &= "DEC Position:" & tb & parm & "\par "
       End If
 
       If makerTags.Contains(sTag(256)) Then
@@ -6349,7 +6350,7 @@ Public Module ImageInfo
           Case Else
             parm = ""
         End Select
-        If Len(parm) > 0 Then note = note & "Scene Mode:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Scene Mode:" & tb & parm & "\par "
       End If
     End If
 
@@ -6364,7 +6365,7 @@ Public Module ImageInfo
 
     If makerTags.Contains(sTag(&H201)) Then
       i = makerTags.Item(sTag(&H201)).singleValue
-      note = note & "Quality:" & tb & i & "\par "
+      note &= "Quality:" & tb & i & "\par "
     End If
 
     If makerTags.Contains(sTag(&H202)) Then
@@ -6376,24 +6377,24 @@ Public Module ImageInfo
         Case 3 : parm = "Manual"
         Case Else : parm = CStr(i)
       End Select
-      note = note & "Macro Mode:" & tb & parm & "\par "
+      note &= "Macro Mode:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H204)) Then ' digital zoom, rational
       x = makerTags.Item(sTag(&H204)).singleValue
       If x > 0 Then parm = Format(x, "###0.0") Else parm = "Off"
-      note = note & "Digital Zoom:" & tb & parm & "\par "
+      note &= "Digital Zoom:" & tb & parm & "\par "
     End If
 
     'If makerTags.Contains(sTag(&H207)) Then ' Camera Type, string
     '  parm = makerTags.Item(sTag(&H207)).singleValue
     '  v = Len(parm)
     '  If InStr(parm, ChrW(0)) > 0 Then parm = Trim(Mid(parm, 1, InStr(parm, ChrW(0)) - 1))
-    '  If Len(parm) > 0 Then note = note & "Camera Type:" & tb & parm & "\par "
+    '  if parm <> "" Then note &= "Camera Type:" & tb & parm & "\par "
     '  End If
 
     If makerTags.Contains(sTag(520)) Then ' [picture info] [camera info], string
-      note = note & "Picture and Camera Info:" & tb & makerTags.Item(sTag(520)).singleValue & "\par "
+      note &= "Picture and Camera Info:" & tb & makerTags.Item(sTag(520)).singleValue & "\par "
     End If
 
     If makerTags.Contains(sTag(521)) Then ' camera ID, undefined
@@ -6401,26 +6402,26 @@ Public Module ImageInfo
       parm = ""
       For i = 0 To uuBound(v)
         If v(i) = 0 Then Exit For ' only the first string makes sense
-        parm = parm & ChrW(v(i))
+        parm &= ChrW(v(i))
       Next i
       parm = Trim(parm)
-      If Len(parm) > 0 Then note = note & "Camera ID Data:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Camera ID Data:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H20D)) Then ' camera ID, undefined
       parm = makerTags.Item(sTag(&H20D)).singleValue
       If InStr(parm, ChrW(0)) > 0 Then parm = Trim(Mid(parm, 1, InStr(parm, ChrW(0)) - 1))
-      If Len(parm) > 0 Then note = note & "Epson Software:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Epson Software:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H300)) Then
       i = makerTags.Item(sTag(&H300)).singleValue
-      note = note & "Precapture Frames:" & tb & i & "\par "
+      note &= "Precapture Frames:" & tb & i & "\par "
     End If
 
     If makerTags.Contains(sTag(&H301)) Then
       i = makerTags.Item(sTag(&H301)).singleValue
-      If Len(parm) > 0 Then note = note & "White Board:" & tb & parm & "\par "
+      If parm <> "" Then note &= "White Board:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H302)) Then
@@ -6431,17 +6432,17 @@ Public Module ImageInfo
         Case 2 : parm = "On (preset)"
         Case Else : parm = ""
       End Select
-      If Len(parm) > 0 Then note = note & "One Touch White Balance:" & tb & parm & "\par "
+      If parm <> "" Then note &= "One Touch White Balance:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H303)) Then
       i = makerTags.Item(sTag(&H303)).singleValue
-      note = note & "White Balance Bracket:" & tb & i & "\par "
+      note &= "White Balance Bracket:" & tb & i & "\par "
     End If
 
     If makerTags.Contains(sTag(&H304)) Then
       i = makerTags.Item(sTag(&H304)).singleValue
-      note = note & "White Balance Bias:" & tb & i & "\par "
+      note &= "White Balance Bias:" & tb & i & "\par "
     End If
 
     If makerTags.Contains(sTag(&H403)) Then
@@ -6483,49 +6484,49 @@ Public Module ImageInfo
         Case 34 : parm = "Smile Shot"
         Case Else : parm = ""
       End Select
-      If Len(parm) > 0 Then note = note & "Scene Mode:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Scene Mode:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H404)) Then
       v = makerTags.Item(sTag(&H404)).singleValue
       parm = ""
       For i = 1 To Len(v)
-        If AscW(v.chars(i - 1)) >= 32 Then parm = parm & v.chars(i - 1)
+        If AscW(v.chars(i - 1)) >= 32 Then parm &= v.chars(i - 1)
       Next i
       If InStr(parm, ChrW(0)) > 0 Then parm = Trim(Mid(parm, 1, InStr(parm, ChrW(0)) - 1))
-      If Len(parm) > 0 Then note = note & "Serial Number:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Serial Number:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H405)) Then ' camera ID, undefined
       parm = makerTags.Item(sTag(&H405)).singleValue
       If InStr(parm, ChrW(0)) > 0 Then parm = Trim(Mid(parm, 1, InStr(parm, ChrW(0)) - 1))
-      If Len(parm) > 0 Then note = note & "Firmware:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Firmware:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H1000)) Then
       x = makerTags.Item(sTag(&H1000)).singleValue
-      If x > 0 And x < 500 Then note = note & "Shutter Speed:" & tb & Format(x, "###,##0.#") & "\par "
+      If x > 0 And x < 500 Then note &= "Shutter Speed:" & tb & Format(x, "###,##0.#") & "\par "
     End If
 
     If makerTags.Contains(sTag(&H1001)) Then
       x = makerTags.Item(sTag(&H1001)).singleValue
-      note = note & "ISO:" & tb & Format(x, "###,##0.#") & "\par "
+      note &= "ISO:" & tb & Format(x, "###,##0.#") & "\par "
     End If
 
     If makerTags.Contains(sTag(&H1002)) Then
       x = makerTags.Item(sTag(&H1002)).singleValue
-      note = note & "Aperture:" & tb & Format(x, "###,##0.#") & "\par "
+      note &= "Aperture:" & tb & Format(x, "###,##0.#") & "\par "
     End If
 
     If makerTags.Contains(sTag(&H1003)) Then
       x = makerTags.Item(sTag(&H1003)).singleValue
-      If x > 0 And x < 500000 Then note = note & "Brightness:" & tb & Format(x, "###,##0.#") & "\par "
+      If x > 0 And x < 500000 Then note &= "Brightness:" & tb & Format(x, "###,##0.#") & "\par "
     End If
 
     If makerTags.Contains(sTag(&H1004)) Then
       i = makerTags.Item(sTag(&H1004)).singleValue
       If i = 2 Then parm = "On" Else If i = 3 Then parm = "Off" Else parm = ""
-      If Len(parm) > 0 Then note = note & "Flash Mode:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Flash Mode:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H1005)) Then
@@ -6537,54 +6538,54 @@ Public Module ImageInfo
         Case 5 : parm = "Internal + External"
         Case Else : parm = ""
       End Select
-      If Len(parm) > 0 Then note = note & "Flash Device:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Flash Device:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H1006)) Then
       x = makerTags.Item(sTag(&H1006)).singleValue
-      note = note & "Exposure Compensation:" & tb & Format(x, "###,##0.#") & "\par "
+      note &= "Exposure Compensation:" & tb & Format(x, "###,##0.#") & "\par "
     End If
 
     If makerTags.Contains(sTag(&H1007)) Then
       i = makerTags.Item(sTag(&H1007)).singleValue
-      note = note & "Sensor Temperature:" & tb & i & "\par "
+      note &= "Sensor Temperature:" & tb & i & "\par "
     End If
 
     If makerTags.Contains(sTag(&H1008)) Then
       i = makerTags.Item(sTag(&H1008)).singleValue
-      note = note & "Lens Temperature:" & tb & i & "\par "
+      note &= "Lens Temperature:" & tb & i & "\par "
     End If
 
     If makerTags.Contains(sTag(&H1009)) Then
       i = makerTags.Item(sTag(&H1009)).singleValue
-      note = note & "Light Condition:" & tb & i & "\par "
+      note &= "Light Condition:" & tb & i & "\par "
     End If
 
     If makerTags.Contains(sTag(&H100A)) Then
       i = makerTags.Item(sTag(&H100A)).singleValue
       If i = 0 Then parm = "Normal" Else If i = 1 Then parm = "Macro" Else parm = ""
-      If Len(parm) > 0 Then note = note & "Focus Range:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Focus Range:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H100B)) Then
       i = makerTags.Item(sTag(&H100B)).singleValue
       If i = 0 Then parm = "Auto" Else If i = 1 Then parm = "Manual" Else parm = ""
-      If Len(parm) > 0 Then note = note & "Focus Mode:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Focus Mode:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H100C)) Then
       x = makerTags.Item(sTag(&H100C)).singleValue
-      note = note & "Manual Focus Distance:" & tb & Format(x, "###,##0.#") & "\par "
+      note &= "Manual Focus Distance:" & tb & Format(x, "###,##0.#") & "\par "
     End If
 
     If makerTags.Contains(sTag(&H100D)) Then
       i = makerTags.Item(sTag(&H100D)).singleValue
-      note = note & "Zoom Step Count:" & tb & i & "\par "
+      note &= "Zoom Step Count:" & tb & i & "\par "
     End If
 
     If makerTags.Contains(sTag(&H100E)) Then
       i = makerTags.Item(sTag(&H100E)).singleValue
-      note = note & "Focus Step Count:" & tb & i & "\par "
+      note &= "Focus Step Count:" & tb & i & "\par "
     End If
 
     If makerTags.Contains(sTag(&H100F)) Then
@@ -6595,36 +6596,36 @@ Public Module ImageInfo
         Case 2 : parm = "Soft"
         Case Else : parm = ""
       End Select
-      If Len(parm) > 0 Then note = note & "Sharpness:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Sharpness:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H1010)) Then
       i = makerTags.Item(sTag(&H1010)).singleValue
-      note = note & "Flash Charge Level:" & tb & i & "\par "
+      note &= "Flash Charge Level:" & tb & i & "\par "
     End If
 
     If makerTags.Contains(sTag(&H1011)) Then
       v = makerTags.Item(sTag(&H1011)).Value
       parm = ""
       If UBound(v) >= 8 Then parm = v(0) & " " & v(1) & " " & v(2) & crlf & tb & v(3) & " " & v(4) & " " & v(5) & crlf & tb & v(6) & " " & v(7) & " " & v(8)
-      If Len(parm) > 0 Then note = note & "Color Matrix:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Color Matrix:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H1012)) Then
       v = makerTags.Item(sTag(&H1012)).Value
       parm = ""
       If UBound(v) >= 3 Then parm = v(0) & " " & v(1) & " " & v(2) & " " & v(3)
-      If Len(parm) > 0 Then note = note & "Black Level:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Black Level:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H1013)) Then
       i = makerTags.Item(sTag(&H1013)).singleValue
-      note = note & "Color Temperature BG:" & tb & i & "\par "
+      note &= "Color Temperature BG:" & tb & i & "\par "
     End If
 
     If makerTags.Contains(sTag(&H1014)) Then
       i = makerTags.Item(sTag(&H1014)).singleValue
-      note = note & "Color Temperature RG:" & tb & i & "\par "
+      note &= "Color Temperature RG:" & tb & i & "\par "
     End If
 
     If makerTags.Contains(sTag(&H1015)) Then
@@ -6646,111 +6647,110 @@ Public Module ImageInfo
           End If
         Case 3 : parm = "One-Touch"
       End Select
-      If Len(parm) > 0 Then note = note & "White Balance Mode:" & tb & parm & "\par "
+      If parm <> "" Then note &= "White Balance Mode:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H1017)) Then
       v = makerTags.Item(sTag(&H1017)).Value
       parm = ""
       If UBound(v) >= 2 Then parm = v(0) & " " & v(1) & " " & v(2)
-      If Len(parm) > 0 Then note = note & "Red Balance:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Red Balance:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H1018)) Then
       v = makerTags.Item(sTag(&H1018)).Value
       parm = ""
       If UBound(v) >= 2 Then parm = v(0) & " " & v(1) & " " & v(2)
-      If Len(parm) > 0 Then note = note & "Blue Balance:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Blue Balance:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H1019)) Then
       i = makerTags.Item(sTag(&H1019)).singleValue
-      note = note & "Color Matrix Number:" & tb & i & "\par "
+      note &= "Color Matrix Number:" & tb & i & "\par "
     End If
 
     If makerTags.Contains(sTag(&H101A)) Then
       v = makerTags.Item(sTag(&H101A)).singleValue
       parm = ""
       For i = 1 To Len(v)
-        If AscW(v.chars(i - 1)) >= 32 Then parm = parm & v.chars(i - 1)
+        If AscW(v.chars(i - 1)) >= 32 Then parm &= v.chars(i - 1)
       Next i
       If InStr(parm, ChrW(0)) > 0 Then parm = Trim(Mid(parm, 1, InStr(parm, ChrW(0)) - 1))
-      If Len(parm) > 0 Then note = note & "Serial Number:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Serial Number:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H1023)) Then
       x = makerTags.Item(sTag(&H1023)).singleValue
-      note = note & "Flash Exposure Compensation:" & tb & Format(x, "###,##0.#") & "\par "
+      note &= "Flash Exposure Compensation:" & tb & Format(x, "###,##0.#") & "\par "
     End If
 
     If makerTags.Contains(sTag(&H1026)) Then
       i = makerTags.Item(sTag(&H1026)).singleValue
       If i = 0 Then parm = "No" Else If i = 1 Then parm = "Yes" Else parm = ""
-      If Len(parm) > 0 Then note = note & "External Flash Bounce:" & tb & parm & "\par "
+      If parm <> "" Then note &= "External Flash Bounce:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H1027)) Then
       i = makerTags.Item(sTag(&H1027)).singleValue
-      note = note & "External Flash Zoom:" & tb & i & "\par "
+      note &= "External Flash Zoom:" & tb & i & "\par "
     End If
 
     If makerTags.Contains(sTag(&H1028)) Then
       i = makerTags.Item(sTag(&H1028)).singleValue
-      note = note & "External Flash Zoom:" & tb & i & "\par "
+      note &= "External Flash Zoom:" & tb & i & "\par "
     End If
 
     If makerTags.Contains(sTag(&H1029)) Then
       v = makerTags.Item(sTag(&H1029)).value
-      parm = ""
       Select Case v(0)
         Case 1 : parm = "High"
         Case 2 : parm = "Normal"
         Case 3 : parm = "Low"
         Case Else : parm = ""
       End Select
-      If Len(parm) > 0 Then note = note & "Contrast:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Contrast:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H102A)) Then
       i = makerTags.Item(sTag(&H102A)).singleValue
-      note = note & "Sharpness Factor:" & tb & i & "\par "
+      note &= "Sharpness Factor:" & tb & i & "\par "
     End If
 
     If makerTags.Contains(sTag(&H1030)) Then
       i = makerTags.Item(sTag(&H1030)).singleValue
-      note = note & "Scene Detect:" & tb & i & "\par "
+      note &= "Scene Detect:" & tb & i & "\par "
     End If
 
     If makerTags.Contains(sTag(&H1039)) Then
       i = makerTags.Item(sTag(&H1039)).singleValue
       If i = 0 Then parm = "Interlaced" Else If i = 1 Then parm = "Progressive" Else parm = ""
-      If Len(parm) > 0 Then note = note & "CCD Scan Mode:" & tb & parm & "\par "
+      If parm <> "" Then note &= "CCD Scan Mode:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H103A)) Then
       i = makerTags.Item(sTag(&H103A)).singleValue
       If i = 0 Then parm = "Off" Else If i = 1 Then parm = "On" Else parm = ""
-      If Len(parm) > 0 Then note = note & "Noise Reduction:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Noise Reduction:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H103B)) Then
       i = makerTags.Item(sTag(&H103B)).singleValue
-      note = note & "Infinity Lens Step:" & tb & i & "\par "
+      note &= "Infinity Lens Step:" & tb & i & "\par "
     End If
 
     If makerTags.Contains(sTag(&H103C)) Then
       i = makerTags.Item(sTag(&H103C)).singleValue
-      note = note & "Near Lens Step:" & tb & i & "\par "
+      note &= "Near Lens Step:" & tb & i & "\par "
     End If
 
     If makerTags.Contains(sTag(&H103D)) Then
       x = makerTags.Item(sTag(&H103D)).singleValue
-      note = note & "Light Value, Center:" & tb & Format(x, "###,##0.#") & "\par "
+      note &= "Light Value, Center:" & tb & Format(x, "###,##0.#") & "\par "
     End If
 
     If makerTags.Contains(sTag(&H103E)) Then
       x = makerTags.Item(sTag(&H103E)).singleValue
-      note = note & "Light Value, Periphery:" & tb & Format(x, "###,##0.#") & "\par "
+      note &= "Light Value, Periphery:" & tb & Format(x, "###,##0.#") & "\par "
     End If
 
     If makerTags.Contains(sTag(&H2010)) Then
@@ -6759,9 +6759,9 @@ Public Module ImageInfo
       If uz.Tags.Contains(sTag(0)) Then
         v = uz.Tags(sTag(0)).value
         parm = ""
-        For i = 0 To UBound(v) : parm = parm & ChrW(v(i)) : Next i
+        For i = 0 To UBound(v) : parm &= ChrW(v(i)) : Next i
         If InStr(parm, ChrW(0)) > 0 Then parm = Trim(Mid(parm, 1, InStr(parm, ChrW(0)) - 1))
-        If Len(parm) > 0 Then note = note & "Equipment Tag Version:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Equipment Tag Version:" & tb & parm & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H100)) Then
@@ -6769,11 +6769,11 @@ Public Module ImageInfo
         If InStr(v, ChrW(0)) > 0 Then v = Trim(Mid(v, 1, InStr(v, ChrW(0)) - 1))
         parm = ""
         For i = 1 To Len(v)
-          If AscW(v.chars(i - 1)) >= 32 Then parm = parm & v.chars(i - 1)
+          If AscW(v.chars(i - 1)) >= 32 Then parm &= v.chars(i - 1)
         Next i
         If Len(parm) > 1 Then
           If olympusCamera.ContainsKey(parm) Then parm = olympusCamera(parm)
-          note = note & "Camera Type:" & tb & parm & "\par "
+          note &= "Camera Type:" & tb & parm & "\par "
         End If
       End If
 
@@ -6782,10 +6782,10 @@ Public Module ImageInfo
         If InStr(v, ChrW(0)) > 0 Then v = Trim(Mid(v, 1, InStr(v, ChrW(0)) - 1))
         parm = ""
         For i = 1 To Len(v)
-          If AscW(v.chars(i - 1)) >= 32 Then parm = parm & v.chars(i - 1)
+          If AscW(v.chars(i - 1)) >= 32 Then parm &= v.chars(i - 1)
         Next i
         If InStr(parm, ChrW(0)) > 0 Then parm = Trim(Mid(parm, 1, InStr(parm, ChrW(0)) - 1))
-        If Len(parm) > 0 Then note = note & "Serial Number:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Serial Number:" & tb & parm & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H102)) Then
@@ -6793,42 +6793,42 @@ Public Module ImageInfo
         If InStr(v, ChrW(0)) > 0 Then v = Trim(Mid(v, 1, InStr(v, ChrW(0)) - 1))
         parm = ""
         For i = 1 To Len(v)
-          If AscW(v.chars(i - 1)) >= 32 Then parm = parm & v.chars(i - 1)
+          If AscW(v.chars(i - 1)) >= 32 Then parm &= v.chars(i - 1)
         Next i
         If InStr(parm, ChrW(0)) > 0 Then parm = Trim(Mid(parm, 1, InStr(parm, ChrW(0)) - 1))
-        If Len(parm) > 0 Then note = note & "Internal Serial Number:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Internal Serial Number:" & tb & parm & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H103)) Then
         x = uz.Tags.Item(sTag(&H103)).singleValue
-        note = note & "Focal Plane Diagonal:" & tb & Format(x, "####,##0.###") & " mm\par "
+        note &= "Focal Plane Diagonal:" & tb & Format(x, "####,##0.###") & " mm\par "
       End If
 
       If uz.Tags.Contains(sTag(&H104)) Then
         i = uz.Tags.Item(sTag(&H104)).singleValue
         parm = Format(i, "x2")
         parm = parm.Insert(1, ".")
-        If i <> 0 Then note = note & "Body Firmware Version:" & tb & parm & "\par "
+        If i <> 0 Then note &= "Body Firmware Version:" & tb & parm & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H201)) Then
         v = uz.Tags.Item(sTag(&H201)).Value
         parm = Format(v(0), "x2") & Format(v(2), "x2") & Format(v(3), "x2")
         If olympusLens.ContainsKey(parm) Then parm = olympusLens(parm) Else parm = ""
-        If Len(parm) > 0 Then note = note & "Lens Type:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Lens Type:" & tb & parm & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H202)) Then
         v = uz.Tags.Item(sTag(&H202)).singleValue
         parm = v
-        If Len(parm) > 0 Then note = note & "Lens Serial Number:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Lens Serial Number:" & tb & parm & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H205)) Then
         i = uz.Tags.Item(sTag(&H205)).singleValue
         If i > 0 Then
           parm = Format(Sqrt(2) ^ (i / 256), "#.0")
-          note = note & "Max Aperture at Min. Focal:" & tb & parm & "\par "
+          note &= "Max Aperture at Min. Focal:" & tb & parm & "\par "
         End If
       End If
 
@@ -6836,7 +6836,7 @@ Public Module ImageInfo
         i = uz.Tags.Item(sTag(&H206)).singleValue
         If i > 0 Then
           parm = Format(Sqrt(2) ^ (i / 256), "#.0")
-          note = note & "Max Aperture at Max. Focal:" & tb & parm & "\par "
+          note &= "Max Aperture at Max. Focal:" & tb & parm & "\par "
         End If
       End If
 
@@ -6844,23 +6844,23 @@ Public Module ImageInfo
         i = uz.Tags.Item(sTag(&H20A)).singleValue
         If i > 0 Then
           parm = Format(Sqrt(2) ^ (i / 256), "#.0")
-          note = note & "Max Aperture at Current Focal:" & tb & parm & "\par "
+          note &= "Max Aperture at Current Focal:" & tb & parm & "\par "
         End If
       End If
 
       If uz.Tags.Contains(sTag(&H207)) Then
         i = uz.Tags.Item(sTag(&H207)).singleValue
-        note = note & "Minimum Focal Length:" & tb & i & " mm \par "
+        note &= "Minimum Focal Length:" & tb & i & " mm \par "
       End If
 
       If uz.Tags.Contains(sTag(&H208)) Then
         i = uz.Tags.Item(sTag(&H208)).singleValue
-        note = note & "Maximum Focal Length:" & tb & i & " mm \par "
+        note &= "Maximum Focal Length:" & tb & i & " mm \par "
       End If
 
       If uz.Tags.Contains(sTag(&H20B)) Then
         i = uz.Tags.Item(sTag(&H20B)).singleValue
-        note = note & "Lens Properties:" & tb & Format(i, "x4") & "\par "
+        note &= "Lens Properties:" & tb & Format(i, "x4") & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H301)) Then
@@ -6877,25 +6877,25 @@ Public Module ImageInfo
             Case 10
               parm = "Olympus Zuiko Digital EC-20 2.0x Teleconverter"
           End Select
-          If Len(parm) > 0 Then note = note & "Extender:" & tb & parm & "\par "
+          If parm <> "" Then note &= "Extender:" & tb & parm & "\par "
         End If
       End If
 
       If uz.Tags.Contains(sTag(&H302)) Then ' Extender Serial Number
         v = uz.Tags.Item(sTag(&H302)).singleValue
         parm = v
-        If Len(parm) > 0 Then note = note & "Extender Serial Number:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Extender Serial Number:" & tb & parm & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H303)) Then ' Extender Model
         v = uz.Tags.Item(sTag(&H302)).singleValue
         parm = v
-        If Len(parm) > 0 Then note = note & "Extender Model:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Extender Model:" & tb & parm & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H304)) Then
         i = uz.Tags.Item(sTag(&H304)).singleValue
-        If i <> 0 Then note = note & "Extender Firmware Version:" & tb & i & "\par "
+        If i <> 0 Then note &= "Extender Firmware Version:" & tb & i & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H1000)) Then
@@ -6907,7 +6907,7 @@ Public Module ImageInfo
           Case 4 : parm = "E-System (body powered)"
           Case Else : parm = ""
         End Select
-        If Len(parm) > 0 Then note = note & "Flash Type:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Flash Type:" & tb & parm & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H1001)) Then
@@ -6927,12 +6927,12 @@ Public Module ImageInfo
           Case 15 : parm = "FL-900R"
           Case Else : parm = ""
         End Select
-        If Len(parm) > 0 Then note = note & "Flash Model:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Flash Model:" & tb & parm & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H1002)) Then
         i = uz.Tags.Item(sTag(&H1002)).singleValue
-        If i <> 0 Then note = note & "Flash Firmware Version:" & tb & i & "\par "
+        If i <> 0 Then note &= "Flash Firmware Version:" & tb & i & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H1003)) Then
@@ -6940,9 +6940,9 @@ Public Module ImageInfo
         If InStr(v, ChrW(0)) > 0 Then v = Trim(Mid(v, 1, InStr(v, ChrW(0)) - 1))
         parm = ""
         For i = 1 To Len(v)
-          If AscW(v.chars(i - 1)) >= 32 Then parm = parm & v.chars(i - 1)
+          If AscW(v.chars(i - 1)) >= 32 Then parm &= v.chars(i - 1)
         Next i
-        If Len(parm) > 0 Then note = note & "Flash Serial Number:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Flash Serial Number:" & tb & parm & "\par "
       End If
     End If ' olympus tag 2010
 
@@ -6952,20 +6952,19 @@ Public Module ImageInfo
       If uz.Tags.Contains(sTag(0)) Then
         v = uz.Tags(sTag(0)).value
         parm = ""
-        For i = 0 To UBound(v) : parm = parm & ChrW(v(i)) : Next i
+        For i = 0 To UBound(v) : parm &= ChrW(v(i)) : Next i
         If InStr(parm, ChrW(0)) > 0 Then parm = Trim(Mid(parm, 1, InStr(parm, ChrW(0)) - 1))
-        If Len(parm) > 0 Then note = note & "Camera Settings Version:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Camera Settings Version:" & tb & parm & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H100)) Then
         i = uz.Tags.Item(sTag(&H100)).singleValue
         If i = 0 Then parm = "No" Else If i = 1 Then parm = "Yes" Else parm = ""
-        If Len(parm) > 0 Then note = note & "Preview Image Valid:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Preview Image Valid:" & tb & parm & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H200)) Then
         i = uz.Tags.Item(sTag(&H200)).singlevalue
-        parm = ""
         Select Case i
           Case 1 : parm = "Manual"
           Case 2 : parm = "Program"
@@ -6974,18 +6973,17 @@ Public Module ImageInfo
           Case 5 : parm = "Program Shift"
           Case Else : parm = ""
         End Select
-        If Len(parm) > 0 Then note = note & "Exposure Mode:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Exposure Mode:" & tb & parm & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H201)) Then
         i = uz.Tags.Item(sTag(&H201)).singleValue
         If i = 0 Then parm = "Off" Else If i = 1 Then parm = "On" Else parm = ""
-        If Len(parm) > 0 Then note = note & "AE Lock:" & tb & parm & "\par "
+        If parm <> "" Then note &= "AE Lock:" & tb & parm & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H202)) Then
         i = uz.Tags.Item(sTag(&H202)).singlevalue
-        parm = ""
         Select Case i
           Case 2 : parm = "Center-weighted average"
           Case 3 : parm = "Spot"
@@ -6995,30 +6993,29 @@ Public Module ImageInfo
           Case 1027 : parm = "Spot+Shadow control"
           Case Else : parm = ""
         End Select
-        If Len(parm) > 0 Then note = note & "Metering Mode:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Metering Mode:" & tb & parm & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H203)) Then
         x = uz.Tags.Item(sTag(&H203)).singlevalue
-        If Len(parm) > 0 Then note = note & "Exposure shift:" & tb & Format(x, "#0.##") & "\par "
+        If parm <> "" Then note &= "Exposure shift:" & tb & Format(x, "#0.##") & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H204)) Then
         i = uz.Tags.Item(sTag(&H204)).singleValue
         If i = 0 Then parm = "Off" Else If i = 1 Then parm = "On" Else parm = ""
-        If Len(parm) > 0 Then note = note & "ND filter:" & tb & parm & "\par "
+        If parm <> "" Then note &= "ND filter:" & tb & parm & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H300)) Then
         i = uz.Tags.Item(sTag(&H300)).singlevalue
-        parm = ""
         Select Case i
           Case 0 : parm = "Off"
           Case 1 : parm = "On"
           Case 2 : parm = "Super Macro"
           Case Else : parm = ""
         End Select
-        If Len(parm) > 0 Then note = note & "Macro Mode:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Macro Mode:" & tb & parm & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H301)) Then
@@ -7043,25 +7040,25 @@ Public Module ImageInfo
         If i And 256 Then parm &= ", AF sensor"
 
         If parm.StartsWith(", ") Then parm = parm.Substring(2)
-        If Len(parm) > 0 Then note = note & "Focus Mode:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Focus Mode:" & tb & parm & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H302)) Then
         v = uz.Tags.Item(sTag(&H302)).Value
         If v(0) = 0 Then parm = "AF Not Used" Else If v(0) = 1 Then parm = "AF Used" Else parm = ""
-        If Len(parm) > 0 Then note = note & "Focus Process:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Focus Process:" & tb & parm & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H303)) Then
         i = uz.Tags.Item(sTag(&H303)).singleValue
         If i = 0 Then parm = "Not Ready" Else If i = 1 Then parm = "Ready" Else parm = ""
-        If Len(parm) > 0 Then note = note & "AF Search:" & tb & parm & "\par "
+        If parm <> "" Then note &= "AF Search:" & tb & parm & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H306)) Then
         i = uz.Tags.Item(sTag(&H306)).singleValue
         If i = 0 Then parm = "Off" Else If i = 1 Then parm = "On" Else parm = ""
-        If Len(parm) > 0 Then note = note & "AF Fine Tune:" & tb & parm & "\par "
+        If parm <> "" Then note &= "AF Fine Tune:" & tb & parm & "\par "
       End If
 
 
@@ -7069,14 +7066,14 @@ Public Module ImageInfo
         i = uz.Tags.Item(sTag(&H400)).singlevalue
         parm = ""
         If i = 0 Then parm = "Off"
-        If i And 2 ^ 0 Then parm = parm & "On"
-        If i And 2 ^ 1 Then parm = parm & ", fill-in"
-        If i And 2 ^ 2 Then parm = parm & ", red-eye"
-        If i And 2 ^ 3 Then parm = parm & ", slow-sync"
-        If i And 2 ^ 4 Then parm = parm & ", forced On"
-        If i And 2 ^ 5 Then parm = parm & ", 2nd curtain"
+        If i And 2 ^ 0 Then parm &= "On"
+        If i And 2 ^ 1 Then parm &= ", fill-in"
+        If i And 2 ^ 2 Then parm &= ", red-eye"
+        If i And 2 ^ 3 Then parm &= ", slow-sync"
+        If i And 2 ^ 4 Then parm &= ", forced On"
+        If i And 2 ^ 5 Then parm &= ", 2nd curtain"
         If parm.StartsWith(", ") Then parm = parm.Substring(2)
-        If Len(parm) > 0 Then note = note & "Flash Mode:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Flash Mode:" & tb & parm & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H403)) Then
@@ -7097,7 +7094,7 @@ Public Module ImageInfo
           Case 20 : parm = "Channel 4, high"
           Case Else : parm = ""
         End Select
-        If Len(parm) > 0 Then note = note & "Flash remote control:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Flash remote control:" & tb & parm & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H404)) Then
@@ -7109,12 +7106,11 @@ Public Module ImageInfo
           Case 5 : parm = "Manual"
           Case Else : parm = ""
         End Select
-        If Len(parm) > 0 Then note = note & "Flash control mode:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Flash control mode:" & tb & parm & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H500)) Then
         i = uz.Tags.Item(sTag(&H500)).singlevalue
-        parm = ""
         Select Case i
           Case 0 : parm = "Auto"
           Case 1 : parm = "Auto (Keep Warm Color Off)"
@@ -7141,23 +7137,23 @@ Public Module ImageInfo
           Case 515 : parm = "Custom WB 4"
           Case Else : parm = ""
         End Select
-        If Len(parm) > 0 Then note = note & "White Balance:" & tb & parm & "\par "
+        If parm <> "" Then note &= "White Balance:" & tb & parm & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H501)) Then
         i = uz.Tags.Item(sTag(&H501)).singleValue
-        note = note & "White Balance Temperature:" & tb & i & "\par "
+        note &= "White Balance Temperature:" & tb & i & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H502)) Then
         i = uz.Tags.Item(sTag(&H502)).singleValue
-        note = note & "White Balance Bracket:" & tb & i & "\par "
+        note &= "White Balance Bracket:" & tb & i & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H503)) Then
         v = uz.Tags.Item(sTag(&H503)).Value
         If UBound(v) >= 2 Then
-          note = note & "Custom Saturation Setting:" & tb & v(0) & "\par "
+          note &= "Custom Saturation Setting:" & tb & v(0) & "\par "
           'note = note & "Custom Saturation Minimum:" & tb & v(1) & "\par "
           'note = note & "Custom Saturation Maximum:" & tb & v(2) & "\par "
         End If
@@ -7165,7 +7161,6 @@ Public Module ImageInfo
 
       If uz.Tags.Contains(sTag(&H504)) Then
         i = uz.Tags.Item(sTag(&H504)).singlevalue
-        parm = ""
         Select Case i
           Case 0 : parm = "Off"
           Case 1 : parm = "CM1 (Red Enhance)"
@@ -7174,13 +7169,13 @@ Public Module ImageInfo
           Case 4 : parm = "CM4 (Skin Tones)"
           Case Else : parm = ""
         End Select
-        If Len(parm) > 0 Then note = note & "Modified Saturation:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Modified Saturation:" & tb & parm & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H505)) Then
         v = uz.Tags.Item(sTag(&H505)).Value
         If UBound(v) >= 2 Then
-          note = note & "Contrast Setting:" & tb & v(0) & "\par "
+          note &= "Contrast Setting:" & tb & v(0) & "\par "
           'note = note & "Custom Contrast Minimum:" & tb & v(1) & "\par "
           'note = note & "Custom Contrast Maximum:" & tb & v(2) & "\par "
         End If
@@ -7189,7 +7184,7 @@ Public Module ImageInfo
       If uz.Tags.Contains(sTag(&H506)) Then
         v = uz.Tags.Item(sTag(&H506)).Value
         If UBound(v) >= 2 Then
-          note = note & "Sharpness Setting:" & tb & v(0) & "\par "
+          note &= "Sharpness Setting:" & tb & v(0) & "\par "
           'note = note & "Custom Sharpness Minimum:" & tb & v(1) & "\par "
           'note = note & "Custom Sharpness Maximum:" & tb & v(2) & "\par "
         End If
@@ -7197,49 +7192,48 @@ Public Module ImageInfo
 
       If uz.Tags.Contains(sTag(&H507)) Then
         i = uz.Tags.Item(sTag(&H507)).singlevalue
-        parm = ""
         Select Case i
           Case 0 : parm = "sRGB"
           Case 1 : parm = "Adobe RGB"
           Case 2 : parm = "Pro Photo RGB"
           Case Else : parm = ""
         End Select
-        If Len(parm) > 0 Then note = note & "Color Space:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Color Space:" & tb & parm & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H509)) Then
         i = uz.Tags.Item(sTag(&H509)).singlevalue
         If olympusSceneMode.ContainsKey(i) Then parm = olympusSceneMode(i) Else parm = ""
-        If Len(parm) > 0 Then note = note & "Scene Mode:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Scene Mode:" & tb & parm & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H50A)) Then
         i = uz.Tags.Item(sTag(&H50A)).singlevalue
         parm = ""
         If i = 0 Then parm = "Off"
-        If i And 2 ^ 0 Then parm = parm & "On"
-        If i And 2 ^ 1 Then parm = parm & ", Noise Filter"
-        If i And 2 ^ 2 Then parm = parm & ", Noise Filter, ISO Boost"
-        If i And 2 ^ 3 Then parm = parm & ", Auto"
+        If i And 2 ^ 0 Then parm &= "On"
+        If i And 2 ^ 1 Then parm &= ", Noise Filter"
+        If i And 2 ^ 2 Then parm &= ", Noise Filter, ISO Boost"
+        If i And 2 ^ 3 Then parm &= ", Auto"
         If parm.StartsWith(", ") Then parm = parm.Substring(2)
-        If Len(parm) > 0 Then note = note & "Noise Reduction:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Noise Reduction:" & tb & parm & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H50B)) Then
         i = uz.Tags.Item(sTag(&H50B)).singleValue
         If i = 0 Then parm = "Off" Else If i = 1 Then parm = "On" Else parm = ""
-        If Len(parm) > 0 Then note = note & "Distortion Correction:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Distortion Correction:" & tb & parm & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H50C)) Then
         i = uz.Tags.Item(sTag(&H50C)).singleValue
         If i = 0 Then parm = "Off" Else If i = 1 Then parm = "On" Else parm = ""
-        If Len(parm) > 0 Then note = note & "Shading Compensation:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Shading Compensation:" & tb & parm & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H50D)) Then
         x = uz.Tags.Item(sTag(&H50D)).singleValue
-        note = note & "Compression Factor:" & tb & Format(x, "####,##0.###") & "\par "
+        note &= "Compression Factor:" & tb & Format(x, "####,##0.###") & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H50F)) Then
@@ -7250,13 +7244,12 @@ Public Module ImageInfo
           If v(0) = 0 And v(1) = 0 And v(2) = 0 Then parm = "n/a"
           If v(0) = 1 And v(1) = -1 And v(2) = 1 Then parm = "High key"
           If v.length = 4 Then parm &= "; " & v(3)
-          If Len(parm) > 0 Then note = note & "Gradation:" & tb & parm & "\par "
+          If parm <> "" Then note &= "Gradation:" & tb & parm & "\par "
         End If
       End If
 
       If uz.Tags.Contains(sTag(&H520)) Then
         v = uz.Tags.Item(sTag(&H520)).value
-        parm = ""
         Select Case v(0)
           Case 1 : parm = "Vivid"
           Case 2 : parm = "Natural"
@@ -7275,37 +7268,36 @@ Public Module ImageInfo
           Case 512 : parm = "Sepia"
           Case Else : parm = ""
         End Select
-        If v.length = 2 Then parm = parm & "; " & v(1)
-        If Len(parm) > 0 Then note = note & "Picture Mode:" & tb & parm & "\par "
+        If v.length = 2 Then parm &= "; " & v(1)
+        If parm <> "" Then note &= "Picture Mode:" & tb & parm & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H521)) Then
         v = uz.Tags.Item(sTag(&H521)).Value
-        i = v(1) : If i > 32767 Then i = i - 65536
+        i = v(1) : If i > 32767 Then i -= 65536
         If UBound(v) >= 2 Then
-          note = note & "Picture Mode Saturation:" & tb & v(0) & " (min " & i & ", max " & v(2) & ")\par "
+          note &= "Picture Mode Saturation:" & tb & v(0) & " (min " & i & ", max " & v(2) & ")\par "
         End If
       End If
 
       If uz.Tags.Contains(sTag(&H523)) Then
         v = uz.Tags.Item(sTag(&H523)).Value
-        i = v(1) : If i > 32767 Then i = i - 65536
+        i = v(1) : If i > 32767 Then i -= 65536
         If UBound(v) >= 2 Then
-          note = note & "Picture Mode Contrast:" & tb & v(0) & " (min " & i & ", max " & v(2) & ")\par "
+          note &= "Picture Mode Contrast:" & tb & v(0) & " (min " & i & ", max " & v(2) & ")\par "
         End If
       End If
 
       If uz.Tags.Contains(sTag(&H524)) Then
         v = uz.Tags.Item(sTag(&H524)).Value
-        i = v(1) : If i > 32767 Then i = i - 65536
+        i = v(1) : If i > 32767 Then i -= 65536
         If UBound(v) >= 2 Then
-          note = note & "Picture Mode Sharpness:" & tb & v(0) & " (min " & i & ", max " & v(2) & ")\par "
+          note &= "Picture Mode Sharpness:" & tb & v(0) & " (min " & i & ", max " & v(2) & ")\par "
         End If
       End If
 
       If uz.Tags.Contains(sTag(&H525)) Then
         i = uz.Tags.Item(sTag(&H525)).singlevalue
-        parm = ""
         Select Case i
           Case 1 : parm = "Neutral"
           Case 2 : parm = "Yellow"
@@ -7314,12 +7306,11 @@ Public Module ImageInfo
           Case 5 : parm = "Green"
           Case Else : parm = ""
         End Select
-        If Len(parm) > 0 Then note = note & "Picture Mode BW Filter:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Picture Mode BW Filter:" & tb & parm & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H526)) Then
         i = uz.Tags.Item(sTag(&H526)).singlevalue
-        parm = ""
         Select Case i
           Case 1 : parm = "Neutral"
           Case 2 : parm = "Sepia"
@@ -7328,7 +7319,7 @@ Public Module ImageInfo
           Case 5 : parm = "Green"
           Case Else : parm = ""
         End Select
-        If Len(parm) > 0 Then note = note & "Picture mode tone:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Picture mode tone:" & tb & parm & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H527)) Then
@@ -7340,7 +7331,7 @@ Public Module ImageInfo
           If v(0) = 0 Then parm = "Standard"
           If v(0) = 1 Then parm = "High"
         End If
-        If Len(parm) > 0 Then note = note & "Noise filter:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Noise filter:" & tb & parm & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H529)) Then
@@ -7348,7 +7339,7 @@ Public Module ImageInfo
         i = v(0)
         If olympusArtFilter.ContainsKey(i) Then
           parm = olympusArtFilter(i) & "; " & v(1) & "; " & v(2) & "; " & v(3)
-          note = note & "Art filter:" & tb & parm & "\par "
+          note &= "Art filter:" & tb & parm & "\par "
         End If
       End If
 
@@ -7357,7 +7348,7 @@ Public Module ImageInfo
         i = v(0)
         If olympusMagicFilter.ContainsKey(i) Then
           parm = olympusMagicFilter(i) & "; " & v(1) & "; " & v(2) & "; " & v(3)
-          note = note & "Magic filter:" & tb & parm & "\par "
+          note &= "Magic filter:" & tb & parm & "\par "
         End If
       End If
 
@@ -7367,7 +7358,7 @@ Public Module ImageInfo
           If v(0) = -1 And v(1) = -1 And v(2) = 1 Then parm = "Low"
           If v(0) = 0 And v(1) = -1 And v(2) = 1 Then parm = "Normal"
           If v(0) = 1 And v(1) = -1 And v(2) = 1 Then parm = "High"
-          If Len(parm) > 0 Then note = note & "Picture mode effect:" & tb & parm & "\par "
+          If parm <> "" Then note &= "Picture mode effect:" & tb & parm & "\par "
         End If
       End If
 
@@ -7376,7 +7367,7 @@ Public Module ImageInfo
         i = v(0)
         If olympusArtFilterEffect.ContainsKey(i) AndAlso v.length >= 7 Then
           parm = olympusArtFilterEffect(i) & "; " & v(4) & "; " & v(6)
-          note = note & "Art filter effect:" & tb & parm & "\par "
+          note &= "Art filter effect:" & tb & parm & "\par "
         End If
       End If
 
@@ -7394,7 +7385,7 @@ Public Module ImageInfo
           Case 8 : parm = "Yellow-green"
           Case Else : parm = ""
         End Select
-        If Len(parm) > 0 Then note = note & "Monochrome profile settings:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Monochrome profile settings:" & tb & parm & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H538)) Then
@@ -7406,18 +7397,17 @@ Public Module ImageInfo
           Case 3 : parm = "High"
           Case Else : parm = ""
         End Select
-        If Len(parm) > 0 Then note = note & "Film grain effect:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Film grain effect:" & tb & parm & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H53A)) Then
         i = uz.Tags.Item(sTag(&H53A)).singleValue
         If i > 0 Then parm = i Else parm = "(none)"
-        note = note & "Monochrome vignetting:" & tb & parm & "\par "
+        note &= "Monochrome vignetting:" & tb & parm & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H53B)) Then
         i = uz.Tags.Item(sTag(&H53B)).singlevalue
-        parm = ""
         Select Case i
           Case 0 : parm = "(none)"
           Case 1 : parm = "Normal"
@@ -7427,24 +7417,23 @@ Public Module ImageInfo
           Case 5 : parm = "Green"
           Case Else : parm = ""
         End Select
-        If Len(parm) > 0 Then note = note & "Monochrome color:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Monochrome color:" & tb & parm & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H600)) Then
         v = uz.Tags.Item(sTag(&H600)).Value
-        note = note & "Drive Mode:" & tb & v(0) & "\par "
-        If v(0) <> 0 Then note = note & "Drive Shot Number:" & tb & v(1) & "\par "
+        note &= "Drive Mode:" & tb & v(0) & "\par "
+        If v(0) <> 0 Then note &= "Drive Shot Number:" & tb & v(1) & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H601)) Then
         v = uz.Tags.Item(sTag(&H601)).Value
-        note = note & "Panorama Mode:" & tb & v(0) & "\par "
-        If v(0) <> 0 Then note = note & "Panorama Shot Number:" & tb & v(1) & "\par "
+        note &= "Panorama Mode:" & tb & v(0) & "\par "
+        If v(0) <> 0 Then note &= "Panorama Shot Number:" & tb & v(1) & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H603)) Then
         i = uz.Tags.Item(sTag(&H603)).singlevalue
-        parm = ""
         Select Case i
           Case 1 : parm = "Standard"
           Case 2 : parm = "High"
@@ -7453,12 +7442,11 @@ Public Module ImageInfo
           Case 4 : parm = "Standard (5)"
           Case Else : parm = ""
         End Select
-        If Len(parm) > 0 Then note = note & "Image Quality:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Image Quality:" & tb & parm & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H604)) Then
         i = uz.Tags.Item(sTag(&H604)).singlevalue
-        parm = ""
         Select Case i
           Case 0 : parm = "(off)"
           Case 1 : parm = "Mode 1"
@@ -7467,7 +7455,7 @@ Public Module ImageInfo
           Case 4 : parm = "Mode 4"
           Case Else : parm = ""
         End Select
-        If Len(parm) > 0 Then note = note & "Image stabilization:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Image stabilization:" & tb & parm & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H804)) Then
@@ -7478,44 +7466,44 @@ Public Module ImageInfo
           If v(0) = 5 And v(1) = 4 Then parm = "HDR1"
           If v(0) = 6 And v(1) = 4 Then parm = "HDR2"
           If v(0) = 9 And v(1) = 8 Then parm = "Focus stacked, 8 images"
-          If Len(parm) > 0 Then note = note & "Stacked image:" & tb & parm & "\par "
+          If parm <> "" Then note &= "Stacked image:" & tb & parm & "\par "
         End If
       End If
 
       If uz.Tags.Contains(sTag(&H900)) Then
         x = uz.Tags.Item(sTag(&H900)).singleValue
-        note = note & "Manometer pressure:" & tb & Format(x / 10, "#0") & " kPa\par "
+        note &= "Manometer pressure:" & tb & Format(x / 10, "#0") & " kPa\par "
 
         If x <> 0 AndAlso uz.Tags.Contains(sTag(&H901)) Then
           v = uz.Tags.Item(sTag(&H901)).Value
-          If v.length > 1 Then note = note & "Manometer reading:" & tb & Format(v(0) / 10, "#0") & " m, " & Format(v(1) / 10, "#0") & " ft \par "
+          If v.length > 1 Then note &= "Manometer reading:" & tb & Format(v(0) / 10, "#0") & " m, " & Format(v(1) / 10, "#0") & " ft \par "
         End If
       End If
 
       If uz.Tags.Contains(sTag(&H902)) Then
         i = uz.Tags.Item(sTag(&H902)).singleValue
         If i = 0 Then parm = "Off" Else If i = 1 Then parm = "On" Else parm = ""
-        If Len(parm) > 0 Then note = note & "Extended white balance detect:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Extended white balance detect:" & tb & parm & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H903)) Then
         x = uz.Tags.Item(sTag(&H903)).singleValue
         v = uz.Tags.Item(sTag(&H903)).Value
         If x > 32767 Then x -= 65536
-        note = note & "Roll angle:" & tb & Format(x, "#0") & "°\par "
+        note &= "Roll angle:" & tb & Format(x, "#0") & "°\par "
       End If
 
       If uz.Tags.Contains(sTag(&H904)) Then
         x = uz.Tags.Item(sTag(&H904)).singleValue
         If x > 32767 Then x -= 65536
         x = -x ' positive pitch is up
-        note = note & "Pitch angle:" & tb & Format(x, "#0") & "°\par "
+        note &= "Pitch angle:" & tb & Format(x, "#0") & "°\par "
       End If
 
       If uz.Tags.Contains(sTag(&H908)) Then
         v = uz.Tags.Item(sTag(&H908)).singleValue
         parm = v
-        If parm <> "" AndAlso Not parm.StartsWith("0000") Then note = note & "UTC date and time:" & tb & parm & "\par "
+        If parm <> "" AndAlso Not parm.StartsWith("0000") Then note &= "UTC date and time:" & tb & parm & "\par "
       End If
 
     End If ' olympus tag 2020
@@ -7526,40 +7514,40 @@ Public Module ImageInfo
       If uz.Tags.Contains(sTag(0)) Then
         v = uz.Tags(sTag(0)).value
         parm = ""
-        For i = 0 To UBound(v) : parm = parm & ChrW(v(i)) : Next i
+        For i = 0 To UBound(v) : parm &= ChrW(v(i)) : Next i
         If InStr(parm, ChrW(0)) > 0 Then parm = Trim(Mid(parm, 1, InStr(parm, ChrW(0)) - 1))
-        If Len(parm) > 0 Then note = note & "Focus Settings Version:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Focus Settings Version:" & tb & parm & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H100)) Then
         i = uz.Tags.Item(sTag(&H100)).singleValue
         If i = 0 Then parm = "Off" Else If i = 1 Then parm = "On" Else parm = ""
-        If Len(parm) > 0 Then note = note & "Autofocus:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Autofocus:" & tb & parm & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H210)) Then
         i = uz.Tags.Item(sTag(&H210)).singleValue
-        note = note & "Scene Detect:" & tb & i & "\par "
+        note &= "Scene Detect:" & tb & i & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H300)) Then
         i = uz.Tags.Item(sTag(&H300)).singleValue
-        note = note & "Zoom Step Count:" & tb & i & "\par "
+        note &= "Zoom Step Count:" & tb & i & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H301)) Then
         i = uz.Tags.Item(sTag(&H301)).singleValue
-        note = note & "Focus Step Count:" & tb & i & "\par "
+        note &= "Focus Step Count:" & tb & i & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H303)) Then
         i = uz.Tags.Item(sTag(&H303)).singleValue
-        note = note & "Focus Step Infinity:" & tb & i & "\par "
+        note &= "Focus Step Infinity:" & tb & i & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H304)) Then
         i = uz.Tags.Item(sTag(&H304)).singleValue
-        note = note & "Focus Step Near:" & tb & i & "\par "
+        note &= "Focus Step Near:" & tb & i & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H305)) Then
@@ -7567,7 +7555,7 @@ Public Module ImageInfo
         ' "and cm when denominator is 10 (E-300), so if we ignore the denominator we are consistently in mm - PH"
         x = uz.Tags.Item(sTag(&H305)).singleValue
         x = x / 100 ' sometimes this should be / 10
-        If x > 0 Then note = note & "Focus Distance:" & tb & Format(x, "####,##0.##") & " m\par "
+        If x > 0 Then note &= "Focus Distance:" & tb & Format(x, "####,##0.##") & " m\par "
       End If
 
       If uz.Tags.Contains(sTag(&H308)) Then
@@ -7611,30 +7599,30 @@ Public Module ImageInfo
           '  Case Else : parm = ""
           'End Select
         End If
-        If Len(parm) > 0 Then note = note & "Autofocus Point:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Autofocus Point:" & tb & parm & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H1201)) Then
         v = uz.Tags.Item(sTag(&H1201)).value
         If v(0) = 0 Then parm = "Off" Else If v(0) = 1 Then parm = "On" Else parm = ""
-        If Len(parm) > 0 Then note = note & "External Flash:" & tb & parm & "\par "
+        If parm <> "" Then note &= "External Flash:" & tb & parm & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H1204)) Then
         v = uz.Tags.Item(sTag(&H1204)).value
         If v(0) = 0 Then parm = "Bounce or Off" Else If v(0) = 1 Then parm = "Direct" Else parm = ""
-        If Len(parm) > 0 Then note = note & "External Flash Bounce:" & tb & parm & "\par "
+        If parm <> "" Then note &= "External Flash Bounce:" & tb & parm & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H1205)) Then
         x = uz.Tags.Item(sTag(&H1205)).singleValue
-        If x > 0 Then note = note & "External Flash Zoom:" & tb & Format(x, "####,##0.###") & "\par "
+        If x > 0 Then note &= "External Flash Zoom:" & tb & Format(x, "####,##0.###") & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H1208)) Then
         v = uz.Tags.Item(sTag(&H1208)).value
         If v(0) = 0 Then parm = "Off" Else If v(0) = 1 Then parm = "On" Else parm = ""
-        If Len(parm) > 0 Then note = note & "Internal Flash:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Internal Flash:" & tb & parm & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H1209)) Then
@@ -7644,13 +7632,13 @@ Public Module ImageInfo
           x = 1 / v(1)
           If x < 1 Then parm &= " (" & Format(x, "#.##") & " strength)" Else parm &= " (full strength)"
         End If
-        If Len(parm) > 0 Then note = note & "Manual Flash:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Manual Flash:" & tb & parm & "\par "
       End If
 
       If uz.Tags.Contains(sTag(&H120A)) Then
         v = uz.Tags.Item(sTag(&H120A)).value
         If v(0) = 0 Then parm = "Off" Else If v(0) = 1 Then parm = "On" Else parm = ""
-        If Len(parm) > 0 Then note = note & "Macro LED:" & tb & parm & "\par "
+        If parm <> "" Then note &= "Macro LED:" & tb & parm & "\par "
       End If
 
 
@@ -7687,7 +7675,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i Mod 256)
       End Select
-      note = note & "JPG Quality:" & tb & parm & "\par "
+      note &= "JPG Quality:" & tb & parm & "\par "
       Select Case i \ 256
         Case 0
           parm = "Normal"
@@ -7698,7 +7686,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i \ 256)
       End Select
-      note = note & "Detail:" & tb & parm & "\par "
+      note &= "Detail:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(514)) Then
@@ -7715,23 +7703,23 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Macro Mode:" & tb & parm & "\par "
+      note &= "Macro Mode:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H204)) Then ' digital zoom, rational
       x = makerTags.Item(sTag(&H204)).singleValue
       If x > 0 Then parm = Format(x, "###0.0") Else parm = "Off"
-      note = note & "Digital Zoom:" & tb & parm & "\par "
+      note &= "Digital Zoom:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H207)) Then ' Firmware version, string
       parm = makerTags.Item(sTag(&H207)).singleValue
       If InStr(parm, ChrW(0)) > 0 Then parm = Trim(Mid(parm, 1, InStr(parm, ChrW(0)) - 1))
-      If Trim(parm) <> "" Then note = note & "Firmware Version:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note &= "Firmware Version:" & tb & Trim(parm) & "\par "
     End If
 
     If makerTags.Contains(sTag(520)) Then ' [picture info] [camera info], string
-      note = note & "Picture and Camera Info:" & tb & makerTags.Item(sTag(520)).singleValue & "\par "
+      note &= "Picture and Camera Info:" & tb & makerTags.Item(sTag(520)).singleValue & "\par "
     End If
 
     If makerTags.Contains(sTag(521)) Then ' camera ID, undefined
@@ -7739,10 +7727,10 @@ Public Module ImageInfo
       parm = ""
       For i = 0 To uuBound(v)
         If v(i) = 0 Then Exit For ' only the first string makes sense
-        parm = parm & ChrW(v(i))
+        parm &= ChrW(v(i))
       Next i
       parm = Trim(parm)
-      If Len(parm) > 0 Then note = note & "Camera ID Data:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Camera ID Data:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H20E)) Then ' [picture info] [camera info], string
@@ -7754,7 +7742,7 @@ Public Module ImageInfo
         Case 3 : parm = "Adjust Exposure"
         Case Else : parm = CStr(i)
       End Select
-      note = note & "Sequential Shot Method:" & tb & parm & "\par "
+      note &= "Sequential Shot Method:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H20F)) Then ' [picture info] [camera info], string
@@ -7767,7 +7755,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Wide Range:" & tb & parm & "\par "
+      note &= "Wide Range:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H210)) Then ' [picture info] [camera info], string
@@ -7778,7 +7766,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Color Adjustment Mode:" & tb & parm & "\par "
+      note &= "Color Adjustment Mode:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H213)) Then ' [picture info] [camera info], string
@@ -7791,7 +7779,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Quick Shot:" & tb & parm & "\par "
+      note &= "Quick Shot:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H214)) Then ' [picture info] [camera info], string
@@ -7804,7 +7792,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Self Timer:" & tb & parm & "\par "
+      note &= "Self Timer:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H216)) Then ' [picture info] [camera info], string
@@ -7817,7 +7805,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Memo Mode:" & tb & parm & "\par "
+      note &= "Memo Mode:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H217)) Then ' [picture info] [camera info], string
@@ -7830,7 +7818,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Record Shutter Release:" & tb & parm & "\par "
+      note &= "Record Shutter Release:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H218)) Then ' [picture info] [camera info], string
@@ -7843,7 +7831,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Flicker Reduction:" & tb & parm & "\par "
+      note &= "Flicker Reduction:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H219)) Then ' [picture info] [camera info], string
@@ -7856,7 +7844,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Optical Zoom:" & tb & parm & "\par "
+      note &= "Optical Zoom:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H21B)) Then ' [picture info] [camera info], string
@@ -7869,7 +7857,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Digital Zoom:" & tb & parm & "\par "
+      note &= "Digital Zoom:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H21D)) Then ' [picture info] [camera info], string
@@ -7882,7 +7870,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Special Light Source:" & tb & parm & "\par "
+      note &= "Special Light Source:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H21E)) Then ' [picture info] [camera info], string
@@ -7895,7 +7883,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Image Resaved?" & tb & parm & "\par "
+      note &= "Image Resaved?" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H21F)) Then ' [picture info] [camera info], string
@@ -7916,12 +7904,12 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Scene Selection:" & tb & parm & "\par "
+      note &= "Scene Selection:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H223)) Then ' [picture info] [camera info], string
       x = makerTags.Item(sTag(&H223)).singleValue
-      note = note & "Manual Focus Distance:" & tb & Format(x, "##,##0.0") & "\par "
+      note &= "Manual Focus Distance:" & tb & Format(x, "##,##0.0") & "\par "
     End If
 
     If makerTags.Contains(sTag(&H224)) Then ' [picture info] [camera info], string
@@ -7938,7 +7926,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Sequential Shot Interval:" & tb & parm & "\par "
+      note &= "Sequential Shot Interval:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H225)) Then ' [picture info] [camera info], string
@@ -7955,7 +7943,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Flash Mode:" & tb & parm & "\par "
+      note &= "Flash Mode:" & tb & parm & "\par "
     End If
 
   End Sub ' sanyo makernote
@@ -7974,18 +7962,18 @@ Public Module ImageInfo
       If k >= 0 Then
         For i = 0 To k
           If v(i) >= 1 And v(i) <= 9 Then v(i) = v(i) + 48
-          parm = parm & ChrW(v(i))
+          parm &= ChrW(v(i))
         Next i
         parm = splitString(parm)
       Else
         parm = v
       End If
-      If Trim(parm) <> "" Then note = note & "Makernote Version:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note &= "Makernote Version:" & tb & Trim(parm) & "\par "
     End If
 
     If makerTags.Contains(sTag(4096)) Then
       parm = makerTags.Item(sTag(4096)).singleValue
-      note = note & "Quality Setting:" & tb & parm & "\par "
+      note &= "Quality Setting:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(4097)) Then
@@ -8006,7 +7994,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Sharpness Setting:" & tb & parm & "\par "
+      note &= "Sharpness Setting:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(4098)) Then
@@ -8039,7 +8027,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "White Balance Setting:" & tb & parm & "\par "
+      note &= "White Balance Setting:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(4099)) Then
@@ -8062,7 +8050,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Color Saturation Setting:" & tb & parm & "\par "
+      note &= "Color Saturation Setting:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(4100)) Then
@@ -8083,12 +8071,12 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Contrast Setting:" & tb & parm & "\par "
+      note &= "Contrast Setting:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H1005)) Then
       v = makerTags.Item(sTag(&H1005)).singleValue
-      note = note & "Color Temperature:" & tb & v & "\par "
+      note &= "Color Temperature:" & tb & v & "\par "
     End If
 
     If makerTags.Contains(sTag(&H1006)) Then
@@ -8103,12 +8091,12 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Contrast:" & tb & parm & "\par "
+      note &= "Contrast:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H100A)) Then
       v = makerTags.Item(sTag(&H100A)).Value
-      If UBound(v) >= 1 Then note = note & "White Balance Fine Tune:" & tb & v(0) & " " & v(1) & "\par "
+      If UBound(v) >= 1 Then note &= "White Balance Fine Tune:" & tb & v(0) & " " & v(1) & "\par "
     End If
 
     If makerTags.Contains(sTag(&H100B)) Then
@@ -8121,7 +8109,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Noise Reduction:" & tb & parm & "\par "
+      note &= "Noise Reduction:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H1010)) Then
@@ -8140,12 +8128,12 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Flash Mode:" & tb & parm & "\par "
+      note &= "Flash Mode:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H1011)) Then
       x = makerTags.Item(sTag(&H1011)).singleValue
-      note = note & "Flash Compensation:" & tb & Format(x, "##0.0#") & "\par "
+      note &= "Flash Compensation:" & tb & Format(x, "##0.0#") & "\par "
     End If
 
     If makerTags.Contains(sTag(&H1020)) Then
@@ -8158,7 +8146,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Macro Mode:" & tb & parm & "\par "
+      note &= "Macro Mode:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H1021)) Then
@@ -8171,7 +8159,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Focus Mode:" & tb & parm & "\par "
+      note &= "Focus Mode:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H1030)) Then
@@ -8184,7 +8172,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Slow Synchro Mode:" & tb & parm & "\par "
+      note &= "Slow Synchro Mode:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H1031)) Then
@@ -8239,7 +8227,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Picture Mode:" & tb & parm & "\par "
+      note &= "Picture Mode:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H1100)) Then
@@ -8252,7 +8240,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Continuous or Auto Bracket Mode:" & tb & parm & "\par "
+      note &= "Continuous or Auto Bracket Mode:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H1300)) Then
@@ -8265,7 +8253,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Blur Warning:" & tb & parm & "\par "
+      note &= "Blur Warning:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H1301)) Then
@@ -8278,7 +8266,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Focus Warning Status:" & tb & parm & "\par "
+      note &= "Focus Warning Status:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H1302)) Then
@@ -8291,7 +8279,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Exposure Warning Status:" & tb & parm & "\par "
+      note &= "Exposure Warning Status:" & tb & parm & "\par "
     End If
     ' Fuji done
 
@@ -8318,7 +8306,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Image Quality:" & tb & parm & "\par "
+      note &= "Image Quality:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H202)) Then
@@ -8331,37 +8319,37 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Macro Mode:" & tb & parm & "\par "
+      note &= "Macro Mode:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H204)) Then
       x = makerTags.Item(sTag(&H204)).singleValue
       If x > 0 Then parm = Format(x, "##0.0") Else parm = "Off"
-      note = note & "Digital Zoom:" & tb & parm & "\par "
+      note &= "Digital Zoom:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H209)) Then
       v = makerTags.Item(sTag(&H209)).Value
       parm = ""
       For i = 0 To UBound(v)
-        parm = parm & ChrW(v(i))
+        parm &= ChrW(v(i))
       Next i
       'parm = splitString(parm)
       If InStr(parm, ChrW(0)) > 0 Then parm = Trim(Mid(parm, 1, InStr(parm, ChrW(0)) - 1))
-      If Len(parm) > 0 Then note = note & "Camera:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Camera:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H20B)) And makerTags.Contains(sTag(&H20C)) Then
       i = makerTags.Item(sTag(&H20B)).singleValue
       j = makerTags.Item(sTag(&H20C)).singleValue
-      note = note & "Image Size:" & tb & i & "x" & j & "\par "
+      note &= "Image Size:" & tb & i & "x" & j & "\par "
     End If
 
     If makerTags.Contains(sTag(&H20D)) Then
       parm = makerTags.Item(sTag(&H20D)).singleValue
       If InStr(parm, ChrW(0)) > 0 Then parm = Trim(Mid(parm, 1, InStr(parm, ChrW(0)) - 1))
       ' parm = splitString(parm)
-      If Len(parm) > 0 Then note = note & "Hardware Type:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Hardware Type:" & tb & parm & "\par "
     End If
     ' epson done
 
@@ -8397,7 +8385,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Recording Mode:" & tb & parm & "\par "
+      note &= "Recording Mode:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(2)) Then
@@ -8414,7 +8402,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "JPG Quality:" & tb & parm & "\par "
+      note &= "JPG Quality:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(3)) Then
@@ -8435,7 +8423,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Focus Mode:" & tb & parm & "\par "
+      note &= "Focus Mode:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(4)) Then
@@ -8452,7 +8440,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Flash Mode:" & tb & parm & "\par "
+      note &= "Flash Mode:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(5)) Then
@@ -8469,12 +8457,12 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Flash Intensity:" & tb & parm & "\par "
+      note &= "Flash Intensity:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(6)) Then
       i = makerTags.Item(sTag(6)).singleValue
-      note = note & "Object Distance:" & tb & Format(i / 1000, "##,##0.0#") & " m" & "\par "
+      note &= "Object Distance:" & tb & Format(i / 1000, "##,##0.0#") & " m" & "\par "
     End If
 
     If makerTags.Contains(sTag(7)) Then
@@ -8495,7 +8483,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "White Balance:" & tb & parm & "\par "
+      note &= "White Balance:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(10)) Then
@@ -8510,7 +8498,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Digital Zoom:" & tb & parm & "\par "
+      note &= "Digital Zoom:" & tb & parm & "\par "
     End If
 
 
@@ -8526,7 +8514,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Sharpness:" & tb & parm & "\par "
+      note &= "Sharpness:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(12)) Then
@@ -8541,7 +8529,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Contrast:" & tb & parm & "\par "
+      note &= "Contrast:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(13)) Then
@@ -8556,12 +8544,12 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Saturation:" & tb & parm & "\par "
+      note &= "Saturation:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(20)) Then
       i = makerTags.Item(sTag(20)).singleValue
-      note = note & "CCD Sensitivity:" & tb & i & "\par "
+      note &= "CCD Sensitivity:" & tb & i & "\par "
     End If
 
     'vOffset = 0
@@ -8570,9 +8558,9 @@ Public Module ImageInfo
     '  parm = ""
     '  For i = i To i + k - 1
     '    If v(i) = 0 Then Exit For
-    '    parm = parm & chrw(v(i))
+    '    parm &= chrw(v(i))
     '      next i
-    '  note = note & "21:     " & tb & parm & "\par "
+    '  note &= "21:     " & tb & parm & "\par "
     '    end If
 
     If makerTags.Contains(sTag(22)) Then
@@ -8591,7 +8579,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Enhancement:" & tb & parm & "\par "
+      note &= "Enhancement:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(23)) Then
@@ -8618,7 +8606,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Filter:         " & tb & parm & "\par "
+      note &= "Filter:         " & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(24)) Then
@@ -8629,7 +8617,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Focus Area:" & tb & parm & "\par "
+      note &= "Focus Area:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(25)) Then
@@ -8640,7 +8628,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Flash Intensity:" & tb & parm & "\par "
+      note &= "Flash Intensity:" & tb & parm & "\par "
     End If
     ' casio done
 
@@ -8648,7 +8636,7 @@ Public Module ImageInfo
 
   Sub kodakMakernote(ByRef makerTags As Collection, ByRef note As String)
 
-    Dim i, k As Integer
+    Dim i As Integer
     Dim parm As String = ""
     Dim v As Object
     Dim x As Double
@@ -8658,34 +8646,34 @@ Public Module ImageInfo
     If makerTags.Contains(sTag(9)) Then
       i = makerTags.Item(sTag(9)).singleValue
       If i = 1 Then parm = "Fine" Else If i = 2 Then parm = "Normal" Else parm = ""
-      If Len(parm) > 0 Then note = note & "Quality:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Quality:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(10)) Then
       i = makerTags.Item(sTag(10)).singleValue
       If i = 0 Then parm = "Off" Else If i = 1 Then parm = "On" Else parm = ""
-      If Len(parm) > 0 Then note = note & "Burst Mode:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Burst Mode:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(11)) Then
       i = makerTags.Item(sTag(11)).singleValue
       If i = 0 Then parm = "Normal" Else If i = 1 Then parm = "Close Up" Else parm = ""
-      If Len(parm) > 0 Then note = note & "Macro Mode:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Macro Mode:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(12)) Then
       v = makerTags.Item(sTag(12)).value
-      If uuBound(v) = 1 AndAlso (v(0) > 0 And v(1) > 0) Then note = note & "Image Size:" & tb & v(0) & " x " & v(1) & "\par "
+      If uuBound(v) = 1 AndAlso (v(0) > 0 And v(1) > 0) Then note &= "Image Size:" & tb & v(0) & " x " & v(1) & "\par "
     End If
 
     If makerTags.Contains(sTag(16)) Then
       parm = makerTags.Item(sTag(16)).singleValue
-      note = note & "Date:" & tb & parm & "\par "
+      note &= "Date:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(20)) Then
       parm = makerTags.Item(sTag(20)).singleValue
-      note = note & "Time:" & tb & parm & "\par "
+      note &= "Time:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(27)) Then
@@ -8700,7 +8688,7 @@ Public Module ImageInfo
         Case Else
           parm = ""
       End Select
-      If Len(parm) > 0 Then note = note & "Shutter Mode:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Shutter Mode:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(28)) Then
@@ -8715,19 +8703,19 @@ Public Module ImageInfo
         Case Else
           parm = ""
       End Select
-      If Len(parm) > 0 Then note = note & "Metering Mode:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Metering Mode:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(29)) Then
       i = makerTags.Item(sTag(29)).singleValue
       If i > 0 Then parm = i Else parm = ""
-      If Len(parm) > 0 Then note = note & "Burst Sequence Index:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Burst Sequence Index:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(30)) Then
       i = makerTags.Item(sTag(30)).singleValue
       If i > 0 Then parm = Format(i / 100, "##0.00") Else parm = ""
-      If Len(parm) > 0 Then note = note & "F-Number:" & tb & parm & "\par "
+      If parm <> "" Then note &= "F-Number:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(32)) Then
@@ -8738,13 +8726,13 @@ Public Module ImageInfo
       Else
         parm = Format(x, "##0.0") & " sec."
       End If
-      If Len(parm) > 0 Then note = note & "Exposure Time:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Exposure Time:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(36)) Then
       i = makerTags.Item(sTag(36)).singleValue
       parm = Format(i / 1000, "##0.0##")
-      If Len(parm) > 0 Then note = note & "Exposure Bias:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Exposure Bias:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(56)) Then
@@ -8759,20 +8747,20 @@ Public Module ImageInfo
         Case Else
           parm = ""
       End Select
-      If Len(parm) > 0 Then note = note & "Focus Mode:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Focus Mode:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(60)) Then
       i = makerTags.Item(sTag(60)).singleValue
       If i = 0 Then parm = "Normal" Else If i = -1 Then parm = "Infinity" Else parm = ""
-      If Len(parm) > 0 Then note = note & "Panorama Mode:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Panorama Mode:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(62)) Then
       i = makerTags.Item(sTag(62)).singleValue
       If i > 0 Then
         parm = Format(i - 25, "####,##0.#")
-        If Len(parm) > 0 Then note = note & "Subject Distance (Inches):" & tb & parm & "\par "
+        If parm <> "" Then note &= "Subject Distance (Inches):" & tb & parm & "\par "
       End If
     End If
 
@@ -8790,7 +8778,7 @@ Public Module ImageInfo
         Case Else
           parm = ""
       End Select
-      If Len(parm) > 0 Then note = note & "White Balance:" & tb & parm & "\par "
+      If parm <> "" Then note &= "White Balance:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(92)) Then
@@ -8807,37 +8795,37 @@ Public Module ImageInfo
         Case Else
           parm = ""
       End Select
-      If Len(parm) > 0 Then note = note & "Flash Mode:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Flash Mode:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(93)) Then
       i = makerTags.Item(sTag(93)).singleValue
       If i = 0 Then parm = "No" Else If i = 1 Then parm = "Yes" Else parm = ""
-      If Len(parm) > 0 Then note = note & "Flash Fired:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Flash Fired:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(94)) Then
       i = makerTags.Item(sTag(94)).singleValue
       parm = Format(i, "####,##0")
-      If Len(parm) > 0 Then note = note & "ISO Setting:" & tb & parm & "\par "
+      If parm <> "" Then note &= "ISO Setting:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(96)) Then
       i = makerTags.Item(sTag(96)).singleValue
       parm = Format(i, "####,##0")
-      If Len(parm) > 0 Then note = note & "ISO:" & tb & parm & "\par "
+      If parm <> "" Then note &= "ISO:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(98)) Then
       i = makerTags.Item(sTag(98)).singleValue
       parm = Format(i / 100, "####,##0.##")
-      If Len(parm) > 0 Then note = note & "Total Zoom:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Total Zoom:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(100)) Then
       i = makerTags.Item(sTag(100)).singleValue
       parm = Format(i, "####,##0")
-      If Len(parm) > 0 Then note = note & "Date-Time Stamp Mode:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Date-Time Stamp Mode:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(102)) Then
@@ -8858,13 +8846,13 @@ Public Module ImageInfo
         Case Else
           parm = ""
       End Select
-      If Len(parm) > 0 Then note = note & "Color Mode:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Color Mode:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(104)) Then
       i = makerTags.Item(sTag(104)).singleValue
       parm = Format(i / 100, "####,##0.##")
-      If Len(parm) > 0 Then note = note & "Digital Zoom Factor:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Digital Zoom Factor:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(107)) Then
@@ -8879,8 +8867,7 @@ Public Module ImageInfo
         Case Else
           parm = ""
       End Select
-      If Len(parm) > 0 Then note = note & "Sharpness:" & tb & parm & "\par "
-      k = k + 1
+      If parm <> "" Then note &= "Sharpness:" & tb & parm & "\par "
     End If
     ' kodak done
 
@@ -8900,13 +8887,13 @@ Public Module ImageInfo
       parm = ""
       If IsArray(v) Then
         For i = 0 To UBound(v)
-          parm = parm & ChrW(v(i))
+          parm &= ChrW(v(i))
         Next i
       Else
         parm = ChrW(v)
       End If
       If Trim(parm) <> "" Then
-        note = note & "Maker Note Version:" & tb & Trim(parm) & "\par "
+        note &= "Maker Note Version:" & tb & Trim(parm) & "\par "
         makerVersion = Val(Trim(parm))
       End If
     End If
@@ -8931,7 +8918,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Image Quality:" & tb & parm & "\par "
+      note &= "Image Quality:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(3)) Then
@@ -8960,7 +8947,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "White Balance:" & tb & parm & "\par "
+      note &= "White Balance:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(7)) Then
@@ -8983,7 +8970,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Focus Mode:" & tb & parm & "\par "
+      note &= "Focus Mode:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(15)) Then
@@ -9003,7 +8990,7 @@ Public Module ImageInfo
         If v(0) = 64 And v(1) = 0 Then parm = "Face Detect"
         If v(0) = 128 And v(1) = 0 Then parm = "Spot Focusing 2"
       End If
-      note = note & "Autofocus Mode:" & tb & parm & "\par "
+      note &= "Autofocus Mode:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(26)) Then
@@ -9022,7 +9009,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Image Stabilizer:" & tb & parm & "\par "
+      note &= "Image Stabilizer:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(28)) Then
@@ -9039,7 +9026,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Macro Mode:" & tb & parm & "\par "
+      note &= "Macro Mode:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(31)) Then
@@ -9200,7 +9187,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Shooting Mode:" & tb & parm & "\par "
+      note &= "Shooting Mode:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(32)) Then
@@ -9215,32 +9202,32 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Audio:" & tb & parm & "\par "
+      note &= "Audio:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(35)) Then
       x = makerTags.Item(sTag(35)).singleValue
       parm = Format(x, "###0.0#")
-      note = note & "White Balance Bias:" & tb & parm & "\par "
+      note &= "White Balance Bias:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(36)) Then
       x = makerTags.Item(sTag(36)).singleValue
-      If x > 32767 Then x = x - 65536
+      If x > 32767 Then x -= 65536
       parm = Format(x, "###0.0#")
-      note = note & "Flash Bias:" & tb & parm & "\par "
+      note &= "Flash Bias:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(37)) Then
       x = makerTags.Item(sTag(37)).singleValue
       parm = x
-      note = note & "Internal Serial Number:" & tb & parm & "\par "
+      note &= "Internal Serial Number:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(38)) Then
       x = makerTags.Item(sTag(38)).singleValue
       parm = x
-      note = note & "Panasonic Exif Version:" & tb & parm & "\par "
+      note &= "Panasonic Exif Version:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(40)) Then
@@ -9263,13 +9250,13 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Color Effect:" & tb & parm & "\par "
+      note &= "Color Effect:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(41)) Then
       x = makerTags.Item(sTag(41)).singleValue
       parm = Format(x / 100, "###0.0#")
-      note = note & "Seconds Since Power On:" & tb & parm & "\par "
+      note &= "Seconds Since Power On:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(42)) Then
@@ -9290,13 +9277,13 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Burst Mode:" & tb & parm & "\par "
+      note &= "Burst Mode:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(43)) Then
       x = makerTags.Item(sTag(43)).singleValue
       parm = Format(x, "###,##0")
-      If x > 0 Then note = note & "Sequence Number:" & tb & parm & "\par "
+      If x > 0 Then note &= "Sequence Number:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(44)) Then
@@ -9420,7 +9407,7 @@ Public Module ImageInfo
         End Select
       End If
 
-      note = note & "Contrast:" & tb & parm & "\par "
+      note &= "Contrast:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(45)) Then
@@ -9439,12 +9426,12 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Noise Reduction:" & tb & parm & "\par "
+      note &= "Noise Reduction:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(46)) Then
       i = makerTags.Item(sTag(46)).singleValue
-      v = makerTags.Item(sTag(46)).Value
+      'v = makerTags.Item(sTag(46)).Value
       Select Case i
         Case 1
           parm = "Off (or 10x3)"
@@ -9457,7 +9444,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Self Timer:" & tb & parm & "\par "
+      note &= "Self Timer:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(48)) Then
@@ -9474,7 +9461,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Rotation:" & tb & parm & "\par "
+      note &= "Rotation:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(49)) Then
@@ -9491,7 +9478,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Autofocus Assist Lamp:" & tb & parm & "\par "
+      note &= "Autofocus Assist Lamp:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(50)) Then
@@ -9506,7 +9493,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Color Mode:" & tb & parm & "\par "
+      note &= "Color Mode:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(51)) Then
@@ -9514,7 +9501,7 @@ Public Module ImageInfo
       If parm Is Nothing Then parm = "" ' prevents error if zero-length array
       If InStr(parm, ChrW(0)) > 0 Then parm = Left(parm, InStr(parm, ChrW(0)) - 1)
       parm = parm.Trim
-      If Len(parm) > 0 AndAlso parm.IndexOf("00:00:00") < 0 AndAlso Asc(parm.Chars(0)) > 31 Then note = note & "Baby or Pet Age:" & tb & parm & "\par "
+      If parm <> "" AndAlso parm.IndexOf("00:00:00") < 0 AndAlso Asc(parm.Chars(0)) > 31 Then note &= "Baby or Pet Age:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(52)) Then
@@ -9527,7 +9514,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Optical Zoom Mode:" & tb & parm & "\par "
+      note &= "Optical Zoom Mode:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(53)) Then
@@ -9544,22 +9531,22 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Conversion Lens:" & tb & parm & "\par "
+      note &= "Conversion Lens:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(54)) Then
       x = makerTags.Item(sTag(54)).singleValue
       If x <> 65535 Then
         parm = Format(x, "####,##0")
-        note = note & "Travel Day:" & tb & parm & "\par "
+        note &= "Travel Day:" & tb & parm & "\par "
       End If
     End If
 
     If makerTags.Contains(sTag(57)) Then
       x = makerTags.Item(sTag(57)).singleValue
-      If x > 32767 And x < 65536 Then x = x - 65536
+      If x > 32767 And x < 65536 Then x -= 65536
       parm = Format(x, "##,##0")
-      note = note & "Contrast:" & tb & parm & "\par "
+      note &= "Contrast:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(58)) Then
@@ -9572,14 +9559,14 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "World Time Location:" & tb & parm & "\par "
+      note &= "World Time Location:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(60)) Then
       x = makerTags.Item(sTag(60)).singleValue
-      If x > 32767 And x < 65536 Then x = x - 65536
-      If x = -2 Then parm = "Intelligent ISO" Else x = parm = Format(x, "##,##0")
-      note = note & "Program:" & tb & parm & "\par "
+      If x > 32767 And x < 65536 Then x -= 65536
+      If x = -2 Then parm = "Intelligent ISO" Else parm = Format(x, "##,##0")
+      note &= "Program:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(61)) Then
@@ -9612,7 +9599,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Advanced Scene Mode:" & tb & parm & "\par "
+      note &= "Advanced Scene Mode:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(62)) Then
@@ -9625,27 +9612,27 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Text Stamp:" & tb & parm & "\par "
+      note &= "Text Stamp:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(63)) Then
       i = makerTags.Item(sTag(63)).singleValue
       parm = CStr(i)
-      note = note & "Faces Detected:" & tb & parm & "\par "
+      note &= "Faces Detected:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(64)) Then
       x = makerTags.Item(sTag(64)).singleValue
-      If x > 32767 And x < 65536 Then x = x - 65536
+      If x > 32767 And x < 65536 Then x -= 65536
       parm = Format(x, "##,##0")
-      note = note & "Saturation:" & tb & parm & "\par "
+      note &= "Saturation:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(65)) Then
       x = makerTags.Item(sTag(65)).singleValue
-      If x > 32767 And x < 65536 Then x = x - 65536
+      If x > 32767 And x < 65536 Then x -= 65536
       parm = Format(x, "##,##0")
-      note = note & "Sharpness:" & tb & parm & "\par "
+      note &= "Sharpness:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(66)) Then
@@ -9674,13 +9661,13 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Film Mode:" & tb & parm & "\par "
+      note &= "Film Mode:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(68)) Then
       x = makerTags.Item(sTag(68)).singleValue
       parm = Format(x, "##,##0")
-      note = note & "Color Temperature (Kelvin):" & tb & parm & "\par "
+      note &= "Color Temperature (Kelvin):" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(69)) Then
@@ -9703,19 +9690,19 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Bracket Settings:" & tb & parm & "\par "
+      note &= "Bracket Settings:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(70)) Then
       x = makerTags.Item(sTag(70)).singleValue
       parm = Format(x, "##,##0")
-      note = note & "White Balance Blue Shift:" & tb & parm & "\par "
+      note &= "White Balance Blue Shift:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(71)) Then
       x = makerTags.Item(sTag(71)).singleValue
       parm = Format(x, "##,##0")
-      note = note & "White Balance Green Shift:" & tb & parm & "\par "
+      note &= "White Balance Green Shift:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(72)) Then
@@ -9730,7 +9717,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      If i > 0 Then note = note & "Flash Curtain:" & tb & parm & "\par "
+      If i > 0 Then note &= "Flash Curtain:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(73)) Then
@@ -9743,20 +9730,20 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Long Exposure N.R.:" & tb & parm & "\par "
+      note &= "Long Exposure N.R.:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(75)) And makerTags.Contains(sTag(76)) Then
       parm = Format(makerTags.Item(sTag(75)).singleValue, "##,##0") & " x " &
-             Format(makerTags.Item(sTag(76)).singleValue, "##,##0") &
-      note = note & "Panasonic Image Size:" & tb & parm & "\par "
+             Format(makerTags.Item(sTag(76)).singleValue, "##,##0")
+      note &= "Panasonic Image Size:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(77)) Then
       v = makerTags.Item(sTag(77)).value
       If IsArray(v) AndAlso UBound(v) = 1 AndAlso (v(0) >= 0 And v(0) <= 1 And v(1) >= 0 And v(1) <= 1) Then
         parm = "(" & Format(v(0), "##,##0") & ", " & Format(v(1), "##,##0") & ")"
-        note = note & "AF Point Position:" & tb & parm & "\par "
+        note &= "AF Point Position:" & tb & parm & "\par "
       End If
     End If
 
@@ -9776,13 +9763,13 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Intelligent Resolution:" & tb & parm & "\par "
+      note &= "Intelligent Resolution:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(119)) Then
       x = makerTags.Item(sTag(119)).singleValue
       parm = Format(x, "##,##0")
-      note = note & "Burst Speed:" & tb & parm & "\par "
+      note &= "Burst Speed:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(121)) Then
@@ -9801,7 +9788,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Intelligent D-Range:" & tb & parm & "\par "
+      note &= "Intelligent D-Range:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(124)) Then
@@ -9814,21 +9801,21 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Clear Retouch:" & tb & parm & "\par "
+      note &= "Clear Retouch:" & tb & parm & "\par "
 
       If i = 1 AndAlso makerTags.Contains(sTag(163)) Then
         x = makerTags.Item(sTag(163)).singleValue
         parm = Format(x, "##,##0.###########")
-        note = note & "Clear Retouch Value:" & tb & parm & "\par "
+        note &= "Clear Retouch Value:" & tb & parm & "\par "
       End If
 
     End If
 
     If makerTags.Contains(sTag(134)) Then
       x = makerTags.Item(sTag(134)).singleValue
-      If x > 32767 Then x = x - 65536
+      If x > 32767 Then x -= 65536
       parm = Format(x, "##,##0")
-      If x <> -1 Then note = note & "Air Pressure (hPa):" & tb & parm & "\par "
+      If x <> -1 Then note &= "Air Pressure (hPa):" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(137)) Then
@@ -9851,7 +9838,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Photo Style:" & tb & parm & "\par "
+      note &= "Photo Style:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(138)) Then
@@ -9864,42 +9851,42 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Clear Retouch:" & tb & parm & "\par "
+      note &= "Clear Retouch:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(140)) Then
       x = makerTags.Item(sTag(140)).singleValue
       If x > 32767 Then x -= 65536
       parm = Format(x / 256, "##,##0.00") & " g"
-      note = note & "Camera Acceleration Up:" & tb & parm & "\par "
+      note &= "Camera Acceleration Up:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(141)) Then
       x = makerTags.Item(sTag(141)).singleValue
       If x > 32767 Then x -= 65536
       parm = Format(x / 256, "##,##0.00") & " g"
-      note = note & "Camera Acceleration Left:" & tb & parm & "\par "
+      note &= "Camera Acceleration Left:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(142)) Then
       x = makerTags.Item(sTag(142)).singleValue
       If x > 32767 Then x -= 65536
       parm = Format(x / 256, "##,##0.00") & " g"
-      note = note & "Camera Acceleration Back:" & tb & parm & "\par "
+      note &= "Camera Acceleration Back:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(144)) Then
       x = makerTags.Item(sTag(144)).singleValue
       If x > 32767 Then x -= 65536
       parm = Format(x / 10, "##,##0.0") & "°"
-      note = note & "Camera Roll Angle:" & tb & parm & "\par "
+      note &= "Camera Roll Angle:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(145)) Then
       x = makerTags.Item(sTag(145)).singleValue
       If x > 32767 Then x -= 65536
       parm = Format(x / 10, "##,##0.0") & "°"
-      note = note & "Camera Pitch Angle:" & tb & parm & "\par "
+      note &= "Camera Pitch Angle:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(143)) Then
@@ -9920,7 +9907,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Camera Orientation:" & tb & parm & "\par "
+      note &= "Camera Orientation:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(147)) Then
@@ -9939,13 +9926,13 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Sweep Panorama Direction:" & tb & parm & "\par "
+      note &= "Sweep Panorama Direction:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(148)) Then
       x = makerTags.Item(sTag(148)).singleValue
       parm = Format(x, "##,##0")
-      note = note & "Sweep Panorama Field of View:" & tb & parm & "\par "
+      note &= "Sweep Panorama Field of View:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(150)) Then
@@ -9960,13 +9947,13 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Timer Recording:" & tb & parm & "\par "
+      note &= "Timer Recording:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(157)) Then
       x = makerTags.Item(sTag(157)).singleValue
       parm = Format(x, "##,##0.###")
-      note = note & "Internal ND Filter:" & tb & parm & "\par "
+      note &= "Internal ND Filter:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(158)) Then
@@ -9989,7 +9976,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "HDR:" & tb & parm & "\par "
+      note &= "HDR:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(159)) Then
@@ -10004,7 +9991,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Shutter Type:" & tb & parm & "\par "
+      note &= "Shutter Type:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(171)) Then
@@ -10017,7 +10004,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Touch AE:" & tb & parm & "\par "
+      note &= "Touch AE:" & tb & parm & "\par "
     End If
 
     '    If makerTags.Contains(sTag(78)) Then
@@ -10029,7 +10016,7 @@ Public Module ImageInfo
     ' parm &= "\par " & tb & "(" & BitConverter.ToInt32(v, k * 16 + 4) & ", " & BitConverter.ToInt32(v, k * 16 + 8) & ", " & _
     '   BitConverter.ToInt32(v, k * 16 + 12) & ", " & BitConverter.ToInt32(v, k * 16 + 16) & ")"
     ' Next k
-    ' note = note & "Faces Detected:" & tb & parm & "\par "
+    ' note &= "Faces Detected:" & tb & parm & "\par "
     ' End If
     ' End If
 
@@ -10042,10 +10029,10 @@ Public Module ImageInfo
           parm = ""
           For i = 0 To UBound(v)
             If v(i) = 0 Then Exit For
-            parm = parm & ChrW(v(i))
+            parm &= ChrW(v(i))
           Next i
           parm = Trim(parm)
-          If Len(parm) > 0 Then note = note & "Internal Serial Number:" & tb & parm & "\par "
+          If parm <> "" Then note &= "Internal Serial Number:" & tb & parm & "\par "
         End If
       End If
 
@@ -10054,27 +10041,27 @@ Public Module ImageInfo
         parm = makerTags.Item(sTag(81)).singleValue
         i = parm.IndexOf(Chr(0))
         If i >= 0 Then parm = parm.Substring(0, i)
-        If Trim(parm) <> "" Then note = note & "Lens Type:" & tb & Trim(parm) & "\par "
+        If Trim(parm) <> "" Then note &= "Lens Type:" & tb & Trim(parm) & "\par "
       End If
 
       If makerTags.Contains(sTag(82)) Then
         parm = makerTags.Item(sTag(82)).singleValue
         i = parm.IndexOf(Chr(0))
         If i >= 0 Then parm = parm.Substring(0, i)
-        If Trim(parm) <> "" Then note = note & "Lens Serial Number:" & tb & Trim(parm) & "\par "
+        If Trim(parm) <> "" Then note &= "Lens Serial Number:" & tb & Trim(parm) & "\par "
       End If
 
       If makerTags.Contains(sTag(83)) Then
         parm = makerTags.Item(sTag(83)).singleValue
         i = parm.IndexOf(Chr(0))
         If i >= 0 Then parm = parm.Substring(0, i)
-        If Trim(parm) <> "" Then note = note & "Accessory Type:" & tb & Trim(parm) & "\par "
+        If Trim(parm) <> "" Then note &= "Accessory Type:" & tb & Trim(parm) & "\par "
       End If
 
       If makerTags.Contains(sTag(&H8010)) Then
         parm = makerTags.Item(sTag(&H8010)).singleValue
         parm = Trim(parm)
-        If Len(parm) > 0 AndAlso parm.IndexOf("00:00:00") < 0 Then note = note & "Baby or Pet Age:" & tb & parm & "\par "
+        If parm <> "" AndAlso parm.IndexOf("00:00:00") < 0 Then note &= "Baby or Pet Age:" & tb & parm & "\par "
       End If
 
 
@@ -10084,7 +10071,7 @@ Public Module ImageInfo
         parm = ""
         If IsArray(v) Then
           For i = 0 To UBound(v)
-            parm = parm & ChrW(v(i))
+            parm &= ChrW(v(i))
           Next i
         Else
           parm = ChrW(v)
@@ -10094,19 +10081,19 @@ Public Module ImageInfo
         i = s.IndexOf(Chr(0))
         If i >= 0 Then s = s.Substring(0, i)
         s = s.Trim
-        If Len(s) > 0 Then note = note & "Internal Serial Number:" & tb & s & "\par "
+        If Len(s) > 0 Then note &= "Internal Serial Number:" & tb & s & "\par "
 
         s = parm.Substring(90, 35)
         i = s.IndexOf(Chr(0))
         If i >= 0 Then s = s.Substring(0, i)
         s = s.Trim
-        If Len(s) > 0 Then note = note & "Lens Type:" & tb & s & "\par "
+        If Len(s) > 0 Then note &= "Lens Type:" & tb & s & "\par "
 
         s = parm.Substring(126, 13)
         i = s.IndexOf(Chr(0))
         If i >= 0 Then s = s.Substring(0, i)
         s = s.Trim
-        If Len(s) > 0 Then note = note & "Lens Serial Number:" & tb & s & "\par "
+        If Len(s) > 0 Then note &= "Lens Serial Number:" & tb & s & "\par "
 
       End If
     End If
@@ -10269,25 +10256,25 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Scene Mode:" & tb & parm & "\par "
+      note &= "Scene Mode:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H8004)) Then
       x = makerTags.Item(sTag(&H8004)).singleValue
       parm = Format(x, "####,##0")
-      note = note & "White Balance Red Level:" & tb & parm & "\par "
+      note &= "White Balance Red Level:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H8005)) Then
       x = makerTags.Item(sTag(&H8005)).singleValue
       parm = Format(x, "####,##0")
-      note = note & "White Balance Green Level:" & tb & parm & "\par "
+      note &= "White Balance Green Level:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H8006)) Then
       x = makerTags.Item(sTag(&H8006)).singleValue
       parm = Format(x, "####,##0")
-      note = note & "White Balance Blue Level:" & tb & parm & "\par "
+      note &= "White Balance Blue Level:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H8007)) Then
@@ -10300,7 +10287,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Flash Fired:" & tb & parm & "\par "
+      note &= "Flash Fired:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H8008)) Then
@@ -10313,7 +10300,7 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Text Stamp:" & tb & parm & "\par "
+      note &= "Text Stamp:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H8009)) Then
@@ -10326,12 +10313,12 @@ Public Module ImageInfo
         Case Else
           parm = CStr(i)
       End Select
-      note = note & "Text Stamp:" & tb & parm & "\par "
+      note &= "Text Stamp:" & tb & parm & "\par "
     End If
 
   End Sub ' panasonicMakernote
 
-  Sub sonyMakernote(ByRef makerTags As Collection, ByRef note As String, intel As Boolean)
+  Sub sonyMakernote(ByRef makerTags As Collection, ByRef note As String)
 
     Dim i, j, k As Integer
     Dim iu As Long
@@ -10373,13 +10360,13 @@ Public Module ImageInfo
         Case Else
           parm = ""
       End Select
-      If Len(parm) > 0 Then note = note & "Quality:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Quality:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H104)) Then
       x = makerTags.Item(sTag(&H104)).singleValue
       parm = Format(x, "##,##0.0###")
-      note = note & "Flash Exposure Compensation:" & tb & parm & "\par "
+      note &= "Flash Exposure Compensation:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H105)) Then
@@ -10398,13 +10385,13 @@ Public Module ImageInfo
         Case Else
           parm = ""
       End Select
-      If Len(parm) > 0 Then note = note & "Teleconverter:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Teleconverter:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H112)) Then
       x = makerTags.Item(sTag(&H112)).singleValue
       parm = Format(x, "##,##0")
-      note = note & "White Balance Fine Tune:" & tb & parm & "\par "
+      note &= "White Balance Fine Tune:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H115)) Then
@@ -10431,7 +10418,7 @@ Public Module ImageInfo
         Case Else
           parm = ""
       End Select
-      If Len(parm) > 0 Then note = note & "White Balance:" & tb & parm & "\par "
+      If parm <> "" Then note &= "White Balance:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H1003)) Then
@@ -10447,17 +10434,17 @@ Public Module ImageInfo
           End If
         Next x
         If k > 0 AndAlso UBound(v) >= 10 Then
-          note = note & "Panorama Full Width:" & tb & Format(v(0), "##,##0") & "\par "
-          note = note & "Panorama Full Height:" & tb & Format(v(1), "##,##0") & "\par "
-          note = note & "Panorama Direction:" & tb & Format(v(2), "##,##0") & "\par "
-          note = note & "Panorama Crop Left:" & tb & Format(v(3), "##,##0") & "\par "
-          note = note & "Panorama Crop Top:" & tb & Format(v(4), "##,##0") & "\par "
-          note = note & "Panorama Crop Right:" & tb & Format(v(5), "##,##0") & "\par "
-          note = note & "Panorama Crop Bottom:" & tb & Format(v(6), "##,##0") & "\par "
-          note = note & "Panorama Frame Width:" & tb & Format(v(7), "##,##0") & "\par "
-          note = note & "Panorama Frame Height:" & tb & Format(v(8), "##,##0") & "\par "
-          note = note & "Panorama Source Width:" & tb & Format(v(9), "##,##0") & "\par "
-          note = note & "Panorama Source Height:" & tb & Format(v(10), "##,##0") & "\par "
+          note &= "Panorama Full Width:" & tb & Format(v(0), "##,##0") & "\par "
+          note &= "Panorama Full Height:" & tb & Format(v(1), "##,##0") & "\par "
+          note &= "Panorama Direction:" & tb & Format(v(2), "##,##0") & "\par "
+          note &= "Panorama Crop Left:" & tb & Format(v(3), "##,##0") & "\par "
+          note &= "Panorama Crop Top:" & tb & Format(v(4), "##,##0") & "\par "
+          note &= "Panorama Crop Right:" & tb & Format(v(5), "##,##0") & "\par "
+          note &= "Panorama Crop Bottom:" & tb & Format(v(6), "##,##0") & "\par "
+          note &= "Panorama Frame Width:" & tb & Format(v(7), "##,##0") & "\par "
+          note &= "Panorama Frame Height:" & tb & Format(v(8), "##,##0") & "\par "
+          note &= "Panorama Source Width:" & tb & Format(v(9), "##,##0") & "\par "
+          note &= "Panorama Source Height:" & tb & Format(v(10), "##,##0") & "\par "
         End If
       End If
     End If
@@ -10465,31 +10452,31 @@ Public Module ImageInfo
     If makerTags.Contains(sTag(&H2002)) Then
       x = makerTags.Item(sTag(&H2002)).singleValue
       parm = Format(x, "##,##0")
-      note = note & "Rating:" & tb & parm & "\par "
+      note &= "Rating:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H2004)) Then
       x = makerTags.Item(sTag(&H2004)).singleValue
       parm = Format(x, "##,##0")
-      note = note & "Contrast:" & tb & parm & "\par "
+      note &= "Contrast:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H2005)) Then
       x = makerTags.Item(sTag(&H2006)).singleValue
       parm = Format(x, "##,##0")
-      note = note & "Saturation:" & tb & parm & "\par "
+      note &= "Saturation:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H2006)) Then
       x = makerTags.Item(sTag(&H2006)).singleValue
       parm = Format(x, "##,##0")
-      note = note & "Sharpness:" & tb & parm & "\par "
+      note &= "Sharpness:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H2007)) Then
       x = makerTags.Item(sTag(&H2007)).singleValue
       parm = Format(x, "##,##0")
-      note = note & "Brightness:" & tb & parm & "\par "
+      note &= "Brightness:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H2008)) Then
@@ -10508,7 +10495,7 @@ Public Module ImageInfo
         Case Else
           parm = ""
       End Select
-      If Len(parm) > 0 Then note = note & "Long Exposure Noise Reduction:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Long Exposure Noise Reduction:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H2009)) Then
@@ -10527,7 +10514,7 @@ Public Module ImageInfo
         Case Else
           parm = ""
       End Select
-      If Len(parm) > 0 Then note = note & "High ISO Noise Reduction:" & tb & parm & "\par "
+      If parm <> "" Then note &= "High ISO Noise Reduction:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H200A)) Then
@@ -10544,7 +10531,7 @@ Public Module ImageInfo
         Case Else
           parm = ""
       End Select
-      If Len(parm) > 0 Then note = note & "HDR:" & tb & parm & "\par "
+      If parm <> "" Then note &= "HDR:" & tb & parm & "\par "
       If i > 0 Then
         Select Case k
           Case 0
@@ -10558,7 +10545,7 @@ Public Module ImageInfo
           Case Else
             parm = ""
         End Select
-        If Len(parm) > 0 Then note = note & "HDR Image:" & tb & parm & "\par "
+        If parm <> "" Then note &= "HDR Image:" & tb & parm & "\par "
       End If
     End If
 
@@ -10572,13 +10559,13 @@ Public Module ImageInfo
         Case Else
           parm = ""
       End Select
-      If Len(parm) > 0 Then note = note & "Multiframe Noise Reduction:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Multiframe Noise Reduction:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H200E)) Then
       iu = makerTags.Item(sTag(&H200E)).singleValue
       If sonyPictureEffect.ContainsKey(iu) Then
-        note = note & "Picture effect:" & tb & sonyPictureEffect(i) & "\par "
+        note &= "Picture effect:" & tb & sonyPictureEffect(i) & "\par "
       End If
     End If
 
@@ -10596,7 +10583,7 @@ Public Module ImageInfo
         Case Else
           parm = ""
       End Select
-      If Len(parm) > 0 Then note = note & "Soft Skin Effect:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Soft Skin Effect:" & tb & parm & "\par "
     End If
 
 
@@ -10623,7 +10610,7 @@ Public Module ImageInfo
         Case Else
           parm = ""
       End Select
-      If Len(parm) > 0 Then note = note & "Vignetting Correction:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Vignetting Correction:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H2012)) Then
@@ -10636,7 +10623,7 @@ Public Module ImageInfo
         Case Else
           parm = ""
       End Select
-      If Len(parm) > 0 Then note = note & "Lateral Chromatic Aberration:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Lateral Chromatic Aberration:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H2013)) Then
@@ -10649,22 +10636,22 @@ Public Module ImageInfo
         Case Else
           parm = ""
       End Select
-      If Len(parm) > 0 Then note = note & "Distortion Correction Setting:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Distortion Correction Setting:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H2014)) Then
       v = makerTags.Item(sTag(&H2014)).value
       If IsArray(v) AndAlso UBound(v) >= 1 Then
-        note = note & "White Balance Amber Shift:" & tb & Format(v(0), "##,##0") & "\par "
-        note = note & "White Balance Magenta Shift:" & tb & Format(v(1), "##,##0") & "\par "
+        note &= "White Balance Amber Shift:" & tb & Format(v(0), "##,##0") & "\par "
+        note &= "White Balance Magenta Shift:" & tb & Format(v(1), "##,##0") & "\par "
       End If
     End If
 
     If makerTags.Contains(sTag(&H2026)) Then
       v = makerTags.Item(sTag(&H2026)).value
       If IsArray(v) AndAlso UBound(v) >= 1 Then
-        note = note & "White Balance Amber Precice Shift:" & tb & Format(v(0), "##,##0") & "\par "
-        note = note & "White Balance Magenta Precise Shift:" & tb & Format(v(1), "##,##0") & "\par "
+        note &= "White Balance Amber Precice Shift:" & tb & Format(v(0), "##,##0") & "\par "
+        note &= "White Balance Magenta Precise Shift:" & tb & Format(v(1), "##,##0") & "\par "
       End If
     End If
 
@@ -10678,7 +10665,7 @@ Public Module ImageInfo
         Case Else
           parm = ""
       End Select
-      If Len(parm) > 0 Then note = note & "Auto Portrait Framed:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Auto Portrait Framed:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H2017)) Then
@@ -10695,7 +10682,7 @@ Public Module ImageInfo
         Case Else
           parm = ""
       End Select
-      If Len(parm) > 0 Then note = note & "Flash Action:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Flash Action:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H201A)) Then
@@ -10708,7 +10695,7 @@ Public Module ImageInfo
         Case Else
           parm = ""
       End Select
-      If Len(parm) > 0 Then note = note & "Electronic Front Curtain Shutter:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Electronic Front Curtain Shutter:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H201B)) Then
@@ -10729,7 +10716,7 @@ Public Module ImageInfo
         Case Else
           parm = iu
       End Select
-      If Len(parm) > 0 Then note = note & "Focus Mode:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Focus Mode:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H201C)) Then
@@ -10754,7 +10741,7 @@ Public Module ImageInfo
         Case Else
           parm = iu
       End Select
-      If Len(parm) > 0 Then note = note & "Auto Focus Area Mode:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Auto Focus Area Mode:" & tb & parm & "\par "
     End If
 
 
@@ -10762,13 +10749,13 @@ Public Module ImageInfo
       v = makerTags.Item(sTag(&H201D)).value
       If IsArray(v) AndAlso UBound(v) = 1 AndAlso (v(0) >= 0 And v(0) <= 1 And v(1) >= 0 And v(1) <= 1) Then
         parm = "(" & Format(v(0), "##,##0") & ", " & Format(v(1), "##,##0") & ")"
-        note = note & "Flexible Spot Position:" & tb & parm & "\par "
+        note &= "Flexible Spot Position:" & tb & parm & "\par "
       End If
     End If
 
     If makerTags.Contains(sTag(&H201E)) Then
       iu = makerTags.Item(sTag(&H201E)).singleValue
-      If Len(parm) > 0 Then note = note & "Autofocus Point Select:" & tb & iu & "\par "
+      If parm <> "" Then note &= "Autofocus Point Select:" & tb & iu & "\par "
     End If
 
     If makerTags.Contains(sTag(&H2020)) Then
@@ -10786,7 +10773,7 @@ Public Module ImageInfo
           For Each i In v
             parm &= Hex$(i) & " "
           Next i
-          note = note & "Auto Focus Points Used:" & tb & parm & "\par "
+          note &= "Auto Focus Points Used:" & tb & parm & "\par "
         End If
       End If
     End If
@@ -10803,7 +10790,7 @@ Public Module ImageInfo
         Case Else
           parm = iu
       End Select
-      If Len(parm) > 0 Then note = note & "Auto Focus Area Mode:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Auto Focus Area Mode:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H2023)) Then
@@ -10816,7 +10803,7 @@ Public Module ImageInfo
         Case Else
           parm = iu
       End Select
-      If Len(parm) > 0 Then note = note & "Multiframe NR Effect:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Multiframe NR Effect:" & tb & parm & "\par "
     End If
 
 
@@ -10838,7 +10825,7 @@ Public Module ImageInfo
           For Each i In v
             parm &= i & " "
           Next i
-          note = note & "Focus Location:" & tb & parm & "\par "
+          note &= "Focus Location:" & tb & parm & "\par "
         End If
       End If
     End If
@@ -10858,13 +10845,13 @@ Public Module ImageInfo
         Case Else
           parm = ""
       End Select
-      If Len(parm) > 0 Then note = note & "Variable Low Pass Filter:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Variable Low Pass Filter:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H2028)) Then
       iu = makerTags.Item(sTag(&H2028)).singlevalue
       If iu = 0 Then parm = "compressed" Else If iu = 1 Then parm = "compressed" Else parm = ""
-      If Len(parm) > 0 Then note = note & "Raw File Type:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Raw File Type:" & tb & parm & "\par "
     End If
 
     'If makerTags.Contains(sTag(&H202A)) Then
@@ -10882,7 +10869,7 @@ Public Module ImageInfo
     '    ' i = getWord(v, 5 + i1 * 4, False)
     '    ' k = getWord(v, 7 + i1 * 4, False)
     '    ' parm = "(" & Format(i, "##,##0") & ", " & Format(k, "##,##0") & ")"
-    '    ' note = note & "Focal Plane AF Point " & i1 + 1 & ":" & tb & parm & "\par "
+    '    ' note &= "Focal Plane AF Point " & i1 + 1 & ":" & tb & parm & "\par "
     '    ' Next i1
     '
     '    k = 0
@@ -10898,7 +10885,7 @@ Public Module ImageInfo
     ' For Each i In v
     ' parm &= i & " "
     ' Next i
-    ' note = note & "Focus Plane AF Point Location:" & tb & parm & "\par "
+    ' note &= "Focus Plane AF Point Location:" & tb & parm & "\par "
     ' End If
     ' End If
     'End If
@@ -10915,7 +10902,7 @@ Public Module ImageInfo
         Case Else
           parm = ""
       End Select
-      If Len(parm) > 0 Then note = note & "Priority Set in AWB:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Priority Set in AWB:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H202C)) Then
@@ -10936,13 +10923,13 @@ Public Module ImageInfo
         Case Else
           parm = ""
       End Select
-      If Len(parm) > 0 Then note = note & "Metering Mode 2:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Metering Mode 2:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H202D)) Then
       x = makerTags.Item(sTag(&H202D)).singlevalue
       parm = Format(x, "#0.##")
-      If Len(parm) > 0 Then note = note & "Exposure Standard Adjustment:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Exposure Standard Adjustment:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H202E)) Then
@@ -10968,13 +10955,13 @@ Public Module ImageInfo
         Case Else
           parm = ""
       End Select
-      If Len(parm) > 0 Then note = note & "Quality:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Quality:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H2031)) Then
       v = makerTags.Item(sTag(&H2031)).singlevalue
       parm = v
-      If Len(parm) > 0 Then note = note & "Serial number:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Serial number:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&H3000)) Then
@@ -10992,21 +10979,21 @@ Public Module ImageInfo
         If k >= 1 And UBound(v) >= 90 Then
           parm = UTF8bare.GetString(v, 6, 19)
           parm = parm.Trim(whiteSpace)
-          If Len(parm) > 0 AndAlso parm.Contains(":") And parm.Contains("20") Then
-            note = note & "Sony Date and Time:" & tb & parm & "\par "
+          If parm <> "" AndAlso parm.Contains(":") And parm.Contains("20") Then
+            note &= "Sony Date and Time:" & tb & parm & "\par "
           End If
 
           j = getWord(v, 26, True)
           k = getWord(v, 28, True)
           parm = Format(k, "##,##0") & " x " & Format(j, "##,##0")
-          If Len(parm) > 0 Then note = note & "Sony Image Size:" & tb & parm & "\par "
+          If parm <> "" Then note &= "Sony Image Size:" & tb & parm & "\par "
 
           k = getWord(v, 48, True)
-          If Len(parm) > 0 Then note = note & "Faces Detected:" & tb & k & "\par "
+          If parm <> "" Then note &= "Faces Detected:" & tb & k & "\par "
 
           parm = UTF8bare.GetString(v, 52, 16)
           parm = parm.Trim(whiteSpace)
-          If Len(parm) > 0 Then note = note & "Meta Version:" & tb & parm & "\par "
+          If parm <> "" Then note &= "Meta Version:" & tb & parm & "\par "
 
         End If
       End If
@@ -11035,33 +11022,33 @@ Public Module ImageInfo
         If v(0) = 3 And v(1) = 3 And v(2) = 2 And v(3) = 0 Then parm = "ARW 2.3.2"
         If v(0) = 3 And v(1) = 3 And v(2) = 3 And v(3) = 0 Then parm = "ARW 2.3.3"
         If v(0) = 3 And v(1) = 3 And v(2) = 5 And v(3) = 0 Then parm = "ARW 2.3.5"
-        note = note & "File format:" & tb & parm & "\par "
+        note &= "File format:" & tb & parm & "\par "
       End If
     End If
 
     If makerTags.Contains(sTag(&HB001)) Then
       iu = makerTags.Item(sTag(&HB001)).singleValue
       If sonyModelID.ContainsKey(iu) Then
-        note = note & "Sony model ID:" & tb & sonyModelID(iu) & "\par "
+        note &= "Sony model ID:" & tb & sonyModelID(iu) & "\par "
       End If
     End If
 
     If makerTags.Contains(sTag(&HB020)) Then
       parm = makerTags.Item(sTag(&HB020)).singleValue
       parm = parm.Trim
-      If Trim(parm) <> "" Then note = note & "Creative Style:" & tb & Trim(parm) & "\par "
+      If Trim(parm) <> "" Then note &= "Creative Style:" & tb & Trim(parm) & "\par "
     End If
 
     If makerTags.Contains(sTag(&HB021)) Then
       x = makerTags.Item(sTag(&HB021)).singleValue
       parm = Format(x, "####,##0")
-      note = note & "Color Temperature:" & tb & parm & "\par "
+      note &= "Color Temperature:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&HB022)) Then
       x = makerTags.Item(sTag(&HB022)).singleValue
       parm = Format(x, "####,##0")
-      note = note & "Color Compensation Filter:" & tb & parm & "\par "
+      note &= "Color Compensation Filter:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&HB023)) Then
@@ -11094,7 +11081,7 @@ Public Module ImageInfo
         Case Else
           parm = ""
       End Select
-      If Len(parm) > 0 Then note = note & "Scene Mode:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Scene Mode:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&HB024)) Then
@@ -11109,7 +11096,7 @@ Public Module ImageInfo
         Case Else
           parm = ""
       End Select
-      If Len(parm) > 0 Then note = note & "Zone Matching:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Zone Matching:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&HB025)) Then
@@ -11144,7 +11131,7 @@ Public Module ImageInfo
         Case Else
           parm = i
       End Select
-      If Len(parm) > 0 Then note = note & "Dynamic Range Optimizer:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Dynamic Range Optimizer:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&HB026)) Then
@@ -11157,7 +11144,7 @@ Public Module ImageInfo
         Case Else
           parm = ""
       End Select
-      If Len(parm) > 0 Then note = note & "Image Stabilization:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Image Stabilization:" & tb & parm & "\par "
     End If
 
     'If makerTags.Contains(sTag(&HB027)) Then
@@ -11169,7 +11156,7 @@ Public Module ImageInfo
     If makerTags.Contains(sTag(&HB029)) Then
       iu = makerTags.Item(sTag(&HB029)).singleValue
       If sonyColorMode.ContainsKey(iu) Then
-        note = note & "Color mode:" & tb & sonyColorMode(iu) & "\par "
+        note &= "Color mode:" & tb & sonyColorMode(iu) & "\par "
       End If
     End If
 
@@ -11186,14 +11173,14 @@ Public Module ImageInfo
     If makerTags.Contains(sTag(&HB02B)) Then
       v = makerTags.Item(sTag(&HB02B)).Value
       If v.length = 2 Then
-        note = note & "Full image size:" & tb & v(0) & " x " & v(1) & "\par "
+        note &= "Full image size:" & tb & v(0) & " x " & v(1) & "\par "
       End If
     End If
 
     If makerTags.Contains(sTag(&HB02C)) Then
       v = makerTags.Item(sTag(&HB02C)).Value
       If v.length = 2 Then
-        note = note & "Preview image size:" & tb & v(0) & " x " & v(1) & "\par "
+        note &= "Preview image size:" & tb & v(0) & " x " & v(1) & "\par "
       End If
     End If
 
@@ -11207,7 +11194,7 @@ Public Module ImageInfo
         Case Else
           parm = ""
       End Select
-      If Len(parm) > 0 Then note = note & "Macro:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Macro:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&HB041)) Then
@@ -11230,7 +11217,7 @@ Public Module ImageInfo
         Case Else
           parm = ""
       End Select
-      If Len(parm) > 0 Then note = note & "Exposure Mode:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Exposure Mode:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&HB042)) Then
@@ -11245,7 +11232,7 @@ Public Module ImageInfo
         Case Else
           parm = ""
       End Select
-      If Len(parm) > 0 Then note = note & "Focus Mode:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Focus Mode:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&HB043)) Then
@@ -11270,7 +11257,7 @@ Public Module ImageInfo
         Case Else
           parm = ""
       End Select
-      If Len(parm) > 0 Then note = note & "AF Area Mode:" & tb & parm & "\par "
+      If parm <> "" Then note &= "AF Area Mode:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&HB044)) Then
@@ -11283,7 +11270,7 @@ Public Module ImageInfo
         Case Else
           parm = ""
       End Select
-      If Len(parm) > 0 Then note = note & "Focus Mode:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Focus Mode:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&HB047)) Then
@@ -11298,7 +11285,7 @@ Public Module ImageInfo
         Case Else
           parm = ""
       End Select
-      If Len(parm) > 0 Then note = note & "JPG Quality:" & tb & parm & "\par "
+      If parm <> "" Then note &= "JPG Quality:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&HB048)) Then
@@ -11312,7 +11299,7 @@ Public Module ImageInfo
         If i Mod 3 <> 0 Then parm &= " " & Str(Abs(i Mod 3)) & "/3" Else If i <> 0 Then parm &= ".0"
         If i > 0 Then parm = "+" & parm
       End If
-      If Len(parm) > 0 Then note = note & "Flash Level:" & tb & parm.Trim & "\par "
+      If parm <> "" Then note &= "Flash Level:" & tb & parm.Trim & "\par "
     End If
 
     If makerTags.Contains(sTag(&HB049)) Then
@@ -11331,7 +11318,7 @@ Public Module ImageInfo
         Case Else
           parm = ""
       End Select
-      If Len(parm) > 0 Then note = note & "Release Mode:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Release Mode:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&HB04B)) Then
@@ -11346,7 +11333,7 @@ Public Module ImageInfo
         Case Else
           parm = ""
       End Select
-      If Len(parm) > 0 Then note = note & "Anti-Blur:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Anti-Blur:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&HB04E)) Then
@@ -11366,7 +11353,7 @@ Public Module ImageInfo
         Case Else
           parm = i
       End Select
-      If Len(parm) > 0 Then note = note & "Focus Mode:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Focus Mode:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&HB04F)) Then
@@ -11381,7 +11368,7 @@ Public Module ImageInfo
         Case Else
           parm = i
       End Select
-      If Len(parm) > 0 Then note = note & "Dynamic Range Optimizer:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Dynamic Range Optimizer:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&HB050)) Then
@@ -11398,7 +11385,7 @@ Public Module ImageInfo
         Case Else
           parm = ""
       End Select
-      If Len(parm) > 0 Then note = note & "High ISO Noise Reduction 2:" & tb & parm & "\par "
+      If parm <> "" Then note &= "High ISO Noise Reduction 2:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&HB052)) Then
@@ -11413,7 +11400,7 @@ Public Module ImageInfo
         Case Else
           parm = i
       End Select
-      If Len(parm) > 0 Then note = note & "Intelligent Auto:" & tb & parm & "\par "
+      If parm <> "" Then note &= "Intelligent Auto:" & tb & parm & "\par "
     End If
 
     If makerTags.Contains(sTag(&HB054)) Then
@@ -11450,7 +11437,7 @@ Public Module ImageInfo
         Case Else
           parm = i
       End Select
-      If Len(parm) > 0 Then note = note & "White Balance:" & tb & parm & "\par "
+      If parm <> "" Then note &= "White Balance:" & tb & parm & "\par "
     End If
 
 
@@ -11724,7 +11711,7 @@ Public Module ImageInfo
     k = sx.IndexOf("<rdf:Description", StringComparison.OrdinalIgnoreCase)
     If k > 0 Then sx = sx.Substring(k + 17)
     k = sx.IndexOf("<?xpacket end", StringComparison.OrdinalIgnoreCase)
-    If k > 0 Then sx = vb.Left(sx, k - 2)
+    If k > 0 Then sx = sx.Substring(0, k - 2)
     sx = sx.Trim(whiteSpace)
     sx = sx.Replace(ChrW(0), crlf)
 
@@ -11751,7 +11738,7 @@ Public Module ImageInfo
       If iState <> newState Then
         Select Case newState
           Case 1 ' >
-            If id1 <> "" And id2 <> "" Then formatXmp = formatXmp & crlf & id1 & " " & id2 & ":" & ChrW(9) & sVal
+            If id1 <> "" And id2 <> "" Then formatXmp &= crlf & id1 & " " & id2 & ":" & ChrW(9) & sVal
             sVal = ""
             id1 = ""
             id2 = ""
@@ -11761,16 +11748,16 @@ Public Module ImageInfo
             id2 = s.Trim(whiteSpace)
           Case 0, -2 ' value
             sVal = s.Trim(whiteSpace)
-            If Len(sVal) > 200 Then sVal = vb.Left(sVal, 200) & "... (" & Len(sVal) & " total bytes)"
+            If Len(sVal) > 200 Then sVal = sVal.Substring(0, 200) & "... (" & Len(sVal) & " total bytes)"
             i1 = InStr(sVal, "/")
             If i1 > 1 AndAlso i1 < Len(sVal) _
-              AndAlso IsNumeric(vb.Left(sVal, i1 - 1)) AndAlso IsNumeric(Mid(sVal, i1 + 1)) AndAlso Val(Mid(sVal, i1 + 1)) <> 0 Then
-              x1 = vb.Left(sVal, i1 - 1)
+              AndAlso IsNumeric(sVal.Substring(0, i1 - 1)) AndAlso IsNumeric(Mid(sVal, i1 + 1)) AndAlso Val(Mid(sVal, i1 + 1)) <> 0 Then
+              x1 = sVal.Substring(0, i1 - 1)
               x2 = Mid(sVal, i1 + 1)
               ' divide the rational
-              formatXmp = formatXmp & crlf & id1 & " " & id2 & ":" & ChrW(9) & Format(x1 / x2, "#,0.0##")
+              formatXmp &= crlf & id1 & " " & id2 & ":" & ChrW(9) & Format(x1 / x2, "#,0.0##")
             Else
-              If sVal <> "" Then formatXmp = formatXmp & crlf & id1 & " " & id2 & ":" & ChrW(9) & sVal
+              If sVal <> "" Then formatXmp &= crlf & id1 & " " & id2 & ":" & ChrW(9) & sVal
             End If
 
             sVal = ""
@@ -11783,7 +11770,7 @@ Public Module ImageInfo
         s = ""
         iState = newState
       Else
-        s = s & c
+        s &= c
       End If
     Next i
 

@@ -1,7 +1,6 @@
 'Photo Mud is licensed under Creative Commons BY-NC-SA 4.0
 'https://creativecommons.org/licenses/by-nc-sa/4.0/
 
-Imports vb = Microsoft.VisualBasic
 Imports System.Text
 Imports System.IO
 Imports System.Math
@@ -303,12 +302,12 @@ Public Class uExif
           If k > 40 Then k = 40
           k = InStr(UTF8bare.GetString(b, 0, k), "8BIM" & ChrW(4) & ChrW(4) & ChrW(0) & ChrW(0) & ChrW(0) & ChrW(0))
           If k > 0 Then
-            k = k + 11
+            k += 11
             getIPTC(b, k)
           End If
         End If
 
-        fpos = fpos + app1Size + 2
+        fpos += app1Size + 2
         b1 = readByte(fpos)
         b2 = readByte()
       Loop
@@ -344,7 +343,7 @@ Public Class uExif
         tg.dataType = 2 ' string
         tg.Value = ss
       End If
-      ipos = ipos + k + 7
+      ipos += k + 7
 
       If Not iptcTagExists(tg.tag) Then iptcTags.Add(tg, tg.key) ' key is a four character hex value for tag - Right("0000" & Hex(tag), 4)
 
@@ -552,7 +551,9 @@ Public Class uExif
 
   Private Function readString(ByRef n As Integer, Optional ByRef iPos As Integer = -1) As String
 
-    Dim b(n - 1) As Byte
+    Dim b() As Byte
+    Dim s As String
+
     If iPos > 0 Then fStream.Seek(iPos - 1, SeekOrigin.Begin)
     Try
       b = binRead.ReadBytes(n)
@@ -560,8 +561,9 @@ Public Class uExif
       ReDim b(0)
     End Try
 
-    readString = UTF8bare.GetString(b)
-    readString = readString.Replace(ChrW(0), vbCrLf).Trim ' lines may be separated by zero
+    s = UTF8bare.GetString(b)
+    s = s.Replace(ChrW(0), vbCrLf).Trim ' lines may be separated by zero
+    Return s
 
   End Function
 
@@ -603,7 +605,6 @@ Public Class uExif
     ReDim b(n - 1)
 
     If n <= 4 Then
-      ReDim b(4)
       b = BitConverter.GetBytes(IFD.Value)
       If Not intel Then ' reverse bytes
         bi = b(0) : b(0) = b(3) : b(3) = bi
@@ -611,7 +612,8 @@ Public Class uExif
       End If
       ReDim Preserve b(n - 1)
     Else
-      If (IFD.Value < 0) Or (IFD.Value + (n - 1) - linkOffset > UBound(ufdata)) Or (IFD.Value < linkOffset) Or linkOffset = -1 Then ' changed 7/21/17
+      If (IFD.Value < 0) Or (IFD.Value + (n - 1) - linkOffset > UBound(ufdata)) Or
+         (IFD.Value < linkOffset) Or linkOffset = -1 Then ' changed 7/21/17
         ReDim v(-1) ' return empty array
         Return v
       End If
@@ -661,7 +663,7 @@ Public Class uExif
             ii2 = getDWordSigned(b, i * 8 + 4, intel)
           Else
             ii1 = getDWord(b, i * 8, intel)
-            If ii1 > 2 ^ 31 + 2 ^ 30 Then ii1 = ii1 - CLng(2 ^ 32) '  this is probably because someone (like GPSStamp) got the signs wrong. It's technically incorrect.
+            If ii1 > 2 ^ 31 + 2 ^ 30 Then ii1 -= CLng(2 ^ 32) '  this is probably because someone (like GPSStamp) got the signs wrong. It's technically incorrect.
             ii2 = getDWord(b, i * 8 + 4, intel)
           End If
           If ii2 <> 0 Then vx(i) = ii1 / ii2 Else vx(i) = 0
@@ -698,7 +700,7 @@ Public Class uExif
       k = b(i)
       For j As Integer = 1 To 3
         k = k << 8
-        k = k + b(i + j)
+        k += b(i + j)
       Next j
       Return k
       'x = b(i + 0) * 65536 * 256.0#
@@ -719,7 +721,7 @@ Public Class uExif
       k = b(i)
       For j As Integer = 1 To 3
         k = k << 8
-        k = k + b(i + j)
+        k += b(i + j)
       Next j
       Return k
       'x = b(i + 0) * 65536 * 256.0#
@@ -728,13 +730,13 @@ Public Class uExif
       'x = x + b(i + 3)
     End If
 
-    'If x >= 2 ^ 31 Then x = x - 2 ^ 32
+    'If x >= 2 ^ 31 Then x -=2 ^ 32
 
   End Function
 
   Private Function getWordSigned(ByRef b() As Byte, ByRef i As Integer, ByRef intel As Boolean) As Short
 
-    Dim k As Integer = 0
+    Dim k As Integer
 
     If intel Then
       'k = k + b(i + 1) * 256
@@ -746,11 +748,11 @@ Public Class uExif
       'k = k + b(i) * 256
       'k = k + b(i + 1)
       k = b(i) * 256
-      k = k + b(i + 1)
+      k += b(i + 1)
       Return CShort(k)
     End If
 
-    'If k >= 32768 Then k = k - 65536
+    'If k >= 32768 Then k -=65536
 
   End Function
   Private Function getWord(ByRef b() As Byte, ipointer As Integer, intel As Boolean) As UShort

@@ -1,7 +1,6 @@
 'Photo Mud is licensed under Creative Commons BY-NC-SA 4.0
 'https://creativecommons.org/licenses/by-nc-sa/4.0/
 
-Imports vb = Microsoft.VisualBasic
 Imports System.Collections.Generic
 Imports System.Drawing.Drawing2D
 Imports System.Drawing.Imaging
@@ -81,7 +80,7 @@ Public Class frmWebPage
 
     lstFiles.Items.RemoveAt(lstFiles.SelectedIndex)
 
-    nimages = nimages - 1
+    nimages -= 1
 
     picWeb.Refresh()
 
@@ -165,19 +164,18 @@ Public Class frmWebPage
   Private Sub cmdView_Click(ByVal Sender As Object, ByVal e As EventArgs) Handles cmdView.Click
 
     Dim s As String
-    Dim i As Integer
     Dim c As Char
 
     s = "file:///"
-    For i = 1 To Len(htmFilePath)
+    For i As Integer = 1 To Len(htmFilePath)
       c = htmFilePath.Chars(i - 1)
       Select Case c
         Case " "
-          s = s & "%20"
+          s &= "%20"
         Case "\"
-          s = s & "/"
+          s &= "/"
         Case Else
-          s = s & c
+          s &= c
       End Select
     Next i
 
@@ -380,7 +378,7 @@ Public Class frmWebPage
             g.FillRectangle(gbrush, r)
             g.DrawRectangle(gPen, Rectangle.Round(r))
           End If
-          k = k + 1
+          k += 1
           If k >= lstFiles.Items.Count Then Exit For
         Next j
       Next i
@@ -511,7 +509,7 @@ Public Class frmWebPage
       If k = -1 Then ' cancel
         Exit For
       ElseIf k = 1 Then ' OK to write the file
-        picInfo = getPicinfo(imgPath(ix(i)), 1)
+        picInfo = getPicinfo(imgPath(ix(i)))
         If picInfo.isNull Then
           xSize = thumbXres
           ySize = thumbYres
@@ -590,7 +588,6 @@ Public Class frmWebPage
     Dim sComment As String
     Dim d As Date
     Dim x As Double
-    Dim sf As New List(Of String)
     Dim sfl As String
     Dim alt As String
     Dim img As Bitmap
@@ -598,6 +595,7 @@ Public Class frmWebPage
     Dim county As String = ""
     Dim state As String = ""
     Dim country As String = "" ' for gps location
+    Dim sf As List(Of String)
 
     ' bug stuff
     Dim ds As DataSet
@@ -612,7 +610,8 @@ Public Class frmWebPage
     red = Min(iniWebForeColor.R, iniWebBackColor.R) + Abs(CInt(iniWebForeColor.R) - CInt(iniWebBackColor.R)) * x
     green = Min(iniWebForeColor.G, iniWebBackColor.G) + Abs(CInt(iniWebForeColor.G) - CInt(iniWebBackColor.G)) * x
     blue = Min(iniWebForeColor.B, iniWebBackColor.B) + Abs(CInt(iniWebForeColor.B) - CInt(iniWebBackColor.B)) * x
-    wFrameColor = "#" & vb.Right("00" & Hex(red), 2) & vb.Right("00" & Hex(green), 2) & vb.Right("00" & Hex(blue), 2)
+    'wFrameColor = "#" & format(vb.Right("00" & Hex(red), 2) & vb.Right("00" & Hex(green), 2) & vb.Right("00" & Hex(blue), 2)
+    wFrameColor = ("#" & Format(red, "x2") & Format(green, "x2") & Format(blue, "x2")).toupper
 
     sf = New List(Of String)
 
@@ -741,7 +740,7 @@ Public Class frmWebPage
       sComment = ""
 
       If webCaption(ix(k)).Trim <> "" Then
-        sComment = sComment & addBreaks(webCaption(ix(k)))
+        sComment &= addBreaks(webCaption(ix(k)))
         If (imgDate(ix(k)) <> Nothing And chkCapDate.Checked) Or _
            (imgDate(ix(k)) <> Nothing And chkCapTime.Checked) Or _
            (Len(Trim(imgName(ix(k)))) <> 0 And chkCapName.Checked) Or _
@@ -750,14 +749,14 @@ Public Class frmWebPage
            (Len(Trim(imgLatLon(ix(k)))) <> 0 And chkCapLocation.Checked) Or _
            (Len(Trim(imgLatLon(ix(k)))) <> 0 And chkCapMaplink.Checked) Or _
            (Trim(imgX(ix(k))) > 0 And chkCapResolution.Checked) Then
-          sComment = sComment & "<br>"
+          sComment &= "<br>"
         End If
       End If
 
       If chkCapDescription.Checked Then
         If imgComments(ix(k)) <> "" Then
           s = addBreaks(imgComments(ix(k)))
-          sComment = sComment & s & "<br>"
+          sComment &= s & "<br>"
         End If
 
         If useQuery Then ' add bug descriptions
@@ -765,14 +764,7 @@ Public Class frmWebPage
           If ds IsNot Nothing AndAlso ds.Tables(0).Rows.Count > 0 Then
             pic = New pixClass(ds.Tables(0).Rows(0))
             s = getCaption(pic)
-            sComment = sComment & s
-          Else
-            ds = getDS("select * from images, gbif.tax where filename = @parm1 and substring(images.taxonid, 2) = gbif.tax.taxid", imgName(ix(k)))
-            If ds IsNot Nothing AndAlso ds.Tables(0).Rows.Count > 0 Then
-              pic = New pixClass(ds.Tables(0).Rows(0))
-              s = getCaption(pic)
-              sComment = sComment & s
-            End If
+            sComment &= s
           End If
         End If
       End If
@@ -786,9 +778,9 @@ Public Class frmWebPage
          (Len(Trim(imgLatLon(ix(k)))) <> 0 And chkCapMaplink.Checked) Or _
          (Trim(imgX(ix(k))) > 0 And chkCapResolution.Checked) Then
         If sComment <> "" Then
-          sComment = sComment & crlf & "<div style=""text-align:center; font-size:smaller""><br>"
+          sComment &= crlf & "<div style=""text-align:center; font-size:smaller""><br>"
         Else
-          sComment = sComment & "<div style=""text-align:center; font-size:smaller"">"
+          sComment &= "<div style=""text-align:center; font-size:smaller"">"
         End If
       End If
 
@@ -799,24 +791,24 @@ Public Class frmWebPage
         d = d.Add(New TimeSpan(x, 0, 0))
 
         If chkCapDate.Checked Then s = Format(d, "short date") & " "
-        If chkCapTime.Checked Then s = s & Format(d, "short time")
-        sComment = sComment & s & "<br>"
+        If chkCapTime.Checked Then s &= Format(d, "short time")
+        sComment &= s & "<br>"
       End If
 
       If imgName(ix(k)) <> "" And chkCapName.Checked Then
-        sComment = sComment & imgName(ix(k)) & "<br>"
+        sComment &= imgName(ix(k)) & "<br>"
       End If
 
       If imgX(ix(k)) > 0 And chkCapResolution.Checked Then
-        sComment = sComment & imgX(ix(k)) & " x " & imgY(ix(k)) & "<br>"
+        sComment &= imgX(ix(k)) & " x " & imgY(ix(k)) & "<br>"
       End If
 
       If imgLatLon(ix(k)) <> "" And chkCapLatLon.Checked Then
-        sComment = sComment & imgLatLon(ix(k)) & "<br>"
+        sComment &= imgLatLon(ix(k)) & "<br>"
       End If
 
       If imgAltitude(ix(k)) <> "" And chkCapAltitude.Checked Then
-        sComment = sComment & imgAltitude(ix(k)) & "<br>"
+        sComment &= imgAltitude(ix(k)) & "<br>"
       End If
 
       If imgLatLon(ix(k)) <> "" And chkCapLocation.Checked Then
@@ -848,13 +840,13 @@ Public Class frmWebPage
         If s.Contains("""") Then s = s.Replace("'", " ") Else s = s.Replace("'", "")
         s = s.Replace("""", "")
         's = s & "(" & imgName(ix(k)) & ")"
-        sComment = sComment & crlf &
+        sComment &= crlf &
           "<a href=""https://www.google.com/maps/place/" & s & "/@" &
           Format(imgXLat(ix(k)), "0.0#####") & "," & Format(imgXLon(ix(k)), "0.0#####") & ",14z/" &
           "data=!4m2!3m1!1s0x0:0x0!5m1!1e4"">-map-</a><br>"
         ' "<a href=""http://maps.google.com/maps?z=14&amp;t=h&amp;q=" & s & """ target=_blank title=""" & imgName(ix(k)) & """>-map-</a><br>" ' old google maps format
       End If
-      If vb.Right(sComment, 6) = "<br>" Then sComment = vb.Left(sComment, Len(sComment) - 4)
+      If sComment.ToLower.EndsWith("<br>") Then sComment = sComment.Substring(0, Len(sComment) - 4)
 
       If (imgDate(ix(k)) <> Nothing And chkCapDate.Checked) Or _
          (imgDate(ix(k)) <> Nothing And chkCapTime.Checked) Or _
@@ -864,7 +856,7 @@ Public Class frmWebPage
          (Len(Trim(imgLatLon(ix(k)))) <> 0 And chkCapLocation.Checked) Or _
          (Len(Trim(imgLatLon(ix(k)))) <> 0 And chkCapMaplink.Checked) Or _
          (Trim(imgX(ix(k))) > 0 And chkCapResolution.Checked) Then
-        sComment = sComment & "</div>"
+        sComment &= "</div>"
       End If
 
       If sComment <> "" Then
@@ -964,7 +956,7 @@ Public Class frmWebPage
     Dim i As Integer
     Dim s As String
     Dim d As Date
-    Dim picinfo As pictureInfo = Nothing
+    Dim picinfo As pictureInfo
     Dim Location As String = ""
     Dim Altitude As String = ""
     Dim pcomments As List(Of PropertyItem)
@@ -979,7 +971,7 @@ Public Class frmWebPage
         eqstr(imgComments(ix(i)), "OLYMPUS DIGITAL CAMERA") OrElse
         eqstr(imgComments(ix(i)), "LEAD Technologies Inc. V1.01") Then imgComments(ix(i)) = ""
 
-      picinfo = getPicinfo(imgPath(ix(i)), False, 1)
+      picinfo = getPicinfo(imgPath(ix(i)))
 
       If Not picinfo.isNull AndAlso (picinfo.Width > 0 And picinfo.Height > 0) Then
         imgX(ix(i)) = picinfo.Width
@@ -1014,24 +1006,13 @@ Public Class frmWebPage
 
   Function addBreaks(ByVal s As String) As String
 
-    Dim i As Integer
+    Dim s1 As String
 
-    i = 1
-    Do While i <= Len(s)
-      If i < Len(s) Then
-        If Mid(s, i, 2) = crlf Then
-          s = vb.Left(s, i - 1) & "<br>" & Mid(s, i + 2)
-          i = i + 3
-        End If
-      End If
-      If s.Chars(i - 1) = ChrW(10) Or s.Chars(i - 1) = ChrW(13) Then
-        s = vb.Left(s, i - 1) & "<br>" & Mid(s, i + 1)
-        i = i + 3
-      End If
-      i = i + 1
-    Loop
+    s1 = s.Replace(vbCrLf, "<br>")
+    s1 = s1.Replace(vbCr, "<br>")
+    s1 = s1.Replace(vbLf, "<br>")
 
-    addBreaks = s
+    Return s1
 
   End Function
 

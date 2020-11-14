@@ -69,8 +69,8 @@ Public Class frmFileTypes
     Next i
 
     i = chkFmt(0).Top + (chkFmt.Count + 1.5) * chkFmt(0).Height * 1.3
-    i = i - Me.ClientSize.Height
-    If i > 0 Then Me.Height = Me.Height + i
+    i -= Me.ClientSize.Height
+    If i > 0 Then Me.Height += i
 
     oldFiletype = New List(Of String)
     For Each s As String In iniFileType

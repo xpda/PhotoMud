@@ -17,7 +17,6 @@ Public Class ctlViewCompare
 
   Dim downX As Integer
   Dim downY As Integer
-  Dim timer1 As New Timer
 
   Public Sub New()
 
@@ -197,17 +196,6 @@ Public Class ctlViewCompare
     pView1.Zoom(absZoom)
     RaiseEvent Zoomed()
     zoomLabel()
-  End Sub
-
-  Public Function imageCenter(p As PointF) As PointF
-    If pView1.Bitmap IsNot Nothing Then
-      Return New PointF(pView1.Bitmap.Width / 2, pView1.Bitmap.Height / 2)
-    End If
-  End Function
-
-  Public Sub Clear()
-    clearBitmap(pView0.Bitmap)
-    clearBitmap(pView1.Bitmap)
   End Sub
 
   Public Sub zoomLabel()

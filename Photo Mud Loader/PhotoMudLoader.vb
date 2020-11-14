@@ -13,122 +13,122 @@ Imports Microsoft.VisualBasic
 
 Module PhotoMudLoader
 
-Sub Main()
+  Sub Main()
 
-Dim epAddress As EndpointAddress
-Dim Client As picClient
-Dim s As String
-Dim loadFile As String
-Dim procs() As Process
-Dim proc As Process
-Dim nextProc As Process = Nothing
-Dim processName As String = "photo mud"
-Dim i, j As Integer
+    Dim epAddress As EndpointAddress
+    Dim Client As picClient
+    Dim s As String
+    Dim loadFile As String
+    Dim procs() As Process
+    Dim proc As Process
+    Dim nextProc As Process = Nothing
+    Dim processName As String = "photo mud"
+    Dim i, j As Integer
 
-Try
-  procs = Process.GetProcessesByName("photomudloader")
-  For j = 1 To 100
-    ' if there is more than on instance of photomudloader, then run the highest procid first, then take turns.
-    If UBound(procs) < 0 Then Exit For ' count <= 0
-    i = -1
-    For Each proc In procs
-      If proc.Id > i Then
-        i = proc.Id
-        nextProc = proc
-        End If
-      Next proc
-
-    If nextProc.Id = Process.GetCurrentProcess.Id Then Exit For
-    Threading.Thread.Sleep(100)
-    procs = Process.GetProcessesByName("photomudloader")
-    Next j
-
-  loadFile = ""
-  For Each s In My.Application.CommandLineArgs
-    ' get the first command line argument that is an existing file
-    If File.Exists(s) Then
-      loadFile = s
-      Exit For
-      End If
-    Next s
-
-  If loadFile = "" Then Exit Sub
-
-  procs = Process.GetProcessesByName(processName)
-  If UBound(procs) >= 0 Then
-    epAddress = New EndpointAddress("net.pipe://localhost/PhotoMudPicLoad")
-    Client = New picClient(New NetNamedPipeBinding, epAddress)
     Try
-      s = Client.LoadPic(loadFile)
-    Catch ex3 As Exception
-      Threading.Thread.Sleep(3000)
-      Try
+      procs = Process.GetProcessesByName("photomudloader")
+      For j = 1 To 100
+        ' if there is more than on instance of photomudloader, then run the highest procid first, then take turns.
+        If UBound(procs) < 0 Then Exit For ' count <= 0
+        i = -1
+        For Each proc In procs
+          If proc.Id > i Then
+            i = proc.Id
+            nextProc = proc
+          End If
+        Next proc
+
+        If nextProc.Id = Process.GetCurrentProcess.Id Then Exit For
+        Threading.Thread.Sleep(100)
+        procs = Process.GetProcessesByName("photomudloader")
+      Next j
+
+      loadFile = ""
+      For Each s In My.Application.CommandLineArgs
+        ' get the first command line argument that is an existing file
+        If File.Exists(s) Then
+          loadFile = s
+          Exit For
+        End If
+      Next s
+
+      If loadFile = "" Then Exit Sub
+
+      procs = Process.GetProcessesByName(processName)
+      If UBound(procs) >= 0 Then
         epAddress = New EndpointAddress("net.pipe://localhost/PhotoMudPicLoad")
         Client = New picClient(New NetNamedPipeBinding, epAddress)
-        s = Client.LoadPic(loadFile)
-      Catch ex2 As Exception
+        Try
+          s = Client.LoadPic(loadFile)
+        Catch ex3 As Exception
+          Threading.Thread.Sleep(3000)
+          Try
+            epAddress = New EndpointAddress("net.pipe://localhost/PhotoMudPicLoad")
+            Client = New picClient(New NetNamedPipeBinding, epAddress)
+            s = Client.LoadPic(loadFile)
+          Catch ex2 As Exception
+          End Try
         End Try
-      End Try
-    AppActivate(procs(0).Id)
+        AppActivate(procs(0).Id)
 
-  Else
-    s = My.Application.Info.DirectoryPath
-    If Right(s, 1) <> "\" Then s = s & "\"
-    s = s & "photo mud.exe"
-    proc = Process.Start(s, """" & loadFile & """")
-    End If
+      Else
+        s = My.Application.Info.DirectoryPath
+        If Right(s, 1) <> "\" Then s &= "\"
+        s &= "photo mud.exe"
+        proc = Process.Start(s, """" & loadFile & """")
+      End If
 
-Catch ex As Exception
-  MsgBox("Loader Error: " & ex.Message)
-  End Try
+    Catch ex As Exception
+      MsgBox("Loader Error: " & ex.Message)
+    End Try
 
-End Sub
+  End Sub
 
-<System.Diagnostics.DebuggerStepThroughAttribute(), _
- System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "3.0.0.0")> _
-Partial Public Class picClient
+  <System.Diagnostics.DebuggerStepThroughAttribute(),
+   System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "3.0.0.0")>
+  Partial Public Class picClient
     Inherits System.ServiceModel.ClientBase(Of IPhotoMudPicLoad)
-    Implements iPhotoMudPicLoad
+    Implements IPhotoMudPicLoad
 
     Public Sub New(ByVal binding As System.ServiceModel.Channels.Binding, ByVal remoteAddress As System.ServiceModel.EndpointAddress)
-        MyBase.New(binding, remoteAddress)
+      MyBase.New(binding, remoteAddress)
     End Sub
 
     Public Function LoadPic(ByVal fName As String) As String Implements IPhotoMudPicLoad.LoadPic
-        Return MyBase.Channel.LoadPic(fName)
+      Return MyBase.Channel.LoadPic(fName)
     End Function
 
-End Class
+  End Class
 
-' from here down was auto generated by svcutil.
-' svcutil.exe /language:vb /out:generatedProxy.vb /config:app.config http://localhost:8000/PhotoMudPicLoad
-' Some has been changed after auto code generation.
-<System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "3.0.0.0"), _
- System.ServiceModel.ServiceContractAttribute(ConfigurationName:="IPhotoMudPicLoad")> _
-Public Interface IPhotoMudPicLoad
-  <System.ServiceModel.OperationContractAttribute(Action:="http://tempuri.org/IPhotoMudPicLoad/LoadPic", ReplyAction:="http://tempuri.org/IPhotoMudPicLoad/LoadPicResponse")> _
-  Function LoadPic(ByVal fName As String) As String
-End Interface
+  ' from here down was auto generated by svcutil.
+  ' svcutil.exe /language:vb /out:generatedProxy.vb /config:app.config http://localhost:8000/PhotoMudPicLoad
+  ' Some has been changed after auto code generation.
+  <System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "3.0.0.0"),
+   System.ServiceModel.ServiceContractAttribute(ConfigurationName:="IPhotoMudPicLoad")>
+  Public Interface IPhotoMudPicLoad
+    <System.ServiceModel.OperationContractAttribute(Action:="http://tempuri.org/IPhotoMudPicLoad/LoadPic", ReplyAction:="http://tempuri.org/IPhotoMudPicLoad/LoadPicResponse")>
+    Function LoadPic(ByVal fName As String) As String
+  End Interface
 
-<System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "3.0.0.0")> _
-Public Interface IPhotoMudPicLoadChannel
-  Inherits IPhotoMudPicLoad, System.ServiceModel.IClientChannel
-End Interface
+  <System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "3.0.0.0")>
+  Public Interface IPhotoMudPicLoadChannel
+    Inherits IPhotoMudPicLoad, System.ServiceModel.IClientChannel
+  End Interface
 
-<System.Diagnostics.DebuggerStepThroughAttribute(), _
-System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "3.0.0.0")> _
-Partial Public Class IPhotoMudPicLoadClient
-  Inherits System.ServiceModel.ClientBase(Of IPhotoMudPicLoad)
-  Implements IPhotoMudPicLoad
+  <System.Diagnostics.DebuggerStepThroughAttribute(),
+  System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "3.0.0.0")>
+  Partial Public Class IPhotoMudPicLoadClient
+    Inherits System.ServiceModel.ClientBase(Of IPhotoMudPicLoad)
+    Implements IPhotoMudPicLoad
 
-  Public Sub New(ByVal binding As System.ServiceModel.Channels.Binding, ByVal remoteAddress As System.ServiceModel.EndpointAddress)
-    MyBase.New(binding, remoteAddress)
-  End Sub
+    Public Sub New(ByVal binding As System.ServiceModel.Channels.Binding, ByVal remoteAddress As System.ServiceModel.EndpointAddress)
+      MyBase.New(binding, remoteAddress)
+    End Sub
 
-  Public Function LoadPic(ByVal fName As String) As String Implements IPhotoMudPicLoad.LoadPic
-    Return MyBase.Channel.LoadPic(fName)
-  End Function
-End Class
+    Public Function LoadPic(ByVal fName As String) As String Implements IPhotoMudPicLoad.LoadPic
+      Return MyBase.Channel.LoadPic(fName)
+    End Function
+  End Class
 
 End Module
 

@@ -50,7 +50,6 @@ Public Class frmSend
   Function SendOriginal() As String
 
     Dim fNames As New List(Of String)
-    Dim attachmentList As String = ""
     Dim msg As String
 
     If Not MultiFile Then ' single image
@@ -97,7 +96,7 @@ Public Class frmSend
           OriginalXres = frmExplore.rview.Bitmap.Width
           OriginalYres = frmExplore.rview.Bitmap.Height
         Else
-          picInfo = getPicinfo(currentpicPath, False)
+          picInfo = getPicinfo(currentpicPath)
           OriginalXres = picInfo.Width
           OriginalYres = picInfo.Height
         End If

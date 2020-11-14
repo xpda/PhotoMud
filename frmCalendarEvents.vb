@@ -154,17 +154,17 @@ Public Class frmCalendarEvents
     category = customCalCat
 
     Do While iLine <= UBound(ss)
-      s = ss(iLine) : iLine = iLine + 1
+      s = ss(iLine) : iLine += 1
       If IsNumeric(s) Then
         Select Case s
           Case -1 ' category
-            category = ss(iLine) : iLine = iLine + 1
+            category = ss(iLine) : iLine += 1
             ' add category to combo box if necessary
             If Not cmbCat.Items.Contains(category) Then cmbCat.Items.Insert(cmbCat.Items.Count, category)
 
           Case 3
-            dt = CDate(ss(iLine)) : iLine = iLine + 1
-            descr = ss(iLine) : iLine = iLine + 1
+            dt = CDate(ss(iLine)) : iLine += 1
+            descr = ss(iLine) : iLine += 1
             cEvent = Nothing
             cEvent.descr = descr
             cEvent.dt = dt

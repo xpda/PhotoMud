@@ -72,7 +72,7 @@ Public Class frmFilter
     Dim sNum() As String
 
     path = My.Application.Info.DirectoryPath
-    If Not path.EndsWith("\") Then path = path & "\"
+    If Not path.EndsWith("\") Then path &= "\"
 
     openDialog1.Title = "Load filter"
     openDialog1.FileName = ""
@@ -153,7 +153,7 @@ Public Class frmFilter
     Dim sf As String
 
     path = My.Application.Info.DirectoryPath
-    If Not path.EndsWith("\") Then path = path & "\"
+    If Not path.EndsWith("\") Then path &= "\"
 
     saveDialog1.Title = "Load filter"
     saveDialog1.FileName = ""
@@ -178,9 +178,9 @@ Public Class frmFilter
     sf = mx.Order & crlf
     For i = 0 To mx.Order - 1
       For j = 0 To mx.Order - 1
-        sf = sf & " " & mx(j, i)
+        sf &= " " & mx(j, i)
       Next j
-      sf = sf & crlf
+      sf &= crlf
     Next i
 
     Try

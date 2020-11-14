@@ -68,12 +68,12 @@ Public Class frmColorMerge
 
   Private Sub cmdZoomin_Click(ByVal Sender As Object, ByVal e As EventArgs) Handles cmdZoomin.Click
     pView.Zoom(2)
-    cZoom = cZoom * 2
+    cZoom *= 2
   End Sub
 
   Private Sub cmdZoomout_Click(ByVal Sender As Object, ByVal e As EventArgs) Handles cmdZoomout.Click
     pView.Zoom(0.5)
-    cZoom = cZoom * 0.5
+    cZoom *= 0.5
   End Sub
 
   Private Sub pview_MouseDown(ByVal sender As Object, ByVal e As MouseEventArgs)
@@ -323,9 +323,9 @@ Public Class frmColorMerge
 
     ' set the weights for non-independent weights
     For i = 0 To nFiles - 1
-      redTotal = redTotal + CDbl(txRed(i).Text) * CDbl(txWeight(i).Text)
-      greenTotal = greenTotal + CDbl(txGreen(i).Text) * CDbl(txWeight(i).Text)
-      blueTotal = blueTotal + CDbl(txBlue(i).Text) * CDbl(txWeight(i).Text)
+      redTotal += CDbl(txRed(i).Text) * CDbl(txWeight(i).Text)
+      greenTotal += CDbl(txGreen(i).Text) * CDbl(txWeight(i).Text)
+      blueTotal += CDbl(txBlue(i).Text) * CDbl(txWeight(i).Text)
     Next i
 
     If chkWeight.Checked Then
@@ -424,9 +424,9 @@ Public Class frmColorMerge
 
     ' set the weights for non-independent weights
     For i = 0 To nFiles - 1
-      redTotal = redTotal + CDbl(txRed(i).Text) * CDbl(txWeight(i).Text)
-      greenTotal = greenTotal + CDbl(txGreen(i).Text) * CDbl(txWeight(i).Text)
-      blueTotal = blueTotal + CDbl(txBlue(i).Text) * CDbl(txWeight(i).Text)
+      redTotal += CDbl(txRed(i).Text) * CDbl(txWeight(i).Text)
+      greenTotal += CDbl(txGreen(i).Text) * CDbl(txWeight(i).Text)
+      blueTotal += CDbl(txBlue(i).Text) * CDbl(txWeight(i).Text)
     Next i
 
     If chkWeight.Checked Then

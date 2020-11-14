@@ -2,7 +2,6 @@
 'https://creativecommons.org/licenses/by-nc-sa/4.0/
 
 Imports System.IO
-Imports vb = Microsoft.VisualBasic
 Imports System.Drawing.Drawing2D
 Imports System.Drawing.Imaging
 Imports System.Drawing
@@ -73,7 +72,7 @@ Public Class frmSearch
 
     Me.Cursor = Cursors.WaitCursor
     s = txSearch.Text
-    If vb.Right(s, 1) <> "\" Then s = s & "\"
+    If Not s.EndsWith("\") Then s &= "\"
     Search(s, chkSubfolders.Checked)
     Me.Cursor = Cursors.Default
 
@@ -245,8 +244,6 @@ Public Class frmSearch
       Clock = New Stopwatch
       Clock.Reset() : Clock.Start()
 
-      s = ""
-
       pComments = readPropertyItems(ns(iFile))
       milli(1) = Clock.ElapsedMilliseconds
 
@@ -256,7 +253,7 @@ Public Class frmSearch
 
           s = CStr(getBmpComment(propID.DateTime, pComments))
           If Len(s) = 19 Then
-            s = vb.Left(s, 10) ' use date only, no time
+            s = s.Substring(0, 10) ' use date only, no time
             s = s.Replace(":", "/")
             Try
               vDate = CDate(s)
@@ -319,7 +316,7 @@ Public Class frmSearch
               x = fInfo.Length
               fDate = fInfo.LastWriteTime
 
-              nFound = nFound + 1
+             nFound +=1
               item = New ListViewItem
               item.Text = CStr(ns(iFile))
               item.SubItems.Add(Format(x / 1000, "#,##0 KB"))
@@ -405,7 +402,7 @@ Public Class frmSearch
     findWords = New List(Of String)
     iStart = 0
     iQuote = 0
-    s = s & ChrW(13)
+    s &= ChrW(13)
     For i = 1 To Len(s)
       c = s.Chars(i - 1)
 
