@@ -456,8 +456,7 @@ Public Module main
     frmMain = New frmMainf
     frmExplore = New frmExploref
 
-
-    ProgramInit()
+        ProgramInit()
     setDefaults()
     getini()
     iniDBConnStr = getConnStr(iniDBhost, iniDBdatabase, iniDBuser, iniDBpassword)

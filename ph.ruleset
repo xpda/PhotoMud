@@ -91,6 +91,7 @@
   <Rules AnalyzerId="Microsoft.CodeAnalysis.VisualBasic.Features" RuleNamespace="Microsoft.CodeAnalysis.VisualBasic.Features">
     <Rule Id="IDE0017" Action="None" />
     <Rule Id="IDE0028" Action="None" />
+    <Rule Id="IDE0079" Action="None" />
     <Rule Id="IDE1006" Action="None" />
   </Rules>
 </RuleSet>

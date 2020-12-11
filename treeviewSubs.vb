@@ -146,7 +146,6 @@ Module treeviewSubs
     If eqstr(srchNode.Tag, fPath) Then ' the drive is the node
       treeView.SelectedNode = srchNode
 
-
       If dirWatch IsNot Nothing Then
         If dirWatch.Path.StartsWith("\\") Then
           dirWatch.EnableRaisingEvents = False
@@ -297,7 +296,8 @@ Module treeviewSubs
 
     If srchNode IsNot Nothing Then
       For Each nd In srchNode.Nodes
-        If eqstr(nd.Tag, fPath.Substring(0, Len(nd.Tag))) Then ' found the node
+        If fPath.StartsWith(nd.Tag, StringComparison.OrdinalIgnoreCase) Then ' found the node
+          'If eqstr(nd.Tag, fPath.Substring(0, Len(nd.Tag))) Then
           If (Len(nd.Tag) < Len(fPath)) Then
             TreeViewfind = TreeViewfind(treeView, fPath, nd) ' recursive
           Else
