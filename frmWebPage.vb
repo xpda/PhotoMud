@@ -673,7 +673,7 @@ Public Class frmWebPage
     sf.Add(".flexz { ")
     sf.Add("  display: flex;")
     sf.Add("  flex-flow: row wrap;")
-    sf.Add("  align-items: top;")
+    sf.Add("  align-items: flex-start;")
     sf.Add("  justify-content: center;")
     sf.Add("  }")
 

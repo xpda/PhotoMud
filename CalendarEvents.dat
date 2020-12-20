@@ -2,10 +2,10 @@
 Birthdays and Anniversaries
 3
 1/18/1928
-Don Webster is <years>
+Don Webster born <year>
 3
 8/30/1928
-Merlene Webster is <years>
+Merlene Webster born <year>
 3
 1/13/1951
 Jerry Webster is <years>
@@ -16,6 +16,9 @@ Stephanie Webster is <years>
 1/23/1992
 Sean Webster is <years>
 3
+2/15/1994
+Abbie Webster
+3
 5/25/1996
 Katarina Webster is <years>
 3
@@ -23,7 +26,7 @@ Katarina Webster is <years>
 Mike Green is <years>
 3
 6/27/1952
-Barbara Green was born <years> years ago
+Barbara Green born <year>
 3
 7/21/1983
 Janet DeMarco is <years>
@@ -31,14 +34,26 @@ Janet DeMarco is <years>
 11/19/1900
 Mike DeMarco's birthday
 3
-08/11/1900
-McKenzie Munson's birthday
+8/11/02
+McKenzie Munson is <years>
 3
 2/7/2014
 Jack DeMarco is <years>
 3
+11/20/17
+Grace DeMarco is <years>
+3
 8/23/1984
 Jeff Green is <years>
+3
+5/28/91
+Bethany Green is <years>
+3
+9/14/09
+Austin Sharp is <years>
+3
+1/7/19
+Christopher Green is <years>
 3
 11/23/1955
 Bob Webster is <years>
@@ -54,9 +69,6 @@ Katie Webster is <years>
 3
 7/2/1984
 Steven Webster is <years>
-3
-11/5/1988
-Laura Tapp is <years>
 3
 5/12/1986
 Melinda Webster is <years>
@@ -78,6 +90,9 @@ Matthew Webster is <years>
 3
 4/18/1987
 Jenny Brown is <years>
+3
+4/23/18
+Liam Brown is <years>
 3
 2/3/1956
 Paul Armstrong is <years>
@@ -133,9 +148,6 @@ Ken Reese is <years>
 7/16/1961
 Lynn Reese is <years>
 3
-8/30/1903
-Helene Bachman born <year>
-3
 11/26/1903
 F.M. Bachman born <year>
 3
@@ -157,17 +169,14 @@ Duane Jenks is <years>
 12/4/1955
 Don Bachman is <years>
 3
-6/11/1957
-Susan Bachman is <years>
-3
 1/3/1958
 David Bachman is <years>
 3
 3/16/1926
-Bob Montgomery was born <year>
+Bob Montgomery born <year>
 3
 9/19/1926
-Jean Montgomery is <years>
+Jean Montgomery born <year>
 3
 11/7/1953
 Marilyn Montgomery is <years>
@@ -275,10 +284,13 @@ Harry Thorpe born <year>
 Louise Van Thorpe is <years>
 3
 5/7/1924
-Roberta Heisler is <years>
+Roberta Heisler born <year>
+3
+12/15/1913
+Donald Heisler born <year>
 3
 1/10/1926
-Bill Van Valkenburgh is <years>
+Bill Van Valkenburgh born <year>
 3
 6/9/1929
 Marilyn Van Valkenburgh is <years>
@@ -325,6 +337,9 @@ Elizabeth Webster is <years>
 3/11/1991
 Molly O'Mealey is <years>
 3
+11/24/1986
+David Thomas is <years>
+3
 12/27/1988
 Abby O'Mealey is <years>
 3
@@ -332,15 +347,15 @@ Abby O'Mealey is <years>
 Margo O'Mealey born <year>
 3
 8/5/1933
-Jeanette Reese is <years>
+Jeanette Reese born <year>
 3
 8/28/2012
 Olivia Webster is <years>
 3
-7/8/2009
+7/8/2011
 Charlotte Johnston is <years>
 3
-7/6/2010
+7/6/2012
 Lilah VanDuser is <years>
 3
 8/7/1924
@@ -363,398 +378,75 @@ Mason Brown is <years>
 3
 7/12/1986
 Kiran Dyamenahalli is <years>
--1
-Races
 3
-1/7/2017
-Tulsa Runway Run 5K, Tulsa
+8/2/2020
+Anika Armstrong Dyamenahalli is <years>
 3
-2/4/2017
-Tulsa Oilers Arena Challenge, Tulsa
+5/7/1790
+Thomas Fendel Webster born <year>
 3
-2/10/2017
-Coast to Coast, New Zealand
+11/2/1964
+Michael Hering is <years>
 3
-2/11/2017
-Coast to Coast, New Zealand
+1/25/1965
+Elizabeth Williams is <years>
 3
-2/18/2017
-Frigid Five Miler, Edmond
+6/1/1977
+Chris Hering is <years>
 3
-2/24/2017
-Postoak Challenge (marathon, half), Tulsa
+8/27/1966
+Jennifer Butler is <years>
 3
-2/25/2017
-Central Classic 5K, Bartlesville 
+1/28/1999
+Grace Hering is <years>
 3
-2/25/2017
-Postoak Challenge 50K, 25K, 10K, Tulsa
+3/31/2001
+Caleb Hering is <years>
 3
-3/4/2017
-Haleiwa Triathlon, Honolulu, HI
+10/6/1940
+Katrina Van Valkenburgh is <years>
 3
-3/5/2017
-Kemah Triathlon, Galveston
+9/15/1936
+Grant Hering is <years>
 3
-3/11/2017
-O'Connell's St. Patrick's Day 8K, Norman
+1/17/1942
+Holland Van Valkenburgh is <years>
 3
-3/11/2017
-St. Patrick's Day Run, Tulsa
+6/26/1983
+Michelle Thomas is <years>
 3
-3/12/2017
-St. Patrick's Day Triathlon, Keller, TX
+5/25/1986
+Joe Thomas is <years>
 3
-3/18/2017
-Bartow Blarney Triathlon
+8/30/90
+Kenzie Thomas is <years>
 3
-3/18/2017
-River Valley 5K/Half Marathon, Fort Smith
+2/1/2017
+Logan Thomas is <years>
 3
-3/18/2017
-Parris Island Triathlon, SC
+6/5/20
+Stevie Thomas is <years>
 3
-3/19/2017
-33rd Annual Great Clermont Triathlon, FL
+12/23/1990
+Rachel Sordahl is <years>
 3
-3/19/2017
-Lake Atlanta Duathlon, Rogers, AR
+1/10/1938
+Donald Knuth is <years>
 3
-3/25/2017
-Run to the Well Kibo 5k, Jenks
+9/16/1893
+Cherokee Strip Land Run
 3
-4/1/2017
-Run Bentonville
+1/4/1643
+Isaac Newton's Birthday
 3
-4/1/2017
-Aquarium Run, Jenks
+1/26/1788
+Australia Day
 3
-4/1/2017
-Escape from Ft De Soto Triathlon, St Petersburg, FL
+8/15/1947
+Independence Day in India
 3
-4/2/2017
-4th Annual No Label Triathlon, Katy, TX
+2/6/1840
+Waitangi Day, New Zealand
 3
-4/8/2017
-Will Rogers Memorial 5K ?, Claremore
-3
-4/9/2017
-Caveman Tri, Flower Mound, TX
-3
-4/9/2017
-Guthrie RnR F-1 Duathlon, Guthrie
-3
-4/9/2017
-Redbud Classic 5K & 10K, Oklahoma City
-3
-4/15/2017
-Case Community Park River Run 5K, Sand Springs
-3
-4/15/2017
-Shiprock Triathlon Festival, Shiprock, NM
-3
-4/22/2017
-Garmin Marathon, Olathe, KS.
-3
-4/23/2017
-Spring Migration Triathlon, Emporia, KS
-3
-4/23/2017
-Spring Fever Tri, Jenks
-3
-4/23/2017
-Historic McKinney Kiwanis Triathlon, TX
-3
-4/29/2017
-Iron Pig Duathlon, Fayetteville
-3
-4/29/2017
-Flower Power Bike Ride, Muskogee
-3
-4/29/2017
-Red Fern Half and 5K, Tahlequah
-3
-4/30/2017
-Steamboat Classic Triathlon, Cape Girardeau, MO
-3
-4/30/2017
-Oklahoma City Memorial Marathon
-3
-5/5/2017
-Cinco de Mayo Run, Tulsa
-3
-5/6/2017
-Valley Rally Bike Ride, Pauls Valley
-3
-5/6/2017
-Tour de Tulsa Bike Ride, Tulsa
-3
-5/7/2017
-TriZou Triathlon, Columbia, MO
-3
-5/7/2017
-Rockin R Triathlon, New Braunfels, TX
-3
-5/7/2017
-Prairie Fire Spring Half Marathon, Wichita
-3
-5/13/2017
-Guthrie Super Sprint Duathlon
-3
-5/13/2017
-Turtle Crawl Triathlon, Jekyll Island, GA
-3
-5/13/2017
-Gator Bait Triathlon, Vicksburg, MS
-3
-5/14/2017
-Kansas City Triathlon
-3
-5/20/2017
-Tulsa Triathlon Sprint, Barnsdall
-3
-5/20/2017
-Joplin Memorial Marathon, Half
-3
-5/20/2017
-Aduddell Riverside 5 Miler, Tulsa
-3
-5/20/2017
-Fleet Feet Half Marathon, Tulsa
-3
-5/21/2017
-Tulsa Triathlon Olympic, Barnsdall
-3
-5/21/2017
-St. Louis Triathlon
-3
-5/27/2017
-New Orleans Triathlon
-3
-5/27/2017
-The Great Ozark Open Water Swim
-3
-6/2/2017
-Hospital Hill Run, Kansas City, MO
-3
-6/3/2017
-DeGray Lake Off-Road Triathlon, Arkadelphia
-3
-6/3/2017
-Oklahoma Tour de Cure Bike Ride, Tulsa
-3
-6/4/2017
-Ozark Valley Triathlon, Fayetteville
-3
-6/4/2017
-Offroad Tri Nationals, Open Water Swim, Arkadelphia
-3
-6/4/2017
-Tybee Island Triathlon, GA
-3
-6/10/2017
-Fresh Ideas Triathlon, Innsbrook, MO
-3
-6/10/2017
-Tulsa Tough, Tulsa
-3
-6/11/2017
-El Dorado Lake Triathlon, El Dorado, KS
-3
-6/10/2017
-Ft Greely Blast Off Triathlon, Ft Greely, AK
-3
-6/11/2017
-Tulsa Tough, Tulsa
-3
-6/17/2017
-Quad Cities Triathlon, Davenport, Iowa
-3
-6/18/2017
-Heartland Triathlon, Sebring, FL
-3
-6/24/2017
-Philadelphia Triathlon - Sprint
-3
-6/24/2017
-Sprint the Bend Triathlon, Rogers, AR
-3
-6/24/2017
-Tri the Boat, Steamboat Springs, CO
-3
-6/25/2017
-Philadelphia Triathlon - Olympic
-3
-6/25/2017
-Chris Brown Tulsa Duathlon, Tulsa
-3
-7/1/2017
-Secret City Triathlon, Oak Ridge, TN
-3
-7/4/2017
-Firecracker 5K, Tulsa
-3
-7/9/2017
-Mudwater Triathlon & Duathlon, Goddard, KS
-3
-7/9/2017
-New Town Tri, Saint Charles, MO
-3
-7/9/2017
-Open Options Triathlon, Shawnee Mission, KS
-3
-7/16/2017
-Waterfront Triathlon, Wichita
-3
-7/23/2017
-Toad Suck Tri Fest, Conway, AR
-3
-7/23/2017
-Evergreen Triathlon, Evergreen, CO
-3
-7/23/2017
-Donner Lake Triathlon, Truckee, CA
-3
-7/29/2017
-Sourdough Triathlon, Fairbanks, AK
-3
-7/30/2017
-Cypress Triathlon, Cypress, TX
-3
-7/30/2017
-Rocky Mountain Tri, Silverthorne, CO
-3
-8/5/2017
-Bedlam Run, Tulsa
-3
-8/11/2017
-Eureka Springs Triathlon
-3
-8/12/2017
-Eureka Springs Bike Ride
-3
-8/12/2017
-Riverside 5000, Tulsa
-3
-8/12/2017
-Age Group Olympic Nationals, Omaha
-3
-8/13/2017
-Age Group Sprint Nationals, Omaha
-3
-8/13/2017
-Eureka Springs 5K and 10K
-3
-8/19/2017
-DeGray Lake Olympic Tri, Arkadelphia
-3
-8/19/2017
-Svitak Freedom Ride, Joplin
-3
-8/19/2017
-Washington, NC Triathlon, Washington, NC
-3
-8/20/2017
-DeGray Lake Sprint Tri, Arkadelphia
-3
-8/20/2017
-Bluff Creek Triathlon, Boone, Iowa
-3
-8/27/2017
-Hotter 'N Hell Hundred, Wichita Falls, TX
-3
-9/2/2017
-TriFest for MS, Bentonville
-3
-9/2/2017
-Plutonium Man Triathlon, Richland, WA
-3
-9/3/2017
-Des Moines Escape Triathlon
-3
-9/4/2017
-Pat Griskus Triathlon, Cypress, TX
-3
-9/9/2017
-Pistol Pete 5K Race, Perkins
-3
-9/10/2017
-Nation's Triathlon, Washington, DC
-3
-9/16/2017
-Get Indoors and Tri, Bentonville
-3
-9/16/2017
-Tri Lakes Triathlon, Fort Wayne, IN
-3
-9/16/2017
-Redman Triathlon, Oklahoma City
-3
-9/17/2017
-Trifect Triathlon, Graford, TX
-3
-9/17/2017
-Disco Triathlon, Valley View, TX
-3
-9/17/2017
-Navy-Air Force Half Marathon, Washington, DC
-3
-9/23/2017
-Lake Geneva Triathlon, Lake Geneva, WI
-3
-9/23/2017
-Pryor Fever 5K ?, Pryor
-3
-10/1/2017
-New Orleans Escape Triathlon
-3
-10/1/2017
-Aquathlon Nationals, Austin, TX
-3
-10/7/2017
-Get Outdoors and Tri, Rogers, AR
-3
-10/7/2017
-Tulsa Zoo Run, Tulsa
-3
-10/8/2017
-6th Annual Oktoberfest Triathlon, Fulshear, TX
-3
-10/8/2017
-Atomic Man Triathlon, Lenoir City, TN
-3
-10/14/2017
-Run the Streets Woolaroc 8K
-3
-10/28/2017
-Tulsa Run, Tulsa
-3
-11/4/2017
-Jenks Half Marathon, Jenks
-3
-11/4/2017
-Roosevelt 5K ?, Pryor
-3
-11/5/2017
-Morro Bay Triathlon, Morro Bay, CA
-3
-11/11/2017
-Fayetteville Half Marathon
-3
-11/12/2017
-Long Course Tri Nationals, Miami, FL
-3
-11/18/2017
-Williams Route 66 5K, Tulsa
-3
-11/19/2017
-Williams Route 66 Marathon, Tulsa
-3
-12/9/2017
-Key West Triathlon
-3
-12/9/2017
-Jingle Bell Run, Tulsa
-3
-12/16/2017
-Fleet Feet Rudolph Run, Broken Arrow
+7/1/1867
+Canada Day

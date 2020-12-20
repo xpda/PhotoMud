@@ -71,7 +71,6 @@ Public Class clsCalendar
     n = cal.GetDaysInMonth(startDate.Year, startDate.Month)
     startDay = Weekday(New Date(startDate.Year, startDate.Month, 1)) - 1  ' day of week (0-6) of the first day of the month
     nWeeks = CInt(Ceiling((n + startDay) / 7))
-    ' If nWeeks = 4 ThennWeeks +=1
 
     xSize = rBox.Width / 7
     ySize = rBox.Height /  (nWeeks + 1.5) ' add another for the title line and half for the footer
@@ -83,7 +82,7 @@ Public Class clsCalendar
     tsizeFooter = 3.0 * tScale / 100
     'tsizeCaption = 1.2 * tScale / 100
     tsizeNumbers = 2.2 * tScale / 100
-    tsizeSmallMonths = 1.0 * tScale / 100
+    tsizeSmallMonths = 0.8 * tScale / 100
     tsizeLunar = 0.9 * tScale / 100
     tsizeNotes = 0.9 * tScale / 100
 
@@ -196,18 +195,18 @@ Public Class clsCalendar
     fmt.Alignment = StringAlignment.Near
     fmt.Trimming = StringTrimming.EllipsisCharacter
     ' lunar comments, upper lines
-    ix = CInt(rBox.X + tsizeLunar + tsizeNumbers * 1.1)  ' upper left corner of the lunar comments
+    ix = Int(rBox.X + tsizeLunar + tsizeNumbers * 1.1)  ' upper left corner of the lunar comments
     iy = rBox.Y + ySize + tsizeLunar  ' upper left corner
-    xs = CInt(xSize - (tsizeLunar + tsizeNumbers * 1.1))
+    xs = Floor(xSize - (tsizeLunar + tsizeNumbers * 1.1))
     ys = tsizeLunar * 4
     d = New Date(startDate.Year, startDate.Month, 1)
     k = d.DayOfYear
     For j = 1 To DateTime.DaysInMonth(d.Year, d.Month)
       If lunarComment(k) <> "" Then
         i = j + startDay - 1 ' day of year
-        x = ix + xSize * (i Mod 7)
-        y = iy + ySize * CInt(i / 7)
-        r = New Rectangle(CInt(x), CInt(y), CInt(xs), CInt(ys))
+        x = ix + xSize * Floor(i Mod 7)
+        y = iy + ySize * Floor(i / 7)
+        r = New Rectangle(Int(x), Int(y), Int(xs), Int(ys))
         g.DrawString(lunarComment(k), gFont, gBrush, r, fmt)
       End If
       k += 1
@@ -219,17 +218,17 @@ Public Class clsCalendar
     fmt.Alignment = StringAlignment.Near
     ' notes, on the bottom
     ix = rBox.X + tsizeNotes / 2 ' upper left corner of the notes
-    iy = CInt(rBox.Y + ySize + tsizeNumbers * 1.13) ' upper left corner
+    iy = Int(rBox.Y + ySize + tsizeNumbers * 1.13) ' upper left corner
     xs = xSize - tsizeNotes
-    ys = CInt(ySize - (tsizeNotes + tsizeNumbers * 1.1))
+    ys = Floor(ySize - (tsizeNotes + tsizeNumbers * 1.1))
     d = New Date(startDate.Year, startDate.Month, 1)
     k = d.DayOfYear
     For j = 1 To DateTime.DaysInMonth(d.Year, d.Month)
       If calComment(k) <> "" Then
         i = j + startDay - 1 ' day of year
         x = ix + xSize * (i Mod 7)
-        y = iy + ySize * CInt(i / 7)
-        r = New Rectangle(CInt(x), CInt(y), CInt(xs), CInt(ys))
+        y = iy + ySize * Floor(i / 7)
+        r = New Rectangle(Int(x), Int(y), Int(xs), Int(ys))
         g.DrawString(calComment(k), gFont, gBrush, r, fmt)
       End If
       k += 1
@@ -259,8 +258,8 @@ Public Class clsCalendar
 
     fmt.LineAlignment = StringAlignment.Center
     fmt.Alignment = StringAlignment.Center
-    xs = CInt(rBox.Width / 7)
-    ys = CInt(rBox.Height / (nwk + 2))
+    xs = Floor(rBox.Width / 7)
+    ys = Floor(rBox.Height / (nwk + 2))
 
     r.X = rBox.X
     r.Y = rBox.Y
@@ -482,7 +481,7 @@ Public Class clsCalendar
                 s = ss(iLine) : iLine += 1
 
               Case 5 ' relative to easter
-                d = easter(iYear)
+                d = wester(iYear)
                 k = CInt(sn(1))
                 d = d.Add(TimeSpan.FromDays(k))
 
@@ -520,7 +519,7 @@ Public Class clsCalendar
                 If calComment(k) = "" Then
                   calComment(k) = s
                 Else
-                  calComment(k) = calComment(k) & crlf & crlf & s
+                  calComment(k) = calComment(k) & crlf & s  ' was 2 crlfs
                 End If
               End If
             End If
@@ -567,32 +566,13 @@ Public Class clsCalendar
 
   End Sub
 
-  Function easter(ByRef yearr As Integer) As Date
-    Dim c As Integer
-    Dim y As Integer
-    Dim n As Integer
-    Dim k As Integer
-    Dim i As Integer
-    Dim j As Integer
-    Dim L As Integer
-    Dim m As Integer
-    Dim d As Integer
+  Function wester(yearr As Integer) As Date
+    Dim easter As Date
+    Dim d As Integer = (((255 - 11 * (yearr Mod 19)) - 21) Mod 30) + 21
 
-    y = yearr
-    c = CInt(y / 100)
-    n = y - 19 * CInt(y / 19)
-    k = CInt((c - 17) / 25)
-    i = c - CInt(c / 4) - CInt((c - k) / 3) + 19 * n + 15
-    i -= 30 * CInt(i / 30)
-    i -= CInt(i / 28) * (1 - CInt(i / 28) * CInt(29 / (i + 1)) * CInt((21 - n) / 11))
-    j = y + CInt(y / 4) + i + 2 - c + CInt(c / 4)
-    j -= 7 * CInt(j / 7)
-    L = i - j
-    m = 3 + CInt((L + 40) / 44)
-    d = L + 28 - 31 * CInt(m / 4)
-
-    easter = CDate(Format(m, "00") & "/" & Format(d, "00") & "/" & Format(y, "0000"))
-
+    easter = New Date(yearr, 3, 1)
+    easter = easter.AddDays(+d + (d > 48) + 6 - ((yearr + yearr \ 4 + d + (d > 48) + 1) Mod 7))
+    Return (easter)
   End Function
 
   Protected Overrides Sub Finalize()

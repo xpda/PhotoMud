@@ -2299,12 +2299,17 @@ Public Class frmExploref
   Sub addListviewItem(fname As String)
 
     Dim item As ListViewItem
-    Dim fInfo As FileInfo
+    Dim fInfo As FileInfo = Nothing
     Dim fIcon As Icon
     Dim k As Integer
 
     If Not (imgSmallIcons.Images.ContainsKey(Path.GetExtension(fname))) Then
-      fIcon = System.Drawing.Icon.ExtractAssociatedIcon(fname)
+      Try
+        fIcon = System.Drawing.Icon.ExtractAssociatedIcon(fname)
+      Catch ex As Exception
+        fIcon = SystemIcons.WinLogo
+      End Try
+
       If fIcon Is Nothing Then fIcon = SystemIcons.WinLogo
       imgSmallIcons.Images.Add(Path.GetExtension(fname), fIcon)
     End If
@@ -2314,11 +2319,16 @@ Public Class frmExploref
     item.Text = Path.GetFileName(fname)
     item.Name = item.Text ' for .find
     item.Tag = fname
-    fInfo = My.Computer.FileSystem.GetFileInfo(fname)
-    k = Round(fInfo.Length / 1000)
-    If k = 0 Then k = 1
-    item.SubItems.Add(Format(k, "#,##0 KB"))
-    item.SubItems.Add(Format(fInfo.LastWriteTime, "short date") & " " & Format(fInfo.LastWriteTime, "short time"))
+
+    Try
+      fInfo = My.Computer.FileSystem.GetFileInfo(fname)
+      k = Round(fInfo.Length / 1000)
+      item.SubItems.Add(Format(k, "#,##0 KB"))
+      item.SubItems.Add(Format(fInfo.LastWriteTime, "short date") & " " & Format(fInfo.LastWriteTime, "short time"))
+    Catch ex As Exception
+      MsgBox("addListviewItem: " & ex.Message)
+    End Try
+
     item.SubItems.Add("")
     ListView1.Items.Add(item)
 

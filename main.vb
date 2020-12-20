@@ -531,6 +531,7 @@ Public Module main
     fmtCommon.Add(New ImageFormat(".tif", "TIFF", ".tif;.tiff", True, True, False, MagickFormat.Tif))
     fmtCommon.Add(New ImageFormat(".raw", "Photo Raw", ".rw2;.cr2;.crw;.nef;.orf;.arw;.mrw;.dcr;.raf", True, False, False, MagickFormat.Raw))
     fmtCommon.Add(New ImageFormat(".wpg", "Word Perfect Graphics", ".wpg", True, False, False, MagickFormat.Wpg))
+    fmtCommon.Add(New ImageFormat(".webp", "Web Pic", ".webp", True, False, False, MagickFormat.WebP))
 
     exifInit()
 
@@ -538,13 +539,13 @@ Public Module main
     '       ".hrz;.ico;.icon;.jp2;.jpt;.j2c;.j2k;.jpg;.jpeg;.mat;.miff;.mrw;.mtv;.nef;.orf;.otb;.p7;.palm;.clipboard;.pbm;.pcd;.pcds;" & _
     '       ".pcx;.pdb;.pdf;.pef;.pfa;.pfb;.pfm;.pgm;.picon;.pict;.pix;.png;.pnm;.ppm;.ps;.ps2;.ps3;.psb;.psd;.ptif;" & _
     '       ".pwp;.raf;.rgb;.rgba;.rfg;.rla;.rle;.sct;.sfw;.sgi;.sun;.svg;.tga;.tif;.tiff;.tim;" & _
-    '       ".vicar;.viff;.wbmp;.wpg;.xbm;.xcf;.xpm;.xwd;.x3f"
+    '       ".vicar;.viff;.wbmp;.webp;.wpg;.xbm;.xcf;.xpm;.xwd;.x3f"
     '    extReadable = s.Split(";").ToList
 
     '    s = ".aai;.art;.avs;.bmp;.dcx;.dib;.epdf;.fax;.fits;.gif;.hdr;.hrz;.jp2;.jpt;.j2c;.j2k;.jpg;.jpeg;.miff;" & _
     '       ".mtv;.otb;.p7;.palm;.clipboard;.pam;.pbm;.pcd;.pcds;.pcx;.pdb;.pdf;.pfm;.pgm;.picon;.pict;.png;.pnm;.ppm;" & _
     '       ".ps;.ps2;.ps3;.psb;.psd;.ptif;.rgb;.rgba;.rfg;.rla;.rle;.sgi;.sun;.svg;.tga;.tif;.tiff;" & _
-    '       ".vicar;.viff;.wbmp;.xbm;.xpm;.xwd"
+    '       ".vicar;.viff;.wbmp;.webp;.xbm;.xpm;.xwd"
     '    extWritable = s.Split(";").ToList
 
     s = ".jpg;.jpeg;.png;.gif;.tif;.tiff;.bmp;.dib"
@@ -870,7 +871,7 @@ Public Module main
     iniFileType = New List(Of String)
 
     For Each fmt As ImageFormat In fmtCommon
-      For Each s As String In fmtCommon(i).Ext.Split(";")
+      For Each s As String In fmt.Ext.Split(";")
         iniFileType.Add(s)
       Next s
     Next fmt
