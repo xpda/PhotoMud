@@ -89,7 +89,7 @@ Public Module main
     Property isWritable As Boolean
     Property isMultiframe As Boolean
     Property MagickFmt As MagickFormat
-    Sub New(Id As String, Description As String, Ext As String, isReadable As Boolean, isWritable As Boolean, _
+    Sub New(Id As String, Description As String, Ext As String, isReadable As Boolean, isWritable As Boolean,
             isMultiframe As Boolean, MagickFmt As MagickFormat)
       Me.ID = Id.ToLower
       Me.Description = Description
@@ -456,7 +456,7 @@ Public Module main
     frmMain = New frmMainf
     frmExplore = New frmExploref
 
-        ProgramInit()
+    ProgramInit()
     setDefaults()
     getini()
     iniDBConnStr = getConnStr(iniDBhost, iniDBdatabase, iniDBuser, iniDBpassword)
@@ -749,7 +749,6 @@ Public Module main
 
   Sub setDefaults()
 
-    Dim i As Integer
     Dim separator() As Char = {" "} ' for raw file ext
 
     Try
@@ -1529,7 +1528,7 @@ Public Module main
 
   End Function
 
-  Function readThumbnail(width As Integer, height As Integer, fName As String, ByRef msg As String, _
+  Function readThumbnail(width As Integer, height As Integer, fName As String, ByRef msg As String,
     thumbStampOnly As Boolean, Optional Quality As InterpolationMode = InterpolationMode.Low) As Bitmap
 
     ' set width and height to zero to use original thumbstamp size.
@@ -2030,13 +2029,13 @@ Public Module main
     filenames = InputFilename() ' get files to open
 
     For i As Integer = 0 To filenames.Count - 1
-        rview = FileIsOpen(filenames(i))
-        If rview Is Nothing Then
-          rview = loadNew(filenames(i))
-        Else
-          If i = n Then rview.Activate(Nothing, Nothing)
-        End If
-      Next i
+      rview = FileIsOpen(filenames(i))
+      If rview Is Nothing Then
+        rview = loadNew(filenames(i))
+      Else
+        If i = n Then rview.Activate(Nothing, Nothing)
+      End If
+    Next i
 
   End Sub
   Sub LoadMruFile(ByVal index As Integer)
@@ -2086,7 +2085,7 @@ Public Module main
 
   Function GetWebData(ByRef url As String) As String
     ' get parameters from registry to pass to the web site for updpate check
-    Return url & "?version=" & My.Application.Info.Version.Major & "." & _
+    Return url & "?version=" & My.Application.Info.Version.Major & "." &
       My.Application.Info.Version.Minor & "." & My.Application.Info.Version.Build
   End Function
 
@@ -2120,7 +2119,7 @@ Public Module main
     End If
   End Function
 
-  Sub SetScreenSaver(ByVal saver0 As Boolean, ByVal saver1 As Boolean, ByVal saver2 As Boolean, _
+  Sub SetScreenSaver(ByVal saver0 As Boolean, ByVal saver1 As Boolean, ByVal saver2 As Boolean,
     ByRef settings() As Boolean)
     ' changes "settings"
 
@@ -2269,7 +2268,7 @@ Public Module main
 
   End Sub
 
-  Sub showPicture(ByVal fName As String, ByRef rview As pViewer, _
+  Sub showPicture(ByVal fName As String, ByRef rview As pViewer,
     ByVal Thumbnail As Boolean, ByRef pComments As List(Of PropertyItem), Optional ByVal redrawZoom As Integer = 0)
     ' zoomin = 0 for max size, no zoomin allowed.
     ' zoomin < 0 for scale to rview
@@ -3082,7 +3081,7 @@ Public Module main
           ix(k) = tix(j)
           j += 1
           ' ignore case when comparing strings 
-        ElseIf (isString AndAlso String.Compare(v(tix(i)), v(tix(j)), True) <= 0) OrElse _
+        ElseIf (isString AndAlso String.Compare(v(tix(i)), v(tix(j)), True) <= 0) OrElse
           (Not isString AndAlso v(tix(i)) <= v(tix(j))) Then
           ix(k) = tix(i)
           i += 1
@@ -3095,7 +3094,7 @@ Public Module main
       If max - min >= 1 Then
         k = min
         ' If v(ix(k)) > v(ix(k + 1)) Then ' compare first and second items
-        If isString AndAlso String.Compare(v(ix(k)), v(ix(k + 1)), True) > 0 OrElse _
+        If isString AndAlso String.Compare(v(ix(k)), v(ix(k + 1)), True) > 0 OrElse
           (Not isString) AndAlso v(ix(k)) > v(ix(k + 1)) Then
           i = ix(k) : ix(k) = ix(k + 1) : ix(k + 1) = i ' swap
         End If
@@ -3301,8 +3300,8 @@ Public Module main
 
   End Function
 
-  Function lineIntersect(ByRef x1 As Double, ByRef y1 As Double, ByRef x2 As Double, ByRef y2 As Double, _
-    ByRef x3 As Double, ByRef y3 As Double, ByRef x4 As Double, ByRef y4 As Double, _
+  Function lineIntersect(ByRef x1 As Double, ByRef y1 As Double, ByRef x2 As Double, ByRef y2 As Double,
+    ByRef x3 As Double, ByRef y3 As Double, ByRef x4 As Double, ByRef y4 As Double,
     ByRef xi As Double, ByRef yi As Double) As Integer
 
     ' get the intersecting point of two lines
@@ -3357,7 +3356,7 @@ Public Module main
 
   End Sub
 
-  Sub alignDraw(ByRef mView As mudViewer, ByRef qBmp As Bitmap, _
+  Sub alignDraw(ByRef mView As mudViewer, ByRef qBmp As Bitmap,
     ByRef rX() As Double, ByRef rY() As Double, npts As Integer)
     ' move the four points to the four corners. Similar to stretchDraw, but backwards.
     ' paste onto mView. qBmp is used as a temporary field
@@ -3384,7 +3383,7 @@ Public Module main
   End Sub
 
 
-  Sub stretchDraw(ByRef mView As mudViewer, ByRef qBmp As Bitmap, _
+  Sub stretchDraw(ByRef mView As mudViewer, ByRef qBmp As Bitmap,
     ByRef destX() As Double, ByRef destY() As Double, npts As Integer)
 
     ' paste onto mView. qBmp is used as a temporary field
@@ -3537,7 +3536,7 @@ Public Module main
 
   End Sub
 
-  Sub mouseWheelZoom(ByRef rview As pViewer, ByRef e As MouseEventArgs, ByRef timer1 As Timer, _
+  Sub mouseWheelZoom(ByRef rview As pViewer, ByRef e As MouseEventArgs, ByRef timer1 As Timer,
     ByVal zoomFac As Double, Optional ByVal paintQuality As InterpolationMode = InterpolationMode.Low)
     ' use paintquality. If there is a timer1, then set it to 350 ms so it can be redrawn in the calling form at bicubic.
     ' zoomfac is how much to zoom per wheel click
@@ -3581,7 +3580,7 @@ Public Module main
     If timer1 IsNot Nothing Then timer1.Interval = 350 : timer1.Start() ' redraw high quality in 350 milliseconds
   End Sub
 
-  Function getShadow(ByRef gImage As Bitmap, ByVal shadowOffset As Integer, ByVal backColor As System.Drawing.Color, _
+  Function getShadow(ByRef gImage As Bitmap, ByVal shadowOffset As Integer, ByVal backColor As System.Drawing.Color,
     ByVal thumbX As Integer, ByVal thumbY As Integer) As Bitmap
     ' adds a fuzzy shadow around an image, returns gdi image.
     ' Called by frmexplore and frmwebpage
@@ -3593,8 +3592,8 @@ Public Module main
     If gImage Is Nothing Then Return Nothing
 
     Using _
-        shadowImg As Bitmap = New Bitmap(thumbX + shadowOffset, thumbY + shadowOffset, _
-          System.Drawing.Imaging.PixelFormat.Format32bppPArgb), _
+        shadowImg As Bitmap = New Bitmap(thumbX + shadowOffset, thumbY + shadowOffset,
+          System.Drawing.Imaging.PixelFormat.Format32bppPArgb),
         shadowG As Graphics = Graphics.FromImage(shadowImg)
 
       xoff = (thumbX - gImage.Width) / 2
@@ -3605,7 +3604,7 @@ Public Module main
       p(2).X = shadowOffset + xoff : p(2).Y = gImage.Height + yoff
       drawFuzzyShadow(p, System.Drawing.Color.FromArgb(255, 60, 60, 60), backColor, shadowOffset, shadowG)
       ' this line covers up a bug in the lineargradientbrush.
-      shadowG.FillRectangle(New SolidBrush(System.Drawing.Color.FromArgb(255, 60, 60, 60)), xoff + 1, yoff + 1, _
+      shadowG.FillRectangle(New SolidBrush(System.Drawing.Color.FromArgb(255, 60, 60, 60)), xoff + 1, yoff + 1,
         gImage.Width, gImage.Height)
 
       Try
@@ -3619,7 +3618,7 @@ Public Module main
 
   End Function
 
-  Sub drawFuzzyShadow(ByVal pCorner() As PointF, ByVal color1 As System.Drawing.Color, ByVal color2 As System.Drawing.Color, _
+  Sub drawFuzzyShadow(ByVal pCorner() As PointF, ByVal color1 As System.Drawing.Color, ByVal color2 As System.Drawing.Color,
     ByVal offset As Integer, ByVal g As Graphics)
 
     Dim i, j As Integer
@@ -3635,7 +3634,7 @@ Public Module main
       ' add offset to the circle points
       For i = 0 To 12 : pz(i).X = fuzCircle(i).X * offset + pCorner(j).X : pz(i).Y = fuzCircle(i).Y * offset + pCorner(j).Y : Next i
       Using _
-        fuzzyGPath As GraphicsPath = New GraphicsPath(pz, fuzType), _
+        fuzzyGPath As GraphicsPath = New GraphicsPath(pz, fuzType),
         fuzzyPBrush As PathGradientBrush = New PathGradientBrush(fuzzyGPath)
 
         fuzzyPBrush.SurroundColors = fcolor
@@ -3868,8 +3867,8 @@ Public Module main
     imgLviewState.Images.Clear()
     imgLviewState.ImageSize = New Size(iWidth, iHeight)
     Using _
-      img As Bitmap = New Bitmap(imgLviewState.ImageSize.Width, imgLviewState.ImageSize.Height, PixelFormat.Format32bppPArgb), _
-      g As Graphics = Graphics.FromImage(img), _
+      img As Bitmap = New Bitmap(imgLviewState.ImageSize.Width, imgLviewState.ImageSize.Height, PixelFormat.Format32bppPArgb),
+      g As Graphics = Graphics.FromImage(img),
       gBrush As SolidBrush = New SolidBrush(backColor)
 
       g.FillRectangle(gBrush, 0, 0, img.Width, img.Height)
@@ -4172,7 +4171,7 @@ Public Module main
 
         Case 1 ' both
 
-          If (hemi(0) = "N" Or hemi(0) = "S") And (hemi(1) = "N" Or hemi(1) = "S") Or _
+          If (hemi(0) = "N" Or hemi(0) = "S") And (hemi(1) = "N" Or hemi(1) = "S") Or
               (hemi(0) = "E" Or hemi(0) = "W") And (hemi(1) = "E" Or hemi(1) = "W") Then
             msg = "Please use N or S and E or W."
           End If
@@ -4376,7 +4375,7 @@ Public Module main
 
       Else ' use the original region for clipping
         Using _
-            g As Graphics = Graphics.FromImage(pView.FloaterBitmap), _
+            g As Graphics = Graphics.FromImage(pView.FloaterBitmap),
             rgPath As GraphicsPath = gPath.Clone
 
           mx.Translate(-pView.FloaterPosition.X, -pView.FloaterPosition.Y)
@@ -4409,7 +4408,7 @@ Public Module main
 
       Else ' use the original path for clipping
         Using _
-            g As Graphics = Graphics.FromImage(pView.FloaterBitmap), _
+            g As Graphics = Graphics.FromImage(pView.FloaterBitmap),
             rgPath As GraphicsPath = gPath.Clone
 
           mx.Translate(-pView.FloaterPosition.X, -pView.FloaterPosition.Y)
@@ -4719,7 +4718,7 @@ Public Module main
         If Format < 0 Then Format = MagickFormat.Unknown
       End If
 
-      If saveSize.Width <> 0 And saveSize.Height <> 0 AndAlso _
+      If saveSize.Width <> 0 And saveSize.Height <> 0 AndAlso
         (saveSize.Width < bmp.Width Or saveSize.Height < bmp.Height) Or expandSize Then
         ' resize and save
         Using pview As New pViewer
@@ -5226,7 +5225,7 @@ Public Module main
     Dim p As New List(Of PropertyItem)
 
     Try
-      Using iStream As New FileStream(fName, FileMode.Open, FileAccess.Read), _
+      Using iStream As New FileStream(fName, FileMode.Open, FileAccess.Read),
         bmp As Bitmap = Image.FromStream(iStream, True, False)
 
         For Each prop As PropertyItem In bmp.PropertyItems
