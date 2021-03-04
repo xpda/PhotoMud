@@ -1135,9 +1135,9 @@ Public Module bugMain
 
     ' gets a file name for when the source(picpath) and targets(folder) are/have different folders (assumed)
 
+    Dim oldtest As Boolean
     Dim i As Integer
     Dim s, s1, matchPath, fname As String
-    Dim lastpicmatch As String = ""
     Dim c As String
     Dim fnames As List(Of String)
 
@@ -1145,43 +1145,58 @@ Public Module bugMain
     s1 = targetFolder
     If Not s1.EndsWith("\") Then s1 &= "\"
     s = Path.GetFileNameWithoutExtension(picpath)
+
+
     ' append a-z... use a, or the last one that exists (if any do).
-
     ' find the last match with matching originalpath
-    exists = False
-    c = "a"
-    fnames = Directory.GetFiles(s1, s & "?.jpg").ToList
-    fnames.Sort()
 
-    matchPath = picpath.Substring(1) ' any drive
-    For i1 As Integer = fnames.Count - 1 To 0 Step -1
-      fname = fnames(i1)
-      c = Path.GetFileNameWithoutExtension(fname)
-      c = c.Substring(c.Length - 1, 1)
-      i = getScalar("SELECT count(*) FROM images WHERE substr(originalpath, 2) = @parm1 and filename = @parm2", matchPath, s & c & ".jpg")
-      If i > 0 Then
-        exists = True
-        Exit For
+    oldtest = False
+    If Not oldtest Then
+      c = ""
+      exists = False
+      fnames = Directory.GetFiles(s1, s & "?.jpg").ToList
+      fnames.Sort()
+
+      matchPath = picpath.Substring(1) ' any drive
+      For i1 As Integer = fnames.Count - 1 To 0 Step -1
+        fname = fnames(i1)
+        c = Path.GetFileNameWithoutExtension(fname)
+        c = c.Substring(c.Length - 1, 1)
+        i = getScalar("SELECT count(*) FROM images WHERE substr(originalpath, 2) = @parm1 and filename = @parm2", matchPath, s & c & ".jpg")
+        If i > 0 Then
+          exists = True
+          Return (s & c & ".jpg")  ' filename without path
+        End If
+      Next i1
+
+      If c = "" Then c = "a" Else c = Chr(Asc(c) + 1)
+      Return (s & c & ".jpg")  ' filename without path
+
+    Else
+      Dim lastpicmatch As String = ""
+      lastpicmatch = ""
+      c = ""
+      If File.Exists(s1 & s & c & ".jpg") Then
+        Do While File.Exists(s1 & s & c & ".jpg")
+          ' find the last match with matching originalpath
+          matchPath = picpath.Substring(1) ' any drive
+          i = getScalar("SELECT count(*) FROM images WHERE substr(originalpath, 2) = @parm1 and filename = @parm2", matchPath, s & c & ".jpg")
+          If i > 0 Then lastpicmatch = c
+          c = Chr(Asc(c) + 1)
+        Loop
+
+        If lastpicmatch <> "" Then
+          c = lastpicmatch
+          exists = True
+        Else
+          exists = False
+        End If
+      Else
+        exists = False
       End If
-    Next i1
 
-    'If File.Exists(s1 & s & c & ".jpg") Then
-    'Do While File.Exists(s1 & s & c & ".jpg")
-    '  find the last match with matching originalpath
-    '  matchPath = picpath.Substring(1) ' any drive
-    '  i = getScalar("SELECT count(*) FROM images WHERE substr(originalpath, 2) = @parm1 and filename = @parm2", matchPath, s & c & ".jpg")
-    '  If i > 0 Then lastpicmatch = c
-    '  c = Chr(Asc(c) + 1)
-    'Loop
-
-    'If lastpicmatch <> "" Then
-    'c = lastpicmatch
-    'exists = True
-    'Else
-    'exists = False
-    'End If
-
-    Return (s & c & ".jpg")  ' filename without path
+      Return (s & c & ".jpg")  ' filename without path
+    End If
 
   End Function
 
